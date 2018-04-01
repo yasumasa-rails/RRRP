@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<!-- saved from url=(0092)https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify -->
+<html lang="ja" dir="ltr" class="" data-ffo-opensans="true" data-ffo-zillaslab="false"><head prefix="og: http://ogp.me/ns#"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <script async="" src="./JSON.stringify() - JavaScript _ MDN_files/analytics.js.ダウンロード"></script><script>(function(d) { d.className = d.className.replace(/\bno-js/, ''); })(document.documentElement);</script>
+  <title>JSON.stringify() - JavaScript | MDN</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="index, follow">
+    <link rel="home" href="https://developer.mozilla.org/ja/">
+    <link rel="license" href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#license">
+  
+
+  
+    
+    
+
+    <link href="./JSON.stringify() - JavaScript _ MDN_files/mdn.5e883c91cc88.css" rel="stylesheet" type="text/css">
+
+    
+  
+
+    <link href="./JSON.stringify() - JavaScript _ MDN_files/wiki.b6f31ca9a664.css" rel="stylesheet" type="text/css">
+
+
+    
+
+  <link href="./JSON.stringify() - JavaScript _ MDN_files/locale-ja.7f758aed61b8.css" rel="stylesheet" type="text/css">
+
+  
+    <script type="text/javascript" src="./JSON.stringify() - JavaScript _ MDN_files/mozilla-dnthelper.3936bd979b1d.js.ダウンロード" charset="utf-8"></script>
+    
+
+<script type="text/javascript">
+    // only load GA if DNT is not enabled
+    if (Mozilla && !Mozilla.dntEnabled()) {
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-36116321-5', 'mozilla.org');
+        ga('set', 'anonymizeIp', true);
+
+        
+
+        // dimension9 == "Section editing"
+        
+            // dimension12 == 'Page Revision'
+            ga('set', 'dimension12', '1349030');
+            // dimension17 == 'English Slug'
+            ga('set', 'dimension17', 'Web/JavaScript/Reference/Global_Objects/JSON/stringify');
+
+        (function() {
+            // http://cfsimplicity.com/61/removing-analytics-clutter-from-campaign-urls
+            var win = window;
+            var removeUtms = function(){
+                var location = win.location;
+                if (location.href.indexOf('utm') != -1 && win.history.replaceState) {
+                    win.history.replaceState({}, '', location.pathname);
+                }
+            };
+
+            ga('send', 'pageview', {'hitCallback': removeUtms});
+        })();
+    }
+</script>
+
+  
+    <!-- common social tags -->
+    
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://cdn.mdn.mozilla.net/static/img/opengraph-logo.72382e605ce3.png">
+    <meta property="og:site_name" content="MDN ウェブドキュメント">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://cdn.mdn.mozilla.net/static/img/opengraph-logo.72382e605ce3.png">
+    <meta name="twitter:site" content="@MozDevNet">
+    <meta name="twitter:creator" content="@MozDevNet">
+    <link rel="search" type="application/opensearchdescription+xml" href="https://developer.mozilla.org/ja/search/xml" title="MDN ウェブドキュメント">
+  
+
+  <!-- third-generation iPad with high-resolution Retina display: -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://cdn.mdn.mozilla.net/static/img/favicon144.e7e21ca263ca.png">
+  <!-- iPhone with high-resolution Retina display: -->
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://cdn.mdn.mozilla.net/static/img/favicon114.d526f38b09c5.png">
+  <!-- first- and second-generation iPad: -->
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://cdn.mdn.mozilla.net/static/img/favicon72.cc65d1d762a0.png">
+  <!-- non-Retina iPhone, iPod Touch, and Android 2.1+ devices: -->
+  <link rel="apple-touch-icon-precomposed" href="https://cdn.mdn.mozilla.net/static/img/favicon57.de33179910ae.png">
+  <!-- basic favicon -->
+  <link rel="shortcut icon" href="https://cdn.mdn.mozilla.net/static/img/favicon32.7f3da72dcea1.png">
+  <!--[if IE]>
+  <meta http-equiv="imagetoolbar" content="no">
+  <script type="text/javascript" src="https://cdn.mdn.mozilla.net/static/build/js/html5shiv.3948ccddab6f.js" charset="utf-8"></script>
+  <![endif]-->
+
+  <script type="text/javascript" src="./JSON.stringify() - JavaScript _ MDN_files/font-check.713e9d01025c.js.ダウンロード" charset="utf-8"></script>
+
+  
+  <link rel="dns-prefetch" href="https://interactive-examples.mdn.mozilla.net/" pr="0.75">
+  <link rel="preconnect" href="https://interactive-examples.mdn.mozilla.net/" pr="0.75">
+
+  <link rel="preload" href="https://interactive-examples.mdn.mozilla.net/js/codemirror-5-31-0.js" as="script">
+  <link rel="preload" href="https://interactive-examples.mdn.mozilla.net/js/editor-js.js" as="script">
+
+  <link rel="alternate" type="application/json" href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify$json">
+  <link rel="canonical" href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+
+  
+    
+      <link rel="alternate" hreflang="en-US" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" title="JSON.stringify()">
+    
+      <link rel="alternate" hreflang="ar" href="https://developer.mozilla.org/ar/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" title="JSON.stringify()">
+    
+      <link rel="alternate" hreflang="ca" href="https://developer.mozilla.org/ca/docs/Web/JavaScript/Referencia/Objectes_globals/JSON/stringify" title="JSON.stringify()">
+    
+      <link rel="alternate" hreflang="de" href="https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" title="JSON.stringify()">
+    
+      <link rel="alternate" hreflang="es" href="https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/JSON/stringify" title="JSON.stringify()">
+    
+      <link rel="alternate" hreflang="fr" href="https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/JSON/stringify" title="JSON.stringify">
+    
+      <link rel="alternate" hreflang="it" href="https://developer.mozilla.org/it/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" title="JSON.stringify()">
+    
+      <link rel="alternate" hreflang="ko" href="https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" title="JSON.stringify()">
+    
+      <link rel="alternate" hreflang="pt-BR" href="https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" title="JSON.stringify()">
+    
+      <link rel="alternate" hreflang="ru" href="https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" title="JSON.stringify()">
+    
+      <link rel="alternate" hreflang="uk" href="https://developer.mozilla.org/uk/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" title="JSON.stringify()">
+    
+      <link rel="alternate" hreflang="zh-CN" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" title="JSON.stringify()">
+    
+      <link rel="alternate" hreflang="zh-TW" href="https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" title="JSON.stringify()">
+    
+  
+
+  <!-- document-specific social tags -->
+  <meta property="og:title" content="JSON.stringify()">
+  <meta property="og:url" content="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+  <meta name="twitter:url" content="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+  <meta name="twitter:title" content="JSON.stringify()">
+  
+  <meta property="og:description" content="JSON.stringify() メソッドはある JavaScript の値を JSON 文字列に変換します。置き換え関数を指定して値を置き換えたり、置き換え配列を指定して指定されたプロパティのみを含むようにしたりすることができます。">
+  <meta name="description" content="JSON.stringify() メソッドはある JavaScript の値を JSON 文字列に変換します。置き換え関数を指定して値を置き換えたり、置き換え配列を指定して指定されたプロパティのみを含むようにしたりすることができます。">
+  <meta name="twitter:description" content="JSON.stringify() メソッドはある JavaScript の値を JSON 文字列に変換します。置き換え関数を指定して値を置き換えたり、置き換え配列を指定して指定されたプロパティのみを含むようにしたりすることができます。">
+  
+
+<link href="./JSON.stringify() - JavaScript _ MDN_files/wiki-compat-tables.427d3667f370.css" type="text/css" rel="stylesheet"><script async="" data-manual="true" src="./JSON.stringify() - JavaScript _ MDN_files/syntax-prism.05dc5663d445.js.ダウンロード"></script></head>
+<body data-slug="Web/JavaScript/Reference/Global_Objects/JSON/stringify" contextmenu="edit-history-menu" data-search-url="" class="document  ">
+
+  <script type="text/javascript">
+    // make sure global mdn object exists
+    var mdn = window.mdn || {};
+
+    (function(win) {
+        'use strict';
+
+        (function(){
+  var FLAGS = {
+    'compat_data': true,'kumaediting': false,'line_length': true,'page_move': false,'registration_disabled': false,'search_suggestions': false,'section_edit': false,'sg_task_completion': false,'spam_admin_override': false,'spam_checks_enabled': true,'spam_spammer_override': false,'spam_submissions_enabled': false,'spam_testing_mode': false,'wiki_samples': true,'wiki_spam_exempted': false,'wiki_spam_training': false
+    },
+    SWITCHES = {
+    'wiki_error_on_delete': false,'wiki_force_immediate_rendering': false,'enable_optimizely': false,'welcome_email': true,'application_ACAO': true,'store_revision_ips': true,'dumb_doc_urls': true,'newsletter': true,'newsletter_article': true,'foundation_callout': false,'helpful-survey-2': true,'wiki_spam_training': true
+    },
+    SAMPLES = {
+    
+    };
+  window.waffle = {
+    "flag_is_active": function waffle_flag(flag_name) {
+      
+      return !!FLAGS[flag_name];
+    },
+    "switch_is_active": function waffle_switch(switch_name) {
+      
+      return !!SWITCHES[switch_name];
+    },
+    "sample_is_active": function waffle_sample(sample_name) {
+      
+      return !!SAMPLES[sample_name];
+    },
+    "FLAGS": FLAGS,
+    "SWITCHES": SWITCHES,
+    "SAMPLES": SAMPLES
+  };
+})();
+
+
+        // This needs to be set before ckeditor.js loads
+        window.CKEDITOR_BASEPATH = '/static/js/libs/ckeditor/build/ckeditor/';
+
+        // Site configuration
+        win.mdn.ckeditor = {};
+        win.mdn.features = {};
+        win.mdn.staticPath = 'https://cdn.mdn.mozilla.net/static/';
+        win.mdn.wiki = {
+            autosuggestTitleUrl: '/ja/docs/get-documents'
+        };
+        win.mdn.assets = {
+            css: {
+                'editor-content': ['https://cdn.mdn.mozilla.net/static/build/styles/editor-content.a7ed0a79c0d6.css','https://cdn.mdn.mozilla.net/static/build/styles/editor-locale-ja.7f758aed61b8.css',
+                ],
+
+                'wiki-compat-tables': ['https://cdn.mdn.mozilla.net/static/build/styles/wiki-compat-tables.427d3667f370.css',]
+            },
+            js: {
+                'syntax-prism': ['https://cdn.mdn.mozilla.net/static/build/js/syntax-prism.05dc5663d445.js',],
+                'wiki-compat-tables': ['https://cdn.mdn.mozilla.net/static/build/js/wiki-compat-tables.003f4acf76ea.js',]
+            }
+        };
+
+        win.mdn.notifications = [];
+
+        
+
+        // interactive editor config
+        win.mdn.interactiveEditor = {
+            siteUrl: "https://developer.mozilla.org",
+            editorUrl: "https://interactive-examples.mdn.mozilla.net"
+        };
+
+    })(this);
+</script>
+    
+  <ul id="nav-access">
+    <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#document-main" id="skip-main">本文へ移動</a></li>
+    <li><a id="skip-language" href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#language">言語の選択</a></li>
+    <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#q" id="skip-search">検索へ移動</a></li>
+  </ul>
+
+  <!-- Header -->
+  <header id="main-header"><div class="center">
+    <a href="https://developer.mozilla.org/ja/" class="logo">MDN ウェブドキュメント</a>
+
+    <div id="nav-sec">
+      <ul>
+      <li class="nav-login"><div class="login">
+    
+        
+        <a href="https://developer.mozilla.org/users/github/login/?next=%2Fja%2Fdocs%2FWeb%2FJavaScript%2FReference%2FGlobal_Objects%2FJSON%2Fstringify" class="login-link js-login-link" data-service="GitHub">
+            ログイン
+            <i class="icon-github" aria-hidden="true"></i>
+        </a>
+    
+</div></li>
+      </ul>
+    </div>
+
+    <nav id="main-nav" class="nav-main" role="navigation"><ul><li class="nav-main-item"><a href="https://developer.mozilla.org/ja/docs/Web">テクノロジー<i aria-hidden="true" class="icon-caret-down"></i></a>
+      <div class="submenu js-submenu" id="nav-tech-submenu">
+        <div class="submenu-column">
+          <ul>
+            <li><a href="https://developer.mozilla.org/ja/docs/Web/HTML">HTML</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Web/CSS">CSS</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript">JavaScript</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Web/Guide/Graphics">グラフィックス</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Web/HTTP">HTTP</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Web/API">API / DOM</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Mozilla/Add-ons/WebExtensions">ブラウザー拡張機能</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Web/MathML">MathML</a></li>
+          </ul>
+        </div></div></li><li class="nav-main-item"><a href="https://developer.mozilla.org/ja/docs/Learn">リファレンスとガイド<i aria-hidden="true" class="icon-caret-down"></i></a>
+        <div class="submenu js-submenu" id="nav-learn-submenu">
+        <div class="submenu-column">
+          <ul>
+            <li><a href="https://developer.mozilla.org/ja/docs/Learn">ウェブ開発について学ぶ</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Web/Tutorials">チュートリアル</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Web/Reference">リファレンス</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Web/Guide">開発者ガイド</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Web/Accessibility">アクセシビリティ</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Games">ゲーム開発</a></li>
+            <li><a href="https://developer.mozilla.org/ja/docs/Web">...さらに見る</a></li>
+          </ul>
+        </div>
+      </div>
+      </li><li class="nav-main-item"><a href="https://developer.mozilla.org/ja/docs/MDN/Feedback">フィードバック<i aria-hidden="true" class="icon-caret-down"></i></a>
+        <div class="submenu js-submenu" id="nav-contact-submenu">
+          <div class="submenu-column">
+            <ul>
+              <li><a href="https://support.mozilla.org/">Firefox のサポートを得る<i aria-hidden="true" class="icon-external-link"></i></a></li>
+              <li><a href="https://stackoverflow.com/">ウェブ開発のサポートを得る<i aria-hidden="true" class="icon-external-link"></i></a></li>
+            </ul>
+            <ul>
+              <li><a href="https://developer.mozilla.org/ja/docs/MDN/Community">MDN コミュニティに参加</a></li>
+              <li><a target="_blank" href="https://bugzilla.mozilla.org/form.doc?bug_file_loc=https%3A//developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">コンテンツの問題を報告<i aria-hidden="true" class="icon-external-link"></i></a></li>
+              <li><a target="_blank" href="https://bugzilla.mozilla.org/form.mdn">バグを報告<i aria-hidden="true" class="icon-external-link"></i></a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+      <li class="nav-main-search"><form action="https://developer.mozilla.org/ja/search" method="get" role="search">
+        <div class="search-wrap">
+          <label for="main-q" class="offscreen">検索</label>
+          <input type="search" id="main-q" name="q" placeholder="検索" data-value="" value="">
+          <span class="search-trigger"><i aria-hidden="true" class="icon-search"></i></span>
+          <button type="submit" class="offscreen">検索</button>
+        </div>
+      </form></li>
+    </ul></nav>
+  </div></header> 
+
+  <!-- Content will go here -->
+  <main id="content">
+      
+  <!-- heading -->
+  <div id="wiki-document-head" class="document-head">
+    <div class="center">
+      <!-- action buttons -->
+      <div class="document-actions">
+        
+
+  
+    
+    
+  
+
+  
+    
+  
+
+  
+
+  <ul class="page-buttons">
+      <li><button id="languages-menu" class="transparent" aria-haspopup="true" aria-owns="languages-menu-submenu" aria-expanded="false"><span>言語</span><i aria-hidden="true" class="icon-language"></i></button>
+
+        <div class="submenu js-submenu" id="languages-menu-submenu">
+          <div class="submenu-column">
+            <ul id="translations">
+              
+                
+                
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" data-locale="en-US" title="英語 (アメリカ)">English (US) (en-US)</a></bdi></li>
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/ar/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" data-locale="ar" title="アラビア語">عربي (ar)</a></bdi></li>
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/ca/docs/Web/JavaScript/Referencia/Objectes_globals/JSON/stringify" data-locale="ca" title="カタルーニャ語">Català (ca)</a></bdi></li>
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" data-locale="de" title="ドイツ語">Deutsch (de)</a></bdi></li>
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/JSON/stringify" data-locale="es" title="スペイン語">Español (es)</a></bdi></li>
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/JSON/stringify" data-locale="fr" title="フランス語">Français (fr)</a></bdi></li>
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/it/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" data-locale="it" title="イタリア語">Italiano (it)</a></bdi></li>
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" data-locale="ko" title="韓国語">한국어 (ko)</a></bdi></li>
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" data-locale="pt-BR" title="ポルトガル語 (ブラジル)">Português (do&nbsp;Brasil) (pt-BR)</a></bdi></li>
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" data-locale="ru" title="ロシア語">Русский (ru)</a></bdi></li>
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/uk/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" data-locale="uk" title="ウクライナ語">Українська (uk)</a></bdi></li>
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" data-locale="zh-CN" title="中国語 (簡体字)">中文 (简体) (zh-CN)</a></bdi></li>
+                
+                  <li><bdi><a rel="internal" href="https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" data-locale="zh-TW" title="中国語 (繁体字)">正體中文 (繁體) (zh-TW)</a></bdi></li>
+                
+              
+
+              
+            </ul>
+          </div>
+        </div>
+      </li>
+      
+      <li class="page-buttons-edit"><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify$edit" class="button neutral" id="edit-button" rel="nofollow">編集<i aria-hidden="true" class="icon-pencil"></i></a></li>
+      
+
+        
+
+        <li class="page-buttons-advanced"><button id="advanced-menu" class="only-icon" aria-haspopup="true" aria-owns="advanced-menu-submenu" aria-expanded="false"><span>詳細</span><i aria-hidden="true" class="icon-cog"></i></button>
+        <div class="submenu js-submenu" id="advanced-menu-submenu">
+          <!-- this page -->
+          <div class="submenu-column">
+            <div class="title">詳細</div>
+            <ul>
+                <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify$history" rel="nofollow">履歴</a></li>
+                
+                
+                
+
+
+                
+
+                
+                
+                
+                <li class="page-print"><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#" onclick="return window.print();">この記事を印刷</a></li>
+            </ul>
+          </div>
+        </div>
+  </li></ul>
+      </div>
+
+      <div class="document-title">
+        
+
+        <h1>JSON.stringify()</h1>
+      </div>
+    </div>
+  </div>
+  
+  <div id="toc" class="toc">
+    <div class="center">
+      <div class="toc-head">ここへジャンプ:</div>
+        <ol class="toc-links">
+          <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Syntax" rel="internal" class="">構文</a></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description" rel="internal" class="">説明</a></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Specifications" rel="internal">仕様策定状況</a></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Browser_compatibility" rel="internal">ブラウザー実装状況</a></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#See_also" rel="internal">関連情報</a>
+        </li></ol>
+    </div>
+  </div>
+  
+
+      <div class="center clear">
+      
+
+    <div class="wiki-main-content" id="document-main" role="main"><div class="center">
+      <!-- start the main content container -->
+        <div id="wiki-column-container" class="wiki-left-present">
+
+          <!-- content row with three strips -->
+          <div class="column-container column-container-reverse">
+
+            <!-- center: main article content -->
+            <div id="wiki-content" class="column-main wiki-column text-content">
+
+              
+
+              
+              
+
+              
+
+              
+                
+              
+              
+
+              <!-- just the article content -->
+              <article id="wikiArticle">
+                
+                  
+                    <div></div>
+
+<p><strong><code>JSON.stringify()</code></strong> メソッドはある JavaScript の値を JSON 文字列に変換します。置き換え関数を指定して値を置き換えたり、置き換え配列を指定して指定されたプロパティのみを含むようにしたりすることができます。</p>
+
+<div><iframe src="./JSON.stringify() - JavaScript _ MDN_files/json-stringify.html" class="interactive interactive-js " width="100%" frameborder="0" height="250"></iframe></div>
+<p class="hidden">この対話型サンプルのソースファイルは GitHub リポジトリに格納されています。対話型サンプルプロジェクトに協力したい場合は、 <a href="https://github.com/mdn/interactive-examples" class="external external-icon" rel="noopener">https://github.com/mdn/interactive-examples</a> をクローンしてプルリクエストを送信してください。</p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox"><code>JSON.stringify(<var>value</var>[, <var>replacer</var>[, <var>space</var>]])</code></pre>
+
+<h3 id="Parameters" name="Parameters" class="highlight-spanned"><span class="highlight-span">引数</span></h3>
+
+<dl>
+ <dt><code>value</code></dt>
+ <dd>JSON 文字列に変換する値。</dd>
+ <dt><code>replacer</code> <span class="inlineIndicator optional optionalInline">Optional</span></dt>
+ <dd>文字列化の手順の挙動を変更する関数、または値のオブジェクトを JSON 文字列に含めるプロパティを選択するホワイトリストとして機能する <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String" title="String グローバルオブジェクトは文字列のコンストラクタ、または文字列シーケンスです。"><code>String</code></a> と <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Number" title="Number JavaScript オブジェクトは、数値に作用するラッパーオブジェクトです。Number オブジェクトは、Number() コンストラクタを用いて生成します。"><code>Number</code></a> オブジェクトの配列。もしこの値が null であるか提供されない場合は、結果の文字列にオブジェクトのすべてのプロパティが含まれます。</dd>
+ <dt><code>space</code> <span class="inlineIndicator optional optionalInline">Optional</span></dt>
+ <dd>出力する JSON 文字列に可読性を目的に空白を挿入するために使う <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String" title="String グローバルオブジェクトは文字列のコンストラクタ、または文字列シーケンスです。"><code>String</code></a> または <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Number" title="Number JavaScript オブジェクトは、数値に作用するラッパーオブジェクトです。Number オブジェクトは、Number() コンストラクタを用いて生成します。"><code>Number</code></a> オブジェクト。これが <code>Number</code> のときは空白として使う空白文字の数を示します。この数字は上限が 10 に設定されていて 10 より大きい場合 10 となります。1 より小さい値は空白を使わないことを示します。これが <code>String</code> のときはその文字列（10 文字より長い場合はその最初の 10 文字）が空白として使われます。もしこの引数が提供されない（または null である）場合は、空白は使用されません。</dd>
+</dl>
+
+<h3 id="id=" name="id=" class="highlight-spanned"><span class="highlight-span">返値</span></h3>
+
+<p>与えられた値を表現する JSON 文字列。</p>
+
+<h2 id="Description" name="Description">説明</h2>
+
+<p><code>JSON.stringify()</code> は値をそれを表す JSON 表記に変換します。</p>
+
+<ul>
+ <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Boolean" title="Boolean オブジェクトは真偽値のオブジェクト・ラッパです。"><code>Boolean</code></a>、 <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Number" title="Number JavaScript オブジェクトは、数値に作用するラッパーオブジェクトです。Number オブジェクトは、Number() コンストラクタを用いて生成します。"><code>Number</code></a>、 <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String" title="String グローバルオブジェクトは文字列のコンストラクタ、または文字列シーケンスです。"><code>String</code></a> オブジェクトは文字列化の際に慣習的な変換セマンティクスに従い、対応する基本的な値に変換されます。</li>
+ <li>変換の際に <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/undefined" title="グローバルプロパティ undefined はプリミティブ値 undefined を表します。これは JavaScript におけるプリミティブ型の一つです。"><code>undefined</code></a>、関数、シンボルに出会った場合、それは省略される（オブジェクトで見つかった時）か <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/null" title="null という値は、オブジェクトの値が存在しないことを表します。これは JavaScript におけるプリミティブ値の一つです。"><code>null</code></a> に変更されます（配列で見つかった時）。ことになります。 <code>JSON.stringify</code> は <code>JSON.stringify(function(){})</code> や <code>JSON.stringify(undefined)</code> のように「純粋」な値を渡した場合に <code>undefined</code> を返すことがあります。</li>
+ <li>プロパティのキーがシンボルであるプロパティはすべて、<code>replacer</code> 関数を使用する場合でも完全に無視されます。</li>
+ <li>enumerable でないプロパティは無視されます。</li>
+</ul>
+
+<pre class="brush: js line-numbers  language-js"><code class=" language-js">JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                  <span class="token comment" spellcheck="true">// '{}'</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token keyword">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                <span class="token comment" spellcheck="true">// 'true'</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token string">'foo'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>               <span class="token comment" spellcheck="true">// '"foo"'</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">'false'</span><span class="token punctuation">,</span> <span class="token keyword">false</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// '[1,"false",false]'</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> x<span class="token punctuation">:</span> <span class="token number">5</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>            <span class="token comment" spellcheck="true">// '{"x":5}'</span>
+
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token number">2006</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">15</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
+<span class="token comment" spellcheck="true">// '"2006-01-02T15:04:05.000Z"'</span>
+
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> x<span class="token punctuation">:</span> <span class="token number">5</span><span class="token punctuation">,</span> y<span class="token punctuation">:</span> <span class="token number">6</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// '{"x":5,"y":6}'</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token keyword">new</span> <span class="token class-name">Number</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">(</span><span class="token string">'false'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Boolean</span><span class="token punctuation">(</span><span class="token keyword">false</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// '[3,"false",false]'</span>
+
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> x<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">,</span> undefined<span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token function">Symbol</span><span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+<span class="token comment" spellcheck="true">// '{"x":[10,null,null,null]}' </span>
+ 
+<span class="token comment" spellcheck="true">// シンボル:</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> x<span class="token punctuation">:</span> undefined<span class="token punctuation">,</span> y<span class="token punctuation">:</span> Object<span class="token punctuation">,</span> z<span class="token punctuation">:</span> <span class="token function">Symbol</span><span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// '{}'</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token punctuation">[</span><span class="token function">Symbol</span><span class="token punctuation">(</span><span class="token string">'foo'</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token string">'foo'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// '{}'</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token punctuation">[</span>Symbol<span class="token punctuation">.</span><span class="token keyword">for</span><span class="token punctuation">(</span><span class="token string">'foo'</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token string">'foo'</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span>Symbol<span class="token punctuation">.</span><span class="token keyword">for</span><span class="token punctuation">(</span><span class="token string">'foo'</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// '{}'</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token punctuation">[</span>Symbol<span class="token punctuation">.</span><span class="token keyword">for</span><span class="token punctuation">(</span><span class="token string">'foo'</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token string">'foo'</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>k<span class="token punctuation">,</span> v<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> k <span class="token operator">===</span> <span class="token string">'symbol'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token string">'a symbol'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// '{}'</span>
+
+<span class="token comment" spellcheck="true">// enumerable でないプロパティ:</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span> Object<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> x<span class="token punctuation">:</span> <span class="token punctuation">{</span> value<span class="token punctuation">:</span> <span class="token string">'x'</span><span class="token punctuation">,</span> enumerable<span class="token punctuation">:</span> <span class="token keyword">false</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> y<span class="token punctuation">:</span> <span class="token punctuation">{</span> value<span class="token punctuation">:</span> <span class="token string">'y'</span><span class="token punctuation">,</span> enumerable<span class="token punctuation">:</span> <span class="token keyword">true</span> <span class="token punctuation">}</span> <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// '{"y":"y"}'</span><span class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="The_replacer_parameter" name="The_replacer_parameter" class="highlight-spanned"><span class="highlight-span"><code>replacer</code> 引数</span></h3>
+
+<p><code>replacer</code> 引数は関数または配列です。関数については、キーと文字列化される値の 2 つの引数を取ります。キーをもつオブジェクトが <code>replacer</code> の <code>this</code> パラメータとして提供されます。最初に文字列化されるオブジェクトを表す空のキーで呼ばれ、それからそれぞれの文字列化されるオブジェクトや配列のプロパティについて呼ばれます。 JSON 文字列に加える値を、次のように返します。</p>
+
+<ul>
+ <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Number" title="Number JavaScript オブジェクトは、数値に作用するラッパーオブジェクトです。Number オブジェクトは、Number() コンストラクタを用いて生成します。"><code>Number</code></a> を返した場合、その数値に対応する文字列が JSON 文字列に追加される時にそのプロパティの値として使用されます。</li>
+ <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String" title="String グローバルオブジェクトは文字列のコンストラクタ、または文字列シーケンスです。"><code>String</code></a> を返した場合、その文字列が JSON 文字列に追加される時にそのプロパティの値として使用されます。</li>
+ <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Boolean" title="Boolean オブジェクトは真偽値のオブジェクト・ラッパです。"><code>Boolean</code></a> を返した場合、"true" または "false" が適切に JSON 文字列に追加される時にそのプロパティの値として使用されます。</li>
+ <li>その他のオブジェクトを返した場合、そのオブジェクトは再帰的に JSON 文字列に文字列化されます。その時それぞれのプロパティに対して、そのオブジェクトが関数である場合を除いて <code>replacer</code> 関数を呼びます。関数である場合は JSON 文字列には何も追加されません。</li>
+ <li><code>undefined</code> を返した場合、そのプロパティは出力する JSON 文字列には含まれません。</li>
+</ul>
+
+<div class="note"><strong>注:</strong> 配列から値を取り除くために <code>replacer</code> 関数を使うことはできません。 <code>undefined</code> または関数を返した場合は代わりに <code>null</code> が使われます。</div>
+
+<h4 id="Example_with_a_function" name="Example_with_a_function">関数を使った例</h4>
+
+<pre class="brush: js line-numbers  language-js"><code class=" language-js"><span class="token keyword">function</span> <span class="token function">replacer</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> value<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// Filtering out properties</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> value <span class="token operator">===</span> <span class="token string">'string'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> undefined<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> value<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">var</span> foo <span class="token operator">=</span> <span class="token punctuation">{</span>foundation<span class="token punctuation">:</span> <span class="token string">'Mozilla'</span><span class="token punctuation">,</span> model<span class="token punctuation">:</span> <span class="token string">'box'</span><span class="token punctuation">,</span> week<span class="token punctuation">:</span> <span class="token number">45</span><span class="token punctuation">,</span> transport<span class="token punctuation">:</span> <span class="token string">'car'</span><span class="token punctuation">,</span> month<span class="token punctuation">:</span> <span class="token number">7</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>foo<span class="token punctuation">,</span> replacer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// '{"week":45,"month":7}'</span><span class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="Example_with_an_array" name="Example_with_an_array">配列を使った例</h4>
+
+<p><code>replacer</code> が配列である場合、その配列の値は結果の JSON 文字列に含めるプロパティの名前を示します。</p>
+
+<pre class="brush: js line-numbers  language-js"><code class=" language-js">JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>foo<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">'week'</span><span class="token punctuation">,</span> <span class="token string">'month'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+<span class="token comment" spellcheck="true">// '{"week":45,"month":7}', "week" と "month" プロパティだけが保持される</span><span class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<h3 id="space_argument" name="space_argument" class="highlight-spanned"><span class="highlight-span"><code>space</code> 引数</span></h3>
+
+<p><code>space</code> 引数で最終的な文字列でのスペーシングを調整できます。数値であれば、レベルの階層がそれぞれその数の空白文字（最大10文字）でインデントされます。文字列であれば、レベル階層がそれぞれこの文字列（またはその最初の10文字）でインデントされます。</p>
+
+<pre class="brush: js line-numbers  language-js"><code class=" language-js">JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> a<span class="token punctuation">:</span> <span class="token number">2</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token string">' '</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// '{</span>
+<span class="token comment" spellcheck="true">//  "a": 2</span>
+<span class="token comment" spellcheck="true">// }'</span><span class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>タブ文字を使うと、標準的な表示の整形と同様になります。</p>
+
+<pre class="brush: js line-numbers  language-js"><code class=" language-js">JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> uno<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span> dos<span class="token punctuation">:</span> <span class="token number">2</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token string">'\t'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// returns the string:</span>
+<span class="token comment" spellcheck="true">// '{</span>
+<span class="token comment" spellcheck="true">//     "uno": 1,</span>
+<span class="token comment" spellcheck="true">//     "dos": 2</span>
+<span class="token comment" spellcheck="true">// }'</span><span class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="toJSON()_behavior" name="toJSON()_behavior" class="highlight-spanned"><span class="highlight-span"><code>toJSON()</code> の挙動</span></h3>
+
+<p>文字列化されるオブジェクトに <code>toJSON</code> という名前の値に関数を持ったプロパティがある場合、その <code>toJSON()</code> メソッドで JSON の文字列化の挙動をカスタマイズできます。シリアライズされるオブジェクトの代わりに、その <code>toJSON()</code> メソッドが呼び出されたときの返値がシリアライズされます。 <code>JSON.stringify()</code> は <code>toJSON</code> に以下のどれか1つの引数をつけて呼び出します。</p>
+
+<ul>
+ <li>このオブジェクトがプロパティの値であった場合は、プロパティ名</li>
+ <li>配列内の値で会った場合は、配列のインデックス番号を文字列で</li>
+ <li><code>JSON.stringify()</code> がこのオブジェクトに対して直接呼び出された場合は、から文字列</li>
+</ul>
+
+<p>例</p>
+
+<pre class="brush: js line-numbers  language-js"><code class=" language-js"><span class="token keyword">const</span> bonnie <span class="token operator">=</span> <span class="token punctuation">{</span>
+  name<span class="token punctuation">:</span> <span class="token string">'Bonnie Washington'</span><span class="token punctuation">,</span>
+  age<span class="token punctuation">:</span> <span class="token number">17</span><span class="token punctuation">,</span>
+  <span class="token keyword">class</span><span class="token punctuation">:</span> <span class="token string">'Year 5 Wisdom'</span><span class="token punctuation">,</span>
+  isMonitor<span class="token punctuation">:</span> <span class="token keyword">false</span><span class="token punctuation">,</span>
+  toJSON<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 元のオブジェクトを誤って変更しないようにオブジェクトの複製を作る</span>
+    <span class="token keyword">const</span> cloneObj <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token keyword">this</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">delete</span> cloneObj<span class="token punctuation">.</span>age<span class="token punctuation">;</span>
+    <span class="token keyword">delete</span> cloneObj<span class="token punctuation">.</span>isMonitor<span class="token punctuation">;</span>
+    cloneObj<span class="token punctuation">.</span>year <span class="token operator">=</span> <span class="token number">5</span><span class="token punctuation">;</span>
+    cloneObj<span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token operator">=</span> <span class="token string">'Wisdom'</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>key<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      cloneObj<span class="token punctuation">.</span>code <span class="token operator">=</span> key<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">return</span> cloneObj<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>bonnie<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// '{"name":"Bonnie Washington","class":"Wisdom","year":5}' を返す</span>
+
+<span class="token keyword">const</span> students <span class="token operator">=</span> <span class="token punctuation">{</span>bonnie<span class="token punctuation">}</span><span class="token punctuation">;</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>students<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// '{"bonnie":{"name":"Bonnie Washington","class":"Wisdom","year":5,"code":"bonnie"}}' を返す</span>
+
+<span class="token keyword">const</span> monitorCandidate <span class="token operator">=</span> <span class="token punctuation">[</span>bonnie<span class="token punctuation">]</span><span class="token punctuation">;</span>
+JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>monitorCandidate<span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">// '[{"name":"Bonnie Washington","class":"Wisdom","year":5,"code":"0"}]' を返す</span><span class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="Issue_with_plain_JSON.stringify_for_use_as_JavaScript" name="Issue_with_plain_JSON.stringify_for_use_as_JavaScript" class="highlight-spanned"><span class="highlight-span">JavaScript としての使用に際してのそのままの <code>JSON.stringify</code> の問題</span></h3>
+
+<p>JSON は <a href="http://timelessrepo.com/json-isnt-a-javascript-subset" class="external external-icon" rel="noopener">JavaScript の完全に厳密なサブセットではない</a>ことに注意してください。2つの行末文字（改行と改段落）は JSON ではエスケープする必要はありませんが、 JavaScript ではエスケープする必要があります。したがって、 JSON が評価式として使われたり、 <a href="https://en.wikipedia.org/wiki/JSONP" class="external external-icon" rel="noopener">JSONP</a> の中で直接用いられたりする場合は、次のユーティリティが使えます。</p>
+
+<pre class="brush: js line-numbers  language-js"><code class=" language-js"><span class="token keyword">function</span> jsFriendlyJSONStringify <span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">.</span>
+        <span class="token function">replace</span><span class="token punctuation">(</span><span class="token regex">/\u2028/g</span><span class="token punctuation">,</span> <span class="token string">'\\u2028'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>
+        <span class="token function">replace</span><span class="token punctuation">(</span><span class="token regex">/\u2029/g</span><span class="token punctuation">,</span> <span class="token string">'\\u2029'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">var</span> s <span class="token operator">=</span> <span class="token punctuation">{</span>
+    a<span class="token punctuation">:</span> String<span class="token punctuation">.</span><span class="token function">fromCharCode</span><span class="token punctuation">(</span><span class="token number">0x2028</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    b<span class="token punctuation">:</span> String<span class="token punctuation">.</span><span class="token function">fromCharCode</span><span class="token punctuation">(</span><span class="token number">0x2029</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">try</span> <span class="token punctuation">{</span>
+    <span class="token function">eval</span><span class="token punctuation">(</span><span class="token string">'('</span> <span class="token operator">+</span> JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">')'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">e</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// "SyntaxError: unterminated string literal"</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// catch する必要はない</span>
+<span class="token function">eval</span><span class="token punctuation">(</span><span class="token string">'('</span> <span class="token operator">+</span> <span class="token function">jsFriendlyJSONStringify</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">')'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// Firefox での console.log はコンソールにログ出力をする場合</span>
+<span class="token comment" spellcheck="true">//   Unicode エスケープを解除するので、alert を使う</span>
+<span class="token function">alert</span><span class="token punctuation">(</span><span class="token function">jsFriendlyJSONStringify</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// {"a":"\u2028","b":"\u2029"}</span><span class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="Example_of_using_JSON.stringify()_with_localStorage" name="Example_of_using_JSON.stringify()_with_localStorage" class="highlight-spanned"><span class="highlight-span"><code>localStorage</code> で <code>JSON.stringify()</code> を使った例</span></h3>
+
+<p>ユーザーが作成したオブジェクトを格納し、ブラウザーが閉じた後に復元できるようにしたい場合は以下の例が <code>JSON.stringify()</code> を適用した模範例です。</p>
+
+<div class="warning">
+<p>関数は有効な JSON のデータではないため、うまく動作しません。しかし、先に（例えば replacer の中で）関数の toString メソッドによって文字列に変換すれば、表示することができます。また、 <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Date" title="日付や時刻を扱うことが可能な、JavaScript の Date インスタンスを生成します。Date オブジェクトは、1970 年 1 月 1 日 (UTC) から始まるミリ秒単位の時刻値を基準としています。"><code>Date</code></a> のような一部のオブジェクトは <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" title="JSON.parse() メソッドは文字列を JSON として解析し、文字列によって記述されている JavaScript の値やオブジェクトを構築します。任意の reviver 関数で、生成されたオブジェクトが返される前に変換を実行することができます。"><code>JSON.parse()</code></a> の後で文字列になります。</p>
+</div>
+
+<pre class="brush: js line-numbers  language-js"><code class=" language-js"><span class="token comment" spellcheck="true">// JSON の一例を作成</span>
+<span class="token keyword">var</span> session <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token string">'screens'</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token string">'state'</span><span class="token punctuation">:</span> <span class="token keyword">true</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+session<span class="token punctuation">.</span>screens<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token string">'name'</span><span class="token punctuation">:</span> <span class="token string">'screenA'</span><span class="token punctuation">,</span> <span class="token string">'width'</span><span class="token punctuation">:</span> <span class="token number">450</span><span class="token punctuation">,</span> <span class="token string">'height'</span><span class="token punctuation">:</span> <span class="token number">250</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+session<span class="token punctuation">.</span>screens<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token string">'name'</span><span class="token punctuation">:</span> <span class="token string">'screenB'</span><span class="token punctuation">,</span> <span class="token string">'width'</span><span class="token punctuation">:</span> <span class="token number">650</span><span class="token punctuation">,</span> <span class="token string">'height'</span><span class="token punctuation">:</span> <span class="token number">350</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+session<span class="token punctuation">.</span>screens<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token string">'name'</span><span class="token punctuation">:</span> <span class="token string">'screenC'</span><span class="token punctuation">,</span> <span class="token string">'width'</span><span class="token punctuation">:</span> <span class="token number">750</span><span class="token punctuation">,</span> <span class="token string">'height'</span><span class="token punctuation">:</span> <span class="token number">120</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+session<span class="token punctuation">.</span>screens<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token string">'name'</span><span class="token punctuation">:</span> <span class="token string">'screenD'</span><span class="token punctuation">,</span> <span class="token string">'width'</span><span class="token punctuation">:</span> <span class="token number">250</span><span class="token punctuation">,</span> <span class="token string">'height'</span><span class="token punctuation">:</span> <span class="token number">60</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+session<span class="token punctuation">.</span>screens<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token string">'name'</span><span class="token punctuation">:</span> <span class="token string">'screenE'</span><span class="token punctuation">,</span> <span class="token string">'width'</span><span class="token punctuation">:</span> <span class="token number">390</span><span class="token punctuation">,</span> <span class="token string">'height'</span><span class="token punctuation">:</span> <span class="token number">120</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+session<span class="token punctuation">.</span>screens<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token string">'name'</span><span class="token punctuation">:</span> <span class="token string">'screenF'</span><span class="token punctuation">,</span> <span class="token string">'width'</span><span class="token punctuation">:</span> <span class="token number">1240</span><span class="token punctuation">,</span> <span class="token string">'height'</span><span class="token punctuation">:</span> <span class="token number">650</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// JSON.stringify() で JSON 文字列に変換してから</span>
+<span class="token comment" spellcheck="true">// session の名前で localStorage に保存</span>
+localStorage<span class="token punctuation">.</span><span class="token function">setItem</span><span class="token punctuation">(</span><span class="token string">'session'</span><span class="token punctuation">,</span> JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span>session<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// JSON.stringify() で生成されて localStorage に保存された文字列を</span>
+<span class="token comment" spellcheck="true">// 再び JSON オブジェクトに変換する方法の例</span>
+<span class="token keyword">var</span> restoredSession <span class="token operator">=</span> JSON<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>localStorage<span class="token punctuation">.</span><span class="token function">getItem</span><span class="token punctuation">(</span><span class="token string">'session'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// ここで変数 restoredSession には localStorage に保存されていた</span>
+<span class="token comment" spellcheck="true">// オブジェクトが入っている</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>restoredSession<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Specifications" name="Specifications">仕様策定状況</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">策定状況</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a href="https://www.ecma-international.org/ecma-262/5.1/#sec-15.12.3" hreflang="en" lang="en" class="external external-icon" rel="noopener">ECMAScript 5.1 (ECMA-262)<br><small lang="ja">JSON.stringify の定義</small></a></td>
+   <td><span class="spec-Standard">標準</span></td>
+   <td>初回定義。JavaScript 1.7 で実装。</td>
+  </tr>
+  <tr>
+   <td><a href="https://www.ecma-international.org/ecma-262/6.0/#sec-json.stringify" hreflang="en" lang="en" class="external external-icon" rel="noopener">ECMAScript 2015 (6th Edition, ECMA-262)<br><small lang="ja">JSON.stringify の定義</small></a></td>
+   <td><span class="spec-Standard">標準</span></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a href="https://tc39.github.io/ecma262/#sec-json.stringify" hreflang="en" lang="en" class="external external-icon" rel="noopener">ECMAScript Latest Draft (ECMA-262)<br><small lang="ja">JSON.stringify の定義</small></a></td>
+   <td><span class="spec-Draft">ドラフト</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザー実装状況</h2>
+
+<div>
+<div class="hidden">このページの互換性一覧表は構造化データから生成されます。データに協力したいのであれば、 <a href="https://github.com/mdn/browser-compat-data" class="external external-icon" rel="noopener">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+
+<p></p><div class="bc-old hidden"><div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+    <li class="selected">
+    <a>Desktop</a>
+    </li>
+    <li>
+    <a>Mobile</a>
+    </li>
+    </ul>
+    <div id="compat-desktop" style="display: block;"><table class="compat-table"><thead><tr><th>機能</th><th>Chrome</th><th>Edge</th><th>Firefox</th><th>Internet Explorer</th><th>Opera</th><th>Safari</th></tr></thead><tbody><tr><td><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">基本サポート</a></td><td class="full-support"><span title="最新の対応状況に更新してください。">
+      有り</span></td><td class="full-support"><span title="最新の対応状況に更新してください。">
+      有り</span></td><td class="full-support">3.5</td><td class="full-support">8</td><td class="full-support">10.5</td><td class="full-support">4</td></tr></tbody></table></div><div id="compat-mobile" style="display: none;"><table class="compat-table"><thead><tr><th>機能</th><th>Android webview</th><th>Chrome for Android</th><th>Edge mobile</th><th>Firefox for Android</th><th>Opera Android</th><th>iOS Safari</th><th>Samsung Internet</th></tr></thead><tbody><tr><td><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">基本サポート</a></td><td class="full-support"><span title="最新の対応状況に更新してください。">
+      有り</span></td><td class="full-support"><span title="最新の対応状況に更新してください。">
+      有り</span></td><td class="full-support"><span title="最新の対応状況に更新してください。">
+      有り</span></td><td class="full-support">4</td><td class="full-support"><span title="最新の対応状況に更新してください。">
+      有り</span></td><td class="full-support"><span title="最新の対応状況に更新してください。">
+      有り</span></td><td class="unknown-support"><span title="実装状況不明。更新してください。">
+      ?</span></td></tr></tbody></table></div></div></div><div class="bc-data"><div class="bc-beta-menu"><a href="https://developer.mozilla.org/docs/New_Compatibility_Tables_Beta">新しい互換性の表はベータ版です&nbsp;<i class="icon-caret-down" aria-hidden="true"></i></a><ul class="submenu js-submenu"><li><a href="https://developer.mozilla.org/docs/New_Compatibility_Tables_Beta">ベータ版に関する詳細</a></li><li><a href="https://www.surveygizmo.com/s3/2342437/0b5ff6b6b8f6" class="external external-icon">アンケートに答える</a></li><li><button class="button bc-error">問題を報告</button></li><li><button class="button bc-old">古い表を表示</button></li></ul></div><table class="bc-table bc-table-js"><thead><tr class="bc-platforms"><td></td><th colspan="6" class="bc-platform-desktop"><abbr class="only-icon" title="デスクトップ"><span>デスクトップ</span><i class="ic-desktop"></i></abbr></th><th colspan="7" class="bc-platform-mobile"><abbr class="only-icon" title="モバイル"><span>モバイル</span><i class="ic-mobile"></i></abbr></th><th colspan="1" class="bc-platform-server"><abbr class="only-icon" title="Server"><span>Server</span><i class="ic-server"></i></abbr></th></tr><tr class="bc-browsers"><td></td><th class="bc-browser-chrome"><abbr class="only-icon" title="Chrome"><span>Chrome</span><i class="ic-chrome"></i></abbr></th><th class="bc-browser-edge"><abbr class="only-icon" title="Edge"><span>Edge</span><i class="ic-edge"></i></abbr></th><th class="bc-browser-firefox"><abbr class="only-icon" title="Firefox"><span>Firefox</span><i class="ic-firefox"></i></abbr></th><th class="bc-browser-ie"><abbr class="only-icon" title="Internet Explorer"><span>Internet Explorer</span><i class="ic-ie"></i></abbr></th><th class="bc-browser-opera"><abbr class="only-icon" title="Opera"><span>Opera</span><i class="ic-opera"></i></abbr></th><th class="bc-browser-safari"><abbr class="only-icon" title="Safari"><span>Safari</span><i class="ic-safari"></i></abbr></th><th class="bc-browser-webview_android"><abbr class="only-icon" title="Android webview"><span>Android webview</span><i class="ic-webview_android"></i></abbr></th><th class="bc-browser-chrome_android"><abbr class="only-icon" title="Chrome for Android"><span>Chrome for Android</span><i class="ic-chrome_android"></i></abbr></th><th class="bc-browser-edge_mobile"><abbr class="only-icon" title="Edge Mobile"><span>Edge Mobile</span><i class="ic-edge_mobile"></i></abbr></th><th class="bc-browser-firefox_android"><abbr class="only-icon" title="Firefox for Android"><span>Firefox for Android</span><i class="ic-firefox_android"></i></abbr></th><th class="bc-browser-opera_android"><abbr class="only-icon" title="Opera for Android"><span>Opera for Android</span><i class="ic-opera_android"></i></abbr></th><th class="bc-browser-safari_ios"><abbr class="only-icon" title="iOS Safari"><span>iOS Safari</span><i class="ic-safari_ios"></i></abbr></th><th class="bc-browser-samsunginternet_android"><abbr class="only-icon" title="Samsung Internet"><span>Samsung Internet</span><i class="ic-samsunginternet_android"></i></abbr></th><th class="bc-browser-nodejs"><abbr class="only-icon" title="Node.js"><span>Node.js</span><i class="ic-nodejs"></i></abbr></th></tr></thead><tbody><tr><th scope="row">基本サポート</th><td class="bc-supports-yes bc-browser-chrome"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              有り</td><td class="bc-supports-yes bc-browser-edge"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              有り</td><td class="bc-supports-yes bc-browser-firefox"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              3.5</td><td class="bc-supports-yes bc-browser-ie"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              8</td><td class="bc-supports-yes bc-browser-opera"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              10.5</td><td class="bc-supports-yes bc-browser-safari"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              4</td><td class="bc-supports-yes bc-browser-webview_android"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              有り</td><td class="bc-supports-yes bc-browser-chrome_android"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              有り</td><td class="bc-supports-yes bc-browser-edge_mobile"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              有り</td><td class="bc-supports-yes bc-browser-firefox_android"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              4</td><td class="bc-supports-yes bc-browser-opera_android"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              有り</td><td class="bc-supports-yes bc-browser-safari_ios"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              有り</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><abbr title="実装状況不明。更新してください。">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-nodejs"><abbr class="bc-level-yes only-icon" title="完全サポート">
+                <span>完全サポート</span>
+              </abbr>
+              有り</td></tr></tbody></table><section id="sect1" class="bc-legend"><h3 id="凡例" class="offscreen highlight-spanned"><span class="highlight-span">凡例</span></h3><dl><dt><span class="bc-supports-yes bc-supports">
+                <abbr class="bc-level bc-level-yes only-icon" title="完全サポート">
+                 <span>完全サポート</span>
+                 &nbsp;
+                </abbr></span></dt><dd>完全サポート</dd><dt><span class="bc-supports-unknown bc-supports">
+                <abbr class="bc-level bc-level-unknown only-icon" title="Compatibility unknown">
+                 <span>Compatibility unknown</span>
+                 &nbsp;
+                </abbr></span></dt><dd>Compatibility unknown</dd></dl></section></div><p></p>
+</div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" title="JSON.parse() メソッドは文字列を JSON として解析し、文字列によって記述されている JavaScript の値やオブジェクトを構築します。任意の reviver 関数で、生成されたオブジェクトが返される前に変換を実行することができます。"><code>JSON.parse()</code></a></li>
+</ul>
+                  
+                
+              </article>
+
+              <!-- contributors -->
+              <div class="wiki-block contributors">
+                <h2 class="offscreen">ドキュメントのタグと貢献者</h2>
+                
+                
+  <div class="tag-attach-list contributors-sub">
+    <i aria-hidden="true" class="icon-tags icon-fw"></i>
+    <strong>タグ:</strong>&nbsp;
+    <ul class="tags tags-small">
+      
+        <li><a href="https://developer.mozilla.org/ja/docs/tag/JavaScript" rel="nofollow">JavaScript</a></li>
+      
+        <li><a href="https://developer.mozilla.org/ja/docs/tag/JSON" rel="nofollow">JSON</a></li>
+      
+        <li><a href="https://developer.mozilla.org/ja/docs/tag/Method" rel="nofollow">Method</a></li>
+      
+        <li><a href="https://developer.mozilla.org/ja/docs/tag/Reference" rel="nofollow">Reference</a></li>
+      
+        <li><a href="https://developer.mozilla.org/ja/docs/tag/stringify" rel="nofollow">stringify</a></li>
+      
+        <li><a href="https://developer.mozilla.org/ja/docs/tag/%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89" rel="nofollow">メソッド</a></li>
+      
+    </ul>
+  </div>
+
+
+                
+                  <div class="contributors-sub">
+                    <i aria-hidden="true" class="icon-group icon-fw"></i>&nbsp;<strong>このページの貢献者:</strong> 
+        <a href="https://developer.mozilla.org/ja/profiles/mfuji09">mfuji09</a>, 
+    
+        <a href="https://developer.mozilla.org/ja/profiles/twe">twe</a>, 
+    
+        <a href="https://developer.mozilla.org/ja/profiles/teoli">teoli</a>
+    
+                  </div>
+                
+
+                
+                  <div class="contributors-sub">
+                    <i aria-hidden="true" class="icon-clock-o icon-fw"></i>&nbsp;<strong>最終更新者:</strong>
+                    <a href="https://developer.mozilla.org/ja/profiles/mfuji09">mfuji09</a>,
+                    <time datetime="2018-01-20T03:52:32.235604-08:00">2018/01/20 3:52:32</time>
+                  </div>
+                
+              </div>
+            </div>
+
+            
+              <!-- quick links and zone subnav strip -->
+              <div id="wiki-left" class="column-strip wiki-column">
+
+                
+                  <!-- crumbs -->
+                  
+  
+    <nav class="crumbs" role="navigation">
+      <ol typeof="BreadcrumbList" vocab="https://schema.org/" aria-label="パンくずリスト">
+        
+          <li property="itemListElement" typeof="ListItem" class="crumb">
+            <a href="https://developer.mozilla.org/ja/docs/Web" property="item" typeof="WebPage">
+              <span property="name">開発者向けのWeb技術</span>
+            </a>
+            <meta property="position" content="1">
+          </li>
+        
+          <li property="itemListElement" typeof="ListItem" class="crumb">
+            <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript" property="item" typeof="WebPage">
+              <span property="name">Java<wbr>Script</span>
+            </a>
+            <meta property="position" content="2">
+          </li>
+        
+          <li property="itemListElement" typeof="ListItem" class="crumb">
+            <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference" property="item" typeof="WebPage">
+              <span property="name">Java<wbr>Script リファレンス</span>
+            </a>
+            <meta property="position" content="3">
+          </li>
+        
+          <li property="itemListElement" typeof="ListItem" class="crumb">
+            <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects" property="item" typeof="WebPage">
+              <span property="name">標準ビルトインオブジェクト</span>
+            </a>
+            <meta property="position" content="4">
+          </li>
+        
+          <li property="itemListElement" typeof="ListItem" class="crumb">
+            <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON" property="item" typeof="WebPage">
+              <span property="name">JSON</span>
+            </a>
+            <meta property="position" content="5">
+          </li>
+        
+        <li property="itemListElement" typeof="ListItem" class="crumb">
+          <span property="name">JSON.stringify()</span>
+        </li>
+      </ol>
+    </nav>
+  
+                
+
+                
+
+                
+                  <!-- quick links -->
+                  
+  <div class="quick-links" id="quick-links">
+    <div class="quick-links-head">関連トピック</div>
+    <ol><li><strong><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects">Standard built-in objects</a></strong></li><li><strong><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON"><code>JSON</code></a></strong></li><li data-default-state="open" class="toggleable current" data-closed=""><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#" class="toggler" aria-haspopup="true"><i aria-hidden="true" class="icon-caret-down"></i><strong>メソッド</strong></a><ol class="toggle-container" aria-expanded="true" style="display: block;"><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" title="JSON.parse() メソッドは文字列を JSON として解析し、文字列によって記述されている JavaScript の値やオブジェクトを構築します。任意の reviver 関数で、生成されたオブジェクトが返される前に変換を実行することができます。"><code>JSON.parse()</code></a></li><li><em><code>JSON.stringify()</code></em></li></ol></li><li><strong>継承</strong></li><li><strong><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object"><code>Object</code></a></strong></li><li class="toggleable" data-closed="true"><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#" class="toggler" aria-haspopup="true"><i aria-hidden="true" class="icon-caret-right"></i><strong>プロパティ</strong></a><ol class="toggle-container" style="display: none;"><li><span class="sidebar-icon"><span title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></span><s class="obsoleteElement"><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/count" title="オブジェクトの列挙型プロパティの数を表します。しかし、取り除かれました。"><code>Object<wbr>.prototype.__count__</code></a></s></li><li><span class="sidebar-icon"><span title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></span><s class="obsoleteElement"><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/noSuchMethod" title="__noSuchMethod__ プロパティは、オブジェクトで定義されていない関数を呼び出した時に実行される関数を表しますが、この関数は使用できなくなりました。"><code>Object<wbr>.prototype.__noSuch<wbr>Method__</code></a></s></li><li><span class="sidebar-icon"><span title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></span><s class="obsoleteElement"><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/Parent" title="__parent__ はオブジェクトのコンテクストへのポインタです。"><code>Object<wbr>.prototype.__parent__</code></a></s></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/proto" title="Object.prototypeの__proto__プロパティは、アクセスされるオブジェクトの内部の[[Prototype]](オブジェクトまたはnullのどちらか)を暴露するアクセサプロパティ(getter関数とsetter関数)です。"><code>Object<wbr>.prototype.__proto__</code></a></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/%E3%82%B3%E3%83%B3%E3%82%B9%E3%83%88%E3%83%A9%E3%82%AF%E3%82%BF" title="インスタンスのプロトタイプをつくったObject関数の参照を返します。ご注意いただきたいのは、このプロパティの値は、関数そのものの参照だということです。関数の名前が含まれた文字列ではありません。1やtrue、あるいは&quot;test&quot;などのプリミティブ値については、このプロパティ値は読み取り専用です。"><code>Object<wbr>.prototype<wbr>.constructor</code></a></li></ol></li><li class="toggleable" data-closed="true"><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#" class="toggler" aria-haspopup="true"><i aria-hidden="true" class="icon-caret-right"></i><strong>メソッド</strong></a><ol class="toggle-container" style="display: none;"><li><span class="sidebar-icon"><span title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/__defineGetter__" title="オブジェクトのプロパティと関数とを結びつけます。 そのプロパティの値が取得されようとする時に、結びつけた関数が呼び出されます。"><code>Object<wbr>.prototype.__define<wbr>Getter__()</code></a></li><li><span class="sidebar-icon"><span title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/__defineSetter__" title="オブジェクトのプロパティと関数とを結びつけます。そのプロパティへ値が設定されようとする時に、結びつけた関数が呼び出されます。"><code>Object<wbr>.prototype.__define<wbr>Setter__()</code></a></li><li><span class="sidebar-icon"><span title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/__lookupGetter__" title="指定したプロパティに結びつけられているゲッタ関数を返します。"><code>Object<wbr>.prototype.__lookup<wbr>Getter__()</code></a></li><li><span class="sidebar-icon"><span title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/__lookupSetter__" title="指定したプロパティに結びつけられているセッタ関数を返します。"><code>Object<wbr>.prototype.__lookup<wbr>Setter__()</code></a></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwnProperty" title="オブジェクトが指定されたプロパティを持っているかどうかを示す真偽値を返します。"><code>Object<wbr>.prototype<wbr>.has<wbr>OwnProperty()</code></a></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/isPrototypeOf" title="isPrototypeOf() メソッドは、オブジェクトが別のオブジェクトのプロトタイプチェーンに存在するかどうかを判定します。"><code>Object<wbr>.prototype<wbr>.isPrototypeOf()</code></a></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/propertyIsEnumerable" title="指定されたプロパティが列挙可能 (enumerable) かどうかを示す真偽値を返します。"><code>Object<wbr>.prototype<wbr>.property<wbr>IsEnumerable()</code></a></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/toLocaleString" title="オブジェクトを表す文字列を返します。このメソッドは子孫に当たるオブジェクトが現地固有性のある (locale-specific) 用途のために上書きする意図でのものです。"><code>Object<wbr>.prototype<wbr>.toLocale<wbr>String()</code></a></li><li><span class="sidebar-icon"><span title="この API は標準化されていません。"><i class="icon-warning-sign"> </i></span></span><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/toSource" title="オブジェクトのソースコードを表す文字列を返します。"><code>Object<wbr>.prototype<wbr>.toSource()</code></a></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/toString" title="オブジェクトを表す文字列を返します。"><code>Object<wbr>.prototype<wbr>.toString()</code></a></li><li><span class="sidebar-icon"><span title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><span class="sidebar-icon"><span title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></span><s class="obsoleteElement"><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/unwatch" title="watch メソッドでセットしたウォッチポイントを取り除きます。"><code>Object<wbr>.prototype<wbr>.unwatch()</code></a></s></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/valueOf" title="指定されたオブジェクトのプリミティブな値を返します。"><code>Object<wbr>.prototype<wbr>.valueOf()</code></a></li><li><span class="sidebar-icon"><span title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><span class="sidebar-icon"><span title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></span><s class="obsoleteElement"><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/watch" title="プロパティに値が代入されるのを監視し、代入された際に関数を実行します。"><code>Object<wbr>.prototype<wbr>.watch()</code></a></s></li><li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf" title=""><code>Object<wbr>.set<wbr>PrototypeOf()</code></a></li></ol></li></ol>
+  </div>
+                
+
+                <!-- approvals -->
+                
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div> <!-- ends "main-content" -->
+
+    
+      <div class="newsletter-box">
+        <div class="newsletter">
+    <form id="newsletterForm" class="newsletter-form nodisable" name="newsletter-form" action="https://www.mozilla.org/en-US/newsletter/" method="post">
+        <div class="newsletter-head">
+            <h2 class="newsletter-teaser">ウェブ開発の一番良いところについて学ぶ</h2>
+            <p class="newsletter-description">MDN から役立つ最新情報をあなたのメールボックスへ直接お届けします。</p>
+            
+            <p class="newsletter-lang">ニュースレターは今のところ英語のみで提供されています。</p>
+            
+        </div>
+
+        <div class="newsletter-fields">
+            <input type="hidden" id="fmt" name="fmt" value="H">
+            <input type="hidden" id="newsletterNewslettersInput" name="newsletters" value="app-dev">
+            <div id="newsletterErrors" class="newsletter-errors"></div>
+
+            <div id="newsletterEmail" class="form-group newsletter-group-email">
+                <label for="newsletterEmailInput" class="form-label offscreen">メールアドレス</label>
+                <input type="email" id="newsletterEmailInput" name="email" class="form-input newsletter-input-email" required="" placeholder="you@example.com" size="30">
+            </div>
+
+            <div id="newsletterPrivacy" class="form-group form-group-agree newsletter-group-privacy hidden">
+                <input type="checkbox" id="newsletterPrivacyInput" name="privacy" required="">
+                <label for="newsletterPrivacyInput">
+                Mozilla がこの <a href="https://www.mozilla.org/privacy/">プライバシーポリシー</a> に従って私の個人情報を扱うことに同意します。
+                </label>
+            </div>
+            <div id="newsletterSubmit" class="newsletter-group-submit">
+                <button id="newsletter-submit" type="submit" class="button neutral newsletter-submit">今すぐ購読</button>
+            </div>
+        </div>
+    </form>
+    <div id="newsletterThanks" class="newsletter-thanks hidden">
+        <h2>ありがとうございます！ 購読確認用の新着メールを探してください。</h2>
+        <p>これまでに Mozilla 関連のニュースレターを購読したことがない場合、購読開始の確認が必要となります。お送りした確認メールを受信トレイもしくは迷惑メールフィルタから探してください。
+        </p>
+    </div>
+    <button id="newsletterHide" type="button" class="only-icon newsletter-hide"><span>ニュースレター購読リンクを隠す</span><i aria-hidden="true" class="icon-times"></i></button>
+</div>
+      </div>
+    
+
+  <menu type="context" id="edit-history-menu">
+    <menuitem data-action="/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify$edit" label="ページを編集"></menuitem>
+    <menuitem data-action="/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify$history" label="ページの履歴を表示"></menuitem>
+  </menu>
+
+      </div>
+  </main>
+  <!-- Footer -->
+    <footer id="nav-footer" class="nav-footer">
+      <div class="center">
+          <a href="https://developer.mozilla.org/ja/" class="nav-footer-logo">MDN ウェブドキュメント</a>
+          <div class="footer-group footer-group-mdn">
+            <h2 class="footer-title">MDN</h2>
+            <ul class="footer-list">
+              <li><a href="https://developer.mozilla.org/ja/docs/Web">ウェブ技術</a></li>
+              <li><a href="https://developer.mozilla.org/ja/docs/Learn">ウェブ開発について学ぶ</a></li>
+              <li><a href="https://developer.mozilla.org/docs/MDN/About">MDN について</a></li>
+              <li><a href="https://developer.mozilla.org/ja/docs/MDN/Feedback">フィードバック</a></li>
+              <li class="footer-social"><a href="https://twitter.com/mozdevnet" class="only-icon"><i aria-hidden="true" class="icon-twitter"></i> <span>Twitter</span></a></li>
+              <li class="footer-social"><a href="https://github.com/mdn/" class="only-icon"><i aria-hidden="true" class="icon-github"></i> <span>GitHub</span></a></li>
+            </ul>
+          </div>
+
+          <a href="https://mozilla.org/" class="nav-footer-mozilla">Mozilla</a>
+          <div class="footer-group footer-group-mozilla">
+            <h2 class="footer-title">Mozilla</h2>
+            <ul class="footer-list">
+              <li><a href="https://www.mozilla.org/about/">このサイトについて</a></li>
+              <li><a href="https://www.mozilla.org/contact/">問い合わせ</a></li>
+              <li><a href="https://donate.mozilla.org/?utm_source=developer.mozilla.org&amp;utm_medium=referral&amp;utm_content=footer">寄付</a></li>
+              <li><a href="https://www.mozilla.org/firefox/?utm_source=developer.mozilla.org&amp;utm_campaign=footer&amp;utm_medium=referral">Firefox</a></li>
+              <li class="footer-social"><a href="https://twitter.com/mozilla" class="only-icon"><i aria-hidden="true" class="icon-twitter"></i> <span>Twitter</span></a></li>
+              <li class="footer-social"><a href="https://www.facebook.com/mozilla" class="only-icon"><i aria-hidden="true" class="icon-facebook"></i> <span>Facebook</span></a></li>
+              <li class="footer-social"><a href="https://www.instagram.com/mozillagram/" class="only-icon"><i aria-hidden="true" class="icon-instagram"></i> <span>Instagram</span></a></li>
+            </ul>
+          </div>
+
+          
+  
+    <form class="languages go" method="get" action="https://developer.mozilla.org/ja/docs/Web">
+      <label for="language">他の言語:</label>
+      <select id="language" class="wiki-l10n" name="next" dir="ltr">
+        <option title="日本語" data-locale="ja" value="/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify" selected="">
+          日本語 (ja)
+        </option>
+        
+          <option title="英語 (アメリカ)" data-locale="ja" value="/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+            English (US) (en-US)
+          </option>
+          <option title="アラビア語" data-locale="ja" value="/ar/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+            عربي (ar)
+          </option>
+          <option title="カタルーニャ語" data-locale="ja" value="/ca/docs/Web/JavaScript/Referencia/Objectes_globals/JSON/stringify">
+            Català (ca)
+          </option>
+          <option title="ドイツ語" data-locale="ja" value="/de/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+            Deutsch (de)
+          </option>
+          <option title="スペイン語" data-locale="ja" value="/es/docs/Web/JavaScript/Referencia/Objetos_globales/JSON/stringify">
+            Español (es)
+          </option>
+          <option title="フランス語" data-locale="ja" value="/fr/docs/Web/JavaScript/Reference/Objets_globaux/JSON/stringify">
+            Français (fr)
+          </option>
+          <option title="イタリア語" data-locale="ja" value="/it/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+            Italiano (it)
+          </option>
+          <option title="韓国語" data-locale="ja" value="/ko/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+            한국어 (ko)
+          </option>
+          <option title="ポルトガル語 (ブラジル)" data-locale="ja" value="/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+            Português (do&nbsp;Brasil) (pt-BR)
+          </option>
+          <option title="ロシア語" data-locale="ja" value="/ru/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+            Русский (ru)
+          </option>
+          <option title="ウクライナ語" data-locale="ja" value="/uk/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+            Українська (uk)
+          </option>
+          <option title="中国語 (簡体字)" data-locale="ja" value="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+            中文 (简体) (zh-CN)
+          </option>
+          <option title="中国語 (繁体字)" data-locale="ja" value="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify">
+            正體中文 (繁體) (zh-TW)
+          </option>
+      </select>
+      <noscript>&lt;button type="submit"&gt;移動&lt;/button&gt;</noscript>
+    </form>
+  
+
+
+          
+            <ul class="footer-tos">
+              <li><a href="https://www.mozilla.org/about/legal/terms/mozilla">利用規約</a></li>
+              <li><a href="https://www.mozilla.org/privacy/websites/">プライバシー</a></li>
+              <li><a href="https://www.mozilla.org/privacy/websites/#cookies">Cookie</a></li>
+            </ul>
+
+            <div id="license" class="contentinfo">
+              <p>© 2005-2018 Mozilla および各貢献者</p> <p>コンテンツは <a href="https://developer.mozilla.org/en-US/docs/MDN/About#Copyrights_and_licenses">これらのライセンス</a> の下で公開されています。</p>
+            </div>
+          
+      </div>
+    </footer> 
+
+  <!-- site js -->
+  
+    
+    <!--[if lte IE 8]><script type="text/javascript" src="https://cdn.mdn.mozilla.net/static/build/js/selectivizr.091e18cf669b.js" charset="utf-8"></script><![endif]-->
+
+    
+    <script type="text/javascript" src="./JSON.stringify() - JavaScript _ MDN_files/javascript.7d6c8915f737.js.ダウンロード"></script>
+    <script type="text/javascript" src="./JSON.stringify() - JavaScript _ MDN_files/main.226517b2a7dc.js.ダウンロード" charset="utf-8"></script>
+    <script>
+      if(window.mdn && mdn.analytics) mdn.analytics.trackOutboundLinks();
+    </script>
+    
+
+  
+
+    <script async="" type="text/javascript" src="./JSON.stringify() - JavaScript _ MDN_files/wiki.c60705233ffd.js.ダウンロード" charset="utf-8"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+    <script async="" type="text/javascript" src="./JSON.stringify() - JavaScript _ MDN_files/newsletter.7cd3274169f2.js.ダウンロード" charset="utf-8"></script>
+  
+
+
+
+<div id="UMS_TOOLTIP" style="position: absolute; cursor: pointer; z-index: 2147483647; background: transparent; top: -100000px; left: -100000px;"></div></body><umsdataelement id="UMSSendDataEventElement"></umsdataelement><div id="TAG_ID4TOOLBAR_UMS_GUID" style="display: none;">49956D85-33B0-A85E-403B-FCD8AAC6764F</div><div id="tmtoolbar_ums_injected" style="display: none;">init_ums</div><div id="TAG_ID4TOOLBAR_GUID" style="display: none;">26113FE1-A182-6327-C4EC-4FD25FF5312C</div><div id="tmtoolbar_message" style="display: none;">init</div><div id="tmtoolbar_injected" style="display: none;">init</div></html>

@@ -1,0 +1,6 @@
+@font-face {
+  font-family: 'Mplus 1p';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Mplus 1p'), local('Mplus1p-Regular'), url(https://fonts.gstatic.com/l/font?kit=aMF6aMWkrgK8QOsET0i4Q2KiHlsqVvd3XD4SLzJxoelANLU3kUmMOObDGK4lvAOLZAZrRWBIy2MsA-Rgq_o1wq2fCx3skPRz96sC_Hqk9gZm85gJtGQn9XiWOiJUdzRs7YDQ96-VXde3p-B6wFAvyjVsGAfD2S-7uDvhyT8TjCU&skey=ce6b3497355c8867&v=v7) format('woff2');
+}

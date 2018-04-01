@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!-- saved from url=(0073)https://interactive-examples.mdn.mozilla.net/pages/js/json-stringify.html -->
+<html lang="en" class="js"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>JavaScript Demo: JSON.stringify()</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="./codemirror-5-31-0.css" rel="stylesheet">
+    <link href="./editor-js.css" rel="stylesheet">
+    
+  </head>
+  <body>
+      <section id="static" class="hidden">
+          <pre><code id="static-js">console.log(JSON.stringify({ x: 5, y: 6 }));
+// expected output: "{"x":5,"y":6}"
+
+console.log(JSON.stringify([new Number(3), new String('false'), new Boolean(false)]));
+// expected output: "[3,"false",false]"
+
+console.log(JSON.stringify({ x: [10, undefined, function(){}, Symbol('')] }));
+// expected output: "{"x":[10,null,null,null]}"
+
+console.log(JSON.stringify(new Date(2006, 0, 2, 15, 4, 5)));
+// expected output: ""2006-01-02T15:04:05.000Z""
+</code>
+</pre>
+
+      </section>
+
+      <section id="live" class="live">
+          <header><h4>JavaScript Demo: JSON.stringify()</h4></header>
+          <div id="editor" class="editor"><div class="CodeMirror cm-s-default CodeMirror-focused"><div class="CodeMirror-vscrollbar" cm-not-content="true"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-hscrollbar" cm-not-content="true"><div style="height: 100%; min-height: 1px; width: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 30px; margin-bottom: -17px; border-right-width: 13px; min-height: 260px; min-width: 498.969px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><span><span>​</span>x</span></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code" role="presentation" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true" tabindex="0" style=""><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" contenteditable="false" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">1</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">JSON</span>.<span class="cm-property">stringify</span>({ <span class="cm-property">x</span>: <span class="cm-number">5</span>, <span class="cm-property">y</span>: <span class="cm-number">6</span> }));</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" contenteditable="false" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">2</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-comment">// expected output: "{"x":5,"y":6}"</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" contenteditable="false" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">3</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" contenteditable="false" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">4</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">JSON</span>.<span class="cm-property">stringify</span>([<span class="cm-keyword">new</span> <span class="cm-variable">Number</span>(<span class="cm-number">3</span>), <span class="cm-keyword">new</span> <span class="cm-variable">String</span>(<span class="cm-string">'false'</span>), <span class="cm-keyword">new</span> <span class="cm-variable">Boolean</span>(<span class="cm-atom">false</span>)]));</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" contenteditable="false" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">5</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-comment">// expected output: "[3,"false",false]"</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" contenteditable="false" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">6</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" contenteditable="false" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">7</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">JSON</span>.<span class="cm-property">stringify</span>({ <span class="cm-property">x</span>: [<span class="cm-number">10</span>, <span class="cm-atom">undefined</span>, <span class="cm-keyword">function</span>(){}, <span class="cm-variable">Symbol</span>(<span class="cm-string">''</span>)] }));</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" contenteditable="false" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">8</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-comment">// expected output: "{"x":[10,null,null,null]}"</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" contenteditable="false" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">9</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" contenteditable="false" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">10</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">JSON</span>.<span class="cm-property">stringify</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Date</span>(<span class="cm-number">2006</span>, <span class="cm-number">0</span>, <span class="cm-number">2</span>, <span class="cm-number">15</span>, <span class="cm-number">4</span>, <span class="cm-number">5</span>)));</span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" contenteditable="false" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">11</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-comment">// expected output: ""2006-01-02T15:04:05.000Z""</span></span></pre></div><div style="position: relative;"><div class="CodeMirror-gutter-wrapper" contenteditable="false" style="left: -30px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">12</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div></div></div></div></div></div><div style="position: absolute; height: 13px; width: 1px; border-bottom: 0px solid transparent; top: 260px;"></div><div class="CodeMirror-gutters" style="height: 273px;"><div class="CodeMirror-gutter CodeMirror-linenumbers" style="width: 29px;"></div></div></div></div></div>
+
+          <div class="output-container">
+              <div class="buttons-container">
+                  <button id="execute" class="button run" type="button">Run ›</button>
+                  <button id="reset" type="button" class="button">Reset</button>
+              </div>
+              <div id="output" class="output"><code></code></div>
+          </div>
+      </section>
+
+    
+
+    <script src="./codemirror-5-31-0.js.ダウンロード"></script>
+    <script src="./editor-js.js.ダウンロード"></script>
+  
+
+</body><div id="TAG_ID4TOOLBAR_UMS_GUID" style="display: none;">82327B1A-DB62-761F-E4F0-F07F39DBF0E8</div><div id="tmtoolbar_ums_injected" style="display: none;">init_ums</div><div id="UMSSendDataEventElement" style="display: none;">init_ums</div></html>

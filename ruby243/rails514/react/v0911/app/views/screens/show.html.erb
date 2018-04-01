@@ -1,0 +1,16 @@
+<%= javascript_pack_tag 'BootstrapTableclass' %>
+
+<h3><%=@title%></h3>
+<div id="screen_id" ></div>
+<script >
+    function showfields() {
+        var field_names = <%=raw @show_columns  %>;
+        return field_names;
+    }
+    function showrecords() {
+        var records = <%=raw @show_records  %>;
+        return records;
+    }
+</script>
+<style>
+</style>

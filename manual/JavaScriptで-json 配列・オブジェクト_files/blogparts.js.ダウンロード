@@ -1,0 +1,12 @@
+function viewBlogparts(){
+    var rs = Math.round(Math.random()*2147483647);
+    var link = "http://blogchart.jp/blog?url="+blogurl;
+    var imgsrc = "http://blogchart.jp/blogparts?type="+partstype+"&id="+id+"&rs="+rs;
+    document.write("<a href='");
+    document.write(link);
+    document.write("' target='_blank' >");
+    document.write("<img src='");
+    document.write(imgsrc);
+    document.write("' border=0 width=163 height=53 />");
+    document.write("</a>");
+}

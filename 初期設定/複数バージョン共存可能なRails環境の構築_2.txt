@@ -1,0 +1,244 @@
+﻿ 複数バージョン共存可能なRails環境の構築
+目的
+
+    Ruby環境はrbenvを使用し、複数のバージョンを切替え可能とする。
+    Bundlerを使用し、Railsをローカルディレクトリにインストールし、複数のバージョンのRailsプロジェクトの作成、共存を可能とする。
+
+Rubyのインストール
+rbenv とは
+
+Rubyを管理するツール。複数バージョンのRubyの管理/切替えができる。
+（１）rbenvのインストール
+
+・githubから
+
+Installation
+
+Installer is here.
+Install rbenv for windows to your USERPROFILE directory.
+
+    Clone git repositry
+
+    > git clone https://github.com/nak1114/rbenv-win.git %USERPROFILE%\.rbenv-win
+
+    Config path
+    Add the bin & shims directory to your PATH environment variable for access to the rbenv command
+
+    > for /f "skip=2 delims=" %a in ('reg query HKCU\Environment /v Path') do set orgpath=%a
+    > setx Path "%USERPROFILE%\.rbenv-win\bin;%USERPROFILE%\.rbenv-win\shims;%orgpath:~22%"
+
+    Restart your shell
+
+    > exit
+
+    Run the following command after rbenv installation , to enable the ruby.
+
+    > rbenv install 2.2.4
+    > rbenv global 2.2.4
+    > rbenv rehash
+
+
+
+
+（２）Homebrewでインストール実施。
+
+ (Xcodeインストール -> Command Line Tools for Xcodeインストール -> Homebrewインストール済）
+
+    最新パッケージリスト取得
+    $ brew update
+    rbenvのインストール
+    $ brew install rbenv
+    バージョンを確認
+    $ rbenv -v
+    rbenv 1.0.0
+
+	
+尚、ruby-build(rubyをビルドインするプラグイン)は、rbenvインストールでインストール済み。インストールする場合は、以下。(インストール済みの場合は、already installedと表示。
+
+    ruby-buildのインストール
+    $ brew install ruby-build
+    バージョンを確認
+    $ ruby-build --version
+    ruby-build 20160602
+
+・PATHを通す
+
+ターミナルへrbenvを使用するためのPATH設定を行う。
+
+$ touch ~/.bash_profile
+
+$ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
+
+$ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
+
+$ source ~/.bash_profile
+
+（３）最新のRubyをインストールする
+
+rbenvからインストール可能なRubyのバージョンを確認
+
+$ rbenv install -l
+
+最新が 2.3.1 であることを確認。
+
+現状MacBookにインストール済みRubyバージョンを確認
+
+$ ruby -v
+
+ruby 2.0.0であることを確認。
+最新バージョン 2.3.1をインストール
+
+$ rbenv install 2.3.1
+
+デフォルトで利用するバージョンを指定
+
+$ rbenv global 2.3.1
+
+$ ruby -v
+
+ruby 2.3.1であることを確認
+
+インストールディレクトリ確認
+
+$ which ruby
+
+~/.rbenv/shims/ruby
+Railsチュートリアルで使用するバージョン2.2.1をインストール
+
+$ rbenv install 2.2.1
+
+インストール済みで利用可能なrubyのバージョンを確認
+
+$ rbenv versions
+
+2.2.1 と 2.3.1 が表示されていることを確認。
+
+system
+2.2.1
+* 2.3.1
+ローカルディレクトリにRails環境を構築
+ワークスペース用ディレクトリの作成
+
+（４）Railsプロジェクト用のワークスペースディレクトリを作成。
+
+(Railsプロジェクトは今後、~/rails_wkspディレクトリ下に作成予定のため)
+
+$ mkdir ~/rails_wksp
+
+$ cd ~/rails_wksp
+Railsチュートリアル実施用ディレクトリ作成
+
+※新規Railsアプリケーション開始時は基本的にここから実施。（別バージョンのRubyを使用する場合は、Rubyのインストールから実施。）
+
+Railsチュートリアル実施のため、Railsアプリケーションを開発するためのディレクトリを作成。この環境にRuby2.2.1を適用。
+
+$ mkdir ~/rails_wksp/sample_app
+
+$ cd ~/rails_wksp/sample_app
+
+以降、本ディレクトリで作業実施。
+使用するRubyのバージョン 2.2.1を指定。
+
+$ rbenv local 2.2.1
+
+$ ruby -v
+
+ruby 2.2.1を確認。
+
+$ rbenv versions
+
+以下を確認。
+
+system
+
+（５）
+Bundlerをインストール
+
+Railsで使用するGemを各プロジェクト毎に管理するため、bundlerのインストールを行う。bundlerはgemの管理システムであり、bundler自体もgemの一種。
+
+RubyGems => gemをインストールするためのアプリケーション(ただしシステム全体に影響してしまう)
+bundler => プロジェクトごとに使用するgemやgemのバージョンを設定できる(システム全体に影響しない)
+
+$ rbenv exec gem install bundler
+
+Successfully installed bundler-1.13.6
+
+$ rbenv rehash
+
+（６）
+Bundlerを使用し一時的にrailsをローカルにインストール
+
+Railsアプリケーションを作成するために一時的にrailsをローカル（sample_app下）にインストール。
+
+    Gemfile作成
+    どんなRubyのライブラリ(gem)を使うのかを示すGemfileを作成
+    $ rbenv exec bundle init
+    作成されたGemfileをの「# gem "rails"」の箇所をエディタで変更
+
+    source "https://rubygems.org"
+
+    # gem "rails"
+    チュートリアルで使用するRailsのバージョン4.2.2を使用するよう以下に変更。
+    gem "rails", "4.2.2"
+
+    Railsのインストール実施
+    $ rbenv exec bundle install --path vendor/bundle
+    Installing rails 4.2.2
+    Bundle complete! 1 Gemfile dependency, 35 gems now installed.
+    Bundled gems are installed into ./vendor/bundle.
+    補足：オプション「--path vendor/bundle」を付けることによりgemは、アプリケーション限定の領域(vendor/bundleディレクトリ）にインストールされる。（オプションがない場合、Mac全体で共有される領域にインストールされる。）
+    システム全体で共有される領域へgemをインストールしても、管理されていれば基本的に問題はないが、依存問題等のリスクを考慮し、アプリケーション毎に隔離独立していることを担保することとした。
+    以下作成を確認
+
+    $ ls
+
+    Gemfile Gemfile.lock vendor
+    補足：vendorディレクトリ下に、「vendor/bundle/ruby/2.2.0」のファイルがあるが、末尾のバージョン(tiny)は無視されているようですので、2.2.0 〜 2.2.x でも .../2.2.0 になる模様。
+
+Railsアプリケーションの新規作成
+
+先にbundleでインストールしたgemパッケージを利用し、Railsアプリケーション「sample_app」を作成。なお、すでに作成済みの「sample_app」ディレクトリをアプリケーション名とするので、「rails new アプリケーション名」は「rails new .」とする。
+
+    Railsアプリケーションの新規作成
+    $ rbenv exec bundle exec rails new . --skip-bundle
+    先に一時的に同一ディレクトリでrailsをインストールしているため、以下のようにGemfileの上書きの確認がされるが、許可を実施。
+
+        conflict  Gemfile
+
+    Overwrite /Users/s-asano/rails_wksp/sample_app/Gemfile? (enter "h" for help) [Ynaqdh] Y
+
+           force  Gemfile
+    補足：bundleでインストールしたgemパッケージを利用するため「bundle exec」というプレフィックスを指定。そして、bundle installが発動し現在有効なrubyにrailsがインストールされないよう「--skip-bundle」オプションを指定。（後述の「Railsアプリケーションの環境セットアップ」で実施。）
+    以下、生成を確認。
+
+    $ ls
+
+    Gemfile Rakefile config lib test
+
+    Gemfile.lock app config.ru log tmp
+
+    README.rdoc bin db public vendor
+
+Railsアプリケーションの環境セットアップ
+
+    必要に応じてsample_appのGemfileの内容を編集
+    Railsの標準gemのインストール実施。「--path vendor/bundle」オプションをつけ、アプリケーションに閉じた状態でGemをインストール
+    $ bundle install --path vendor/bundle
+    Installing rails 4.2.2
+    Bundle complete! 12 Gemfile dependencies, 56 gems now installed.
+    Bundled gems are installed into ./vendor/bundle.
+    これにより、Rails(及び関連Gem)が、新規作成Railsアプリケーションのvender/bundleディレクトリ以下にインストールされる。
+
+Railsアプリケーションの起動
+
+    Railsアプリケーションを起動
+    $ bundle exec rails server
+    ＊railsやrakeといったコマンドを実行する際は、bundle exec を介する必要がある。
+    ブラウザを立ち上げ、アドレスバーに「http://localhost:3000」を入力しRailsの初期画面が表示されることを確認。
+	
+（ａ）state=sslv3 read server certificate b certificate verify failed	　　発生時
+証明書をダウンロードする。
+http://curl.haxx.se/ca/cacert.pem
+環境変数 SSL_CERT_FILE に cacert.pem のパスを設定する
+set SSL_CERT_FILE=./cacert.pem
+	

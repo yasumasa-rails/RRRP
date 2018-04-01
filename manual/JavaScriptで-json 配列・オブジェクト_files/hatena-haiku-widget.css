@@ -1,0 +1,170 @@
+body {
+  color: #333;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+body#keyword-widget {
+  background: #ecf3e9;
+}
+
+body#user-widget {
+  background: #f7e7e7;
+}
+
+img {
+  border: none;
+}
+
+div.haiku-widget {
+  overflow: hidden;
+}
+
+#keyword-widget div.haiku-widget div.haiku-widget-header {
+  background: #7ba86d url(/images/keyword-widget-header.gif) top right no-repeat;
+  color: #fff;
+}
+
+#user-widget div.haiku-widget div.haiku-widget-header {
+  background: #D07C7A url(/images/user-widget-header.gif) top right no-repeat;
+  color: #fff;
+}
+
+div.haiku-widget div.haiku-widget-header a{
+  color: #fff;
+  font-weight: bold;
+}
+
+#keyword-widget div.haiku-widget div.haiku-widget-header div.haiku-widget-title {
+  padding: 6px;
+  background: url(/images/keyword-widget-title.gif) top left no-repeat;
+  font-size: 90%;
+}
+
+#user-widget div.haiku-widget div.haiku-widget-header div.haiku-widget-title {
+  padding: 6px;
+  background: url(/images/user-widget-title.gif) top left no-repeat;
+  font-size: 90%;
+}
+
+.haiku-widget-body.image-entries {
+  padding: 0;
+}
+
+#keyword-widget div.haiku-widget div.haiku-widget-body,
+#keyword-widget .image-entries div.entry div.info {
+  background: #ecf3e9;
+}
+
+#user-widget div.haiku-widget div.haiku-widget-body,
+#user-widget .image-entries div.entry div.info {
+  background: #f7e7e7;
+}
+
+#user-widget .image-entries div.entry,
+#keyword-widget .image-entries div.entry {
+/*  height: auto;*/
+}
+
+#keyword-widget div.haiku-widget div.entry {
+  padding: 5px;
+  line-height: 1.5;
+  font-size: 90%;
+  border-top: 1px solid #d7e3d4;
+}
+
+#user-widget div.haiku-widget div.entry {
+  padding: 5px;
+  line-height: 1.5;
+  font-size: 90%;
+  border-top: 1px solid #edd1d1;
+}
+
+div.haiku-widget div.entry div.title {
+  font-weight: bold;
+  font-size: 80%;
+  padding: 0 0 3px 3px;
+}
+
+div.haiku-widget div.entry div.title a{
+  color: #467237;
+}
+
+div.haiku-widget div.entry div.body {
+  padding: 3px;
+}
+
+div.haiku-widget div.entry div.info{
+  padding: 3px 0 0 3px;
+  font-size: 80%;
+}
+
+div.haiku-widget div.entry div.info img{
+  vertical-align: middle;
+  margin-bottom: 2px;
+}
+
+div.haiku-widget div.entry div.info img.profile-icon {
+  margin-right: 3px;
+}
+
+div.haiku-widget div.entry div.info span.username a{
+  font-weight: bold;
+  text-decoration: none;
+  color: #b36b85;
+}
+
+div.haiku-widget div.entry div.info span.timestamp{
+  color: #b36b85;
+  margin-left: 0px;
+  margin-right: 2px;
+}
+
+div.haiku-widget div.haiku-widget-form textarea{
+  width: 95%;
+}
+
+div.haiku-widget div.haiku-widget-form div.send-button{
+}
+
+div.haiku-widget div.haiku-widget-form div.send-button input.button{
+  padding: 3px;
+  background: #fff;
+  border: 1px solid #bbc4cd;
+}
+
+div.haiku-widget div.haiku-widget-form div.input-selecter {
+  text-align: right;
+  margin-top: -1px;
+}
+
+div.haiku-widget div.haiku-widget-form div.input-selecter img{
+  cursor: pointer;
+}
+
+div.haiku-widget div.more {
+  text-align: right;
+}
+
+#keyword-widget div.haiku-widget div.more a{
+  padding-left: 10px;
+  background: url(/images/icon-arrow-rightbar.gif) 0 50% no-repeat;
+  font-size: 90%;
+}
+
+#user-widget div.haiku-widget div.more a{
+  padding-left: 10px;
+  background: url(/images/icon-arrow-leftbar.gif) 0 50% no-repeat;
+  font-size: 90%;
+}
+
+div.haiku-widget div.haiku-widget-credit {
+  text-align: right;
+  margin-top: 7px;
+}
+
+.image-entries .entry.more {
+  width: 90%;
+  height: auto;
+}

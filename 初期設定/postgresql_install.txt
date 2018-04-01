@@ -1,0 +1,75 @@
+﻿PostgreSQLのインストール
+
+$ sudo yum -y install postgresql94
+$ sudo yum -y install postgresql94-devel
+$ sudo yum -y install postgresql94-server
+$ psql --version
+psql (9.4.5)
+
+初期化からの起動
+
+$ sudo /etc/init.d/postgresql94 initdb
+$ sudo /etc/init.d/postgresql94 start
+
+PostgreSQLアカウントの設定
+
+$ sudo -u postgres psql
+postgres=# alter role postgres with password 'hogehoge';
+postgres=# alter role [user_name] with password '[password]';
+
+データベースの作成
+
+postgres=# create database [database_name] owner [user_name];
+
+アクセス権限の設定
+
+$ vim /var/lib/pgsql94/data/pg_hba.conf
+
+local all all peerを
+local all all md5に変更
+Railの設定
+アプリの作成
+
+$ rails new myapp -d postgresql
+config/database.ymlの設定
+
+default: &default
+  adapter: postgresql
+  encoding: utf8
+  pool: 5
+  username: [username]
+  password: [password] 
+
+development:
+  <<: *default
+  database: myapp_development
+
+test:
+  <<: *default
+  database: myapp_test
+
+production:
+  <<: *default
+  database: myapp_production
+
+Create Data Base
+
+launch psql
+
+$ psql -U postgres
+User postgres password:
+psql (10)
+
+postgres=#
+
+create role
+
+postgres=#< create role myapp with createdb login password 'password';
+
+create database
+
+postgres=#< create database myapp_development owner myapp;
+
+quit
+
+postgres=#< \q

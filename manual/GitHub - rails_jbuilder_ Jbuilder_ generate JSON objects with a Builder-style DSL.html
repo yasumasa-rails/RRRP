@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<!-- saved from url=(0033)https://github.com/rails/jbuilder -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>body {transition: opacity ease-in 0.2s; } 
+body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
+</style>
+    
+  <link rel="dns-prefetch" href="https://assets-cdn.github.com/">
+  <link rel="dns-prefetch" href="https://avatars0.githubusercontent.com/">
+  <link rel="dns-prefetch" href="https://avatars1.githubusercontent.com/">
+  <link rel="dns-prefetch" href="https://avatars2.githubusercontent.com/">
+  <link rel="dns-prefetch" href="https://avatars3.githubusercontent.com/">
+  <link rel="dns-prefetch" href="https://github-cloud.s3.amazonaws.com/">
+  <link rel="dns-prefetch" href="https://user-images.githubusercontent.com/">
+
+
+
+  <link crossorigin="anonymous" href="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/frameworks-521cbf980c80.css" integrity="sha512-Uhy/mAyAx1HfsenmjQ85ASpOk5bjt2Ay03pNeixXIvkHlEm5S+N4u0HWfDGhvsGYx4bGyviXWGGPZeIffqYcNA==" media="all" rel="stylesheet">
+  <link crossorigin="anonymous" href="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/github-bab09cdfa5e9.css" integrity="sha512-urCc36XpOB6NJpSUfwUO4198a84yfDnoKASZ+D+7pCjpTpQ3YrhkgX9SgIpI83PiKF87mXoMJHJ/nE0eXNeTqA==" media="all" rel="stylesheet">
+  
+  
+  <link crossorigin="anonymous" href="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/site-e1e1bc98a53e.css" integrity="sha512-4eG8mKU+R9QAnMQwfSIgbo24hS+nUXxSuUs5G5LMQw+5wjC1TSKfgxJb2j61PXya94+wMwN1OT7r7MF5rbdUvw==" media="all" rel="stylesheet">
+  
+
+  <meta name="viewport" content="width=device-width">
+  
+  <title>GitHub - rails/jbuilder: Jbuilder: generate JSON objects with a Builder-style DSL</title>
+  <link rel="search" type="application/opensearchdescription+xml" href="https://github.com/opensearch.xml" title="GitHub">
+  <link rel="fluid-icon" href="https://github.com/fluidicon.png" title="GitHub">
+  <meta property="fb:app_id" content="1401488693436528">
+
+    
+    <meta content="https://avatars3.githubusercontent.com/u/4223?s=400&amp;v=4" property="og:image"><meta content="GitHub" property="og:site_name"><meta content="object" property="og:type"><meta content="rails/jbuilder" property="og:title"><meta content="https://github.com/rails/jbuilder" property="og:url"><meta content="jbuilder - Jbuilder: generate JSON objects with a Builder-style DSL" property="og:description">
+
+  <link rel="assets" href="https://assets-cdn.github.com/">
+  
+  <meta name="pjax-timeout" content="1000">
+  
+  <meta name="request-id" content="D4AB:1B923:65C448C:8EA7B70:5A7497F9" data-pjax-transient="">
+  
+
+  <meta name="selected-link" value="repo_source" data-pjax-transient="">
+
+    <meta name="google-site-verification" content="KT5gs8h0wvaagLKAVWq8bbeNwnZZK1r1XQysX3xurLU">
+  <meta name="google-site-verification" content="ZzhVyEFwb7w3e0-uOTltm8Jsck2F5StVihD0exw2fsA">
+  <meta name="google-site-verification" content="GXs5KoUUkNCoaAZn7wPN-t01Pywp9M3sEjnt_3_ZWPc">
+    <meta name="google-analytics" content="UA-3769691-2">
+
+<meta content="collector.githubapp.com" name="octolytics-host"><meta content="github" name="octolytics-app-id"><meta content="https://collector.githubapp.com/github-external/browser_event" name="octolytics-event-url"><meta content="D4AB:1B923:65C448C:8EA7B70:5A7497F9" name="octolytics-dimension-request_id"><meta content="sea" name="octolytics-dimension-region_edge"><meta content="iad" name="octolytics-dimension-region_render">
+<meta content="https://github.com/hydro_browser_events" name="hydro-events-url">
+<meta content="/&lt;user-name&gt;/&lt;repo-name&gt;" data-pjax-transient="true" name="analytics-location">
+
+
+
+
+  <meta class="js-ga-set" name="dimension1" content="Logged Out">
+
+
+  
+
+      <meta name="hostname" content="github.com">
+  <meta name="user-login" content="">
+
+      <meta name="expected-hostname" content="github.com">
+    <meta name="js-proxy-site-detection-payload" content="YzdhN2IxNGM1NDUyM2JmMGMwZjgwMTY1NWMxZTg2MWFiMjcwYWM2ZDU5NGI3ZmFjYmIwYTE5NGQwM2ZhMjc3Y3x7InJlbW90ZV9hZGRyZXNzIjoiMTI0LjEwMy4yNDMuMiIsInJlcXVlc3RfaWQiOiJENEFCOjFCOTIzOjY1QzQ0OEM6OEVBN0I3MDo1QTc0OTdGOSIsInRpbWVzdGFtcCI6MTUxNzU5MDUyMSwiaG9zdCI6ImdpdGh1Yi5jb20ifQ==">
+
+    <meta name="enabled-features" content="UNIVERSE_BANNER,FREE_TRIALS,MARKETPLACE_HERO_CARD_UPLOADER">
+
+  <meta name="html-safe-nonce" content="27a79ac540e55a668fa6fa21a5d6bc659c14add3">
+
+  <meta http-equiv="x-pjax-version" content="e8ba15cac414de1a895297c595e646a3">
+  
+
+      <link href="https://github.com/rails/jbuilder/commits/master.atom" rel="alternate" title="Recent Commits to jbuilder:master" type="application/atom+xml">
+
+  <meta name="description" content="jbuilder - Jbuilder: generate JSON objects with a Builder-style DSL">
+  <meta name="go-import" content="github.com/rails/jbuilder git https://github.com/rails/jbuilder.git">
+
+  <meta content="4223" name="octolytics-dimension-user_id"><meta content="rails" name="octolytics-dimension-user_login"><meta content="2861056" name="octolytics-dimension-repository_id"><meta content="rails/jbuilder" name="octolytics-dimension-repository_nwo"><meta content="true" name="octolytics-dimension-repository_public"><meta content="false" name="octolytics-dimension-repository_is_fork"><meta content="2861056" name="octolytics-dimension-repository_network_root_id"><meta content="rails/jbuilder" name="octolytics-dimension-repository_network_root_nwo"><meta content="false" name="octolytics-dimension-repository_explore_github_marketplace_ci_cta_shown">
+
+
+    <link rel="canonical" href="https://github.com/rails/jbuilder" data-pjax-transient="">
+
+
+  <meta name="browser-stats-url" content="https://api.github.com/_private/browser/stats">
+
+  <meta name="browser-errors-url" content="https://api.github.com/_private/browser/errors">
+
+  <link rel="mask-icon" href="https://assets-cdn.github.com/pinned-octocat.svg" color="#000000">
+  <link rel="icon" type="image/x-icon" class="js-site-favicon" href="https://assets-cdn.github.com/favicon.ico">
+
+<meta name="theme-color" content="#1e2327">
+
+
+  <meta name="u2f-support" content="true">
+
+  </head>
+
+  <body class="logged-out env-production">
+    
+
+  <div class="position-relative js-header-wrapper ">
+    <a href="https://github.com/rails/jbuilder#start-of-content" tabindex="1" class="px-2 py-4 show-on-focus js-skip-to-content">Skip to content</a>
+    <div id="js-pjax-loader-bar" class="pjax-loader-bar"><div class="progress"></div></div>
+
+    
+    
+    
+
+
+
+        <header class="Header header-logged-out  position-relative f4 py-3" role="banner">
+  <div class="container-lg d-flex px-3">
+    <div class="d-flex flex-justify-between flex-items-center">
+      <a class="header-logo-invertocat my-0" href="https://github.com/" aria-label="Homepage" data-ga-click="(Logged out) Header, go to homepage, icon:logo-wordmark">
+        <svg aria-hidden="true" class="octicon octicon-mark-github" height="32" version="1.1" viewBox="0 0 16 16" width="32"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg>
+      </a>
+
+    </div>
+
+    <div class="HeaderMenu HeaderMenu--bright d-flex flex-justify-between flex-auto">
+        <nav class="mt-0">
+          <ul class="d-flex list-style-none">
+              <li class="ml-2">
+                <a href="https://github.com/features" class="js-selected-navigation-item HeaderNavlink px-0 py-2 m-0" data-ga-click="Header, click, Nav menu - item:features" data-selected-links="/features /features/project-management /features/code-review /features/project-management /features/integrations /features">
+                  Features
+</a>              </li>
+              <li class="ml-4">
+                <a href="https://github.com/business" class="js-selected-navigation-item HeaderNavlink px-0 py-2 m-0" data-ga-click="Header, click, Nav menu - item:business" data-selected-links="/business /business/security /business/customers /business">
+                  Business
+</a>              </li>
+
+              <li class="ml-4">
+                <a href="https://github.com/explore" class="js-selected-navigation-item HeaderNavlink px-0 py-2 m-0" data-ga-click="Header, click, Nav menu - item:explore" data-selected-links="/explore /trending /trending/developers /integrations /integrations/feature/code /integrations/feature/collaborate /integrations/feature/ship showcases showcases_search showcases_landing /explore">
+                  Explore
+</a>              </li>
+
+              <li class="ml-4">
+                    <a href="https://github.com/marketplace" class="js-selected-navigation-item HeaderNavlink px-0 py-2 m-0" data-ga-click="Header, click, Nav menu - item:marketplace" data-selected-links=" /marketplace">
+                      Marketplace
+</a>              </li>
+              <li class="ml-4">
+                <a href="https://github.com/pricing" class="js-selected-navigation-item HeaderNavlink px-0 py-2 m-0" data-ga-click="Header, click, Nav menu - item:pricing" data-selected-links="/pricing /pricing/developer /pricing/team /pricing/business-hosted /pricing/business-enterprise /pricing">
+                  Pricing
+</a>              </li>
+          </ul>
+        </nav>
+
+      <div class="d-flex">
+          <div class="d-lg-flex flex-items-center mr-3">
+            <div class="header-search scoped-search site-scoped-search js-site-search" role="search">
+  <!-- '"` --><!-- </textarea></xmp> --><form accept-charset="UTF-8" action="https://github.com/rails/jbuilder/search" class="js-site-search-form" data-scoped-search-url="/rails/jbuilder/search" data-unscoped-search-url="/search" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="✓"></div>
+    <label class="form-control header-search-wrapper js-chromeless-input-container">
+        <a href="https://github.com/rails/jbuilder" class="header-search-scope no-underline">This repository</a>
+      <input type="text" class="form-control header-search-input js-site-search-focus js-site-search-field is-clearable" data-hotkey="s" name="q" value="" placeholder="Search" aria-label="Search this repository" data-unscoped-placeholder="Search GitHub" data-scoped-placeholder="Search" autocapitalize="off">
+        <input type="hidden" class="js-site-search-type-field" name="type">
+    </label>
+</form></div>
+
+          </div>
+
+        <span class="d-inline-block">
+            <div class="HeaderNavlink px-0 py-2 m-0">
+              <a class="text-bold text-white no-underline" href="https://github.com/login?return_to=%2Frails%2Fjbuilder" data-ga-click="(Logged out) Header, clicked Sign in, text:sign-in">Sign in</a>
+                <span class="text-gray">or</span>
+                <a class="text-bold text-white no-underline" href="https://github.com/join?source=header-repo" data-ga-click="(Logged out) Header, clicked Sign up, text:sign-up">Sign up</a>
+            </div>
+        </span>
+      </div>
+    </div>
+  </div>
+</header>
+
+  </div>
+
+  <div id="start-of-content" class="show-on-focus"></div>
+
+    <div id="js-flash-container">
+</div>
+
+
+
+  <div role="main" class="application-main ">
+        <div itemscope="" itemtype="http://schema.org/SoftwareSourceCode" class="">
+    <div id="js-repo-pjax-container" data-pjax-container="">
+      
+
+
+
+  
+
+
+
+  <div class="pagehead repohead instapaper_ignore readability-menu experiment-repo-nav  ">
+    <div class="repohead-details-container clearfix container">
+
+      <ul class="pagehead-actions">
+  <li>
+      <a href="https://github.com/login?return_to=%2Frails%2Fjbuilder" class="btn btn-sm btn-with-count tooltipped tooltipped-n" aria-label="You must be signed in to watch a repository" rel="nofollow">
+    <svg aria-hidden="true" class="octicon octicon-eye" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M8.06 2C3 2 0 8 0 8s3 6 8.06 6C13 14 16 8 16 8s-3-6-7.94-6zM8 12c-2.2 0-4-1.78-4-4 0-2.2 1.8-4 4-4 2.22 0 4 1.8 4 4 0 2.22-1.78 4-4 4zm2-4c0 1.11-.89 2-2 2-1.11 0-2-.89-2-2 0-1.11.89-2 2-2 1.11 0 2 .89 2 2z"></path></svg>
+    Watch
+  </a>
+  <a class="social-count" href="https://github.com/rails/jbuilder/watchers" aria-label="93 users are watching this repository">
+    93
+  </a>
+
+  </li>
+
+  <li>
+      <a href="https://github.com/login?return_to=%2Frails%2Fjbuilder" class="btn btn-sm btn-with-count tooltipped tooltipped-n" aria-label="You must be signed in to star a repository" rel="nofollow">
+    <svg aria-hidden="true" class="octicon octicon-star" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74z"></path></svg>
+    Star
+  </a>
+
+    <a class="social-count js-social-count" href="https://github.com/rails/jbuilder/stargazers" aria-label="3258 users starred this repository">
+      3,258
+    </a>
+
+  </li>
+
+  <li>
+      <a href="https://github.com/login?return_to=%2Frails%2Fjbuilder" class="btn btn-sm btn-with-count tooltipped tooltipped-n" aria-label="You must be signed in to fork a repository" rel="nofollow">
+        <svg aria-hidden="true" class="octicon octicon-repo-forked" height="16" version="1.1" viewBox="0 0 10 16" width="10"><path fill-rule="evenodd" d="M8 1a1.993 1.993 0 0 0-1 3.72V6L5 8 3 6V4.72A1.993 1.993 0 0 0 2 1a1.993 1.993 0 0 0-1 3.72V6.5l3 3v1.78A1.993 1.993 0 0 0 5 15a1.993 1.993 0 0 0 1-3.72V9.5l3-3V4.72A1.993 1.993 0 0 0 8 1zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zm3 10c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zm3-10c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+        Fork
+      </a>
+
+    <a href="https://github.com/rails/jbuilder/network" class="social-count" aria-label="311 users forked this repository">
+      311
+    </a>
+  </li>
+</ul>
+
+      <h1 class="public ">
+  <svg aria-hidden="true" class="octicon octicon-repo" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M4 9H3V8h1v1zm0-3H3v1h1V6zm0-2H3v1h1V4zm0-2H3v1h1V2zm8-1v12c0 .55-.45 1-1 1H6v2l-1.5-1.5L3 16v-2H1c-.55 0-1-.45-1-1V1c0-.55.45-1 1-1h10c.55 0 1 .45 1 1zm-1 10H1v2h2v-1h3v1h5v-2zm0-10H2v9h9V1z"></path></svg>
+  <span class="author" itemprop="author"><a href="https://github.com/rails" class="url fn" rel="author">rails</a></span><!--
+--><span class="path-divider">/</span><!--
+--><strong itemprop="name"><a href="https://github.com/rails/jbuilder" data-pjax="#js-repo-pjax-container">jbuilder</a></strong>
+
+</h1>
+
+    </div>
+    
+<nav class="reponav js-repo-nav js-sidenav-container-pjax container" itemscope="" itemtype="http://schema.org/BreadcrumbList" role="navigation" data-pjax="#js-repo-pjax-container">
+
+  <span itemscope="" itemtype="http://schema.org/ListItem" itemprop="itemListElement">
+    <a href="https://github.com/rails/jbuilder" class="js-selected-navigation-item selected reponav-item" data-hotkey="g c" data-selected-links="repo_source repo_downloads repo_commits repo_releases repo_tags repo_branches repo_packages /rails/jbuilder" itemprop="url">
+      <svg aria-hidden="true" class="octicon octicon-code" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z"></path></svg>
+      <span itemprop="name">Code</span>
+      <meta itemprop="position" content="1">
+</a>  </span>
+
+    <span itemscope="" itemtype="http://schema.org/ListItem" itemprop="itemListElement">
+      <a href="https://github.com/rails/jbuilder/issues" class="js-selected-navigation-item reponav-item" data-hotkey="g i" data-selected-links="repo_issues repo_labels repo_milestones /rails/jbuilder/issues" itemprop="url">
+        <svg aria-hidden="true" class="octicon octicon-issue-opened" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+        <span itemprop="name">Issues</span>
+        <span class="Counter">38</span>
+        <meta itemprop="position" content="2">
+</a>    </span>
+
+  <span itemscope="" itemtype="http://schema.org/ListItem" itemprop="itemListElement">
+    <a href="https://github.com/rails/jbuilder/pulls" class="js-selected-navigation-item reponav-item" data-hotkey="g p" data-selected-links="repo_pulls /rails/jbuilder/pulls" itemprop="url">
+      <svg aria-hidden="true" class="octicon octicon-git-pull-request" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+      <span itemprop="name">Pull requests</span>
+      <span class="Counter">15</span>
+      <meta itemprop="position" content="3">
+</a>  </span>
+
+    <a href="https://github.com/rails/jbuilder/projects" class="js-selected-navigation-item reponav-item" data-hotkey="g b" data-selected-links="repo_projects new_repo_project repo_project /rails/jbuilder/projects">
+      <svg aria-hidden="true" class="octicon octicon-project" height="16" version="1.1" viewBox="0 0 15 16" width="15"><path fill-rule="evenodd" d="M10 12h3V2h-3v10zm-4-2h3V2H6v8zm-4 4h3V2H2v12zm-1 1h13V1H1v14zM14 0H1a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1z"></path></svg>
+      Projects
+      <span class="Counter">0</span>
+</a>
+
+
+  <a href="https://github.com/rails/jbuilder/pulse" class="js-selected-navigation-item reponav-item" data-selected-links="repo_graphs repo_contributors dependency_graph pulse /rails/jbuilder/pulse">
+    <svg aria-hidden="true" class="octicon octicon-graph" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M16 14v1H0V0h1v14h15zM5 13H3V8h2v5zm4 0H7V3h2v10zm4 0h-2V6h2v7z"></path></svg>
+    Insights
+</a>
+
+</nav>
+
+
+  </div>
+
+<div class="container new-discussion-timeline experiment-repo-nav  ">
+  <div class="repository-content ">
+
+    
+      <div class="signup-prompt-bg rounded-1">
+      <div class="signup-prompt p-4 text-center mb-4 rounded-1">
+        <div class="position-relative">
+          <!-- '"` --><!-- </textarea></xmp> --><form accept-charset="UTF-8" action="https://github.com/site/dismiss_signup_prompt" method="post"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="✓"><input name="authenticity_token" type="hidden" value="bZEiyTA6hPlT6Qq7+Zhz0bOjzuKvhBG4SmfRfWQtulC4iaJwcUQTHrXJVXgLb2bTHRIX2Z+xHW6HcAagmoJBLg=="></div>
+            <button type="submit" class="position-absolute top-0 right-0 btn-link link-gray" data-ga-click="(Logged out) Sign up prompt, clicked Dismiss, text:dismiss">
+              Dismiss
+            </button>
+</form>
+          <h3 class="pt-2">Join GitHub today</h3>
+          <p class="col-6 mx-auto">GitHub is home to over 20 million developers working together to host and review code, manage projects, and build software together.</p>
+          <p class="pb-2">
+            <a class="btn btn-blue" href="https://github.com/join?source=prompt-code" data-ga-click="(Logged out) Sign up prompt, clicked Sign up, text:sign-up">Sign up</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+
+  <div class="js-repo-meta-container">
+  <div class="repository-meta mb-0 mb-3 js-repo-meta-edit js-details-container ">
+    <div class="repository-meta-content col-11 mb-1">
+          <span class="col-11 text-gray-dark mr-2" itemprop="about">
+            Jbuilder: generate JSON objects with a Builder-style DSL
+          </span>
+    </div>
+
+  </div>
+
+</div>
+
+
+
+  <div class="overall-summary overall-summary-bottomless">
+    <div class="stats-switcher-viewport js-stats-switcher-viewport">
+      <div class="stats-switcher-wrapper">
+      <ul class="numbers-summary">
+        <li class="commits">
+          <a data-pjax="" href="https://github.com/rails/jbuilder/commits/master">
+              <svg aria-hidden="true" class="octicon octicon-history" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path fill-rule="evenodd" d="M8 13H6V6h5v2H8v5zM7 1C4.81 1 2.87 2.02 1.59 3.59L0 2v4h4L2.5 4.5C3.55 3.17 5.17 2.3 7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-.34.03-.67.09-1H.08C.03 7.33 0 7.66 0 8c0 3.86 3.14 7 7 7s7-3.14 7-7-3.14-7-7-7z"></path></svg>
+              <span class="num text-emphasized">
+                613
+              </span>
+              commits
+          </a>
+        </li>
+        <li>
+          <a data-pjax="" href="https://github.com/rails/jbuilder/branches">
+            <svg aria-hidden="true" class="octicon octicon-git-branch" height="16" version="1.1" viewBox="0 0 10 16" width="10"><path fill-rule="evenodd" d="M10 5c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v.3c-.02.52-.23.98-.63 1.38-.4.4-.86.61-1.38.63-.83.02-1.48.16-2 .45V4.72a1.993 1.993 0 0 0-1-3.72C.88 1 0 1.89 0 3a2 2 0 0 0 1 1.72v6.56c-.59.35-1 .99-1 1.72 0 1.11.89 2 2 2 1.11 0 2-.89 2-2 0-.53-.2-1-.53-1.36.09-.06.48-.41.59-.47.25-.11.56-.17.94-.17 1.05-.05 1.95-.45 2.75-1.25S8.95 7.77 9 6.73h-.02C9.59 6.37 10 5.73 10 5zM2 1.8c.66 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2C1.35 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2zm0 12.41c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zm6-8c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path></svg>
+            <span class="num text-emphasized">
+              5
+            </span>
+            branches
+          </a>
+        </li>
+
+        <li>
+          <a href="https://github.com/rails/jbuilder/releases">
+            <svg aria-hidden="true" class="octicon octicon-tag" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path fill-rule="evenodd" d="M7.73 1.73C7.26 1.26 6.62 1 5.96 1H3.5C2.13 1 1 2.13 1 3.5v2.47c0 .66.27 1.3.73 1.77l6.06 6.06c.39.39 1.02.39 1.41 0l4.59-4.59a.996.996 0 0 0 0-1.41L7.73 1.73zM2.38 7.09c-.31-.3-.47-.7-.47-1.13V3.5c0-.88.72-1.59 1.59-1.59h2.47c.42 0 .83.16 1.13.47l6.14 6.13-4.73 4.73-6.13-6.15zM3.01 3h2v2H3V3h.01z"></path></svg>
+            <span class="num text-emphasized">
+              60
+            </span>
+            releases
+          </a>
+        </li>
+
+        <li>
+            <a href="https://github.com/rails/jbuilder/graphs/contributors">
+  <svg aria-hidden="true" class="octicon octicon-organization" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M16 12.999c0 .439-.45 1-1 1H7.995c-.539 0-.994-.447-.995-.999H1c-.54 0-1-.561-1-1 0-2.634 3-4 3-4s.229-.409 0-1c-.841-.621-1.058-.59-1-3 .058-2.419 1.367-3 2.5-3s2.442.58 2.5 3c.058 2.41-.159 2.379-1 3-.229.59 0 1 0 1s1.549.711 2.42 2.088C9.196 9.369 10 8.999 10 8.999s.229-.409 0-1c-.841-.62-1.058-.59-1-3 .058-2.419 1.367-3 2.5-3s2.437.581 2.495 3c.059 2.41-.158 2.38-1 3-.229.59 0 1 0 1s3.005 1.366 3.005 4"></path></svg>
+    <span class="num text-emphasized">
+      92
+    </span>
+    contributors
+</a>
+
+        </li>
+          <li>
+            <a href="https://github.com/rails/jbuilder/blob/master/MIT-LICENSE">
+              <svg aria-hidden="true" class="octicon octicon-law" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path fill-rule="evenodd" d="M7 4c-.83 0-1.5-.67-1.5-1.5S6.17 1 7 1s1.5.67 1.5 1.5S7.83 4 7 4zm7 6c0 1.11-.89 2-2 2h-1c-1.11 0-2-.89-2-2l2-4h-1c-.55 0-1-.45-1-1H8v8c.42 0 1 .45 1 1h1c.42 0 1 .45 1 1H3c0-.55.58-1 1-1h1c0-.55.58-1 1-1h.03L6 5H5c0 .55-.45 1-1 1H3l2 4c0 1.11-.89 2-2 2H2c-1.11 0-2-.89-2-2l2-4H1V5h3c0-.55.45-1 1-1h4c.55 0 1 .45 1 1h3v1h-1l2 4zM2.5 7L1 10h3L2.5 7zM13 10l-1.5-3-1.5 3h3z"></path></svg>
+                MIT
+            </a>
+          </li>
+      </ul>
+
+        <div class="repository-lang-stats">
+          <ol class="repository-lang-stats-numbers">
+            <li>
+                <a href="https://github.com/rails/jbuilder/search?l=ruby" data-ga-click="Repository, language stats search click, location:repo overview">
+                  <span class="color-block language-color" style="background-color:#701516;"></span>
+                  <span class="lang">Ruby</span>
+                  <span class="percent">100.0%</span>
+                </a>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="repository-lang-stats-graph js-toggle-lang-stats" title="Click for language details" data-ga-click="Repository, language bar stats toggle, location:repo overview">
+      <span class="language-color" aria-label="Ruby 100.0%" style="width:100.0%; background-color:#701516;" itemprop="keywords">Ruby</span>
+    </div>
+
+
+
+  <div class="file-navigation in-mid-page">
+
+    <details class="get-repo-select-menu js-menu-container float-right position-relative dropdown-details details-reset">
+  <summary class="btn btn-sm btn-primary">
+    Clone or download
+    <span class="dropdown-caret"></span>
+  </summary>
+  <div class="position-relative">
+    <div class="get-repo-modal dropdown-menu dropdown-menu-sw pb-0 js-toggler-container ">
+        <div class="clone-options https-clone-options">
+
+          <h4 class="mb-1">
+            Clone with HTTPS
+            <a class="muted-link" href="https://help.github.com/articles/which-remote-url-should-i-use" target="_blank" title="Which remote URL should I use?">
+              <svg aria-hidden="true" class="octicon octicon-question" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path fill-rule="evenodd" d="M6 10h2v2H6v-2zm4-3.5C10 8.64 8 9 8 9H6c0-.55.45-1 1-1h.5c.28 0 .5-.22.5-.5v-1c0-.28-.22-.5-.5-.5h-1c-.28 0-.5.22-.5.5V7H4c0-1.5 1.5-3 3-3s3 1 3 2.5zM7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7z"></path></svg>
+            </a>
+          </h4>
+          <p class="mb-2 get-repo-decription-text">
+            Use Git or checkout with SVN using the web URL.
+          </p>
+
+          <div class="input-group js-zeroclipboard-container">
+  <input type="text" class="form-control input-monospace input-sm js-zeroclipboard-target js-url-field" value="https://github.com/rails/jbuilder.git" aria-label="Clone this repository at https://github.com/rails/jbuilder.git" readonly="">
+  <div class="input-group-button">
+    <button aria-label="Copy to clipboard" class="js-zeroclipboard btn btn-sm zeroclipboard-button tooltipped tooltipped-s" data-copied-hint="Copied!" type="button"><svg aria-hidden="true" class="octicon octicon-clippy" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path fill-rule="evenodd" d="M2 13h4v1H2v-1zm5-6H2v1h5V7zm2 3V8l-3 3 3 3v-2h5v-2H9zM4.5 9H2v1h2.5V9zM2 12h2.5v-1H2v1zm9 1h1v2c-.02.28-.11.52-.3.7-.19.18-.42.28-.7.3H1c-.55 0-1-.45-1-1V4c0-.55.45-1 1-1h3c0-1.11.89-2 2-2 1.11 0 2 .89 2 2h3c.55 0 1 .45 1 1v5h-1V6H1v9h10v-2zM2 5h8c0-.55-.45-1-1-1H8c-.55 0-1-.45-1-1s-.45-1-1-1-1 .45-1 1-.45 1-1 1H3c-.55 0-1 .45-1 1z"></path></svg></button>
+  </div>
+</div>
+
+        </div>
+
+      <div class="mt-2">
+          <a href="https://desktop.github.com/" class="btn btn-outline get-repo-btn tooltipped tooltipped-s tooltipped-multiline" aria-label="Clone rails/jbuilder to your computer and use it in GitHub Desktop.">
+    Open in Desktop
+  </a>
+
+<a href="https://github.com/rails/jbuilder/archive/master.zip" class="btn btn-outline get-repo-btn
+" rel="nofollow" data-ga-click="Repository, download zip, location:repo overview">
+  Download ZIP
+</a>
+
+      </div>
+    </div>
+  </div>
+</details>
+
+
+  <div class="BtnGroup float-right">
+
+    <a href="https://github.com/rails/jbuilder/find/master" class="btn btn-sm empty-icon float-right BtnGroup-item" data-pjax="" data-hotkey="t" data-ga-click="Repository, find file, location:repo overview">
+      Find file
+    </a>
+  </div>
+
+  
+<div class="select-menu branch-select-menu js-menu-container js-select-menu float-left">
+  <button class=" btn btn-sm select-menu-button js-menu-target css-truncate" data-hotkey="w" type="button" aria-label="Switch branches or tags" aria-expanded="false" aria-haspopup="true">
+      <i>Branch:</i>
+      <span class="js-select-button css-truncate-target">master</span>
+  </button>
+
+  <div class="select-menu-modal-holder js-menu-content js-navigation-container" data-pjax="">
+
+    <div class="select-menu-modal">
+      <div class="select-menu-header">
+        <svg aria-label="Close" class="octicon octicon-x js-menu-close" height="16" role="img" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48z"></path></svg>
+        <span class="select-menu-title">Switch branches/tags</span>
+      </div>
+
+      <div class="select-menu-filters">
+        <div class="select-menu-text-filter">
+          <input type="text" aria-label="Filter branches/tags" id="context-commitish-filter-field" class="form-control js-filterable-field js-navigation-enable" placeholder="Filter branches/tags">
+        </div>
+        <div class="select-menu-tabs">
+          <ul>
+            <li class="select-menu-tab">
+              <a href="https://github.com/rails/jbuilder#" data-tab-filter="branches" data-filter-placeholder="Filter branches/tags" class="js-select-menu-tab" role="tab">Branches</a>
+            </li>
+            <li class="select-menu-tab">
+              <a href="https://github.com/rails/jbuilder#" data-tab-filter="tags" data-filter-placeholder="Find a tag…" class="js-select-menu-tab" role="tab">Tags</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="select-menu-list select-menu-tab-bucket js-select-menu-tab-bucket" data-tab-filter="branches" role="menu">
+
+        <div data-filterable-for="context-commitish-filter-field" data-filterable-type="substring">
+
+
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/1.x-stable" data-name="1.x-stable" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target js-select-menu-filter-text">
+                1.x-stable
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/2.0.x-stable" data-name="2.0.x-stable" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target js-select-menu-filter-text">
+                2.0.x-stable
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/additive_blocks" data-name="additive_blocks" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target js-select-menu-filter-text">
+                additive_blocks
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/array-next-experimental" data-name="array-next-experimental" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target js-select-menu-filter-text">
+                array-next-experimental
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open selected" href="https://github.com/rails/jbuilder/tree/master" data-name="master" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target js-select-menu-filter-text">
+                master
+              </span>
+            </a>
+        </div>
+
+          <div class="select-menu-no-results">Nothing to show</div>
+      </div>
+
+      <div class="select-menu-list select-menu-tab-bucket js-select-menu-tab-bucket" data-tab-filter="tags">
+        <div data-filterable-for="context-commitish-filter-field" data-filterable-type="substring">
+
+
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.7.0" data-name="v2.7.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.7.0">
+                v2.7.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.6.4" data-name="v2.6.4" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.6.4">
+                v2.6.4
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.6.3" data-name="v2.6.3" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.6.3">
+                v2.6.3
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.6.2" data-name="v2.6.2" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.6.2">
+                v2.6.2
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.6.1" data-name="v2.6.1" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.6.1">
+                v2.6.1
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.6.0" data-name="v2.6.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.6.0">
+                v2.6.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.5.0" data-name="v2.5.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.5.0">
+                v2.5.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.4.1" data-name="v2.4.1" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.4.1">
+                v2.4.1
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.4.0" data-name="v2.4.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.4.0">
+                v2.4.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.3.2" data-name="v2.3.2" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.3.2">
+                v2.3.2
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.3.1" data-name="v2.3.1" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.3.1">
+                v2.3.1
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.3.0" data-name="v2.3.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.3.0">
+                v2.3.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.16" data-name="v2.2.16" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.16">
+                v2.2.16
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.15" data-name="v2.2.15" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.15">
+                v2.2.15
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.14" data-name="v2.2.14" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.14">
+                v2.2.14
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.13" data-name="v2.2.13" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.13">
+                v2.2.13
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.12" data-name="v2.2.12" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.12">
+                v2.2.12
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.11" data-name="v2.2.11" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.11">
+                v2.2.11
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.10" data-name="v2.2.10" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.10">
+                v2.2.10
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.9" data-name="v2.2.9" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.9">
+                v2.2.9
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.8" data-name="v2.2.8" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.8">
+                v2.2.8
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.7" data-name="v2.2.7" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.7">
+                v2.2.7
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.6" data-name="v2.2.6" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.6">
+                v2.2.6
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.5" data-name="v2.2.5" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.5">
+                v2.2.5
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.4" data-name="v2.2.4" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.4">
+                v2.2.4
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.3" data-name="v2.2.3" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.3">
+                v2.2.3
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.2" data-name="v2.2.2" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.2">
+                v2.2.2
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.1" data-name="v2.2.1" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.1">
+                v2.2.1
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.2.0" data-name="v2.2.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.2.0">
+                v2.2.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.1.3" data-name="v2.1.3" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.1.3">
+                v2.1.3
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.1.2" data-name="v2.1.2" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.1.2">
+                v2.1.2
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.1.1" data-name="v2.1.1" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.1.1">
+                v2.1.1
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.1.0" data-name="v2.1.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.1.0">
+                v2.1.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.0.8" data-name="v2.0.8" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.0.8">
+                v2.0.8
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.0.7" data-name="v2.0.7" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.0.7">
+                v2.0.7
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.0.6" data-name="v2.0.6" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.0.6">
+                v2.0.6
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.0.5" data-name="v2.0.5" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.0.5">
+                v2.0.5
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.0.4" data-name="v2.0.4" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.0.4">
+                v2.0.4
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.0.3" data-name="v2.0.3" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.0.3">
+                v2.0.3
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.0.2" data-name="v2.0.2" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.0.2">
+                v2.0.2
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.0.1" data-name="v2.0.1" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.0.1">
+                v2.0.1
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.0.0" data-name="v2.0.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.0.0">
+                v2.0.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.0.0.beta2" data-name="v2.0.0.beta2" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.0.0.beta2">
+                v2.0.0.beta2
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v2.0.0.beta" data-name="v2.0.0.beta" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v2.0.0.beta">
+                v2.0.0.beta
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.5.3" data-name="v1.5.3" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.5.3">
+                v1.5.3
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.5.2" data-name="v1.5.2" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.5.2">
+                v1.5.2
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.5.1" data-name="v1.5.1" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.5.1">
+                v1.5.1
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.5.0" data-name="v1.5.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.5.0">
+                v1.5.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.4.2" data-name="v1.4.2" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.4.2">
+                v1.4.2
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.4.1" data-name="v1.4.1" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.4.1">
+                v1.4.1
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.4.0" data-name="v1.4.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.4.0">
+                v1.4.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.3.0" data-name="v1.3.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.3.0">
+                v1.3.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.2.1" data-name="v1.2.1" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.2.1">
+                v1.2.1
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.2.0" data-name="v1.2.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.2.0">
+                v1.2.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.0.2" data-name="v1.0.2" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.0.2">
+                v1.0.2
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.0.1" data-name="v1.0.1" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.0.1">
+                v1.0.1
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v1.0.0" data-name="v1.0.0" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v1.0.0">
+                v1.0.0
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v0.9.1" data-name="v0.9.1" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v0.9.1">
+                v0.9.1
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v0.3.2" data-name="v0.3.2" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v0.3.2">
+                v0.3.2
+              </span>
+            </a>
+            <a class="select-menu-item js-navigation-item js-navigation-open " href="https://github.com/rails/jbuilder/tree/v0.3.1" data-name="v0.3.1" data-skip-pjax="true" rel="nofollow">
+              <svg aria-hidden="true" class="octicon octicon-check select-menu-item-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg>
+              <span class="select-menu-item-text css-truncate-target" title="v0.3.1">
+                v0.3.1
+              </span>
+            </a>
+        </div>
+
+        <div class="select-menu-no-results">Nothing to show</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+        <button type="button" class="btn btn-sm disabled tooltipped tooltipped-n new-pull-request-btn" aria-label="You must be signed in to create a pull request">
+          New pull request
+        </button>
+
+  <div class="breadcrumb">
+    
+  </div>
+</div>
+
+
+  
+
+
+  <div class="commit-tease js-details-container Details">
+    <span class="float-right">
+      Latest commit
+      <a class="commit-tease-sha" href="https://github.com/rails/jbuilder/commit/46f9e50a97f4a93e800afbe92b50c0c990acc3ef" data-pjax="">
+        46f9e50
+      </a>
+      <span itemprop="dateModified"><relative-time datetime="2018-01-09T16:37:24Z" title="2018年1月10日 1:37 JST">24 days ago</relative-time></span>
+    </span>
+
+
+      <span class="commit-author-section">
+          <a href="https://github.com/rafaelfranca" class="d-inline-block">
+            <img src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/47848" width="20" height="20" class="avatar avatar-small" alt="@rafaelfranca">
+          </a>
+        
+  <a href="https://github.com/rafaelfranca" class="user-mention">rafaelfranca</a>
+
+      </span>
+
+      <a href="https://github.com/rails/jbuilder/commit/46f9e50a97f4a93e800afbe92b50c0c990acc3ef" class="message" data-pjax="true" title="Merge pull request #423 from nicolasleger/test-ruby-versions
+
+Test on new Ruby versions">Merge pull request</a> <a href="https://github.com/rails/jbuilder/pull/423" class="issue-link js-issue-link" data-error-text="Failed to load issue title" data-id="287108992" data-permission-text="Issue title is private" data-url="https://github.com/rails/jbuilder/issues/423">#423</a> <a href="https://github.com/rails/jbuilder/commit/46f9e50a97f4a93e800afbe92b50c0c990acc3ef" class="message" data-pjax="true" title="Merge pull request #423 from nicolasleger/test-ruby-versions
+
+Test on new Ruby versions">from nicolasleger/test-ruby-versions</a>
+        <span class="hidden-text-expander inline">
+          <button type="button" class="ellipsis-expander js-details-target" aria-expanded="false">…</button>
+        </span>
+
+      <div class="commit-desc"><pre class="text-small">Test on new Ruby versions</pre></div>
+
+  </div>
+
+
+
+<div class="file-wrap">
+
+  <a href="https://github.com/rails/jbuilder/tree/46f9e50a97f4a93e800afbe92b50c0c990acc3ef" class="d-none js-permalink-shortcut" data-hotkey="y">Permalink</a>
+
+  <table class="files js-navigation-container js-active-navigation-container" data-pjax="">
+
+
+    <tbody>
+      <tr class="warning include-fragment-error">
+        <td class="icon"><svg aria-hidden="true" class="octicon octicon-alert" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M8.865 1.52c-.18-.31-.51-.5-.87-.5s-.69.19-.87.5L.275 13.5c-.18.31-.18.69 0 1 .19.31.52.5.87.5h13.7c.36 0 .69-.19.86-.5.17-.31.18-.69.01-1L8.865 1.52zM8.995 13h-2v-2h2v2zm0-3h-2V6h2v4z"></path></svg></td>
+        <td class="content" colspan="3">Failed to load latest commit information.</td>
+      </tr>
+
+        <tr class="js-navigation-item">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file-directory" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path fill-rule="evenodd" d="M13 4H7V3c0-.66-.31-1-1-1H1c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V5c0-.55-.45-1-1-1zM6 4H1V3h5v1z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/tree/master/gemfiles" class="js-navigation-open" id="ac46a8b5a40536c4171a5ebee5aca2d4-39bc6d2a9fa397ac757ad9b0a8c592c7192a73bd" title="gemfiles">gemfiles</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/f6fab7edfda46e64644211f2c7f63784626f4023" class="message" data-pjax="true" title="Update Appraisals file to fetch latest versions
+
+Bundler seemed to be having a hard time resolving to a later version
+of the Rails 5.0.x series so simplify the gemfiles to give bundler
+more freedom to resolve things.">Update Appraisals file to fetch latest versions</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2017-11-21T13:36:01Z" title="2017年11月21日 22:36 JST">2 months ago</time-ago></span>
+          </td>
+        </tr>
+        <tr class="js-navigation-item">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file-directory" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path fill-rule="evenodd" d="M13 4H7V3c0-.66-.31-1-1-1H1c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V5c0-.55-.45-1-1-1zM6 4H1V3h5v1z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/tree/master/lib" class="js-navigation-open" id="e8acc63b1e238f3255c900eed37254b8-3534ff7cbb6676042627dce08370a8e68c517594" title="lib">lib</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/1ed80b07b349b25734b7a9147c2770a981d72a68" class="message" data-pjax="true" title="Fix implicitly rendering a JSON partial with the same name as an HTML partial (#400)">Fix implicitly rendering a JSON partial with the same name as an HTML…</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2017-06-05T09:45:27Z" title="2017年6月5日 18:45 JST">8 months ago</time-ago></span>
+          </td>
+        </tr>
+        <tr class="js-navigation-item">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file-directory" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path fill-rule="evenodd" d="M13 4H7V3c0-.66-.31-1-1-1H1c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V5c0-.55-.45-1-1-1zM6 4H1V3h5v1z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/tree/master/test" class="js-navigation-open" id="098f6bcd4621d373cade4e832627b4f6-d912bb1afbbd198c8bde26699425fff1652c0a35" title="test">test</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/e114301c6c3c12b39e7df5acae9582e1098e081c" class="message" data-pjax="true" title="Ensure that jbuilder is loaded correctly
+
+If JBuilderTemplate class was loaded before JBuilder then the
+superclass for the template would be a proxy object class and
+not the full JBuilder class.">Ensure that jbuilder is loaded correctly</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2017-11-21T13:39:19Z" title="2017年11月21日 22:39 JST">2 months ago</time-ago></span>
+          </td>
+        </tr>
+        <tr class="js-navigation-item">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M6 5H2V4h4v1zM2 8h7V7H2v1zm0 2h7V9H2v1zm0 2h7v-1H2v1zm10-7.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v12h10V5z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/blob/master/.gitignore" class="js-navigation-open" id="a084b794bc0759e7a6b77810e01874f2-92b755a68be269acb5c2baa4be2f51a10c502eb2" title=".gitignore">.gitignore</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/53c5b22e1e69bc5e8e8be36b7ee3385e8387c788" class="message" data-pjax="true" title="Add pkg to gitignore
+
+[ci skip]">Add pkg to gitignore</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2014-07-16T15:13:32Z" title="2014年7月17日 0:13 JST">4 years ago</time-ago></span>
+          </td>
+        </tr>
+        <tr class="js-navigation-item">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M6 5H2V4h4v1zM2 8h7V7H2v1zm0 2h7V9H2v1zm0 2h7v-1H2v1zm10-7.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v12h10V5z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/blob/master/.travis.yml" class="js-navigation-open" id="354f30a63fb0907d4ad57269548329e3-7a9dd1b6c757638b7a72cb16499c770a5e685090" title=".travis.yml">.travis.yml</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/5323d6dedf81787bbd5dfba994271037822f4760" class="message" data-pjax="true" title="Test on new Ruby versions">Test on new Ruby versions</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2018-01-09T14:17:29Z" title="2018年1月9日 23:17 JST">24 days ago</time-ago></span>
+          </td>
+        </tr>
+        <tr class="js-navigation-item">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M6 5H2V4h4v1zM2 8h7V7H2v1zm0 2h7V9H2v1zm0 2h7v-1H2v1zm10-7.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v12h10V5z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/blob/master/Appraisals" class="js-navigation-open" id="3bb7346aca79d8142e16e61372bd04dc-eb5575180803cd7eb9a97f32c2ef03fbe022cd67" title="Appraisals">Appraisals</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/f6fab7edfda46e64644211f2c7f63784626f4023" class="message" data-pjax="true" title="Update Appraisals file to fetch latest versions
+
+Bundler seemed to be having a hard time resolving to a later version
+of the Rails 5.0.x series so simplify the gemfiles to give bundler
+more freedom to resolve things.">Update Appraisals file to fetch latest versions</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2017-11-21T13:36:01Z" title="2017年11月21日 22:36 JST">2 months ago</time-ago></span>
+          </td>
+        </tr>
+        <tr class="js-navigation-item">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M6 5H2V4h4v1zM2 8h7V7H2v1zm0 2h7V9H2v1zm0 2h7v-1H2v1zm10-7.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v12h10V5z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/blob/master/CHANGELOG.md" class="js-navigation-open" id="4ac32a78649ca5bdd8e0ba38b7006a1e-5ebaaec5781e75a40cba8d8988283c52befad3e8" title="CHANGELOG.md">CHANGELOG.md</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/6627fd25496f06baca3a16fa4bbd9f2e80fdb409" class="message" data-pjax="true" title="New version to drop the pessimistic upper-bound restriction on Active Support and MultiJSON to prevent future gemfile resolution deadlocks">New version to drop the pessimistic upper-bound restriction on Active…</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2017-05-10T16:20:43Z" title="2017年5月11日 1:20 JST">9 months ago</time-ago></span>
+          </td>
+        </tr>
+        <tr class="js-navigation-item">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M6 5H2V4h4v1zM2 8h7V7H2v1zm0 2h7V9H2v1zm0 2h7v-1H2v1zm10-7.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v12h10V5z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/blob/master/CONTRIBUTING.md" class="js-navigation-open" id="6a3371457528722a734f3c51d9238c13-9140eb21f80a87fe4a4efc6748621e78a86950ca" title="CONTRIBUTING.md">CONTRIBUTING.md</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/554b64822357a283ef6f2385f7b6b9c8ad64dda3" class="message" data-pjax="true" title="Update contribution README (#355)">Update contribution README (</a><a href="https://github.com/rails/jbuilder/pull/355" class="issue-link js-issue-link" data-url="https://github.com/rails/jbuilder/issues/355" data-id="177339189" data-error-text="Failed to load issue title" data-permission-text="Issue title is private">#355</a><a href="https://github.com/rails/jbuilder/commit/554b64822357a283ef6f2385f7b6b9c8ad64dda3" class="message" data-pjax="true" title="Update contribution README (#355)">)</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2016-09-16T18:21:04Z" title="2016年9月17日 3:21 JST">a year ago</time-ago></span>
+          </td>
+        </tr>
+        <tr class="js-navigation-item">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M6 5H2V4h4v1zM2 8h7V7H2v1zm0 2h7V9H2v1zm0 2h7v-1H2v1zm10-7.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v12h10V5z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/blob/master/Gemfile" class="js-navigation-open" id="8b7db4d5cc4b8f6dc8feb7030baa2478-7d8b31648e7223f797b5d3a2ea45a30f11db300a" title="Gemfile">Gemfile</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/45f6dac2a5658974f93043442bf8f1f27ab8bbe5" class="message" data-pjax="true" title="Add pry to Gemfile">Add pry to Gemfile</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2015-06-15T07:13:00Z" title="2015年6月15日 16:13 JST">3 years ago</time-ago></span>
+          </td>
+        </tr>
+        <tr class="js-navigation-item navigation-focus">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M6 5H2V4h4v1zM2 8h7V7H2v1zm0 2h7V9H2v1zm0 2h7v-1H2v1zm10-7.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v12h10V5z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/blob/master/MIT-LICENSE" class="js-navigation-open" id="6d6f69ab160d70085563c5d6eb87b978-06eb669bbba10c1fa6483cf9e8294b6300b29946" itemprop="license" title="MIT-LICENSE">MIT-LICENSE</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/2f6c8c566b5f5c55f9846435b32ef6d91519d448" class="message" data-pjax="true" title="Update copyright year to 2017 (#393)">Update copyright year to 2017 (</a><a href="https://github.com/rails/jbuilder/pull/393" class="issue-link js-issue-link" data-url="https://github.com/rails/jbuilder/issues/393" data-id="220166359" data-error-text="Failed to load issue title" data-permission-text="Issue title is private">#393</a><a href="https://github.com/rails/jbuilder/commit/2f6c8c566b5f5c55f9846435b32ef6d91519d448" class="message" data-pjax="true" title="Update copyright year to 2017 (#393)">)</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2017-04-07T16:34:22Z" title="2017年4月8日 1:34 JST">10 months ago</time-ago></span>
+          </td>
+        </tr>
+        <tr class="js-navigation-item">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M6 5H2V4h4v1zM2 8h7V7H2v1zm0 2h7V9H2v1zm0 2h7v-1H2v1zm10-7.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v12h10V5z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/blob/master/README.md" class="js-navigation-open" id="04c6e90faac2675aa89e2176d2eec7d8-8580401b2e8480cdf4bfc1918f378decfc17db84" title="README.md">README.md</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/e1f2099d6a2dde2879167e0c632666cbbc450bb2" class="message" data-pjax="true" title="Add example for `merge!` to README.md">Add example for `merge!` to README.md</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2017-11-21T11:23:55Z" title="2017年11月21日 20:23 JST">2 months ago</time-ago></span>
+          </td>
+        </tr>
+        <tr class="js-navigation-item">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M6 5H2V4h4v1zM2 8h7V7H2v1zm0 2h7V9H2v1zm0 2h7v-1H2v1zm10-7.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v12h10V5z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/blob/master/Rakefile" class="js-navigation-open" id="52c976fc38ed2b4e3b1192f8a8e24cff-c51d8827926825592622daf651af6bee3ad2bd75" title="Rakefile">Rakefile</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/eb5d37636fe3d7b2e3f01202ba3fd74693e1405e" class="message" data-pjax="true" title="Bump to Rails 4.2.0 as that&#39;s the most recently supported Rails version
+
+This solves issues with json 1.8.3 not compiling against Ruby 2.4.1 etc.">Bump to Rails 4.2.0 as that's the most recently supported Rails version</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2017-06-05T10:07:15Z" title="2017年6月5日 19:07 JST">8 months ago</time-ago></span>
+          </td>
+        </tr>
+        <tr class="js-navigation-item">
+          <td class="icon">
+            <svg aria-hidden="true" class="octicon octicon-file" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M6 5H2V4h4v1zM2 8h7V7H2v1zm0 2h7V9H2v1zm0 2h7v-1H2v1zm10-7.5V14c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V2c0-.55.45-1 1-1h7.5L12 4.5zM11 5L8 2H1v12h10V5z"></path></svg>
+            <img alt="" class="spinner" height="16" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/octocat-spinner-32.gif" width="16">
+          </td>
+          <td class="content">
+            <span class="css-truncate css-truncate-target"><a href="https://github.com/rails/jbuilder/blob/master/jbuilder.gemspec" class="js-navigation-open" id="7e72102ca4f1d35aeace522060a7eb86-5726778c696bf10b60e7a39bee87456e2cb9dc2a" title="jbuilder.gemspec">jbuilder.gemspec</a></span>
+          </td>
+          <td class="message">
+            <span class="css-truncate css-truncate-target">
+                  <a href="https://github.com/rails/jbuilder/commit/eb5d37636fe3d7b2e3f01202ba3fd74693e1405e" class="message" data-pjax="true" title="Bump to Rails 4.2.0 as that&#39;s the most recently supported Rails version
+
+This solves issues with json 1.8.3 not compiling against Ruby 2.4.1 etc.">Bump to Rails 4.2.0 as that's the most recently supported Rails version</a>
+            </span>
+          </td>
+          <td class="age">
+            <span class="css-truncate css-truncate-target"><time-ago datetime="2017-06-05T10:07:15Z" title="2017年6月5日 19:07 JST">8 months ago</time-ago></span>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+</div>
+
+
+
+  <div id="readme" class="readme boxed-group clearfix announce instapaper_body md">
+    <h3>
+      <svg aria-hidden="true" class="octicon octicon-book" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M3 5h4v1H3V5zm0 3h4V7H3v1zm0 2h4V9H3v1zm11-5h-4v1h4V5zm0 2h-4v1h4V7zm0 2h-4v1h4V9zm2-6v9c0 .55-.45 1-1 1H9.5l-1 1-1-1H2c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h5.5l1 1 1-1H15c.55 0 1 .45 1 1zm-8 .5L7.5 3H2v9h6V3.5zm7-.5H9.5l-.5.5V12h6V3z"></path></svg>
+      README.md
+    </h3>
+
+      <article class="markdown-body entry-content" itemprop="text"><h1><a href="https://github.com/rails/jbuilder#jbuilder" aria-hidden="true" class="anchor" id="user-content-jbuilder"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Jbuilder</h1>
+<p>Jbuilder gives you a simple DSL for declaring JSON structures that beats
+manipulating giant hash structures. This is particularly helpful when the
+generation process is fraught with conditionals and loops. Here's a simple
+example:</p>
+<div class="highlight highlight-source-ruby"><pre><span class="pl-c"><span class="pl-c">#</span> app/views/messages/show.json.jbuilder</span>
+
+json.content format_content(<span class="pl-smi">@message</span>.content)
+json.(<span class="pl-smi">@message</span>, <span class="pl-c1">:created_at</span>, <span class="pl-c1">:updated_at</span>)
+
+json.author <span class="pl-k">do</span>
+  json.name <span class="pl-smi">@message</span>.creator.name.familiar
+  json.email_address <span class="pl-smi">@message</span>.creator.email_address_with_name
+  json.url url_for(<span class="pl-smi">@message</span>.creator, <span class="pl-c1">format:</span> <span class="pl-c1">:json</span>)
+<span class="pl-k">end</span>
+
+<span class="pl-k">if</span> current_user.admin?
+  json.visitors calculate_visitors(<span class="pl-smi">@message</span>)
+<span class="pl-k">end</span>
+
+json.comments <span class="pl-smi">@message</span>.comments, <span class="pl-c1">:content</span>, <span class="pl-c1">:created_at</span>
+
+json.attachments <span class="pl-smi">@message</span>.attachments <span class="pl-k">do</span> |<span class="pl-smi">attachment</span>|
+  json.filename attachment.filename
+  json.url url_for(attachment)
+<span class="pl-k">end</span></pre></div>
+<p>This will build the following structure:</p>
+<div class="highlight highlight-source-js"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>content<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>&lt;p&gt;This is &lt;i&gt;serious&lt;/i&gt; monkey business&lt;/p&gt;<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>created_at<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>2011-10-29T20:45:28-05:00<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>updated_at<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>2011-10-29T20:45:28-05:00<span class="pl-pds">"</span></span>,
+
+  <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span><span class="pl-k">:</span> {
+    <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>David H.<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>email_address<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>'David Heinemeier Hansson' &lt;david@heinemeierhansson.com&gt;<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>http://example.com/users/1-david.json<span class="pl-pds">"</span></span>
+  },
+
+  <span class="pl-s"><span class="pl-pds">"</span>visitors<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-c1">15</span>,
+
+  <span class="pl-s"><span class="pl-pds">"</span>comments<span class="pl-pds">"</span></span><span class="pl-k">:</span> [
+    { <span class="pl-s"><span class="pl-pds">"</span>content<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>Hello everyone!<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>created_at<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>2011-10-29T20:45:28-05:00<span class="pl-pds">"</span></span> },
+    { <span class="pl-s"><span class="pl-pds">"</span>content<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>To you my good sir!<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>created_at<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>2011-10-29T20:47:28-05:00<span class="pl-pds">"</span></span> }
+  ],
+
+  <span class="pl-s"><span class="pl-pds">"</span>attachments<span class="pl-pds">"</span></span><span class="pl-k">:</span> [
+    { <span class="pl-s"><span class="pl-pds">"</span>filename<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>forecast.xls<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>http://example.com/downloads/forecast.xls<span class="pl-pds">"</span></span> },
+    { <span class="pl-s"><span class="pl-pds">"</span>filename<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>presentation.pdf<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>http://example.com/downloads/presentation.pdf<span class="pl-pds">"</span></span> }
+  ]
+}</pre></div>
+<p>To define attribute and structure names dynamically, use the <code>set!</code> method:</p>
+<div class="highlight highlight-source-ruby"><pre>json.set! <span class="pl-c1">:author</span> <span class="pl-k">do</span>
+  json.set! <span class="pl-c1">:name</span>, <span class="pl-s"><span class="pl-pds">'</span>David<span class="pl-pds">'</span></span>
+<span class="pl-k">end</span>
+
+<span class="pl-c"><span class="pl-c">#</span> =&gt; {"author": { "name": "David" }}</span></pre></div>
+<p>To merge existing hash or array to current context:</p>
+<div class="highlight highlight-source-ruby"><pre>hash <span class="pl-k">=</span> { <span class="pl-c1">author:</span> { <span class="pl-c1">name:</span> <span class="pl-s"><span class="pl-pds">"</span>David<span class="pl-pds">"</span></span> } }
+json.post <span class="pl-k">do</span>
+  json.title <span class="pl-s"><span class="pl-pds">"</span>Merge HOWTO<span class="pl-pds">"</span></span>
+  json.merge! hash
+<span class="pl-k">end</span>
+
+<span class="pl-c"><span class="pl-c">#</span> =&gt; "post": { "title": "Merge HOWTO", "author": { "name": "David" } }</span></pre></div>
+<p>Top level arrays can be handled directly.  Useful for index and other collection actions.</p>
+<div class="highlight highlight-source-ruby"><pre><span class="pl-c"><span class="pl-c">#</span> @comments = @post.comments</span>
+
+json.array! <span class="pl-smi">@comments</span> <span class="pl-k">do</span> |<span class="pl-smi">comment</span>|
+  <span class="pl-k">next</span> <span class="pl-k">if</span> comment.marked_as_spam_by?(current_user)
+
+  json.body comment.body
+  json.author <span class="pl-k">do</span>
+    json.first_name comment.author.first_name
+    json.last_name comment.author.last_name
+  <span class="pl-k">end</span>
+<span class="pl-k">end</span>
+
+<span class="pl-c"><span class="pl-c">#</span> =&gt; [ { "body": "great post...", "author": { "first_name": "Joe", "last_name": "Bloe" }} ]</span></pre></div>
+<p>You can also extract attributes from array directly.</p>
+<div class="highlight highlight-source-ruby"><pre><span class="pl-c"><span class="pl-c">#</span> @people = People.all</span>
+
+json.array! <span class="pl-smi">@people</span>, <span class="pl-c1">:id</span>, <span class="pl-c1">:name</span>
+
+<span class="pl-c"><span class="pl-c">#</span> =&gt; [ { "id": 1, "name": "David" }, { "id": 2, "name": "Jamie" } ]</span></pre></div>
+<p>Jbuilder objects can be directly nested inside each other.  Useful for composing objects.</p>
+<div class="highlight highlight-source-ruby"><pre><span class="pl-k">class</span> <span class="pl-en">Person</span>
+  <span class="pl-c"><span class="pl-c">#</span> ... Class Definition ... #</span>
+  <span class="pl-k">def</span> <span class="pl-en">to_builder</span>
+    <span class="pl-c1">Jbuilder</span>.<span class="pl-k">new</span> <span class="pl-k">do</span> |<span class="pl-smi">person</span>|
+      person.(<span class="pl-c1">self</span>, <span class="pl-c1">:name</span>, <span class="pl-c1">:age</span>)
+    <span class="pl-k">end</span>
+  <span class="pl-k">end</span>
+<span class="pl-k">end</span>
+
+<span class="pl-k">class</span> <span class="pl-en">Company</span>
+  <span class="pl-c"><span class="pl-c">#</span> ... Class Definition ... #</span>
+  <span class="pl-k">def</span> <span class="pl-en">to_builder</span>
+    <span class="pl-c1">Jbuilder</span>.<span class="pl-k">new</span> <span class="pl-k">do</span> |<span class="pl-smi">company</span>|
+      company.name name
+      company.president president.to_builder
+    <span class="pl-k">end</span>
+  <span class="pl-k">end</span>
+<span class="pl-k">end</span>
+
+company <span class="pl-k">=</span> <span class="pl-c1">Company</span>.<span class="pl-k">new</span>(<span class="pl-s"><span class="pl-pds">'</span>Doodle Corp<span class="pl-pds">'</span></span>, <span class="pl-c1">Person</span>.<span class="pl-k">new</span>(<span class="pl-s"><span class="pl-pds">'</span>John Stobs<span class="pl-pds">'</span></span>, <span class="pl-c1">58</span>))
+company.to_builder.target!
+
+<span class="pl-c"><span class="pl-c">#</span> =&gt; {"name":"Doodle Corp","president":{"name":"John Stobs","age":58}}</span></pre></div>
+<p>You can either use Jbuilder stand-alone or directly as an ActionView template
+language. When required in Rails, you can create views a la show.json.jbuilder
+(the json is already yielded):</p>
+<div class="highlight highlight-source-ruby"><pre><span class="pl-c"><span class="pl-c">#</span> Any helpers available to views are available to the builder</span>
+json.content format_content(<span class="pl-smi">@message</span>.content)
+json.(<span class="pl-smi">@message</span>, <span class="pl-c1">:created_at</span>, <span class="pl-c1">:updated_at</span>)
+
+json.author <span class="pl-k">do</span>
+  json.name <span class="pl-smi">@message</span>.creator.name.familiar
+  json.email_address <span class="pl-smi">@message</span>.creator.email_address_with_name
+  json.url url_for(<span class="pl-smi">@message</span>.creator, <span class="pl-c1">format:</span> <span class="pl-c1">:json</span>)
+<span class="pl-k">end</span>
+
+<span class="pl-k">if</span> current_user.admin?
+  json.visitors calculate_visitors(<span class="pl-smi">@message</span>)
+<span class="pl-k">end</span></pre></div>
+<p>You can use partials as well. The following will render the file
+<code>views/comments/_comments.json.jbuilder</code>, and set a local variable
+<code>comments</code> with all this message's comments, which you can use inside
+the partial.</p>
+<div class="highlight highlight-source-ruby"><pre>json.partial! <span class="pl-s"><span class="pl-pds">'</span>comments/comments<span class="pl-pds">'</span></span>, <span class="pl-c1">comments:</span> <span class="pl-smi">@message</span>.comments</pre></div>
+<p>It's also possible to render collections of partials:</p>
+<div class="highlight highlight-source-ruby"><pre>json.array! <span class="pl-smi">@posts</span>, <span class="pl-c1">partial:</span> <span class="pl-s"><span class="pl-pds">'</span>posts/post<span class="pl-pds">'</span></span>, <span class="pl-c1">as:</span> <span class="pl-c1">:post</span>
+
+<span class="pl-c"><span class="pl-c">#</span> or</span>
+
+json.partial! <span class="pl-s"><span class="pl-pds">'</span>posts/post<span class="pl-pds">'</span></span>, <span class="pl-c1">collection:</span> <span class="pl-smi">@posts</span>, <span class="pl-c1">as:</span> <span class="pl-c1">:post</span>
+
+<span class="pl-c"><span class="pl-c">#</span> or</span>
+
+json.partial! <span class="pl-c1">partial:</span> <span class="pl-s"><span class="pl-pds">'</span>posts/post<span class="pl-pds">'</span></span>, <span class="pl-c1">collection:</span> <span class="pl-smi">@posts</span>, <span class="pl-c1">as:</span> <span class="pl-c1">:post</span>
+
+<span class="pl-c"><span class="pl-c">#</span> or</span>
+
+json.comments <span class="pl-smi">@post</span>.comments, <span class="pl-c1">partial:</span> <span class="pl-s"><span class="pl-pds">'</span>comments/comment<span class="pl-pds">'</span></span>, <span class="pl-c1">as:</span> <span class="pl-c1">:comment</span></pre></div>
+<p>You can pass any objects into partial templates with or without <code>:locals</code> option.</p>
+<div class="highlight highlight-source-ruby"><pre>json.partial! <span class="pl-s"><span class="pl-pds">'</span>sub_template<span class="pl-pds">'</span></span>, <span class="pl-c1">locals:</span> { <span class="pl-c1">user:</span> user }
+
+<span class="pl-c"><span class="pl-c">#</span> or</span>
+
+json.partial! <span class="pl-s"><span class="pl-pds">'</span>sub_template<span class="pl-pds">'</span></span>, <span class="pl-c1">user:</span> user</pre></div>
+<p>You can explicitly make Jbuilder object return null if you want:</p>
+<div class="highlight highlight-source-ruby"><pre>json.extract! <span class="pl-smi">@post</span>, <span class="pl-c1">:id</span>, <span class="pl-c1">:title</span>, <span class="pl-c1">:content</span>, <span class="pl-c1">:published_at</span>
+json.author <span class="pl-k">do</span>
+  <span class="pl-k">if</span> <span class="pl-smi">@post</span>.anonymous?
+    json.null! <span class="pl-c"><span class="pl-c">#</span> or json.nil!</span>
+  <span class="pl-k">else</span>
+    json.first_name <span class="pl-smi">@post</span>.author_first_name
+    json.last_name <span class="pl-smi">@post</span>.author_last_name
+  <span class="pl-k">end</span>
+<span class="pl-k">end</span></pre></div>
+<p>To prevent Jbuilder from including null values in the output, you can use the <code>ignore_nil!</code> method:</p>
+<div class="highlight highlight-source-ruby"><pre>json.ignore_nil!
+json.foo <span class="pl-c1">nil</span>
+json.bar <span class="pl-s"><span class="pl-pds">"</span>bar<span class="pl-pds">"</span></span>
+<span class="pl-c"><span class="pl-c">#</span> =&gt; { "bar": "bar" }</span></pre></div>
+<p>Fragment caching is supported, it uses <code>Rails.cache</code> and works like caching in
+HTML templates:</p>
+<div class="highlight highlight-source-ruby"><pre>json.cache! [<span class="pl-s"><span class="pl-pds">'</span>v1<span class="pl-pds">'</span></span>, <span class="pl-smi">@person</span>], <span class="pl-c1">expires_in:</span> <span class="pl-c1">10</span>.minutes <span class="pl-k">do</span>
+  json.extract! <span class="pl-smi">@person</span>, <span class="pl-c1">:name</span>, <span class="pl-c1">:age</span>
+<span class="pl-k">end</span></pre></div>
+<p>You can also conditionally cache a block by using <code>cache_if!</code> like this:</p>
+<div class="highlight highlight-source-ruby"><pre>json.cache_if! <span class="pl-k">!</span>admin?, [<span class="pl-s"><span class="pl-pds">'</span>v1<span class="pl-pds">'</span></span>, <span class="pl-smi">@person</span>], <span class="pl-c1">expires_in:</span> <span class="pl-c1">10</span>.minutes <span class="pl-k">do</span>
+  json.extract! <span class="pl-smi">@person</span>, <span class="pl-c1">:name</span>, <span class="pl-c1">:age</span>
+<span class="pl-k">end</span></pre></div>
+<p>If you are rendering fragments for a collection of objects, have a look at
+<code>jbuilder_cache_multi</code> gem. It uses fetch_multi (&gt;= Rails 4.1) to fetch
+multiple keys at once.</p>
+<p>Keys can be auto formatted using <code>key_format!</code>, this can be used to convert
+keynames from the standard ruby_format to camelCase:</p>
+<div class="highlight highlight-source-ruby"><pre>json.key_format! <span class="pl-c1">camelize:</span> <span class="pl-c1">:lower</span>
+json.first_name <span class="pl-s"><span class="pl-pds">'</span>David<span class="pl-pds">'</span></span>
+
+<span class="pl-c"><span class="pl-c">#</span> =&gt; { "firstName": "David" }</span></pre></div>
+<p>You can set this globally with the class method <code>key_format</code> (from inside your
+environment.rb for example):</p>
+<div class="highlight highlight-source-ruby"><pre><span class="pl-c1">Jbuilder</span>.key_format <span class="pl-c1">camelize:</span> <span class="pl-c1">:lower</span></pre></div>
+<h2><a href="https://github.com/rails/jbuilder#faster-json-backends" aria-hidden="true" class="anchor" id="user-content-faster-json-backends"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Faster JSON backends</h2>
+<p>Jbuilder uses MultiJson, which by default will use the JSON gem. That gem is
+currently tangled with ActiveSupport's all-Ruby <code>#to_json</code> implementation,
+which is slow (fixed in Rails &gt;= 4.1). For faster Jbuilder rendering, you can
+specify something like the Yajl JSON generator instead. You'll need to include
+the <code>yajl-ruby</code> gem in your Gemfile and then set the following configuration
+for MultiJson:</p>
+<div class="highlight highlight-source-ruby"><pre><span class="pl-k">require</span> <span class="pl-s"><span class="pl-pds">'</span>multi_json<span class="pl-pds">'</span></span>
+<span class="pl-c1">MultiJson</span>.use <span class="pl-c1">:yajl</span></pre></div>
+<h2><a href="https://github.com/rails/jbuilder#contributing-to-jbuilder" aria-hidden="true" class="anchor" id="user-content-contributing-to-jbuilder"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Contributing to Jbuilder</h2>
+<p>Jbuilder is the work of many contributors. You're encouraged to submit pull requests, propose
+features and discuss issues.</p>
+<p>See <a href="https://github.com/rails/jbuilder/blob/master/CONTRIBUTING.md">CONTRIBUTING</a>.</p>
+<h2><a href="https://github.com/rails/jbuilder#license" aria-hidden="true" class="anchor" id="user-content-license"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>License</h2>
+<p>Jbuilder is released under the <a href="http://www.opensource.org/licenses/MIT" rel="nofollow">MIT License</a>.</p>
+</article>
+  </div>
+
+
+  </div>
+  <div class="modal-backdrop js-touch-events"></div>
+</div>
+
+    </div>
+  </div>
+
+  </div>
+
+      
+<div class="footer container-lg px-3" role="contentinfo">
+  <div class="position-relative d-flex flex-justify-between py-6 mt-6 f6 text-gray border-top border-gray-light ">
+    <ul class="list-style-none d-flex flex-wrap ">
+      <li class="mr-3">© 2018 <span title="0.24830s from unicorn-3365974170-r3mdz">GitHub</span>, Inc.</li>
+        <li class="mr-3"><a href="https://github.com/site/terms" data-ga-click="Footer, go to terms, text:terms">Terms</a></li>
+        <li class="mr-3"><a href="https://github.com/site/privacy" data-ga-click="Footer, go to privacy, text:privacy">Privacy</a></li>
+        <li class="mr-3"><a href="https://github.com/security" data-ga-click="Footer, go to security, text:security">Security</a></li>
+        <li class="mr-3"><a href="https://status.github.com/" data-ga-click="Footer, go to status, text:status">Status</a></li>
+        <li><a href="https://help.github.com/" data-ga-click="Footer, go to help, text:help">Help</a></li>
+    </ul>
+
+    <a href="https://github.com/" aria-label="Homepage" class="footer-octicon" title="GitHub">
+      <svg aria-hidden="true" class="octicon octicon-mark-github" height="24" version="1.1" viewBox="0 0 16 16" width="24"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg>
+</a>
+    <ul class="list-style-none d-flex flex-wrap ">
+        <li class="mr-3"><a href="https://github.com/contact" data-ga-click="Footer, go to contact, text:contact">Contact GitHub</a></li>
+      <li class="mr-3"><a href="https://developer.github.com/" data-ga-click="Footer, go to api, text:api">API</a></li>
+      <li class="mr-3"><a href="https://training.github.com/" data-ga-click="Footer, go to training, text:training">Training</a></li>
+      <li class="mr-3"><a href="https://shop.github.com/" data-ga-click="Footer, go to shop, text:shop">Shop</a></li>
+        <li class="mr-3"><a href="https://github.com/blog" data-ga-click="Footer, go to blog, text:blog">Blog</a></li>
+        <li><a href="https://github.com/about" data-ga-click="Footer, go to about, text:about">About</a></li>
+
+    </ul>
+  </div>
+</div>
+
+
+
+  <div id="ajax-error-message" class="ajax-error-message flash flash-error">
+    <svg aria-hidden="true" class="octicon octicon-alert" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M8.865 1.52c-.18-.31-.51-.5-.87-.5s-.69.19-.87.5L.275 13.5c-.18.31-.18.69 0 1 .19.31.52.5.87.5h13.7c.36 0 .69-.19.86-.5.17-.31.18-.69.01-1L8.865 1.52zM8.995 13h-2v-2h2v2zm0-3h-2V6h2v4z"></path></svg>
+    <button type="button" class="flash-close js-ajax-error-dismiss" aria-label="Dismiss error">
+      <svg aria-hidden="true" class="octicon octicon-x" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48z"></path></svg>
+    </button>
+    You can't perform that action at this time.
+  </div>
+
+
+    
+    <script crossorigin="anonymous" integrity="sha512-XMGJvyy1pIQdZi6FwfzPUDXHfItIkA7EL3jK0uSro6JSF0Tp76YxJNtflJlhbeQxOHaIj144gWd+J2ZmFUgFiQ==" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/frameworks-5cc189bf2cb5.js.ダウンロード" type="application/javascript"></script>
+    
+    <script async="async" crossorigin="anonymous" integrity="sha512-pBVMX22ctKspAGK5FqSqLlexZeQ5kHGC1oEzzAJ6D+nSihn9f8HJ7TZ0TJgsYYkLm1d3TQPoSeXIZEKLel60eg==" src="./GitHub - rails_jbuilder_ Jbuilder_ generate JSON objects with a Builder-style DSL_files/github-a4154c5f6d9c.js.ダウンロード" type="application/javascript"></script>
+    
+    
+    
+    
+  <div class="js-stale-session-flash stale-session-flash flash flash-warn flash-banner d-none">
+    <svg aria-hidden="true" class="octicon octicon-alert" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M8.865 1.52c-.18-.31-.51-.5-.87-.5s-.69.19-.87.5L.275 13.5c-.18.31-.18.69 0 1 .19.31.52.5.87.5h13.7c.36 0 .69-.19.86-.5.17-.31.18-.69.01-1L8.865 1.52zM8.995 13h-2v-2h2v2zm0-3h-2V6h2v4z"></path></svg>
+    <span class="signed-in-tab-flash">You signed in with another tab or window. <a href="https://github.com/rails/jbuilder">Reload</a> to refresh your session.</span>
+    <span class="signed-out-tab-flash">You signed out in another tab or window. <a href="https://github.com/rails/jbuilder">Reload</a> to refresh your session.</span>
+  </div>
+  <div class="facebox" id="facebox" style="display:none;">
+  <div class="facebox-popup">
+    <div class="facebox-content" role="dialog" aria-labelledby="facebox-header" aria-describedby="facebox-description">
+    </div>
+    <button type="button" class="facebox-close js-facebox-close" aria-label="Close modal">
+      <svg aria-hidden="true" class="octicon octicon-x" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48z"></path></svg>
+    </button>
+  </div>
+</div>
+
+
+  
+
+
+<div id="UMS_TOOLTIP" style="position: absolute; cursor: pointer; z-index: 2147483647; background: transparent; top: -100000px; left: -100000px;"></div></body><umsdataelement id="UMSSendDataEventElement"></umsdataelement></html>

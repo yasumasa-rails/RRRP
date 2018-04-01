@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<!-- saved from url=(0058)https://qiita.com/cigalecigales/items/f4274088f20832252374 -->
+<html xmlns:og="http://ogp.me/ns#"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>[*Rails*] deviseの使い方（rails5版） - Qiita</title><meta content="width=device-width,initial-scale=1" name="viewport"><meta content="
+
+はじめに
+
+Rails5で再検証版です。
+以下のRails4のときのやつを現状（2016/11/12, 13）のバージョンで確認して、一部バージョン上がってうまく動かないところを修正したりした感じです。
+[Rails] deviseの使い方
+
+【前回】
+rails : 4.2.0
+ruby  : 2.2.0
+devise: 3.4.1
+
+↓
+
+【今回】
+rails : 5.0.0.1
+ruby  : 2.3.1
+devise: 4.2.0
+
+
+あと、上の記事で最後に..." name="description"><meta content="#55c500" name="theme-color"><meta content="summary" name="twitter:card"><meta content="@Qiita" name="twitter:site"><meta content="manycicadas" name="twitter:creator"><meta content="[*Rails*] deviseの使い方（rails5版） - Qiita" property="og:title"><meta content="article" property="og:type"><meta content="https://qiita.com/cigalecigales/items/f4274088f20832252374" property="og:url"><meta content="https://cdn.qiita.com/assets/qiita-fb-2887e7b4aad86fd8c25cea84846f2236.png" property="og:image"><meta content="# はじめに
+Rails5で再検証版です。
+以下のRails4のときのやつを現状（2016/11/12, 13）のバージョンで確認して、一部バージョン上がってうまく動かないところを修正したりした感じです。
+[[*Rails*] dev..." property="og:description"><meta content="Qiita" property="og:site_name"><meta content="564524038" property="fb:admins"><link rel="canonical" href="https://qiita.com/cigalecigales/items/f4274088f20832252374"><link rel="shortcut icon" type="image/x-icon" href="https://cdn.qiita.com/assets/favicons/public/production-4ff10c1e1e2b5fcb353ff9cafdd56c70.ico"><link rel="apple-touch-icon" type="image/png" href="https://cdn.qiita.com/assets/favicons/public/apple-touch-icon-f9a6afad761ec2306e10db2736187c8b.png"><link href="https://qiita.com/opensearch.xml" rel="search" title="Qiita" type="application/opensearchdescription+xml"><link rel="stylesheet" media="all" href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/public-d2b8be51ee818d33d07759606e65d7f5.min.css"><meta name="csrf-param" content="authenticity_token">
+<meta name="csrf-token" content="LCSw/Wfar5ag6mEspsxHUwtchO6IneFR+j/3zRRdhoDPQ/X835AfJd6mVSM6o60FVaovFqnRCoohj0cG397n4Q=="><script src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/osd.js.ダウンロード"></script><script src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/pubads_impl_rendering_177.js.ダウンロード"></script><script src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/ads"></script><script src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/cb=gapi.loaded_1" async=""></script><script src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/cb=gapi(1).loaded_0" async=""></script><script async="" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/widgets.js.ダウンロード" id="twitter-jssdk"></script><script async="" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/all.js.ダウンロード" id="facebook-jssdk"></script><script async="" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/plusone.js.ダウンロード" id="google-plusone-jssdk" gapi_processed="true"></script><script async="" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/btn.js.ダウンロード" id="pocket-btn-js"></script><script type="text/javascript" async="" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/mixpanel-2-latest.min.js.ダウンロード"></script><script type="text/javascript" async="" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/analytics.js.ダウンロード"></script><script>
+  window.gtmDataLayer = [
+    {
+      'analytics.dimension5': 'false',
+      'app.env': 'production',
+      'app.layoutVersion': 1,
+      'app.userId': null
+    },
+    { 'gtm.start': new Date().getTime(), event: 'gtm.js' }
+  ];
+</script>
+<script src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/gtm.js.ダウンロード" async=""></script>
+<script type="text/javascript" charset="utf-8" async="" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/button.df1da1fef194d8f8f3fd803a219a8177.js.ダウンロード"></script><style id="react-tooltip">.__react_component_tooltip{border-radius:3px;display:inline-block;font-size:13px;left:-999em;opacity:0;padding:8px 21px;position:fixed;pointer-events:none;transition:opacity 0.3s ease-out;top:-999em;visibility:hidden;z-index:999}.__react_component_tooltip:before,.__react_component_tooltip:after{content:"";width:0;height:0;position:absolute}.__react_component_tooltip.show{opacity:0.9;margin-top:0px;margin-left:0px;visibility:visible}.__react_component_tooltip.type-dark{color:#fff;background-color:#222}.__react_component_tooltip.type-dark.place-top:after{border-top-color:#222;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-dark.place-bottom:after{border-bottom-color:#222;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-dark.place-left:after{border-left-color:#222;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-dark.place-right:after{border-right-color:#222;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-dark.border{border:1px solid #fff}.__react_component_tooltip.type-dark.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-dark.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-dark.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-dark.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-success{color:#fff;background-color:#8DC572}.__react_component_tooltip.type-success.place-top:after{border-top-color:#8DC572;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-success.place-bottom:after{border-bottom-color:#8DC572;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-success.place-left:after{border-left-color:#8DC572;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-success.place-right:after{border-right-color:#8DC572;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-success.border{border:1px solid #fff}.__react_component_tooltip.type-success.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-success.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-success.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-success.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-warning{color:#fff;background-color:#F0AD4E}.__react_component_tooltip.type-warning.place-top:after{border-top-color:#F0AD4E;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-warning.place-bottom:after{border-bottom-color:#F0AD4E;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-warning.place-left:after{border-left-color:#F0AD4E;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-warning.place-right:after{border-right-color:#F0AD4E;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-warning.border{border:1px solid #fff}.__react_component_tooltip.type-warning.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-warning.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-warning.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-warning.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-error{color:#fff;background-color:#BE6464}.__react_component_tooltip.type-error.place-top:after{border-top-color:#BE6464;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-error.place-bottom:after{border-bottom-color:#BE6464;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-error.place-left:after{border-left-color:#BE6464;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-error.place-right:after{border-right-color:#BE6464;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-error.border{border:1px solid #fff}.__react_component_tooltip.type-error.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-error.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-error.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-error.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-info{color:#fff;background-color:#337AB7}.__react_component_tooltip.type-info.place-top:after{border-top-color:#337AB7;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-info.place-bottom:after{border-bottom-color:#337AB7;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-info.place-left:after{border-left-color:#337AB7;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-info.place-right:after{border-right-color:#337AB7;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-info.border{border:1px solid #fff}.__react_component_tooltip.type-info.border.place-top:before{border-top:8px solid #fff}.__react_component_tooltip.type-info.border.place-bottom:before{border-bottom:8px solid #fff}.__react_component_tooltip.type-info.border.place-left:before{border-left:8px solid #fff}.__react_component_tooltip.type-info.border.place-right:before{border-right:8px solid #fff}.__react_component_tooltip.type-light{color:#222;background-color:#fff}.__react_component_tooltip.type-light.place-top:after{border-top-color:#fff;border-top-style:solid;border-top-width:6px}.__react_component_tooltip.type-light.place-bottom:after{border-bottom-color:#fff;border-bottom-style:solid;border-bottom-width:6px}.__react_component_tooltip.type-light.place-left:after{border-left-color:#fff;border-left-style:solid;border-left-width:6px}.__react_component_tooltip.type-light.place-right:after{border-right-color:#fff;border-right-style:solid;border-right-width:6px}.__react_component_tooltip.type-light.border{border:1px solid #222}.__react_component_tooltip.type-light.border.place-top:before{border-top:8px solid #222}.__react_component_tooltip.type-light.border.place-bottom:before{border-bottom:8px solid #222}.__react_component_tooltip.type-light.border.place-left:before{border-left:8px solid #222}.__react_component_tooltip.type-light.border.place-right:before{border-right:8px solid #222}.__react_component_tooltip.place-top{margin-top:-10px}.__react_component_tooltip.place-top:before{border-left:10px solid transparent;border-right:10px solid transparent;bottom:-8px;left:50%;margin-left:-10px}.__react_component_tooltip.place-top:after{border-left:8px solid transparent;border-right:8px solid transparent;bottom:-6px;left:50%;margin-left:-8px}.__react_component_tooltip.place-bottom{margin-top:10px}.__react_component_tooltip.place-bottom:before{border-left:10px solid transparent;border-right:10px solid transparent;top:-8px;left:50%;margin-left:-10px}.__react_component_tooltip.place-bottom:after{border-left:8px solid transparent;border-right:8px solid transparent;top:-6px;left:50%;margin-left:-8px}.__react_component_tooltip.place-left{margin-left:-10px}.__react_component_tooltip.place-left:before{border-top:6px solid transparent;border-bottom:6px solid transparent;right:-8px;top:50%;margin-top:-5px}.__react_component_tooltip.place-left:after{border-top:5px solid transparent;border-bottom:5px solid transparent;right:-6px;top:50%;margin-top:-4px}.__react_component_tooltip.place-right{margin-left:10px}.__react_component_tooltip.place-right:before{border-top:6px solid transparent;border-bottom:6px solid transparent;left:-8px;top:50%;margin-top:-5px}.__react_component_tooltip.place-right:after{border-top:5px solid transparent;border-bottom:5px solid transparent;left:-6px;top:50%;margin-top:-4px}.__react_component_tooltip .multi-line{display:block;padding:2px 0px;text-align:center}</style><style type="text/css">.fb_hidden{position:absolute;top:-10000px;z-index:10001}.fb_reposition{overflow:hidden;position:relative}.fb_invisible{display:none}.fb_reset{background:none;border:0;border-spacing:0;color:#000;cursor:auto;direction:ltr;font-family:"lucida grande", tahoma, verdana, arial, sans-serif;font-size:11px;font-style:normal;font-variant:normal;font-weight:normal;letter-spacing:normal;line-height:1;margin:0;overflow:visible;padding:0;text-align:left;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;visibility:visible;white-space:normal;word-spacing:normal}.fb_reset>div{overflow:hidden}.fb_link img{border:none}@keyframes fb_transform{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}.fb_animate{animation:fb_transform .3s forwards}
+.fb_dialog{background:rgba(82, 82, 82, .7);position:absolute;top:-10000px;z-index:10001}.fb_reset .fb_dialog_legacy{overflow:visible}.fb_dialog_advanced{padding:10px;-moz-border-radius:8px;-webkit-border-radius:8px;border-radius:8px}.fb_dialog_content{background:#fff;color:#333}.fb_dialog_close_icon{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 0 transparent;cursor:pointer;display:block;height:15px;position:absolute;right:18px;top:17px;width:15px}.fb_dialog_mobile .fb_dialog_close_icon{top:5px;left:5px;right:auto}.fb_dialog_padding{background-color:transparent;position:absolute;width:1px;z-index:-1}.fb_dialog_close_icon:hover{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -15px transparent}.fb_dialog_close_icon:active{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -30px transparent}.fb_dialog_loader{background-color:#f6f7f9;border:1px solid #606060;font-size:24px;padding:20px}.fb_dialog_top_left,.fb_dialog_top_right,.fb_dialog_bottom_left,.fb_dialog_bottom_right{height:10px;width:10px;overflow:hidden;position:absolute}.fb_dialog_top_left{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ye/r/8YeTNIlTZjm.png) no-repeat 0 0;left:-10px;top:-10px}.fb_dialog_top_right{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ye/r/8YeTNIlTZjm.png) no-repeat 0 -10px;right:-10px;top:-10px}.fb_dialog_bottom_left{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ye/r/8YeTNIlTZjm.png) no-repeat 0 -20px;bottom:-10px;left:-10px}.fb_dialog_bottom_right{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ye/r/8YeTNIlTZjm.png) no-repeat 0 -30px;right:-10px;bottom:-10px}.fb_dialog_vert_left,.fb_dialog_vert_right,.fb_dialog_horiz_top,.fb_dialog_horiz_bottom{position:absolute;background:#525252;filter:alpha(opacity=70);opacity:.7}.fb_dialog_vert_left,.fb_dialog_vert_right{width:10px;height:100%}.fb_dialog_vert_left{margin-left:-10px}.fb_dialog_vert_right{right:0;margin-right:-10px}.fb_dialog_horiz_top,.fb_dialog_horiz_bottom{width:100%;height:10px}.fb_dialog_horiz_top{margin-top:-10px}.fb_dialog_horiz_bottom{bottom:0;margin-bottom:-10px}.fb_dialog_iframe{line-height:0}.fb_dialog_content .dialog_title{background:#6d84b4;border:1px solid #365899;color:#fff;font-size:14px;font-weight:bold;margin:0}.fb_dialog_content .dialog_title>span{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yd/r/Cou7n-nqK52.gif) no-repeat 5px 50%;float:left;padding:5px 0 7px 26px}body.fb_hidden{-webkit-transform:none;height:100%;margin:0;overflow:visible;position:absolute;top:-10000px;left:0;width:100%}.fb_dialog.fb_dialog_mobile.loading{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ya/r/3rhSv5V8j3o.gif) white no-repeat 50% 50%;min-height:100%;min-width:100%;overflow:hidden;position:absolute;top:0;z-index:10001}.fb_dialog.fb_dialog_mobile.loading.centered{width:auto;height:auto;min-height:initial;min-width:initial;background:none}.fb_dialog.fb_dialog_mobile.loading.centered #fb_dialog_loader_spinner{width:100%}.fb_dialog.fb_dialog_mobile.loading.centered .fb_dialog_content{background:none}.loading.centered #fb_dialog_loader_close{color:#fff;display:block;padding-top:20px;clear:both;font-size:18px}#fb-root #fb_dialog_ipad_overlay{background:rgba(0, 0, 0, .45);position:absolute;bottom:0;left:0;right:0;top:0;width:100%;min-height:100%;z-index:10000}#fb-root #fb_dialog_ipad_overlay.hidden{display:none}.fb_dialog.fb_dialog_mobile.loading iframe{visibility:hidden}.fb_dialog_content .dialog_header{-webkit-box-shadow:white 0 1px 1px -1px inset;background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#738ABA), to(#2C4987));border-bottom:1px solid;border-color:#1d4088;color:#fff;font:14px Helvetica, sans-serif;font-weight:bold;text-overflow:ellipsis;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0;vertical-align:middle;white-space:nowrap}.fb_dialog_content .dialog_header table{-webkit-font-smoothing:subpixel-antialiased;height:43px;width:100%}.fb_dialog_content .dialog_header td.header_left{font-size:12px;padding-left:5px;vertical-align:middle;width:60px}.fb_dialog_content .dialog_header td.header_right{font-size:12px;padding-right:5px;vertical-align:middle;width:60px}.fb_dialog_content .touchable_button{background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#4966A6), color-stop(.5, #355492), to(#2A4887));border:1px solid #29487d;-webkit-background-clip:padding-box;-webkit-border-radius:3px;-webkit-box-shadow:rgba(0, 0, 0, .117188) 0 1px 1px inset, rgba(255, 255, 255, .167969) 0 1px 0;display:inline-block;margin-top:3px;max-width:85px;line-height:18px;padding:4px 12px;position:relative}.fb_dialog_content .dialog_header .touchable_button input{border:none;background:none;color:#fff;font:12px Helvetica, sans-serif;font-weight:bold;margin:2px -12px;padding:2px 6px 3px 6px;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog_content .dialog_header .header_center{color:#fff;font-size:16px;font-weight:bold;line-height:18px;text-align:center;vertical-align:middle}.fb_dialog_content .dialog_content{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/y9/r/jKEcVPZFk-2.gif) no-repeat 50% 50%;border:1px solid #555;border-bottom:0;border-top:0;height:150px}.fb_dialog_content .dialog_footer{background:#f6f7f9;border:1px solid #555;border-top-color:#ccc;height:40px}#fb_dialog_loader_close{float:left}.fb_dialog.fb_dialog_mobile .fb_dialog_close_button{text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog.fb_dialog_mobile .fb_dialog_close_icon{visibility:hidden}#fb_dialog_loader_spinner{animation:rotateSpinner 1.2s linear infinite;background-color:transparent;background-image:url(https://static.xx.fbcdn.net/rsrc.php/v3/yD/r/t-wz8gw1xG1.png);background-repeat:no-repeat;background-position:50% 50%;height:24px;width:24px}@keyframes rotateSpinner{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.fb_iframe_widget{display:inline-block;position:relative}.fb_iframe_widget span{display:inline-block;position:relative;text-align:justify}.fb_iframe_widget iframe{position:absolute}.fb_iframe_widget_fluid_desktop,.fb_iframe_widget_fluid_desktop span,.fb_iframe_widget_fluid_desktop iframe{max-width:100%}.fb_iframe_widget_fluid_desktop iframe{min-width:220px;position:relative}.fb_iframe_widget_lift{z-index:1}.fb_hide_iframes iframe{position:relative;left:-10000px}.fb_iframe_widget_loader{position:relative;display:inline-block}.fb_iframe_widget_fluid{display:inline}.fb_iframe_widget_fluid span{width:100%}.fb_iframe_widget_loader iframe{min-height:32px;z-index:2;zoom:1}.fb_iframe_widget_loader .FB_Loader{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/y9/r/jKEcVPZFk-2.gif) no-repeat;height:32px;width:32px;margin-left:-16px;position:absolute;left:50%;z-index:4}
+.fb_invisible_flow{display:inherit;height:0;overflow-x:hidden;width:0}.fb_mobile_overlay_active{height:100%;overflow:hidden;position:fixed;width:100%}.fb_shrink_active{opacity:1;transform:scale(1, 1);transition-duration:200ms;transition-timing-function:ease-out}.fb_shrink_active:active{opacity:.5;transform:scale(.75, .75)}</style><link rel="preload" href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/integrator.js.ダウンロード" as="script"><script type="text/javascript" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/integrator.js.ダウンロード"></script><link rel="preload" href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/integrator.js(1).ダウンロード" as="script"><script type="text/javascript" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/integrator.js(1).ダウンロード"></script><script src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/pubads_impl_177.js.ダウンロード" async=""></script></head><body class=" with-js"><noscript>&lt;iframe height="0" src="//www.googletagmanager.com/ns.html?id=GTM-TBQWPN" style="display:none;visibility:hidden" width="0"&gt;&lt;/iframe&gt;</noscript><script>
+  document.body.className = document.body.className.replace('without-js', '') + ' with-js';
+  window.Qiita = {"asset_host":"cdn.qiita.com","TLD":"com","controller_path":"public/items","controller_action":"public/items#show","controller":"items","action":"show","action_path":"public/items#show","env":"production","flash":{},"is_team_page":false,"request_parameters":{"controller":"public/items","action":"show","user_id":"cigalecigales","type":"items","id":"f4274088f20832252374"},"root_domain":"qiita.com","variant":null,"config":{"mixpanel":{"per_team":"c0a2116368b33b44b5029ebd2cc9b094","public":"17d24b448ca579c365d2d1057f3a1791","team":"b7c0342acba2dbc8742484d98788efb3"},"default_locale":"en","locale":"ja"},"team":null,"user":null,"GIT_BRANCH":null,"DEBUG":false};
+
+</script>
+<div class="st-HeaderContainer"><script type="application/json" class="js-react-on-rails-component" data-component-name="GlobalHeaderContainer" data-dom-id="GlobalHeaderContainer-react-component-4cbd1556-5f63-4b6e-8206-db8413893ddf">{"user":null,"realms":[{"human_name":"Qiita","is_current_realm":true,"is_qiita":true,"is_qiita_team":false,"logged_in_user":null,"team_id":null,"url":"https://qiita.com/"}],"teamFindUrl":"https://teams-center.qiita.com/find_team","unreadNotificationsCount":null,"locale":"ja","is_fluid":false}</script>
+    <div id="GlobalHeaderContainer-react-component-4cbd1556-5f63-4b6e-8206-db8413893ddf"><div data-reactroot="" class="st-Header px-2 px-1@s"><div class="st-Header_container"><div class="st-Header_start"><a href="https://qiita.com/" class="st-Header_logo mr-1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 26"><title>Qiita</title><path d="M24.6 12.2C24.6 6.2 20 0 12.2 0 6.2 0 0 4.6 0 12.4c0 6 4.6 12.2 12.4 12.2 2.5 0 5-.8 7.1-2.3l3.6 3.6 1.6-1.6-3.4-3.4c2.1-2.3 3.3-5.3 3.3-8.7zm-12.4-10c5.7 0 10.2 4.4 10.2 10.1 0 4.9-3.8 10.1-10.1 10.1s-10.1-5.1-10.1-10c0-6.4 5.1-10.2 10-10.2zM30.5 7.1h2.1v17h-2.1zM31.5 4.8c-1 0-1.8-.8-1.8-1.8s.8-1.8 1.8-1.8 1.8.8 1.8 1.8-.8 1.8-1.8 1.8zM40 4.8c-1 0-1.8-.8-1.8-1.8S39 1.2 40 1.2s1.8.8 1.8 1.8S41 4.8 40 4.8zM39 7.1h2.1v17H39zM53.7 24.4c-3.9 0-6.2-3-6.2-6v-16h2.1v4.7H57v2.1h-7.4v9.3c0 1.9 1.5 3.9 4.1 3.9.7 0 1.4-.2 2-.6l.2-.1 1 1.8-.2.1c-.9.5-2 .8-3 .8zM67.6 24.5c-5.7 0-9.1-4.5-9.1-8.9 0-5.7 4.5-9.1 8.9-9.1 2.3 0 4.1.8 5.4 2.3V7.1h2.1v17h-2.1v-1.9c-1.2 1.5-3 2.3-5.2 2.3zm-.2-15.9c-3.4 0-6.8 2.6-6.8 7 0 3.4 2.6 6.8 7 6.8 2 0 4-.9 5.3-2.5v-8.8c-1.4-1.6-3.3-2.5-5.5-2.5z"></path></svg></a><div><div class="st-Header_realmSelector ml-1of2" tabindex="0"><span class="fa fa-caret-down"></span></div><div class="st-Header_dropdown st-RealmSelector"><div class="st-RealmSelector_realms"><a class="st-Header_dropdownItem st-RealmItem" href="https://qiita.com/"><div class="st-RealmItem_statusIcon"><span class="fa fa-fw fa-check"></span></div><div class="st-RealmItem_humanName">Qiita</div></a></div><hr><div class="st-RealmSelector_supplements"><div class="st-RealmSelector_label">ログイン中のチームがありません</div><a href="https://teams-center.qiita.com/find_team" class="st-Header_dropdownItem st-RealmSelectorSupplement"><div class="st-RealmSelectorSupplement_icon"><span class="fa fa-fw fa-sign-in"></span></div><div>Qiita:Team にログイン...</div></a></div></div></div><div class="u-relative ml-3 ml-1@s"><div class="st-Header_community py-2 mr-3" tabindex="0"><!-- react-text: 26 -->コミュニティ<!-- /react-text --><span class="fa fa-caret-down ml-1"></span></div><div class="st-Header_dropdown"><a href="https://qiita.com/users" class="st-Header_dropdownItem"><span class="fa fa-fw fa-users mr-1of2"></span><!-- react-text: 31 -->ユーザー一覧<!-- /react-text --></a><a href="https://qiita.com/organizations" class="st-Header_dropdownItem"><span class="fa fa-fw fa-building-o mr-1of2"></span><!-- react-text: 34 -->Organization一覧<!-- /react-text --></a><a href="https://qiita.com/advent-calendar" class="st-Header_dropdownItem"><span class="fa fa-fw fa-calendar mr-1of2"></span><!-- react-text: 37 -->アドベントカレンダー<!-- /react-text --></a><div class="st-Header_dropdownSeparator"></div><a href="https://qiitadon.com/" class="st-Header_dropdownItem" target="_blank"><span class="fa fa-fw fa-comments-o mr-1of2"></span><!-- react-text: 41 -->Qiitadon (β)<!-- /react-text --></a><div class="st-Header_dropdownSeparator"></div><a href="http://help.qiita.com/ja/articles/qiita-community-guideline" class="st-Header_dropdownItem" target="_blank"><span class="fa fa-fw fa-book mr-1of2"></span><!-- react-text: 45 -->コミュニティガイドライン<!-- /react-text --></a><a href="http://help.qiita.com/ja/articles/qiita-article-guideline" class="st-Header_dropdownItem" target="_blank"><span class="fa fa-fw fa-book mr-1of2"></span><!-- react-text: 48 -->良い記事を書くために<!-- /react-text --></a></div></div><form class="st-Header_search" action="https://qiita.com/search" method="get"><span class="fa fa-search"></span><input type="search" class="st-Header_searchInput pl-4" autocomplete="off" placeholder="キーワードを入力" name="q" required=""></form><div class="st-Header_searchButton"><span class="fa fa-search"></span></div></div><div class="st-Header_end"><a class="st-Header_signupButton" href="https://qiita.com/signup?redirect_to=%2Fcigalecigales%2Fitems%2Ff4274088f20832252374">ユーザ登録</a><a class="st-Header_loginLink" href="https://qiita.com/login?redirect_to=%2Fcigalecigales%2Fitems%2Ff4274088f20832252374">ログイン</a></div><div class="st-Header_overlay"></div><form class="st-Header_searchModal" action="https://qiita.com/search" method="get"><input type="text" class="st-Header_searchModalInput pl-1" autocomplete="off" placeholder="キーワードを入力" name="q" required=""></form></div></div></div>
+    
+</div><div id="main"><script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-57303619-2', 'auto', { name: 'userTracker' });
+ga('userTracker.send', 'pageview');</script><script async="" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/analytics.js.ダウンロード"></script><script type="application/ld+json">{  "@context": "http://schema.org",  "@type": "BreadcrumbList",  "itemListElement": [    {      "@type": "ListItem",      "position": 1,      "item": {        "@id": "/",        "name": "Qiita"      }    },    {      "@type": "ListItem",      "position": 2,      "item": {        "@id": "/tags/Ruby",        "name": "Ruby"      }    }  ]}</script><article class="p-items" itemscope="itemscope" itemtype="http://schema.org/Article"><div class="p-items_wrapper"><div class="p-items_container"><div class="p-items_stickyMenu it-Actions" data-mount-target="articleStickyMenu"><div data-reactroot=""><div class="it-Actions_item it-Actions_item-like likable"><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374/likers" class="it-Actions_likeCount">214</a><button data-effect="solid" data-place="right" data-tip="いいね" currentitem="false"><i class="fa fa-fw fa-thumbs-up"></i></button></div><div class="it-Actions_item it-Actions_item-stock"><button data-effect="solid" data-place="right" data-tip="ストック" currentitem="false"><i class="fa fa-folder-open" style="margin-top: 4px; margin-left: 2px;"></i></button></div><div role="button" tabindex="0" class="SocialMediaShareButton SocialMediaShareButton--twitter" style="margin-top: 32px; margin-bottom: 16px;"><div style="width: 32px; height: 32px;"><svg viewBox="0 0 64 64" fill="white" width="32" height="32" class="social-icon social-icon--twitter "><g><circle cx="32" cy="32" r="31" fill="#00aced"></circle></g><g><path d="M48,22.1c-1.2,0.5-2.4,0.9-3.8,1c1.4-0.8,2.4-2.1,2.9-3.6c-1.3,0.8-2.7,1.3-4.2,1.6 C41.7,19.8,40,19,38.2,19c-3.6,0-6.6,2.9-6.6,6.6c0,0.5,0.1,1,0.2,1.5c-5.5-0.3-10.3-2.9-13.5-6.9c-0.6,1-0.9,2.1-0.9,3.3 c0,2.3,1.2,4.3,2.9,5.5c-1.1,0-2.1-0.3-3-0.8c0,0,0,0.1,0,0.1c0,3.2,2.3,5.8,5.3,6.4c-0.6,0.1-1.1,0.2-1.7,0.2c-0.4,0-0.8,0-1.2-0.1 c0.8,2.6,3.3,4.5,6.1,4.6c-2.2,1.8-5.1,2.8-8.2,2.8c-0.5,0-1.1,0-1.6-0.1c2.9,1.9,6.4,2.9,10.1,2.9c12.1,0,18.7-10,18.7-18.7 c0-0.3,0-0.6,0-0.8C46,24.5,47.1,23.4,48,22.1z"></path></g></svg></div></div><div role="button" tabindex="0" class="SocialMediaShareButton SocialMediaShareButton--facebook"><div style="width: 32px; height: 32px;"><svg viewBox="0 0 64 64" fill="white" width="32" height="32" class="social-icon social-icon--facebook "><g><circle cx="32" cy="32" r="31" fill="#3b5998"></circle></g><g><path d="M34.1,47V33.3h4.6l0.7-5.3h-5.3v-3.4c0-1.5,0.4-2.6,2.6-2.6l2.8,0v-4.8c-0.5-0.1-2.2-0.2-4.1-0.2 c-4.1,0-6.9,2.5-6.9,7V28H24v5.3h4.6V47H34.1z"></path></g></svg></div></div></div></div><div class="p-items_main"><div class="p-items_article" data-article-props="{&quot;author&quot;:{&quot;name&quot;:&quot;芭蕉&quot;,&quot;urlName&quot;:&quot;cigalecigales&quot;,&quot;profileImageUrl&quot;:&quot;https://qiita-image-store.s3.amazonaws.com/0/48912/profile-images/1473691524&quot;,&quot;description&quot;:&quot;&quot;,&quot;showUrl&quot;:&quot;https://qiita.com/cigalecigales&quot;,&quot;followUrl&quot;:&quot;https://qiita.com/cigalecigales/follow&quot;,&quot;unfollowUrl&quot;:&quot;https://qiita.com/cigalecigales/unfollow&quot;},&quot;commentsCount&quot;:4,&quot;createdAtInUnixtime&quot;:1479024744,&quot;isBanned&quot;:false,&quot;isEditRequestSendable&quot;:false,&quot;isLikable&quot;:true,&quot;isLiked&quot;:false,&quot;isPublic&quot;:true,&quot;isSecret&quot;:false,&quot;isStockable&quot;:true,&quot;isStocked&quot;:false,&quot;likeUrl&quot;:&quot;https://qiita.com/api/internal/items/f4274088f20832252374/likes&quot;,&quot;likesCount&quot;:214,&quot;showUrl&quot;:&quot;https://qiita.com/cigalecigales/items/f4274088f20832252374&quot;,&quot;stockUrl&quot;:&quot;https://qiita.com/cigalecigales/items/f4274088f20832252374/stock&quot;,&quot;summary&quot;:&quot;\n\u003cspan id=\&quot;はじめに\&quot; class=\&quot;fragment\&quot;\u003e\u003c/span\u003e\u003ca href=\&quot;#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB\&quot;\u003e\u003ci class=\&quot;fa fa-link\&quot;\u003e\u003c/i\u003e\u003c/a\u003eはじめに\n\nRails5で再検証版です。\n以下のRails4のときのやつを現状（2016/11/12, 13）のバージョンで確認して、一部バージョン上がってうまく動かないところを修正したりした感じで…&quot;,&quot;tags&quot;:[{&quot;isFollowed&quot;:false,&quot;largeIconUrl&quot;:&quot;https://s3-ap-northeast-1.amazonaws.com/qiita-tag-image/840c33b576a2f123cb9aedefbe4c712164a9997d/large.jpg?1418548649&quot;,&quot;mediumIconUrl&quot;:&quot;https://s3-ap-northeast-1.amazonaws.com/qiita-tag-image/0337fbcbff62fb8fa5d0b8be5c3b47d1115d91fc/medium.jpg?1418548649&quot;,&quot;name&quot;:&quot;Ruby&quot;,&quot;showUrl&quot;:&quot;https://qiita.com/tags/Ruby&quot;,&quot;thumbIconUrl&quot;:&quot;https://s3-ap-northeast-1.amazonaws.com/qiita-tag-image/4376e9086ac32dcc67fab110c4da0bbacc7755c5/thumb.jpg?1418548649&quot;,&quot;urlName&quot;:&quot;ruby&quot;},{&quot;isFollowed&quot;:false,&quot;largeIconUrl&quot;:&quot;https://s3-ap-northeast-1.amazonaws.com/qiita-tag-image/a366fc34caa85747b6b377c761c983a9a99b4ddb/large.jpg?1489110713&quot;,&quot;mediumIconUrl&quot;:&quot;https://s3-ap-northeast-1.amazonaws.com/qiita-tag-image/6ae023831e95ee12e287c04656a8d128e6834bce/medium.jpg?1489110713&quot;,&quot;name&quot;:&quot;Rails&quot;,&quot;showUrl&quot;:&quot;https://qiita.com/tags/Rails&quot;,&quot;thumbIconUrl&quot;:&quot;https://s3-ap-northeast-1.amazonaws.com/qiita-tag-image/0430c94b32757b4e2be100cad300fdff6e67c446/thumb.jpg?1489110713&quot;,&quot;urlName&quot;:&quot;rails&quot;},{&quot;isFollowed&quot;:false,&quot;largeIconUrl&quot;:&quot;https://s3-ap-northeast-1.amazonaws.com/qiita-tag-image/7ebfb9f323ec77afdc4102f128d65ef221724ed3/large.jpg?1378373513&quot;,&quot;mediumIconUrl&quot;:&quot;https://s3-ap-northeast-1.amazonaws.com/qiita-tag-image/9a4a365b697b80f207d093fff0736c38223cac36/medium.jpg?1378373513&quot;,&quot;name&quot;:&quot;devise&quot;,&quot;showUrl&quot;:&quot;https://qiita.com/tags/devise&quot;,&quot;thumbIconUrl&quot;:&quot;https://s3-ap-northeast-1.amazonaws.com/qiita-tag-image/71f5ca9fff1af397b7a5ba7b833c9fc568e7f704/thumb.jpg?1378373513&quot;,&quot;urlName&quot;:&quot;devise&quot;},{&quot;isFollowed&quot;:false,&quot;largeIconUrl&quot;:&quot;//cdn.qiita.com/assets/icons/medium/missing-2e17009a0b32a6423572b0e6dc56727e.png&quot;,&quot;mediumIconUrl&quot;:&quot;//cdn.qiita.com/assets/icons/medium/missing-2e17009a0b32a6423572b0e6dc56727e.png&quot;,&quot;name&quot;:&quot;omniauth-twitter&quot;,&quot;showUrl&quot;:&quot;https://qiita.com/tags/omniauth-twitter&quot;,&quot;thumbIconUrl&quot;:&quot;//cdn.qiita.com/assets/icons/medium/missing-2e17009a0b32a6423572b0e6dc56727e.png&quot;,&quot;urlName&quot;:&quot;omniauth-twitter&quot;}],&quot;title&quot;:&quot;[*Rails*] deviseの使い方（rails5版）&quot;,&quot;unstockUrl&quot;:&quot;https://qiita.com/cigalecigales/items/f4274088f20832252374/unstock&quot;,&quot;uuid&quot;:&quot;f4274088f20832252374&quot;}" data-following-likers-props="[]"><div class="it-Header"><div class="u-flex-center-between mb-3"><div class="it-Header_info"><div class="it-Header_author"><a href="https://qiita.com/cigalecigales"><img class="it-Header_authorImage" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1473691524" alt="1473691524"></a> <a class="it-Header_authorName" href="https://qiita.com/cigalecigales">@cigalecigales</a> </div><div class="it-Header_time"><meta content="2016-11-13T17:12:24+09:00" itemprop="datePublished"><span data-toggle="tooltip" title="" data-original-title="2016年11月13日に投稿"><time datetime="2017-05-12T16:28:20+09:00" itemprop="dateModified">2017年05月12日</time>に更新</span></div><div class="it-Header_meta"><div class="it-Header_manipulate"><div class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="https://qiita.com/cigalecigales/items/f4274088f20832252374#"><span class="fa fa-ellipsis-h fa-lg"></span></a><ul class="dropdown-menu dropdown-menu-right"><li class="dropdown__item"><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374/revisions"><span class="fa fa-fw fa-history"></span> 編集履歴</a></li><li class="dropdown__item"><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374/patches"><span class="fa fa-fw fa-inbox"></span> 編集リクエスト一覧</a></li><li class="dropdown__item"><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374/likers"><span class="fa fa-fw fa-thumbs-up"></span> いいねしたユーザー一覧</a></li><li class="dropdown__item"><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374.md"><span class="fa fa-fw fa-file-text-o"></span> Markdownで本文を見る</a></li><li class="divider" role="separator"></li><li class="dropdown__item"><a data-target=".js-report-form" data-toggle="modal" href="https://qiita.com/cigalecigales/items/f4274088f20832252374#"><span class="fa fa-fw fa-flag"></span> 問題がある投稿を報告する</a></li></ul></div></div></div></div></div><h1 class="it-Header_title" itemprop="headline">[*Rails*] deviseの使い方（rails5版）</h1><div class="it-Tags"><a class="it-Tags_item" href="https://qiita.com/tags/Ruby"><span>Ruby</span></a><a class="it-Tags_item" href="https://qiita.com/tags/Rails"><span>Rails</span></a><a class="it-Tags_item" href="https://qiita.com/tags/devise"><span>devise</span></a><a class="it-Tags_item" href="https://qiita.com/tags/omniauth-twitter"><span>omniauth-twitter</span></a></div></div><div data-reactroot="" class="it-ActionsMobile it-ActionsMobile-disableSticky"><div class="it-ActionsMobile_item"><div class="it-ActionsMobile_like likable" data-effect="solid" data-offset="{&#39;top&#39;: 0, &#39;right&#39;: 30}"><button><span class="fa fa-fw fa-thumbs-up" style="margin-right: 4px;"></span><span>214</span></button></div></div><div class="it-ActionsMobile_item"><div class="it-ActionsMobile_stock"><div class="StockButton isNextMobile"><div class="StockButton isNextMobile"><button><div class="StockButton__stock"><div class="fa-stack"><span class="fa fa-folder-open fa-stack-1x unstock" style="font-size: 24px;"></span></div></div></button></div></div></div></div></div><div data-mount-target="mobileArticleActions"></div><section class="it-MdContent" itemprop="articleBody"><div id="item-f4274088f20832252374">
+<h1>
+<span id="はじめに" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><i class="fa fa-link"></i></a>はじめに</h1>
+
+<p>Rails5で再検証版です。<br>
+以下のRails4のときのやつを現状（2016/11/12, 13）のバージョンで確認して、一部バージョン上がってうまく動かないところを修正したりした感じです。<br>
+<a href="http://qiita.com/cigalecigales/items/73d7bd7ec59a001ccd74" id="reference-8298f2203f02c48d24c6">[<em>Rails</em>] deviseの使い方</a></p>
+
+<div class="code-frame" data-lang="text"><div class="highlight"><pre><span></span>【前回】
+rails : 4.2.0
+ruby  : 2.2.0
+devise: 3.4.1
+
+↓
+
+【今回】
+rails : 5.0.0.1
+ruby  : 2.3.1
+devise: 4.2.0
+</pre></div></div>
+
+<p>あと、上の記事で最後に「全部まとめきれてないので、忘れないうちにちょっとずつ追加していこうと思います。」とか書いていながら全く追加することはなかったので、追加しようと思ってたものをちょっとだけ思い出して追加したバージョンです。</p>
+
+<h1>
+<span id="deviseとは" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#devise%E3%81%A8%E3%81%AF"><i class="fa fa-link"></i></a>deviseとは</h1>
+
+<p>ユーザー登録して、送られてきたメールのリンクをクリックして本登録して、ログインして、パスワード忘れたら再設定して、何回もログインミスったらアカウントロックして…などといった認証系アプリに必要な機能を簡単に追加できる便利なgemです。</p>
+
+<h1>
+<span id="deviseの導入" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#devise%E3%81%AE%E5%B0%8E%E5%85%A5"><i class="fa fa-link"></i></a>deviseの導入</h1>
+
+<h2>
+<span id="1-gemのインストール" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-gem%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB"><i class="fa fa-link"></i></a>1. gemのインストール</h2>
+
+<h3>
+<span id="1-プロジェクトの作成" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%81%AE%E4%BD%9C%E6%88%90"><i class="fa fa-link"></i></a>1. プロジェクトの作成</h3>
+
+<p>新しいプロジェクトを作ります。</p>
+
+<div class="code-frame" data-lang="bash"><div class="highlight"><pre><span></span>$ rails new devise_rails5
+$ <span class="nb">cd</span> devise_rails5
+</pre></div></div>
+
+<h3>
+<span id="2-gemfileの編集とインストール" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-gemfile%E3%81%AE%E7%B7%A8%E9%9B%86%E3%81%A8%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB"><i class="fa fa-link"></i></a>2. Gemfileの編集とインストール</h3>
+
+<p>以下ファイルに<code>devise</code>と<code>omniauth-twitter</code>を追加します。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">Gemfile</span></div>
+<div class="highlight"><pre><span></span><span class="n">source</span> <span class="s1">'https://rubygems.org'</span>
+
+<span class="p">(</span><span class="err">省略</span><span class="p">)</span><span class="o">...</span>
+
+<span class="c1"># Devise</span>
+<span class="n">gem</span> <span class="s1">'devise'</span>
+<span class="n">gem</span> <span class="s1">'omniauth-twitter'</span>
+
+</pre></div>
+</div>
+
+<p>gemをインストール。</p>
+
+<div class="code-frame" data-lang="bash"><div class="highlight"><pre><span></span>$ bundle install
+</pre></div></div>
+
+<h2>
+<span id="2-deviseの設定" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-devise%E3%81%AE%E8%A8%AD%E5%AE%9A"><i class="fa fa-link"></i></a>2. deviseの設定</h2>
+
+<p>devise関連ファイルを追加。<br>
+すると以下のような英文が表示されます。1から4まで順番に見ていきます。</p>
+
+<div class="code-frame" data-lang="bash"><div class="highlight"><pre><span></span>$ rails g devise:install
+      create  config/initializers/devise.rb
+      create  config/locales/devise.en.yml
+<span class="o">===============================================================================</span>
+
+Some setup you must <span class="k">do</span> manually <span class="k">if</span> you haven<span class="s1">'t yet:</span>
+
+<span class="s1">  1. Ensure you have defined default url options in your environments files. Here</span>
+<span class="s1">     is an example of default_url_options appropriate for a development environment</span>
+<span class="s1">     in config/environments/development.rb:</span>
+
+<span class="s1">       config.action_mailer.default_url_options = { host: '</span>localhost<span class="err">'</span>, port: <span class="m">3000</span> <span class="o">}</span>
+
+     In production, :host should be <span class="nb">set</span> to the actual host of your application.
+
+  <span class="m">2</span>. Ensure you have defined root_url to *something* in your config/routes.rb.
+     For example:
+
+       root to: <span class="s2">"home#index"</span>
+
+  <span class="m">3</span>. Ensure you have flash messages in app/views/layouts/application.html.erb.
+     For example:
+
+       &lt;p <span class="nv">class</span><span class="o">=</span><span class="s2">"notice"</span>&gt;&lt;%<span class="o">=</span> notice %&gt;&lt;/p&gt;
+       &lt;p <span class="nv">class</span><span class="o">=</span><span class="s2">"alert"</span>&gt;&lt;%<span class="o">=</span> alert %&gt;&lt;/p&gt;
+
+  <span class="m">4</span>. You can copy Devise views <span class="o">(</span><span class="k">for</span> customization<span class="o">)</span> to your app by running:
+
+       rails g devise:views
+
+<span class="o">===============================================================================</span>
+</pre></div></div>
+
+<p><strong>1. デフォルトURLの指定</strong><br>
+英文の例に書いてあった<code>config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }</code>を以下のファイルに追加しました。<br>
+<code>config.action_mailer.default_url_options = { host: 'localhost:3000' }</code>でもOKです。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">config/environments/development.rb</span></div>
+<div class="highlight"><pre><span></span><span class="no">Rails</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span>
+  <span class="c1"># Settings specified here will take precedence over those in config/application.rb.</span>
+
+  <span class="p">(</span><span class="err">省略</span><span class="p">)</span><span class="o">...</span>
+
+  <span class="c1"># mailer setting</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">action_mailer</span><span class="o">.</span><span class="n">default_url_options</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">host</span><span class="p">:</span> <span class="s1">'localhost'</span><span class="p">,</span> <span class="ss">port</span><span class="p">:</span> <span class="mi">3000</span> <span class="p">}</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<p><strong>2. root_urlの指定</strong><br>
+1番で指定した<em><a href="http://localhost:3000/" class="autolink" rel="nofollow noopener" target="_blank">http://localhost:3000/</a></em>にアクセスした際に表示されるページを指定します。<br>
+現状ページは1つも作っていないため、先に追加します。</p>
+
+<p>Pagesコントローラーと、indexページとshowページを追加してみます。</p>
+
+<div class="code-frame" data-lang="bash"><div class="highlight"><pre><span></span>$ rails g controller Pages index show
+</pre></div></div>
+
+<p>routes.rbに以下を指定します。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">config/routes.rb</span></div>
+<div class="highlight"><pre><span></span><span class="no">Rails</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">draw</span> <span class="k">do</span>
+  <span class="n">root</span> <span class="s1">'pages#index'</span>
+  <span class="n">get</span> <span class="s1">'pages/show'</span>
+  <span class="p">(</span><span class="err">省略</span><span class="p">)</span><span class="o">...</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<p><strong>3. flashメッセージの設定</strong><br>
+ログインした時などに上の方に「ログインしました」みたいなメッセージが出るようにします。<br>
+以下のファイルの<code>&lt;body&gt;</code>タグのすぐ下に指定されたタグを挿入します。</p>
+
+<div class="code-frame" data-lang="erb">
+<div class="code-lang"><span class="bold">app/views/layouts/application.html.erb</span></div>
+<div class="highlight"><pre><span></span><span class="x">&lt;!DOCTYPE html&gt;</span>
+<span class="x">&lt;html&gt; </span>
+<span class="x"> &lt;head&gt;</span>
+<span class="x">  &lt;title&gt;DeviseRails5&lt;/title&gt;</span>
+<span class="x">  </span><span class="cp">&lt;%=</span> <span class="n">csrf_meta_tags</span> <span class="cp">%&gt;</span><span class="x"></span>
+
+<span class="x">  </span><span class="cp">&lt;%=</span> <span class="n">stylesheet_link_tag</span>    <span class="s1">'application'</span><span class="p">,</span> <span class="ss">media</span><span class="p">:</span> <span class="s1">'all'</span><span class="p">,</span> <span class="s1">'data-turbolinks-track'</span><span class="p">:</span> <span class="s1">'reload'</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">  </span><span class="cp">&lt;%=</span> <span class="n">javascript_include_tag</span> <span class="s1">'application'</span><span class="p">,</span> <span class="s1">'data-turbolinks-track'</span><span class="p">:</span> <span class="s1">'reload'</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x"> &lt;/head&gt;</span>
+<span class="x"> &lt;body&gt;</span>
+<span class="x">  &lt;p class="notice"&gt;</span><span class="cp">&lt;%=</span> <span class="n">notice</span> <span class="cp">%&gt;</span><span class="x">&lt;/p&gt;</span>
+<span class="x">  &lt;p class="alert"&gt;</span><span class="cp">&lt;%=</span> <span class="n">alert</span> <span class="cp">%&gt;</span><span class="x">&lt;/p&gt;</span>
+
+<span class="x">  </span><span class="cp">&lt;%=</span> <span class="k">yield</span> <span class="cp">%&gt;</span><span class="x"></span>
+
+<span class="x"> &lt;/body&gt; </span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+</div>
+
+<p><strong>4. DeviseのViewを生成</strong><br>
+Deviseの導入で追加されるViewは、以下のコマンドを実行しなければデザインを変更できないので、デザインをカスタマイズするためにも実行します。</p>
+
+<div class="code-frame" data-lang="bash"><div class="highlight"><pre><span></span>$ rails g devise:views
+</pre></div></div>
+
+<p>すると以下の様なファイルが生成されます。</p>
+
+<div class="code-frame" data-lang="bash"><div class="highlight"><pre><span></span>app/views/devise/shared/_links.html.erb <span class="o">(</span>リンク用パーシャル<span class="o">)</span>
+app/views/devise/confirmations/new.html.erb <span class="o">(</span>認証メールの再送信画面<span class="o">)</span>
+app/views/devise/passwords/edit.html.erb <span class="o">(</span>パスワード変更画面<span class="o">)</span>
+app/views/devise/passwords/new.html.erb <span class="o">(</span>パスワードを忘れた際、メールを送る画面<span class="o">)</span>
+app/views/devise/registrations/edit.html.erb <span class="o">(</span>ユーザー情報変更画面<span class="o">)</span>
+app/views/devise/registrations/new.html.erb <span class="o">(</span>ユーザー登録画面<span class="o">)</span>
+app/views/devise/sessions/new.html.erb <span class="o">(</span>ログイン画面<span class="o">)</span>
+app/views/devise/unlocks/new.html.erb <span class="o">(</span>ロック解除メール再送信画面<span class="o">)</span>
+app/views/devise/mailer/confirmation_instructions.html.erb <span class="o">(</span>メール用アカウント認証文<span class="o">)</span>
+app/views/devise/mailer/password_change.html.erb （メール用パスワード変更完了文）
+app/views/devise/mailer/reset_password_instructions.html.erb <span class="o">(</span>メール用パスワードリセット文<span class="o">)</span>
+app/views/devise/mailer/unlock_instructions.html.erb <span class="o">(</span>メール用ロック解除文<span class="o">)</span>
+</pre></div></div>
+
+<h2>
+<span id="3-userモデルの設定" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#3-user%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E8%A8%AD%E5%AE%9A"><i class="fa fa-link"></i></a>3. Userモデルの設定</h2>
+
+<h3>
+<span id="1-userモデルの作成" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-user%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E4%BD%9C%E6%88%90"><i class="fa fa-link"></i></a>1. Userモデルの作成</h3>
+
+<p>以下を実行。</p>
+
+<div class="code-frame" data-lang="bash"><div class="highlight"><pre><span></span>$ rails g devise User
+</pre></div></div>
+
+<p>マイグレーションファイルができます。<br>
+デフォルトではこんな感じになってます。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">db/migrate/20161112121754_devise_create_users.rb</span></div>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">DeviseCreateUsers</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="o">[</span><span class="mi">5</span><span class="o">.</span><span class="mi">0</span><span class="o">]</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">create_table</span> <span class="ss">:users</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+      <span class="c1">## Database authenticatable</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span> <span class="ss">:email</span><span class="p">,</span>              <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">default</span><span class="p">:</span> <span class="s2">""</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span> <span class="ss">:encrypted_password</span><span class="p">,</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">default</span><span class="p">:</span> <span class="s2">""</span>
+
+      <span class="c1">## Recoverable</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span>   <span class="ss">:reset_password_token</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="ss">:reset_password_sent_at</span>
+
+      <span class="c1">## Rememberable</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="ss">:remember_created_at</span>
+
+      <span class="c1">## Trackable</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">integer</span>  <span class="ss">:sign_in_count</span><span class="p">,</span> <span class="ss">default</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="ss">:current_sign_in_at</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="ss">:last_sign_in_at</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span>   <span class="ss">:current_sign_in_ip</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span>   <span class="ss">:last_sign_in_ip</span>
+
+      <span class="c1">## Confirmable</span>
+      <span class="c1"># t.string   :confirmation_token</span>
+      <span class="c1"># t.datetime :confirmed_at</span>
+      <span class="c1"># t.datetime :confirmation_sent_at</span>
+      <span class="c1"># t.string   :unconfirmed_email # Only if using reconfirmable</span>
+
+      <span class="c1">## Lockable</span>
+      <span class="c1"># t.integer  :failed_attempts, default: 0, null: false # Only if lock strategy is :failed_attempts</span>
+      <span class="c1"># t.string   :unlock_token # Only if unlock strategy is :email or :both</span>
+      <span class="c1"># t.datetime :locked_at</span>
+
+
+      <span class="n">t</span><span class="o">.</span><span class="n">timestamps</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span>
+    <span class="k">end</span>
+
+    <span class="n">add_index</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:email</span><span class="p">,</span>                <span class="ss">unique</span><span class="p">:</span> <span class="kp">true</span>
+    <span class="n">add_index</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:reset_password_token</span><span class="p">,</span> <span class="ss">unique</span><span class="p">:</span> <span class="kp">true</span>
+    <span class="c1"># add_index :users, :confirmation_token,   unique: true</span>
+    <span class="c1"># add_index :users, :unlock_token,         unique: true</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<p>Userモデルはこんな感じになっています。<br>
+デフォルトでは<code>database_authenticatable</code>、<code>registerable</code>、<code>recoverable</code>、<code>rememberable</code>、<code>trackable</code>、<code>validatable</code>が使えるようになっています。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">app/models/user.rb</span></div>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="c1"># Include default devise modules. Others available are:</span>
+  <span class="c1"># :confirmable, :lockable, :timeoutable and :omniauthable</span>
+  <span class="n">devise</span> <span class="ss">:database_authenticatable</span><span class="p">,</span> <span class="ss">:registerable</span><span class="p">,</span>
+         <span class="ss">:recoverable</span><span class="p">,</span> <span class="ss">:rememberable</span><span class="p">,</span> <span class="ss">:trackable</span><span class="p">,</span> <span class="ss">:validatable</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<h3>
+<span id="2-deviseモジュール概要" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-devise%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB%E6%A6%82%E8%A6%81"><i class="fa fa-link"></i></a>2. deviseモジュール概要</h3>
+
+<p>各モジュールについて以下に紹介します。</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">機能</th>
+<th style="text-align: left">概要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left">database_authenticatable</td>
+<td style="text-align: left">サインイン時にユーザーの正当性を検証するためにパスワードを暗号化してDBに登録します。認証方法としてはPOSTリクエストかHTTP Basic認証が使えます。</td>
+</tr>
+<tr>
+<td style="text-align: left">registerable</td>
+<td style="text-align: left">登録処理を通してユーザーをサインアップします。また、ユーザーに自身のアカウントを編集したり削除することを許可します。</td>
+</tr>
+<tr>
+<td style="text-align: left">recoverable</td>
+<td style="text-align: left">パスワードをリセットし、それを通知します。</td>
+</tr>
+<tr>
+<td style="text-align: left">rememberable</td>
+<td style="text-align: left">保存されたcookieから、ユーザーを記憶するためのトークンを生成・削除します。</td>
+</tr>
+<tr>
+<td style="text-align: left">trackable</td>
+<td style="text-align: left">サインイン回数や、サインイン時間、IPアドレスを記録します。</td>
+</tr>
+<tr>
+<td style="text-align: left">validatable</td>
+<td style="text-align: left">Emailやパスワードのバリデーションを提供します。独自に定義したバリデーションを追加することもできます。</td>
+</tr>
+<tr>
+<td style="text-align: left">confirmable</td>
+<td style="text-align: left">メールに記載されているURLをクリックして本登録を完了する、といったよくある登録方式を提供します。また、サインイン中にアカウントが認証済みかどうかを検証します。</td>
+</tr>
+<tr>
+<td style="text-align: left">lockable</td>
+<td style="text-align: left">一定回数サインインを失敗するとアカウントをロックします。ロック解除にはメールによる解除か、一定時間経つと解除するといった方法があります。</td>
+</tr>
+<tr>
+<td style="text-align: left">timeoutable</td>
+<td style="text-align: left">一定時間活動していないアカウントのセッションを破棄します。</td>
+</tr>
+<tr>
+<td style="text-align: left">omniauthable</td>
+<td style="text-align: left">
+<a href="https://github.com/intridea/omniauth" rel="nofollow noopener" target="_blank"><em>intridea/omniauth</em></a>をサポートします。TwitterやFacebookなどの認証を追加したい場合はこれを使用します。</td>
+</tr>
+</tbody>
+</table>
+
+<h3>
+<span id="3-userモデルの編集" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#3-user%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86"><i class="fa fa-link"></i></a>3. Userモデルの編集</h3>
+
+<p>今回はデフォルトではないものも触ってみたいと思うので全部入れてみます。<br>
+Twitter認証を使うのでTwitterを指定しています。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">app/models/user.rb</span></div>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="c1"># Include default devise modules. Others available are:</span>
+  <span class="c1"># :confirmable, :lockable, :timeoutable and :omniauthable</span>
+  <span class="n">devise</span> <span class="ss">:database_authenticatable</span><span class="p">,</span> <span class="ss">:registerable</span><span class="p">,</span>
+         <span class="ss">:recoverable</span><span class="p">,</span> <span class="ss">:rememberable</span><span class="p">,</span> <span class="ss">:trackable</span><span class="p">,</span> <span class="ss">:validatable</span><span class="p">,</span>
+         <span class="ss">:confirmable</span><span class="p">,</span> <span class="ss">:lockable</span><span class="p">,</span> <span class="ss">:timeoutable</span><span class="p">,</span> <span class="ss">:omniauthable</span><span class="p">,</span> <span class="ss">omniauth_providers</span><span class="p">:</span> <span class="o">[</span><span class="ss">:twitter</span><span class="o">]</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<h3>
+<span id="4-マイグレーションファイルの編集" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#4-%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86"><i class="fa fa-link"></i></a>4. マイグレーションファイルの編集</h3>
+
+<p>上に合わせて使用モジュールに対応する部分のコメントアウトを外します。今回は全部使うので全部外します。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">db/migrate/20161112121754_devise_create_users.rb</span></div>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">DeviseCreateUsers</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="o">[</span><span class="mi">5</span><span class="o">.</span><span class="mi">0</span><span class="o">]</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">create_table</span> <span class="ss">:users</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+      <span class="c1">## Database authenticatable</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span> <span class="ss">:email</span><span class="p">,</span>              <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">default</span><span class="p">:</span> <span class="s2">""</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span> <span class="ss">:encrypted_password</span><span class="p">,</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">default</span><span class="p">:</span> <span class="s2">""</span>
+
+      <span class="c1">## Recoverable</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span>   <span class="ss">:reset_password_token</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="ss">:reset_password_sent_at</span>
+
+      <span class="c1">## Rememberable</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="ss">:remember_created_at</span>
+
+      <span class="c1">## Trackable</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">integer</span>  <span class="ss">:sign_in_count</span><span class="p">,</span> <span class="ss">default</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="ss">:current_sign_in_at</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="ss">:last_sign_in_at</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span>   <span class="ss">:current_sign_in_ip</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span>   <span class="ss">:last_sign_in_ip</span>
+
+      <span class="c1">## Confirmable</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span>   <span class="ss">:confirmation_token</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="ss">:confirmed_at</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="ss">:confirmation_sent_at</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span>   <span class="ss">:unconfirmed_email</span> <span class="c1"># Only if using reconfirmable</span>
+
+      <span class="c1">## Lockable</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">integer</span>  <span class="ss">:failed_attempts</span><span class="p">,</span> <span class="ss">default</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span> <span class="c1"># Only if lock strategy is :failed_attempts</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">string</span>   <span class="ss">:unlock_token</span> <span class="c1"># Only if unlock strategy is :email or :both</span>
+      <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="ss">:locked_at</span>
+
+
+      <span class="n">t</span><span class="o">.</span><span class="n">timestamps</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span>
+    <span class="k">end</span>
+
+    <span class="n">add_index</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:email</span><span class="p">,</span>                <span class="ss">unique</span><span class="p">:</span> <span class="kp">true</span>
+    <span class="n">add_index</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:reset_password_token</span><span class="p">,</span> <span class="ss">unique</span><span class="p">:</span> <span class="kp">true</span>
+    <span class="n">add_index</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:confirmation_token</span><span class="p">,</span>   <span class="ss">unique</span><span class="p">:</span> <span class="kp">true</span>
+    <span class="n">add_index</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:unlock_token</span><span class="p">,</span>         <span class="ss">unique</span><span class="p">:</span> <span class="kp">true</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<h3>
+<span id="5-omniauth-twitter用カラムの追加" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#5-omniauth-twitter%E7%94%A8%E3%82%AB%E3%83%A9%E3%83%A0%E3%81%AE%E8%BF%BD%E5%8A%A0"><i class="fa fa-link"></i></a>5. omniauth-twitter用カラムの追加</h3>
+
+<p>ついでにomniauth-twitterで使う<code>provider</code>と<code>uid</code>、それとTwitter認証の場合はアカウント名を保存しておきたいので<code>username</code>もUserテーブルに追加します。</p>
+
+<div class="code-frame" data-lang="bash"><div class="highlight"><pre><span></span>$ rails g migration add_columns_to_users provider uid username
+</pre></div></div>
+
+<p>以下のようなマイグレーションファイルができます。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">db/migrate/20161112122634_add_columns_to_users.rb</span></div>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AddColumnsToUsers</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="o">[</span><span class="mi">5</span><span class="o">.</span><span class="mi">0</span><span class="o">]</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">add_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:provider</span><span class="p">,</span> <span class="ss">:string</span>
+    <span class="n">add_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:uid</span><span class="p">,</span> <span class="ss">:string</span>
+    <span class="n">add_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:username</span><span class="p">,</span> <span class="ss">:string</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<p>ここまで出来たら以下を実行します。</p>
+
+<div class="code-frame" data-lang="bash"><div class="highlight"><pre><span></span>$ rake db:migrate
+</pre></div></div>
+
+<h2>
+<span id="4-viewの編集" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#4-view%E3%81%AE%E7%B7%A8%E9%9B%86"><i class="fa fa-link"></i></a>4. viewの編集</h2>
+
+<p>以下のファイルを編集して、ページ上部にメニューが出るようにします。<br>
+<code>user_signed_in?</code>はdeviseのHelperメソッドです。<br>
+ログインしているかしてないかで上部のメニューの表示が変わるようになります。<br>
+<code>current_user</code>で現在サインインしているユーザーの情報を取得できます。</p>
+
+<div class="code-frame" data-lang="erb">
+<div class="code-lang"><span class="bold">app/views/layouts/application.html.erb</span></div>
+<div class="highlight"><pre><span></span><span class="x">&lt;!DOCTYPE html&gt;</span>
+<span class="x">&lt;html&gt;</span>
+<span class="x">    &lt;head&gt;</span>
+<span class="x">        &lt;title&gt;DeviseRails5&lt;/title&gt;</span>
+<span class="x">        </span><span class="cp">&lt;%=</span> <span class="n">csrf_meta_tags</span> <span class="cp">%&gt;</span><span class="x"></span>
+
+<span class="x">        </span><span class="cp">&lt;%=</span> <span class="n">stylesheet_link_tag</span>    <span class="s1">'application'</span><span class="p">,</span> <span class="ss">media</span><span class="p">:</span> <span class="s1">'all'</span><span class="p">,</span> <span class="s1">'data-turbolinks-track'</span><span class="p">:</span> <span class="s1">'reload'</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">        </span><span class="cp">&lt;%=</span> <span class="n">javascript_include_tag</span> <span class="s1">'application'</span><span class="p">,</span> <span class="s1">'data-turbolinks-track'</span><span class="p">:</span> <span class="s1">'reload'</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">    &lt;/head&gt;</span>
+
+<span class="x">    &lt;body&gt;</span>
+<span class="x">        &lt;header&gt;</span>
+<span class="x">            &lt;nav&gt;</span>
+<span class="x">                </span><span class="cp">&lt;%</span> <span class="k">if</span> <span class="n">user_signed_in?</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">                &lt;strong&gt;</span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="n">current_user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">pages_show_path</span> <span class="cp">%&gt;</span><span class="x">&lt;/strong&gt;</span>
+<span class="x">                </span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">'プロフィール変更'</span><span class="p">,</span> <span class="n">edit_user_registration_path</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">                </span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">'ログアウト'</span><span class="p">,</span> <span class="n">destroy_user_session_path</span><span class="p">,</span> <span class="nb">method</span><span class="p">:</span> <span class="ss">:delete</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">            </span><span class="cp">&lt;%</span> <span class="k">else</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">                </span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">'サインアップ'</span><span class="p">,</span> <span class="n">new_user_registration_path</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">                </span><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s1">'ログイン'</span><span class="p">,</span> <span class="n">new_user_session_path</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">                </span><span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">            &lt;/nav&gt;</span>
+<span class="x">        &lt;/header&gt;</span>
+
+<span class="x">        &lt;p class="notice"&gt;</span><span class="cp">&lt;%=</span> <span class="n">notice</span> <span class="cp">%&gt;</span><span class="x">&lt;/p&gt;</span>
+<span class="x">        &lt;p class="alert"&gt;</span><span class="cp">&lt;%=</span> <span class="n">alert</span> <span class="cp">%&gt;</span><span class="x">&lt;/p&gt;</span>
+
+<span class="x">        </span><span class="cp">&lt;%=</span> <span class="k">yield</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">    &lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+</div>
+
+<p>以下の2ページも修正。<br>
+indexの方がトップページ、showの方がログインしているユーザー用のページになる予定です。</p>
+
+<div class="code-frame" data-lang="erb">
+<div class="code-lang"><span class="bold">app/views/pages/index.html.erb</span></div>
+<div class="highlight"><pre><span></span><span class="x">&lt;h1&gt;ようこそ&lt;/h1&gt;</span>
+<span class="x">&lt;p&gt;トップページです。&lt;/p&gt;</span>
+</pre></div>
+</div>
+
+<div class="code-frame" data-lang="erb">
+<div class="code-lang"><span class="bold">app/views/pages/show.html.erb</span></div>
+<div class="highlight"><pre><span></span><span class="x">&lt;h1&gt;こんにちは、</span><span class="cp">&lt;%=</span> <span class="n">current_user</span><span class="o">.</span><span class="n">username</span> <span class="cp">%&gt;</span><span class="x">さん&lt;/h1&gt;</span>
+<span class="x">&lt;p&gt;ユーザー用ページです。&lt;/p&gt;</span>
+</pre></div>
+</div>
+
+<p>サーバーを立ち上げて、「サインアップ」を押下すると、<code>app/models/user.rb</code>で<code>omniauthable</code>を設定しているのに何の設定もしていないので現状ではエラーになります。<br>
+<a href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f33373132376666352d386433362d323766622d373139382d3530336463636239643761652e706e67" target="_blank" rel="nofollow noopener"><img src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f33373132376666352d386433362d323766622d373139382d3530336463636239643761652e706e67" alt="エラー.png" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/48912/37127ff5-8d36-27fb-7198-503dccb9d7ae.png"></a></p>
+
+<p><code>omniauthable</code>を設定していない場合はサインアップページが表示されます。</p>
+
+<h1>
+<span id="twitterで認証する" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#twitter%E3%81%A7%E8%AA%8D%E8%A8%BC%E3%81%99%E3%82%8B"><i class="fa fa-link"></i></a>Twitterで認証する</h1>
+
+<h2>
+<span id="1-設定" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-%E8%A8%AD%E5%AE%9A"><i class="fa fa-link"></i></a>1. 設定</h2>
+
+<h3>
+<span id="1-twitter-developerの登録" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-twitter-developer%E3%81%AE%E7%99%BB%E9%8C%B2"><i class="fa fa-link"></i></a>1. Twitter Developerの登録</h3>
+
+<p><a href="https://apps.twitter.com/" rel="nofollow noopener" target="_blank"><em>Twitter Developer</em></a>にアクセスし、<strong>Create New App</strong>をクリックし（ツイッターにログインしてないとボタンが出ません）、情報を適当の入力にします。<br>
+<a href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f30353163656138372d313665302d616465322d353962652d3063653063366464613636372e706e67" target="_blank" rel="nofollow noopener"><img src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f30353163656138372d313665302d616465322d353962652d3063653063366464613636372e706e67" alt="Twitterアプリ登録.png" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/48912/051cea87-16e0-ade2-59be-0ce0c6dda667.png"></a></p>
+
+<p>作成したプロジェクトを開き、<strong>Settings</strong>タブの下の方の<strong>Allow this application to be used to Sign in with Twitter</strong>にチェックが入っていることを確認します。</p>
+
+<h3>
+<span id="2-設定ファイルの編集" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86"><i class="fa fa-link"></i></a>2. 設定ファイルの編集</h3>
+
+<p><strong>Keys and Access Tokens</strong>タブを開き、<strong>Consumer Key (API Key)</strong>と<strong>Consumer Secret (API Secret)</strong>を以下の該当箇所にコピーして貼り付けます。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">config/initializers/devise.rb</span></div>
+<div class="highlight"><pre><span></span><span class="no">Devise</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="c1"># The secret key used by Devise. Devise uses this key to generate</span>
+  <span class="p">(</span><span class="err">省略</span><span class="p">)</span><span class="o">...</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">omniauth</span> <span class="ss">:twitter</span><span class="p">,</span> <span class="s2">"API Key"</span><span class="p">,</span> <span class="s2">"API Secret"</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<h2>
+<span id="2-動作確認" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D"><i class="fa fa-link"></i></a>2. 動作確認</h2>
+
+<p>サーバーを立ち上げてサインアップページの下の方にある<strong>Sign in with Twitter</strong>というリンクをクリックします。</p>
+
+<p>すると以下の様な画面が開くので<strong>連携アプリを認証</strong>をクリックします。<br>
+<a href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f61626638336536362d373230302d303832332d616630662d3466626339643233623536662e706e67" target="_blank" rel="nofollow noopener"><img src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f61626638336536362d373230302d303832332d616630662d3466626339643233623536662e706e67" alt="連携アプリの認証.png" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/48912/abf83e66-7200-0823-af0f-4fbc9d23b56f.png"></a></p>
+
+<p>こんな画面が出るはずです。<br>
+<a href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f38393662643532362d333537382d366234352d653837342d3565393363623631376465382e706e67" target="_blank" rel="nofollow noopener"><img src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f38393662643532362d333537382d366234352d653837342d3565393363623631376465382e706e67" alt="スクリーンショット 2015-02-18 23.52.20.png" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/48912/896bd526-3578-6b45-e874-5e93cb617de8.png"></a></p>
+
+<h2>
+<span id="3-コールバック用コントローラーの作成" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#3-%E3%82%B3%E3%83%BC%E3%83%AB%E3%83%90%E3%83%83%E3%82%AF%E7%94%A8%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%BC%E3%81%AE%E4%BD%9C%E6%88%90"><i class="fa fa-link"></i></a>3. コールバック用コントローラーの作成</h2>
+
+<p>Twitter認証後適切に画面が遷移するように以下を実行してコントローラーを作ります。</p>
+
+<div class="code-frame" data-lang="bash"><div class="highlight"><pre><span></span>$ rails g controller omniauth_callbacks
+</pre></div></div>
+
+<p>作成したコントローラーの中身を以下のように修正します。<br>
+継承するのが<strong>Devise::OmniauthCallbacksController</strong>になっていることに注意です。<br>
+<strong>omniauth.auth</strong>という環境変数に認証に関する情報が入っています。<br>
+その情報を使ってユーザーが登録されているかを検証し、登録してる場合はログイン、登録されてない場合は登録用ページに遷移します。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">app/controllers/omniauth_callbacks_controller.rb</span></div>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">OmniauthCallbacksController</span> <span class="o">&lt;</span> <span class="no">Devise</span><span class="o">::</span><span class="no">OmniauthCallbacksController</span>
+    <span class="k">def</span> <span class="nf">twitter</span>
+        <span class="vi">@user</span> <span class="o">=</span> <span class="no">User</span><span class="o">.</span><span class="n">from_omniauth</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">env</span><span class="o">[</span><span class="s2">"omniauth.auth"</span><span class="o">].</span><span class="n">except</span><span class="p">(</span><span class="s2">"extra"</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="vi">@user</span><span class="o">.</span><span class="n">persisted?</span>
+            <span class="n">sign_in_and_redirect</span> <span class="vi">@user</span>
+        <span class="k">else</span>
+            <span class="n">session</span><span class="o">[</span><span class="s2">"devise.user_attributes"</span><span class="o">]</span> <span class="o">=</span> <span class="vi">@user</span><span class="o">.</span><span class="n">attributes</span>
+            <span class="n">redirect_to</span> <span class="n">new_user_registration_url</span>
+        <span class="k">end</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<p>ちなみにomniauth.authの中にはこんなものが入ってます。（一部の値は適当に変えてあります。）</p>
+
+<div class="code-frame" data-lang="bash"><div class="highlight"><pre><span></span><span class="o">{</span><span class="s2">"provider"</span><span class="o">=</span>&gt;<span class="s2">"twitter"</span>, <span class="s2">"uid"</span><span class="o">=</span>&gt;<span class="s2">"0123456789"</span>, <span class="s2">"info"</span><span class="o">=</span>&gt;<span class="o">{</span><span class="s2">"nickname"</span><span class="o">=</span>&gt;<span class="s2">"manycicadas"</span>, <span class="s2">"name"</span><span class="o">=</span>&gt;<span class="s2">"芭蕉"</span>, <span class="s2">"location"</span><span class="o">=</span>&gt;<span class="s2">"関東"</span>, <span class="s2">"image"</span><span class="o">=</span>&gt;<span class="s2">"http://pbs.twimg.com/profile_images/483964583371997185/2ZqzhzKV_normal.png"</span>, <span class="s2">"description"</span><span class="o">=</span>&gt;<span class="s2">"JavaEE/Ruby(Rails)/HTML/CSS/JavaScript/Raspberry Pi などなどが好き。"</span>, <span class="s2">"urls"</span><span class="o">=</span>&gt;<span class="o">{</span><span class="s2">"Website"</span><span class="o">=</span>&gt;nil, <span class="s2">"Twitter"</span><span class="o">=</span>&gt;<span class="s2">"https://twitter.com/manycicadas"</span><span class="o">}}</span>, <span class="s2">"credentials"</span><span class="o">=</span>&gt;<span class="o">{</span><span class="s2">"token"</span><span class="o">=</span>&gt;<span class="s2">"0123456789-hQywfs78sQ9NnwpSkwiejf2Ij74sut7hKjEsF9"</span>, <span class="s2">"secret"</span><span class="o">=</span>&gt;<span class="s2">"sijIYUsiJslOhiwkYukshKKJG6skWbhbXCYji3sabla3O1"</span><span class="o">}}</span>
+</pre></div></div>
+
+<p>Userモデルに<strong>self.from_omniauth</strong>と<strong>self.new_with_session</strong>を作ります。<br>
+self.from_omniauthではuidとproviderで検索してあったらそれを、無かったらレコードを作ります。<br>
+self.new_with_sessionについては、もしこのメソッドを追加しておかなければ、Twitter認証後サインアップページで登録を行っても、認証情報として取ってきたuidやproviderなどが登録されません。それらが登録されないのでTwitterで認証しても登録されてないユーザーとして毎回サインアップページに飛ばされます。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">app/models/user.rb</span></div>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="c1"># Include default devise modules. Others available are:</span>
+  <span class="c1"># :confirmable, :lockable, :timeoutable and :omniauthable</span>
+  <span class="n">devise</span> <span class="ss">:database_authenticatable</span><span class="p">,</span> <span class="ss">:registerable</span><span class="p">,</span>
+         <span class="ss">:recoverable</span><span class="p">,</span> <span class="ss">:rememberable</span><span class="p">,</span> <span class="ss">:trackable</span><span class="p">,</span> <span class="ss">:validatable</span><span class="p">,</span>
+         <span class="ss">:confirmable</span><span class="p">,</span> <span class="ss">:lockable</span><span class="p">,</span> <span class="ss">:timeoutable</span><span class="p">,</span> <span class="ss">:omniauthable</span><span class="p">,</span> <span class="ss">omniauth_providers</span><span class="p">:</span> <span class="o">[</span><span class="ss">:twitter</span><span class="o">]</span>
+
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_omniauth</span><span class="p">(</span><span class="n">auth</span><span class="p">)</span>
+    <span class="n">find_or_create_by</span><span class="p">(</span><span class="ss">provider</span><span class="p">:</span> <span class="n">auth</span><span class="o">[</span><span class="s2">"provider"</span><span class="o">]</span><span class="p">,</span> <span class="ss">uid</span><span class="p">:</span> <span class="n">auth</span><span class="o">[</span><span class="s2">"uid"</span><span class="o">]</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span>
+      <span class="n">user</span><span class="o">.</span><span class="n">provider</span> <span class="o">=</span> <span class="n">auth</span><span class="o">[</span><span class="s2">"provider"</span><span class="o">]</span>
+      <span class="n">user</span><span class="o">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">auth</span><span class="o">[</span><span class="s2">"uid"</span><span class="o">]</span>
+      <span class="n">user</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">auth</span><span class="o">[</span><span class="s2">"info"</span><span class="o">][</span><span class="s2">"nickname"</span><span class="o">]</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">new_with_session</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">session</span><span class="o">[</span><span class="s2">"devise.user_attributes"</span><span class="o">]</span>
+      <span class="kp">new</span><span class="p">(</span><span class="n">session</span><span class="o">[</span><span class="s2">"devise.user_attributes"</span><span class="o">]</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span>
+        <span class="n">user</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="n">params</span>
+      <span class="k">end</span>
+    <span class="k">else</span>
+      <span class="k">super</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<p>以下ファイルを編集して、コールバック用のコントローラーとしてさっき作ったコントローラーが呼ばれるようにします。これを書かないとdevise側のコントローラーが呼ばれます。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">config/routes.rb</span></div>
+<div class="highlight"><pre><span></span><span class="no">Rails</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">draw</span> <span class="k">do</span>
+  <span class="n">devise_for</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">controllers</span><span class="p">:</span> <span class="p">{</span> <span class="ss">:omniauth_callbacks</span> <span class="o">=&gt;</span> <span class="s2">"omniauth_callbacks"</span> <span class="p">}</span>
+  <span class="n">root</span> <span class="s1">'pages#index'</span>
+  <span class="n">get</span> <span class="s1">'pages/show'</span>
+  <span class="p">(</span><span class="err">省略</span><span class="p">)</span><span class="o">...</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<p>これでTwitter認証ができるようになりました。<br>
+初回、Twitter認証を行うと、サインアップページに飛ばされ、そこでメールアドレスやパスワードを入力して登録するとユーザー情報が登録されます。<br>
+今回はcomfirmable機能を入れているので、登録したら確認メッセージを送ったとのメッセージが出て、そのままログインすることはできません。<br>
+この機能を入れてなかった場合、登録すると即ログインします。</p>
+
+<h1>
+<span id="アカウント登録確認メールを送る" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E7%99%BB%E9%8C%B2%E7%A2%BA%E8%AA%8D%E3%83%A1%E3%83%BC%E3%83%AB%E3%82%92%E9%80%81%E3%82%8B"><i class="fa fa-link"></i></a>アカウント登録確認メールを送る</h1>
+
+<h2>
+<span id="1-comfirmable概要" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-comfirmable%E6%A6%82%E8%A6%81"><i class="fa fa-link"></i></a>1. comfirmable概要</h2>
+
+<p>多くの登録系サイトで採用されている、登録すると仮登録状態になり、届いたメールのリンクをクリックするとログイン可能になるという仕組みを追加できるのがcomfirmableです。<br>
+今回はGmailのアカウントを使って実際にメールが届くように設定します。</p>
+
+<h2>
+<span id="2-ログを見る" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E3%83%AD%E3%82%B0%E3%82%92%E8%A6%8B%E3%82%8B"><i class="fa fa-link"></i></a>2. ログを見る</h2>
+
+<p>サインアップ画面からEmailやパスワードを入力して登録すると、ログに以下のような内容が出力されます。<br>
+現状何も設定してないので、送信元アドレスなどがデフォルトであることが分かります。</p>
+
+<div class="code-frame" data-lang="bash">
+<div class="code-lang"><span class="bold">log/deployments.log</span></div>
+<div class="highlight"><pre><span></span>Devise::Mailer#confirmation_instructions: processed outbound mail in <span class="m">715</span>.7ms
+Sent mail to test@example.com <span class="o">(</span><span class="m">51</span>.1ms<span class="o">)</span>
+Date: Sat, <span class="m">12</span> Nov <span class="m">2016</span> <span class="m">22</span>:26:18 +0900
+From: please-change-me-at-config-initializers-devise@example.com
+Reply-To: please-change-me-at-config-initializers-devise@example.com
+To: test@example.com
+Message-ID: &lt;5827187aa0893_104ff3fcd39297f34991c@YukihonoiMac-8.local.mail&gt;
+Subject: Confirmation instructions
+Mime-Version: <span class="m">1</span>.0
+Content-Type: text/html<span class="p">;</span>
+ <span class="nv">charset</span><span class="o">=</span>UTF-8
+Content-Transfer-Encoding: 7bit
+
+&lt;p&gt;Welcome test@example.com!&lt;/p&gt;
+
+&lt;p&gt;You can confirm your account email through the link below:&lt;/p&gt;
+
+&lt;p&gt;&lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">"http://localhost:3000/users/confirmation?confirmation_token=ZaPGWtxbTzo_3eJxvzm9"</span>&gt;Confirm my account&lt;/a&gt;&lt;/p&gt;
+</pre></div>
+</div>
+
+<h2>
+<span id="3-メールが実際に届くようにする" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#3-%E3%83%A1%E3%83%BC%E3%83%AB%E3%81%8C%E5%AE%9F%E9%9A%9B%E3%81%AB%E5%B1%8A%E3%81%8F%E3%82%88%E3%81%86%E3%81%AB%E3%81%99%E3%82%8B"><i class="fa fa-link"></i></a>3. メールが実際に届くようにする</h2>
+
+<h3>
+<span id="1-設定ファイルの編集" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86"><i class="fa fa-link"></i></a>1. 設定ファイルの編集</h3>
+
+<p>今回はgmailを使うのでメールアドレスにはgmailを設定します。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">config/initializers/devise.rb</span></div>
+<div class="highlight"><pre><span></span><span class="no">Devise</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="p">(</span><span class="err">省略</span><span class="p">)</span><span class="o">...</span>
+  <span class="c1"># mail setting</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">mailer_sender</span> <span class="o">=</span> <span class="s2">"メールアドレス"</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<p>gmailの場合はGメールアドレスとGメールパスワードの部分を自分のアカウントのものに変更します。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">config/environments/development.rb</span></div>
+<div class="highlight"><pre><span></span><span class="no">Rails</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span>
+  <span class="c1"># default url</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">action_mailer</span><span class="o">.</span><span class="n">default_url_options</span> <span class="o">=</span> <span class="p">{</span>  <span class="ss">host</span><span class="p">:</span> <span class="s1">'localhost'</span><span class="p">,</span> <span class="ss">port</span><span class="p">:</span> <span class="mi">3000</span> <span class="p">}</span>
+  <span class="c1"># mail setting</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">action_mailer</span><span class="o">.</span><span class="n">raise_delivery_errors</span> <span class="o">=</span> <span class="kp">true</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">action_mailer</span><span class="o">.</span><span class="n">delivery_method</span> <span class="o">=</span> <span class="ss">:smtp</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">action_mailer</span><span class="o">.</span><span class="n">smtp_settings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="ss">:address</span> <span class="o">=&gt;</span> <span class="s2">"smtp.gmail.com"</span><span class="p">,</span>
+    <span class="ss">:port</span> <span class="o">=&gt;</span> <span class="mi">587</span><span class="p">,</span>
+    <span class="ss">:user_name</span> <span class="o">=&gt;</span> <span class="s2">"Gメールアドレス"</span><span class="p">,</span>
+    <span class="ss">:password</span> <span class="o">=&gt;</span> <span class="s2">"Gメールパスワード"</span><span class="p">,</span>
+    <span class="ss">:authentication</span> <span class="o">=&gt;</span> <span class="ss">:plain</span><span class="p">,</span>
+    <span class="ss">:enable_starttls_auto</span> <span class="o">=&gt;</span> <span class="kp">true</span>
+  <span class="p">}</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<h3>
+<span id="2-gmailの設定" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-gmail%E3%81%AE%E8%A8%AD%E5%AE%9A"><i class="fa fa-link"></i></a>2. Gmailの設定</h3>
+
+<h4>
+<span id="1-とりあえず試したい場合" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-%E3%81%A8%E3%82%8A%E3%81%82%E3%81%88%E3%81%9A%E8%A9%A6%E3%81%97%E3%81%9F%E3%81%84%E5%A0%B4%E5%90%88"><i class="fa fa-link"></i></a>1. とりあえず試したい場合</h4>
+
+<p>デフォルトでは安全性の低いアプリケーションからGmailへのアクセスが制限されています。<br>
+よってその制限を解除することで動くようにできます。<br>
+ただ、安全性の低いアプリからのアクセスを許可するということはセキュリティ的にはいまいちなのであくまで動作確認ように利用することをおすすめします。<br>
+<a href="https://support.google.com/accounts/answer/6010255" rel="nofollow noopener" target="_blank"><em>安全性の低いアプリがアカウントにアクセスするのを許可する</em></a>の<strong>安全性の低いアプリを許可</strong>というリンクをクリックして、以下のように設定します。<br>
+<a href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f31376237316137392d613265392d373730302d336436302d3065353463373762333463632e706e67" target="_blank" rel="nofollow noopener"><img src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f31376237316137392d613265392d373730302d336436302d3065353463373762333463632e706e67" alt="スクリーンショット 2015-02-21 11.49.19.png" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/48912/17b71a79-a2e9-7700-3d60-0e54c77b34cc.png"></a></p>
+
+<h4>
+<span id="2-2段階認証がオンの場合" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-2%E6%AE%B5%E9%9A%8E%E8%AA%8D%E8%A8%BC%E3%81%8C%E3%82%AA%E3%83%B3%E3%81%AE%E5%A0%B4%E5%90%88"><i class="fa fa-link"></i></a>2. 2段階認証がオンの場合</h4>
+
+<p>2段階認証をオンにしている場合、1の設定はできないはずなのでこちらをやってください。<br>
+また、1のセキュリティ的にイマイチな方をやりたくない方もこの際2段階認証をオンにしてこの設定をやってください。</p>
+
+<p><a href="https://myaccount.google.com/u/1/security?pli=1" rel="nofollow noopener" target="_blank">アカウントへのアクセスとセキュリティ設定の管理</a>を開きます。<br>
+2段階認証がオフの場合は<strong>2段階認証プロセス</strong>から2段階認証の設定をしてください。（<a href="https://support.google.com/accounts/answer/185839" rel="nofollow noopener" target="_blank">2 段階認証プロセスを有効にする</a>)<br>
+2段階認証設定を行っている場合は<strong>アプリパスワード</strong>を開きます。<br>
+<a href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f36653462323134662d663436312d646132352d393931362d3066666563386538613931342e706e67" target="_blank" rel="nofollow noopener"><img src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f36653462323134662d663436312d646132352d393931362d3066666563386538613931342e706e67" alt="パスワードとログイン方法.png" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/48912/6e4b214f-f461-da25-9916-0ffec8e8a914.png"></a></p>
+
+<p><strong>端末を選択</strong>と<strong>アプリを選択</strong>で適切なものを選びます。<br>
+私は端末を選択では<code>Mac</code>を、アプリを選択で<code>その他（名前を入力）</code>を選択して登録しました。<br>
+<a href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f36663861353164352d353663632d386132332d313562332d3137303433353133396335652e706e67" target="_blank" rel="nofollow noopener"><img src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f36663861353164352d353663632d386132332d313562332d3137303433353133396335652e706e67" alt="アプリパスワード.png" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/48912/6f8a51d5-56cc-8a23-15b3-170435139c5e.png"></a></p>
+
+<p>パスワードが生成されます。<br>
+<a href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f35383033336261322d326338352d396131332d316261652d3163313935393236306232632e706e67" target="_blank" rel="nofollow noopener"><img src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f35383033336261322d326338352d396131332d316261652d3163313935393236306232632e706e67" alt="2段階認証パスワード.png" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/48912/58033ba2-2c85-9a13-1bae-1c1959260b2c.png"></a></p>
+
+<p>生成されたパスワードを、1の設定の<code>:password =&gt; "Gメールパスワード",</code>のGメールのパスワードの部分に設定します。</p>
+
+<h3>
+<span id="3-届いたメールを確認" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#3-%E5%B1%8A%E3%81%84%E3%81%9F%E3%83%A1%E3%83%BC%E3%83%AB%E3%82%92%E7%A2%BA%E8%AA%8D"><i class="fa fa-link"></i></a>3. 届いたメールを確認</h3>
+
+<p>これでアプリ側からサインアップすると、以下の様なメールが届くようになります。<strong>Confirm my account</strong>をクリックするログイン画面からログインが可能になります。<br>
+<a href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f63636539366665302d636433392d393665372d326335342d6131353638343838346666322e706e67" target="_blank" rel="nofollow noopener"><img src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f63636539366665302d636433392d393665372d326335342d6131353638343838346666322e706e67" alt="承認メール.png" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/48912/cce96fe0-cd39-96e7-2c54-a15684884ff2.png"></a></p>
+
+<p>メールで送られる文章は以下のファイルを編集することで可能です。<br>
+<code>app/views/devise/confirmation_instructions.html.erb</code></p>
+
+<h1>
+<span id="アカウントをロックする" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E3%82%92%E3%83%AD%E3%83%83%E3%82%AF%E3%81%99%E3%82%8B"><i class="fa fa-link"></i></a>アカウントをロックする</h1>
+
+<h2>
+<span id="1-lockable概要" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-lockable%E6%A6%82%E8%A6%81"><i class="fa fa-link"></i></a>1. lockable概要</h2>
+
+<p>アカウントの認証を一定回数間違うと、アカウントをロックするようにする機能です。</p>
+
+<h2>
+<span id="2-設定" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E8%A8%AD%E5%AE%9A"><i class="fa fa-link"></i></a>2. 設定</h2>
+
+<h3>
+<span id="1-設定ファイルの編集-1" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86-1"><i class="fa fa-link"></i></a>1. 設定ファイルの編集</h3>
+
+<p>以下ファイルを修正して、アカウントの認証を5回失敗します。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">config/initializers/devise.rb</span></div>
+<div class="highlight"><pre><span></span><span class="no">Devise</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+    <span class="p">(</span><span class="err">省略</span><span class="p">)</span><span class="o">...</span>
+    <span class="c1"># lock sessings</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">unlock_strategy</span> <span class="o">=</span> <span class="ss">:email</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">maximum_attempts</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<p>するとアカウントがロックされてこのようなメールが届きます。<br>
+<a href="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f36363662653965662d653266312d306535362d363364392d6565346235356537353237332e706e67" target="_blank" rel="nofollow noopener"><img src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f36363662653965662d653266312d306535362d363364392d6565346235356537353237332e706e67" alt="アンロックメール.png" data-canonical-src="https://qiita-image-store.s3.amazonaws.com/0/48912/666be9ef-e2f1-0e56-63d9-ee4b55e75273.png"></a></p>
+
+<p>メールの中身は<code>app/views/devise/mailer/unlock_instructions.rb</code>ファイルを修正すれば変わります。</p>
+
+<h3>
+<span id="2-設定値について" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E8%A8%AD%E5%AE%9A%E5%80%A4%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><i class="fa fa-link"></i></a>2. 設定値について</h3>
+
+<ul>
+<li>
+<strong>lock_strategy</strong>（ロック方法）</li>
+</ul>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">属性</th>
+<th style="text-align: left">説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left">:failed_attempts</td>
+<td style="text-align: left">失敗回数によってロック。</td>
+</tr>
+<tr>
+<td style="text-align: left">:none</td>
+<td style="text-align: left">ロックしない。</td>
+</tr>
+</tbody>
+</table>
+
+<ul>
+<li>
+<strong>unlock_strategy</strong>（ロック解除方法）</li>
+</ul>
+
+<table>
+<thead>
+<tr>
+<th style="text-align: left">属性</th>
+<th style="text-align: left">説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left">:time</td>
+<td style="text-align: left">指定時間でロックを解除する。</td>
+</tr>
+<tr>
+<td style="text-align: left">:email</td>
+<td style="text-align: left">メールでロックを解除する。</td>
+</tr>
+<tr>
+<td style="text-align: left">:both</td>
+<td style="text-align: left">:timeと:emailの両方。</td>
+</tr>
+<tr>
+<td style="text-align: left">:none</td>
+<td style="text-align: left">解除させない。</td>
+</tr>
+</tbody>
+</table>
+
+<p>:noneを指定した場合、ユーザーのレコードの<code>locked_at</code>カラムを<code>nil</code>にアップデートしたらロックが解除できます。</p>
+
+<ul>
+<li>
+<strong>unlock_in</strong>（ロック解除時間）</li>
+</ul>
+
+<p>2時間で解除するなら<code>config.unlock_in = 2.hours</code>といった具合に指定。</p>
+
+<ul>
+<li><strong>unlock_keys</strong></li>
+</ul>
+
+<p>アカウントをロックまたは解除するときに使用するキーを定義するらしいです。<br>
+<code>config.unlock_keys = [:username]</code>という感じで指定できます。</p>
+
+<ul>
+<li>
+<strong>maximum_attempts</strong>（失敗可能回数）</li>
+</ul>
+
+<p>アカウントの認証を失敗して良い回数を指定します。<br>
+<code>config.maximum_attempts = 4</code>と指定した場合、4回目までは失敗しても大丈夫ですが、5回目を失敗した時点でアカウントがロックされます。</p>
+
+<h1>
+<span id="セッションをタイムアウトする" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#%E3%82%BB%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E3%82%BF%E3%82%A4%E3%83%A0%E3%82%A2%E3%82%A6%E3%83%88%E3%81%99%E3%82%8B"><i class="fa fa-link"></i></a>セッションをタイムアウトする</h1>
+
+<h2>
+<span id="1-timeoutable概要" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-timeoutable%E6%A6%82%E8%A6%81"><i class="fa fa-link"></i></a>1. timeoutable概要</h2>
+
+<p>一定時間活動がない場合にセッションをタイムアウトさせるのがtimeoutableです。</p>
+
+<h2>
+<span id="2-設定-1" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E8%A8%AD%E5%AE%9A-1"><i class="fa fa-link"></i></a>2. 設定</h2>
+
+<p>以下ファイルを修正するとタイムアウトまでの時間を指定できます。<br>
+以下の場合だと3分後にセッションがタイムアウトします。<br>
+デフォルトは30分だそうです。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">config/initializers/devise.rb</span></div>
+<div class="highlight"><pre><span></span><span class="no">Devise</span><span class="o">.</span><span class="n">setup</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+    <span class="p">(</span><span class="err">省略</span><span class="p">)</span><span class="o">...</span>
+    <span class="c1"># timeout setting</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">timeout_in</span> <span class="o">=</span> <span class="mi">3</span><span class="o">.</span><span class="n">minutes</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<h1>
+<span id="その他の設定" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#%E3%81%9D%E3%81%AE%E4%BB%96%E3%81%AE%E8%A8%AD%E5%AE%9A"><i class="fa fa-link"></i></a>その他の設定</h1>
+
+<h2>
+<span id="1-ログイン後のページを変更する" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E5%BE%8C%E3%81%AE%E3%83%9A%E3%83%BC%E3%82%B8%E3%82%92%E5%A4%89%E6%9B%B4%E3%81%99%E3%82%8B"><i class="fa fa-link"></i></a>1. ログイン後のページを変更する</h2>
+
+<p>ログインすると、デフォルトではroot_urlに飛ばされます。<br>
+これを<code>app/views/pages/show.html.erb</code>になるように修正します。<br>
+<strong>after_sign_in_path_for</strong>メソッドを追加します。ここにログイン後に遷移したいページを指定します。<br>
+あと<strong>sign_in_required</strong>も追加します。showページはログインしているユーザーだけにアクセスさせ、ログインしてない場合はログインページに遷移させます。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">app/controllers/application_controller.rb</span></div>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">Base</span>
+  <span class="p">(</span><span class="err">省略</span><span class="p">)</span><span class="o">...</span>
+    <span class="k">def</span> <span class="nf">after_sign_in_path_for</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+        <span class="n">pages_show_path</span>
+    <span class="k">end</span>
+
+    <span class="kp">private</span>
+        <span class="k">def</span> <span class="nf">sign_in_required</span>
+            <span class="n">redirect_to</span> <span class="n">new_user_session_url</span> <span class="k">unless</span> <span class="n">user_signed_in?</span>
+        <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<p>Pagesコントローラーに<code>before_action</code>を追加します。</p>
+
+<div class="code-frame" data-lang="rb">
+<div class="code-lang"><span class="bold">app/controllers/pages_controller.rb</span></div>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PagesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">before_action</span> <span class="ss">:sign_in_required</span><span class="p">,</span> <span class="ss">only</span><span class="p">:</span> <span class="o">[</span><span class="ss">:show</span><span class="o">]</span>
+  <span class="p">(</span><span class="err">省略</span><span class="p">)</span><span class="o">...</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<p>これでログイン後showページに遷移するようになります。</p>
+
+<h2>
+<span id="2-サインアップする際に登録するパラメーターを増やす" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E3%82%B5%E3%82%A4%E3%83%B3%E3%82%A2%E3%83%83%E3%83%97%E3%81%99%E3%82%8B%E9%9A%9B%E3%81%AB%E7%99%BB%E9%8C%B2%E3%81%99%E3%82%8B%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF%E3%83%BC%E3%82%92%E5%A2%97%E3%82%84%E3%81%99"><i class="fa fa-link"></i></a>2. サインアップする際に登録するパラメーターを増やす</h2>
+
+<p>ユーザーを登録するときにデフォルトではEmailとパスワードだけですが、<br>
+ユーザー名も登録させたい、などの場合があると思います。</p>
+
+<p>まずはサインアップページにユーザー名を入力するエリアを追加します。<br>
+ユーザーのプロフィール変更ページ（<code>views/devise/registrations/edit.html.erb</code>）にも同様に追加しときます。</p>
+
+<div class="code-frame" data-lang="erb">
+<div class="code-lang"><span class="bold">views/devise/registrations/new.html.erb</span></div>
+<div class="highlight"><pre><span></span><span class="x">&lt;h2&gt;Sign up&lt;/h2&gt;</span>
+
+<span class="cp">&lt;%=</span> <span class="n">form_for</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="ss">as</span><span class="p">:</span> <span class="n">resource_name</span><span class="p">,</span> <span class="ss">url</span><span class="p">:</span> <span class="n">registration_path</span><span class="p">(</span><span class="n">resource_name</span><span class="p">))</span> <span class="k">do</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">  &lt;!-- 省略 --&gt;</span>
+
+<span class="x">  &lt;div class="field"&gt;</span>
+<span class="x">    </span><span class="cp">&lt;%=</span> <span class="n">f</span><span class="o">.</span><span class="n">label</span> <span class="ss">:username</span> <span class="cp">%&gt;</span><span class="x">&lt;br /&gt;</span>
+<span class="x">    </span><span class="cp">&lt;%=</span> <span class="n">f</span><span class="o">.</span><span class="n">text_field</span> <span class="ss">:username</span> <span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">  &lt;/div&gt;</span>
+
+<span class="x">  &lt;!-- 省略 --&gt;</span>
+<span class="cp">&lt;%</span> <span class="k">end</span> <span class="cp">%&gt;</span><span class="x"></span>
+
+<span class="cp">&lt;%=</span> <span class="n">render</span> <span class="s2">"devise/shared/links"</span> <span class="cp">%&gt;</span><span class="x"></span>
+</pre></div>
+</div>
+
+<p>次にApplicationControllerに以下を追加します。<br>
+テンプレートを変えて、ユーザー名を入力するようにしただけでは実際に登録されないからです。<br>
+詳しくは<code>strong_parameters</code>について調べてください。<br>
+簡単に言えばよく分からんパラメーターは渡せないようになってるので渡せるようにします。</p>
+
+<div class="code-frame" data-lang="ruby">
+<div class="code-lang"><span class="bold">app/controllers/application_controller.rb</span></div>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">protect_from_forgery</span> <span class="ss">with</span><span class="p">:</span> <span class="ss">:exception</span>
+  <span class="n">before_action</span> <span class="ss">:configure_permitted_parameters</span><span class="p">,</span> <span class="k">if</span><span class="p">:</span> <span class="ss">:devise_controller?</span>
+
+  <span class="c1"># 省略</span>
+
+  <span class="kp">protected</span>
+    <span class="k">def</span> <span class="nf">configure_permitted_parameters</span>
+      <span class="n">devise_parameter_sanitizer</span><span class="o">.</span><span class="n">permit</span><span class="p">(</span><span class="ss">:sign_up</span><span class="p">,</span> <span class="ss">keys</span><span class="p">:</span> <span class="o">[</span><span class="ss">:username</span><span class="o">]</span><span class="p">)</span>
+      <span class="n">devise_parameter_sanitizer</span><span class="o">.</span><span class="n">permit</span><span class="p">(</span><span class="ss">:account_update</span><span class="p">,</span> <span class="ss">keys</span><span class="p">:</span> <span class="o">[</span><span class="ss">:username</span><span class="o">]</span><span class="p">)</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+
+<h1>
+<span id="最後に" class="fragment"></span><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#%E6%9C%80%E5%BE%8C%E3%81%AB"><i class="fa fa-link"></i></a>最後に</h1>
+
+<p>作ったプロジェクト全体は以下です。<br>
+<a href="https://github.com/cigalecigales/devise_rails5" rel="nofollow noopener" target="_blank">cigalecigales/devise_rails5</a></p>
+</div></section><div style="text-align: center; margin-right: -12px; margin-left: -12px;"><div style="display: inline-block; margin-top: 24px; margin-right: 8px;"><div id="dfp-slot-after-body-for-pc-left" data-google-query-id="COTCrNzjhNkCFUSjvQodCmMAng" style="height: 280px; width: 336px;"><div id="google_ads_iframe_/383564218/qiita.com_items-show_under-article-left_0__container__" style="border: 0pt none; display: inline-block; width: 336px; height: 280px;"><iframe frameborder="0" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/container.html" id="google_ads_iframe_/383564218/qiita.com_items-show_under-article-left_0" title="3rd party ad content" name="" scrolling="no" marginwidth="0" marginheight="0" width="336" height="280" data-is-safeframe="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" style="border: 0px; vertical-align: bottom;"></iframe></div></div></div><div style="display: inline-block; margin-top: 24px;"><div id="dfp-slot-after-body-for-pc-right" data-google-query-id="CO6JrdzjhNkCFVhuvQodP2UENQ" style="height: 280px; width: 336px;"><div id="google_ads_iframe_/383564218/qiita.com_items-show_under-article-right_0__container__" style="border: 0pt none; display: inline-block; width: 336px; height: 280px;"><iframe frameborder="0" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/container(1).html" id="google_ads_iframe_/383564218/qiita.com_items-show_under-article-right_0" title="3rd party ad content" name="" scrolling="no" marginwidth="0" marginheight="0" width="336" height="280" data-is-safeframe="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" style="border: 0px; vertical-align: bottom;"></iframe></div></div></div></div></div><div class="p-items_footnote"><ul class="references js-referencesView mt-5"><li class="references_header"><i class="fa fa-fw fa-link"></i> この記事は以下の記事からリンクされています</li><a class="references_toggleOldReferences js-toggleOldReferences" href="https://qiita.com/cigalecigales/items/f4274088f20832252374#"><i class="fa fa-expand js-toggleOldReferencesIcon"></i><span class="js-toggleOldReferencesText">過去の4件を表示する</span></a><li class="references_reference js-reference js-oldReference"><a href="https://qiita.com/cigalecigales/items/73d7bd7ec59a001ccd74#_reference-724c29bf84aa9d1b3d25"><img alt="" width="18" height="18" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1473691524">[*Rails*] deviseの使い方（rails4版）</a><span>からリンク</span><time class="references_datetime js-dateTimeView" datetime="2016-11-13T08:15:17+00:00">約1年前</time></li><li class="references_reference js-reference js-oldReference"><a href="https://qiita.com/7sgg_m/items/178e0d90fc55c5716474#_reference-a147eaaeb06b23de1f67"><img alt="" width="18" height="18" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1473704355">開発中にrailsのメールを確認する(letter_opener)</a><span>からリンク</span><time class="references_datetime js-dateTimeView" datetime="2017-02-11T16:56:22+00:00">12ヶ月前</time></li><li class="references_reference js-reference js-oldReference"><a href="https://qiita.com/edo1z/items/e249f2eee1432f95c857#_reference-bd77f38771ac2a75a364"><img alt="" width="18" height="18" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1498071962">Rails - deviseやってみる</a><span>からリンク</span><time class="references_datetime js-dateTimeView" datetime="2017-04-28T15:52:37+00:00">9ヶ月前</time></li><li class="references_reference js-reference js-oldReference"><a href="https://qiita.com/akahirout2641/items/39333b5ca88be6ce81fa#_reference-ecc1a643154dc0193019"><img alt="" width="18" height="18" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1473720966">既存のPJにdeviseのconfirmableを実装する(Ruby on Rails)</a><span>からリンク</span><time class="references_datetime js-dateTimeView" datetime="2017-07-23T05:16:48+00:00">6ヶ月前</time></li><li class="references_reference js-reference"><a href="https://qiita.com/taKassi/items/821ae3d0361268108b1f#_reference-6dba4ce1cc132fc4c583"><img alt="" width="18" height="18" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1505176497">Rails Devise で email と password 以外の要素を加えた時にすること</a><span>からリンク</span><time class="references_datetime js-dateTimeView" datetime="2017-09-12T12:48:55+00:00">5ヶ月前</time></li><li class="references_reference js-reference"><a href="https://qiita.com/kogache/items/5d1311edc21df481ee8b#_reference-8ced74d6842ee4c2a7e7"><img alt="" width="18" height="18" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/e5fdd6c953a9d4eb1700abddd06089d6">rails 関連の備忘録</a><span>からリンク</span><time class="references_datetime js-dateTimeView" datetime="2017-11-22T03:22:03+00:00">2ヶ月前</time></li><li class="references_reference js-reference"><a href="https://qiita.com/da-shi/items/aa76afdea3c528a9b128#_reference-39373bf3d9a1d8670f1f"><img alt="" width="18" height="18" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1512142366">RailsAdminを使ってみた</a><span>からリンク</span><time class="references_datetime js-dateTimeView" datetime="2017-12-19T22:01:58+00:00">約1ヶ月前</time></li><li class="references_reference js-reference"><a href="https://qiita.com/toumasuxp/items/6456a6ae9cf3e864a650#_reference-3b26dd95db1378b38772"><img alt="" width="18" height="18" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1516275671">Rails｜deviseでのtwitter認証をもっと使いやすくする方法を紹介するよ</a><span>からリンク</span><time class="references_datetime js-dateTimeView" datetime="2018-01-25T14:17:55+00:00">7日前</time></li><li class="references_reference js-reference"><a href="https://qiita.com/toumasuxp/items/efc589a49ce2ffd57b03#_reference-4644b8f712b7be88743f"><img alt="" width="18" height="18" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1516275671">Rails5｜ユーザーが記事を投稿したと同時に、twitterでその記事のツイートをできるようにする</a><span>からリンク</span><time class="references_datetime js-dateTimeView" datetime="2018-01-26T06:01:11+00:00">6日前</time></li></ul></div></div><div class="p-items_options"><div id="dfp-slot-sidebar-top" data-google-query-id="CNyKrdzjhNkCFUzKvQod_18Amw" style="width: 300px; height: 250px; margin-top: 16px; margin-bottom: 20px;"><div id="google_ads_iframe_/383564218/qiita.com_items-show_sidebar-top_0__container__" style="border: 0pt none; display: inline-block; width: 300px; height: 250px;"><iframe frameborder="0" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/container(2).html" id="google_ads_iframe_/383564218/qiita.com_items-show_sidebar-top_0" title="3rd party ad content" name="" scrolling="no" marginwidth="0" marginheight="0" width="300" height="250" data-is-safeframe="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" style="border: 0px; vertical-align: bottom;"></iframe></div></div><div id="dfp-slot-sidebar-bottom" data-google-query-id="CNeSrdzjhNkCFUxsvQodCF0Mhw" style="width: 300px; height: 250px; margin-bottom: 16px;"><div id="google_ads_iframe_/383564218/qiita.com_items-show_sidebar-bottom_0__container__" style="border: 0pt none; display: inline-block; width: 300px; height: 250px;"><iframe frameborder="0" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/container(3).html" id="google_ads_iframe_/383564218/qiita.com_items-show_sidebar-bottom_0" title="3rd party ad content" name="" scrolling="no" marginwidth="0" marginheight="0" width="300" height="250" data-is-safeframe="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" style="border: 0px; vertical-align: bottom;"></iframe></div></div></div><div class="p-items_toc"><script type="application/json" id="js-react-on-rails-context">{}</script>
+<script type="application/json" class="js-react-on-rails-component" data-component-name="Toc" data-dom-id="Toc-react-component-bfd7af0c-a077-4c98-81c4-46f2194fd61c">{"body":"\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB\"\u003eはじめに\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#devise%E3%81%A8%E3%81%AF\"\u003edeviseとは\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#devise%E3%81%AE%E5%B0%8E%E5%85%A5\"\u003edeviseの導入\u003c/a\u003e\n\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#1-gem%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB\"\u003e1. gemのインストール\u003c/a\u003e\n\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#1-%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%81%AE%E4%BD%9C%E6%88%90\"\u003e1. プロジェクトの作成\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#2-gemfile%E3%81%AE%E7%B7%A8%E9%9B%86%E3%81%A8%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB\"\u003e2. Gemfileの編集とインストール\u003c/a\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#2-devise%E3%81%AE%E8%A8%AD%E5%AE%9A\"\u003e2. deviseの設定\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#3-user%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E8%A8%AD%E5%AE%9A\"\u003e3. Userモデルの設定\u003c/a\u003e\n\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#1-user%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E4%BD%9C%E6%88%90\"\u003e1. Userモデルの作成\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#2-devise%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB%E6%A6%82%E8%A6%81\"\u003e2. deviseモジュール概要\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#3-user%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86\"\u003e3. Userモデルの編集\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#4-%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86\"\u003e4. マイグレーションファイルの編集\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#5-omniauth-twitter%E7%94%A8%E3%82%AB%E3%83%A9%E3%83%A0%E3%81%AE%E8%BF%BD%E5%8A%A0\"\u003e5. omniauth-twitter用カラムの追加\u003c/a\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#4-view%E3%81%AE%E7%B7%A8%E9%9B%86\"\u003e4. viewの編集\u003c/a\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#twitter%E3%81%A7%E8%AA%8D%E8%A8%BC%E3%81%99%E3%82%8B\"\u003eTwitterで認証する\u003c/a\u003e\n\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#1-%E8%A8%AD%E5%AE%9A\"\u003e1. 設定\u003c/a\u003e\n\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#1-twitter-developer%E3%81%AE%E7%99%BB%E9%8C%B2\"\u003e1. Twitter Developerの登録\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#2-%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86\"\u003e2. 設定ファイルの編集\u003c/a\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#2-%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D\"\u003e2. 動作確認\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#3-%E3%82%B3%E3%83%BC%E3%83%AB%E3%83%90%E3%83%83%E3%82%AF%E7%94%A8%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%BC%E3%81%AE%E4%BD%9C%E6%88%90\"\u003e3. コールバック用コントローラーの作成\u003c/a\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E7%99%BB%E9%8C%B2%E7%A2%BA%E8%AA%8D%E3%83%A1%E3%83%BC%E3%83%AB%E3%82%92%E9%80%81%E3%82%8B\"\u003eアカウント登録確認メールを送る\u003c/a\u003e\n\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#1-comfirmable%E6%A6%82%E8%A6%81\"\u003e1. comfirmable概要\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#2-%E3%83%AD%E3%82%B0%E3%82%92%E8%A6%8B%E3%82%8B\"\u003e2. ログを見る\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#3-%E3%83%A1%E3%83%BC%E3%83%AB%E3%81%8C%E5%AE%9F%E9%9A%9B%E3%81%AB%E5%B1%8A%E3%81%8F%E3%82%88%E3%81%86%E3%81%AB%E3%81%99%E3%82%8B\"\u003e3. メールが実際に届くようにする\u003c/a\u003e\n\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#1-%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86\"\u003e1. 設定ファイルの編集\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#2-gmail%E3%81%AE%E8%A8%AD%E5%AE%9A\"\u003e2. Gmailの設定\u003c/a\u003e\n\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#1-%E3%81%A8%E3%82%8A%E3%81%82%E3%81%88%E3%81%9A%E8%A9%A6%E3%81%97%E3%81%9F%E3%81%84%E5%A0%B4%E5%90%88\"\u003e1. とりあえず試したい場合\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#2-2%E6%AE%B5%E9%9A%8E%E8%AA%8D%E8%A8%BC%E3%81%8C%E3%82%AA%E3%83%B3%E3%81%AE%E5%A0%B4%E5%90%88\"\u003e2. 2段階認証がオンの場合\u003c/a\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#3-%E5%B1%8A%E3%81%84%E3%81%9F%E3%83%A1%E3%83%BC%E3%83%AB%E3%82%92%E7%A2%BA%E8%AA%8D\"\u003e3. 届いたメールを確認\u003c/a\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E3%82%92%E3%83%AD%E3%83%83%E3%82%AF%E3%81%99%E3%82%8B\"\u003eアカウントをロックする\u003c/a\u003e\n\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#1-lockable%E6%A6%82%E8%A6%81\"\u003e1. lockable概要\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#2-%E8%A8%AD%E5%AE%9A\"\u003e2. 設定\u003c/a\u003e\n\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#1-%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86-1\"\u003e1. 設定ファイルの編集\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#2-%E8%A8%AD%E5%AE%9A%E5%80%A4%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6\"\u003e2. 設定値について\u003c/a\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#%E3%82%BB%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E3%82%BF%E3%82%A4%E3%83%A0%E3%82%A2%E3%82%A6%E3%83%88%E3%81%99%E3%82%8B\"\u003eセッションをタイムアウトする\u003c/a\u003e\n\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#1-timeoutable%E6%A6%82%E8%A6%81\"\u003e1. timeoutable概要\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#2-%E8%A8%AD%E5%AE%9A-1\"\u003e2. 設定\u003c/a\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#%E3%81%9D%E3%81%AE%E4%BB%96%E3%81%AE%E8%A8%AD%E5%AE%9A\"\u003eその他の設定\u003c/a\u003e\n\u003cul\u003e\n\u003cli\u003e\n\u003ca href=\"#1-%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E5%BE%8C%E3%81%AE%E3%83%9A%E3%83%BC%E3%82%B8%E3%82%92%E5%A4%89%E6%9B%B4%E3%81%99%E3%82%8B\"\u003e1. ログイン後のページを変更する\u003c/a\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#2-%E3%82%B5%E3%82%A4%E3%83%B3%E3%82%A2%E3%83%83%E3%83%97%E3%81%99%E3%82%8B%E9%9A%9B%E3%81%AB%E7%99%BB%E9%8C%B2%E3%81%99%E3%82%8B%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF%E3%83%BC%E3%82%92%E5%A2%97%E3%82%84%E3%81%99\"\u003e2. サインアップする際に登録するパラメーターを増やす\u003c/a\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/li\u003e\n\u003cli\u003e\n\u003ca href=\"#%E6%9C%80%E5%BE%8C%E3%81%AB\"\u003e最後に\u003c/a\u003e\n\u003c/li\u003e\n\u003c/ul\u003e\n"}</script>
+    <div id="Toc-react-component-bfd7af0c-a077-4c98-81c4-46f2194fd61c"><div data-reactroot="" class="tocTree"><div class="tocTree_contents nav" style="max-height: 736px;"><ul>
+<li class="active">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">はじめに</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#devise%E3%81%A8%E3%81%AF">deviseとは</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#devise%E3%81%AE%E5%B0%8E%E5%85%A5">deviseの導入</a>
+<ul>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-gem%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB">1. gemのインストール</a>
+<ul>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%81%AE%E4%BD%9C%E6%88%90">1. プロジェクトの作成</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-gemfile%E3%81%AE%E7%B7%A8%E9%9B%86%E3%81%A8%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB">2. Gemfileの編集とインストール</a>
+</li>
+</ul>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-devise%E3%81%AE%E8%A8%AD%E5%AE%9A">2. deviseの設定</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#3-user%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E8%A8%AD%E5%AE%9A">3. Userモデルの設定</a>
+<ul>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-user%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E4%BD%9C%E6%88%90">1. Userモデルの作成</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-devise%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB%E6%A6%82%E8%A6%81">2. deviseモジュール概要</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#3-user%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86">3. Userモデルの編集</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#4-%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86">4. マイグレーションファイルの編集</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#5-omniauth-twitter%E7%94%A8%E3%82%AB%E3%83%A9%E3%83%A0%E3%81%AE%E8%BF%BD%E5%8A%A0">5. omniauth-twitter用カラムの追加</a>
+</li>
+</ul>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#4-view%E3%81%AE%E7%B7%A8%E9%9B%86">4. viewの編集</a>
+</li>
+</ul>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#twitter%E3%81%A7%E8%AA%8D%E8%A8%BC%E3%81%99%E3%82%8B">Twitterで認証する</a>
+<ul>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-%E8%A8%AD%E5%AE%9A">1. 設定</a>
+<ul>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-twitter-developer%E3%81%AE%E7%99%BB%E9%8C%B2">1. Twitter Developerの登録</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86">2. 設定ファイルの編集</a>
+</li>
+</ul>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D">2. 動作確認</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#3-%E3%82%B3%E3%83%BC%E3%83%AB%E3%83%90%E3%83%83%E3%82%AF%E7%94%A8%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%BC%E3%81%AE%E4%BD%9C%E6%88%90">3. コールバック用コントローラーの作成</a>
+</li>
+</ul>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E7%99%BB%E9%8C%B2%E7%A2%BA%E8%AA%8D%E3%83%A1%E3%83%BC%E3%83%AB%E3%82%92%E9%80%81%E3%82%8B">アカウント登録確認メールを送る</a>
+<ul>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-comfirmable%E6%A6%82%E8%A6%81">1. comfirmable概要</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E3%83%AD%E3%82%B0%E3%82%92%E8%A6%8B%E3%82%8B">2. ログを見る</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#3-%E3%83%A1%E3%83%BC%E3%83%AB%E3%81%8C%E5%AE%9F%E9%9A%9B%E3%81%AB%E5%B1%8A%E3%81%8F%E3%82%88%E3%81%86%E3%81%AB%E3%81%99%E3%82%8B">3. メールが実際に届くようにする</a>
+<ul>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86">1. 設定ファイルの編集</a>
+</li>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-gmail%E3%81%AE%E8%A8%AD%E5%AE%9A">2. Gmailの設定</a>
+<ul>
+<li class="">
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-%E3%81%A8%E3%82%8A%E3%81%82%E3%81%88%E3%81%9A%E8%A9%A6%E3%81%97%E3%81%9F%E3%81%84%E5%A0%B4%E5%90%88">1. とりあえず試したい場合</a>
+</li>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-2%E6%AE%B5%E9%9A%8E%E8%AA%8D%E8%A8%BC%E3%81%8C%E3%82%AA%E3%83%B3%E3%81%AE%E5%A0%B4%E5%90%88">2. 2段階認証がオンの場合</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#3-%E5%B1%8A%E3%81%84%E3%81%9F%E3%83%A1%E3%83%BC%E3%83%AB%E3%82%92%E7%A2%BA%E8%AA%8D">3. 届いたメールを確認</a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E3%82%92%E3%83%AD%E3%83%83%E3%82%AF%E3%81%99%E3%82%8B">アカウントをロックする</a>
+<ul>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-lockable%E6%A6%82%E8%A6%81">1. lockable概要</a>
+</li>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E8%A8%AD%E5%AE%9A">2. 設定</a>
+<ul>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E7%B7%A8%E9%9B%86-1">1. 設定ファイルの編集</a>
+</li>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E8%A8%AD%E5%AE%9A%E5%80%A4%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6">2. 設定値について</a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#%E3%82%BB%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E3%82%BF%E3%82%A4%E3%83%A0%E3%82%A2%E3%82%A6%E3%83%88%E3%81%99%E3%82%8B">セッションをタイムアウトする</a>
+<ul>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-timeoutable%E6%A6%82%E8%A6%81">1. timeoutable概要</a>
+</li>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E8%A8%AD%E5%AE%9A-1">2. 設定</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#%E3%81%9D%E3%81%AE%E4%BB%96%E3%81%AE%E8%A8%AD%E5%AE%9A">その他の設定</a>
+<ul>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#1-%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E5%BE%8C%E3%81%AE%E3%83%9A%E3%83%BC%E3%82%B8%E3%82%92%E5%A4%89%E6%9B%B4%E3%81%99%E3%82%8B">1. ログイン後のページを変更する</a>
+</li>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#2-%E3%82%B5%E3%82%A4%E3%83%B3%E3%82%A2%E3%83%83%E3%83%97%E3%81%99%E3%82%8B%E9%9A%9B%E3%81%AB%E7%99%BB%E9%8C%B2%E3%81%99%E3%82%8B%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF%E3%83%BC%E3%82%92%E5%A2%97%E3%82%84%E3%81%99">2. サインアップする際に登録するパラメーターを増やす</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#%E6%9C%80%E5%BE%8C%E3%81%AB">最後に</a>
+</li>
+</ul>
+</div></div></div>
+    
+</div></div></div><div class="p-items_container"><div class="p-items_leftDummy"></div><div class="p-items_main"><div class="p-items_aside"><div class="it-AuthorInfo mt-5 mb-5" itemprop="author" itemscope="" itemtype="http://schema.org/Person"><a href="https://qiita.com/cigalecigales"><img class="it-AuthorInfo_image" itemprop="image" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1473691524" alt="1473691524"></a><div class="it-AuthorInfo_body"><div class="it-AuthorInfo_header"><a class="it-AuthorInfo_urlname" itemprop="name" href="https://qiita.com/cigalecigales">@cigalecigales</a></div><div class="it-AuthorInfo_description"></div><div class="it-AuthorInfo_footer"><script type="application/json" class="js-react-on-rails-component" data-component-name="UserFollowButton" data-dom-id="UserFollowButton-react-component-76221dd6-76d2-4276-a1d4-3f2dfe4ce320">{"initial_followed_by":false,"position":"ArticleAuthorInfo","size":"btn-xs","url_name":"cigalecigales"}</script>
+    <div id="UserFollowButton-react-component-76221dd6-76d2-4276-a1d4-3f2dfe4ce320"><span data-reactroot="" class="userFollowButton"><button class="btn btn-default btn-block userFollowButton_inner btn-xs"><i class="i fa fa-user-plus"></i><!-- react-text: 4 -->フォロー<!-- /react-text --></button></span></div>
+    
+</div></div></div><div class="p-items_Footer mb-5"><div data-mount-target="articleFooterMenu"><div data-reactroot="" class="ArticleFooter__menu mt-2"><div class="u-flex u-align-center"><div class="it-Footer_stock"><div class="StockButton isNextFooter"><button><div class="StockButton__stock"><div class="fa-stack"><span class="fa fa-folder-open fa-stack-1x unstock"></span></div><span class="StockButton__label">ストック</span></div></button></div></div><div class="u-flex-align-center mb-2"><div class="LikeButton"><button class="p-button"><i class="fa fa-fw fa-thumbs-up"></i><span>いいね</span></button><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374/likers" class="LikeButton__balloon">214</a></div></div></div><div class="__react_component_tooltip place-top type-dark " data-id="tooltip"></div></div></div><div class="it-Footer_social mt-1of2"><div class="socialButtons"><div class="socialButtons_twitter"><iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" class="twitter-share-button twitter-share-button-rendered twitter-tweet-button" title="Twitter Tweet Button" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/tweet_button.83d5793f6ebbe2046330abda6016ae93.en.html" style="position: static; visibility: visible; width: 60px; height: 20px;" data-url="https://qiita.com/cigalecigales/items/f4274088f20832252374"></iframe></div><div class="socialButtons_hatebu"><iframe class="hatena-bookmark-button-frame" title="はてブに追加" frameborder="0" scrolling="no" width="47" height="20" src="javascript:false" style="width: 47px; height: 20px;" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/saved_resource.html"></iframe><script async="async" charset="utf-8" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/bookmark_button.js.ダウンロード" type="text/javascript"></script></div><div class="socialButtons_googlePlus"><div id="___plusone_0" style="text-indent: 0px; margin: 0px; padding: 0px; background: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 32px; height: 20px;"><iframe ng-non-bindable="" frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 32px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 20px;" tabindex="0" vspace="0" width="100%" id="I0_1517490239500" name="I0_1517490239500" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/fastbutton.html" data-gapiattached="true" title="G+"></iframe></div></div><div class="socialButtons_qiitadon"><a class="mastodonShareButton" href="https://qiitadon.com/share?text=%5B%2ARails%2A%5D+devise%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9%EF%BC%88rails5%E7%89%88%EF%BC%89+by+cigalecigales+https%3A%2F%2Fqiita.com%2Fcigalecigales%2Fitems%2Ff4274088f20832252374+%23Qiita+%23Ruby+%23Rails+%23devise+%23omniauthtwitter" target="_blank" title="Qiitadonでトゥート">Toot</a></div><div class="socialButtons_facebook"><div class="fb-like fb_iframe_widget" data-action="like" data-href="https://qiita.com/cigalecigales/items/f4274088f20832252374" data-layout="button_count" data-share="false" data-show-faces="false" fb-xfbml-state="rendered" fb-iframe-plugin-query="action=like&amp;app_id=222621691108322&amp;container_width=0&amp;href=https%3A%2F%2Fqiita.com%2Fcigalecigales%2Fitems%2Ff4274088f20832252374&amp;layout=button_count&amp;locale=en_US&amp;sdk=joey&amp;share=false&amp;show_faces=false"><span style="vertical-align: bottom; width: 61px; height: 20px;"><iframe name="f3a85edd0d3ea78" width="1000px" height="1000px" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" title="fb:like Facebook Social Plugin" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/like.html" style="border: none; visibility: visible; width: 61px; height: 20px;" class=""></iframe></span></div></div><div class="socialButtons_pocket"><div class="pocket-btn"><iframe width="135" height="22" id="pocket-button-0" frameborder="0" allowtransparency="true" scrolling="NO" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/button.html"></iframe></div></div></div></div><div id="dfp-slot-article-footer" data-google-query-id="CNb7otzjhNkCFQFTvQod9CQAfg" style="width: 838px; height: 30px; display: none;"><div id="google_ads_iframe_/383564218/p_qiita_textad_0__container__" style="border: 0pt none;"><iframe id="google_ads_iframe_/383564218/p_qiita_textad_0" title="3rd party ad content" name="google_ads_iframe_/383564218/p_qiita_textad_0" width="838" height="30" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" style="border: 0px; vertical-align: bottom;" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/saved_resource(1).html"></iframe></div></div></div><div class="itemsShowComment_wrapper" id="comments"><script type="application/json" class="js-react-on-rails-component" data-component-name="PublicCommentListContainer" data-dom-id="PublicCommentListContainer-react-component-a19a2c92-5ebd-40be-9869-a9881832a6d9">{"currentUser":null,"initialComments":[{"banned":false,"body":"\u003cp\u003e痒いところに手が届きました！\u003cbr\u003e\nありがとうございます！\u003c/p\u003e\n","created_at":"2016-12-19T15:35:56+09:00","expanded_references":"","id":703008,"is_team":false,"item_id":437896,"item_type":"PublicDomainArticle","item_uuid":"f4274088f20832252374","likable":false,"liked":false,"public_likes_count":2,"raw_body":"痒いところに手が届きました！\nありがとうございます！\n","reaction_types":[{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f44d.png","name":"+1"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f64f.png","name":"pray"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f389.png","name":"tada"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f647.png","name":"bow"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f631.png","name":"scream"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f440.png","name":"eyes"}],"reactions":[],"team":null,"team_membership":null,"updatable":false,"url":"https://qiita.com/cigalecigales/items/f4274088f20832252374#comment-594f5b9efe7e2eb5a020","user":{"contribution":2,"created_at":"2016-08-28T22:22:39+09:00","id":138783,"is_admin":false,"profile_image_url":"https://qiita-image-store.s3.amazonaws.com/0/138783/profile-images/1473720723","suspended":false,"url_name":"msho"},"uuid":"594f5b9efe7e2eb5a020","via_email":false},{"banned":false,"body":"\u003cp\u003e最高！！！\u003cbr\u003e\nありがとう\u003c/p\u003e\n","created_at":"2017-09-19T13:36:36+09:00","expanded_references":"","id":891858,"is_team":false,"item_id":437896,"item_type":"PublicDomainArticle","item_uuid":"f4274088f20832252374","likable":false,"liked":false,"public_likes_count":1,"raw_body":"最高！！！\nありがとう\n","reaction_types":[{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f44d.png","name":"+1"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f64f.png","name":"pray"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f389.png","name":"tada"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f647.png","name":"bow"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f631.png","name":"scream"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f440.png","name":"eyes"}],"reactions":[],"team":null,"team_membership":null,"updatable":false,"url":"https://qiita.com/cigalecigales/items/f4274088f20832252374#comment-a38aa078bf94b34b9567","user":{"contribution":18,"created_at":"2017-05-28T14:39:17+09:00","id":183835,"is_admin":false,"profile_image_url":"https://secure.gravatar.com/avatar/3e1b022fdb82a6e49887ad047c39a252","suspended":false,"url_name":"loverails"},"uuid":"a38aa078bf94b34b9567","via_email":false},{"banned":false,"body":"\u003cp\u003e\u003ca href=\"/cigalecigales\" class=\"user-mention js-hovercard\" title=\"cigalecigales\" data-hovercard-target-type=\"user\" data-hovercard-target-name=\"cigalecigales\"\u003e@cigalecigales\u003c/a\u003e さんご丁寧な記事ありがとうございます。とても参考にしています。\u003cbr\u003e\n現在、\u003ca href=\"https://peing.net\" rel=\"nofollow noopener\" target=\"_blank\"\u003ePeing: 匿名で質問を受け取れる質問箱を作ろう！\u003c/a\u003eのログインを参考に、\u003c/p\u003e\n\n\u003cp\u003e・Twitterサインアップ後は、\u003cstrong\u003eメールアドレス＋パスワードの入力なし\u003c/strong\u003eでログイン\u003cbr\u003e\n・通常サインアップ時は、\u003cstrong\u003euseridとパスワードのみ\u003c/strong\u003eでログイン\u003cbr\u003e\n（いずれにしましても\u003cstrong\u003eメールアドレスをサインアップ時に求めない\u003c/strong\u003e）\u003cbr\u003e\nこのような仕様にしたいと考えています。\u003c/p\u003e\n\n\u003cp\u003e(おそらく)なんらかの\u003ccode\u003edevise\u003c/code\u003eモジュールを無効にする必要がある、とは思ってはいますが、\u003cbr\u003e\n思い当たる解決方法にがございます方いらっしゃっれば、是非ご教授頂けないでしょうか。\u003cbr\u003e\nよろしくお願いします。\u003c/p\u003e\n","created_at":"2018-01-29T10:52:26+09:00","expanded_references":"","id":973276,"is_team":false,"item_id":437896,"item_type":"PublicDomainArticle","item_uuid":"f4274088f20832252374","likable":false,"liked":false,"public_likes_count":1,"raw_body":"@cigalecigales さんご丁寧な記事ありがとうございます。とても参考にしています。\n現在、[Peing: 匿名で質問を受け取れる質問箱を作ろう！](https://peing.net)のログインを参考に、\n\n・Twitterサインアップ後は、**メールアドレス＋パスワードの入力なし**でログイン\n・通常サインアップ時は、**useridとパスワードのみ**でログイン\n（いずれにしましても**メールアドレスをサインアップ時に求めない**）\nこのような仕様にしたいと考えています。\n\n(おそらく)なんらかの`devise`モジュールを無効にする必要がある、とは思ってはいますが、\n思い当たる解決方法にがございます方いらっしゃっれば、是非ご教授頂けないでしょうか。\nよろしくお願いします。\n","reaction_types":[{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f44d.png","name":"+1"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f64f.png","name":"pray"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f389.png","name":"tada"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f647.png","name":"bow"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f631.png","name":"scream"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f440.png","name":"eyes"}],"reactions":[],"team":null,"team_membership":null,"updatable":false,"url":"https://qiita.com/cigalecigales/items/f4274088f20832252374#comment-6ca830a57e5a99b32806","user":{"contribution":54,"created_at":"2016-09-28T09:19:59+09:00","id":142346,"is_admin":false,"profile_image_url":"https://qiita-image-store.s3.amazonaws.com/0/142346/profile-images/1516492855","suspended":false,"url_name":"rik0"},"uuid":"6ca830a57e5a99b32806","via_email":false},{"banned":false,"body":"\u003cp\u003e\u003ca href=\"/rik0\" class=\"user-mention js-hovercard\" title=\"rik0\" data-hovercard-target-type=\"user\" data-hovercard-target-name=\"rik0\"\u003e@rik0\u003c/a\u003e さん\u003c/p\u003e\n\n\u003cp\u003eコメントありがとうございます。\u003cbr\u003e\n\u003ccode\u003eemail\u003c/code\u003eを使わずに\u003ccode\u003eusername\u003c/code\u003eを使うというのは過去にやった記憶はあるのですが、\u003cbr\u003e\nパッとサンプルが見つからなかったので参考情報程度となりますが。\u003c/p\u003e\n\n\u003cp\u003e記載の内容だと、diviseのモジュールは、デフォルトのモジュール ＋ \u003ccode\u003eomniauthable\u003c/code\u003eで良いかと思います。\u003c/p\u003e\n\n\u003cp\u003e\u003cstrong\u003e・Twitterサインアップ後は、メールアドレス＋パスワードの入力なしでログイン\u003c/strong\u003e\u003c/p\u003e\n\n\u003cp\u003eこの記事のサンプルだと、\u003ccode\u003eapp/controllers/omniauth_callbacks_controller.rb\u003c/code\u003eで\u003cbr\u003e\n登録されてないユーザーだった場合に登録画面にリダイレクトしているので、\u003cbr\u003e\nTwitterでサインアップするとユーザーを登録してそのままサインインするようにすればよいかと思います。\u003cbr\u003e\nパスワードはデフォルトでNOT NULL制約がついてるはずなのでそのへんの考慮は必要そうです。\u003c/p\u003e\n\n\u003cp\u003e\u003cstrong\u003e・通常サインアップ時は、useridとパスワードのみでログイン\u003cbr\u003e\n（いずれにしましてもメールアドレスをサインアップ時に求めない）\u003c/strong\u003e\u003c/p\u003e\n\n\u003cp\u003eメールアドレスを使いたく無いという点に関しては、公式のWikiからですが、以下を参考にすればよいかと思います。\u003cbr\u003e\n\u003ca href=\"https://github.com/plataformatec/devise/wiki/How-To:-Allow-users-to-sign-in-with-something-other-than-their-email-address\" rel=\"nofollow noopener\" target=\"_blank\"\u003eHow To: Allow users to sign in with something other than their email address\u003c/a\u003e\u003c/p\u003e\n","created_at":"2018-01-30T23:47:02+09:00","expanded_references":"","id":974809,"is_team":false,"item_id":437896,"item_type":"PublicDomainArticle","item_uuid":"f4274088f20832252374","likable":false,"liked":false,"public_likes_count":0,"raw_body":"@rik0 さん\n\nコメントありがとうございます。\n`email`を使わずに`username`を使うというのは過去にやった記憶はあるのですが、\nパッとサンプルが見つからなかったので参考情報程度となりますが。\n\n記載の内容だと、diviseのモジュールは、デフォルトのモジュール ＋ `omniauthable`で良いかと思います。\n\n**・Twitterサインアップ後は、メールアドレス＋パスワードの入力なしでログイン**\n\nこの記事のサンプルだと、`app/controllers/omniauth_callbacks_controller.rb`で\n登録されてないユーザーだった場合に登録画面にリダイレクトしているので、\nTwitterでサインアップするとユーザーを登録してそのままサインインするようにすればよいかと思います。\nパスワードはデフォルトでNOT NULL制約がついてるはずなのでそのへんの考慮は必要そうです。\n\n**・通常サインアップ時は、useridとパスワードのみでログイン\n（いずれにしましてもメールアドレスをサインアップ時に求めない）**\n\nメールアドレスを使いたく無いという点に関しては、公式のWikiからですが、以下を参考にすればよいかと思います。\n[How To: Allow users to sign in with something other than their email address](https://github.com/plataformatec/devise/wiki/How-To:-Allow-users-to-sign-in-with-something-other-than-their-email-address)\n\n\n","reaction_types":[{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f44d.png","name":"+1"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f64f.png","name":"pray"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f389.png","name":"tada"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f647.png","name":"bow"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f631.png","name":"scream"},{"image_url":"https://cdn.qiita.com/emoji/twemoji/unicode/1f440.png","name":"eyes"}],"reactions":[],"team":null,"team_membership":null,"updatable":false,"url":"https://qiita.com/cigalecigales/items/f4274088f20832252374#comment-5854ef0bd783def009b1","user":{"contribution":1408,"created_at":"2014-07-14T21:40:50+09:00","id":48912,"is_admin":false,"profile_image_url":"https://qiita-image-store.s3.amazonaws.com/0/48912/profile-images/1473691524","suspended":false,"url_name":"cigalecigales"},"uuid":"5854ef0bd783def009b1","via_email":false}],"monthly_public_image_uploadable_size_limit":null,"total_uploaded_public_image_size_in_current_month":null,"item":{"id":437896,"uuid":"f4274088f20832252374","suspended":false,"secret":false},"owner":{"url_name":"cigalecigales"},"is_team":false,"is_project":false,"logged_in":false,"polling":false,"mention_candidates":[{"id":48912,"url_name":"cigalecigales","profile_image_url":"https://qiita-image-store.s3.amazonaws.com/0/48912/profile-images/1473691524"},{"id":138783,"url_name":"msho","profile_image_url":"https://qiita-image-store.s3.amazonaws.com/0/138783/profile-images/1473720723"},{"id":183835,"url_name":"loverails","profile_image_url":"https://secure.gravatar.com/avatar/3e1b022fdb82a6e49887ad047c39a252"},{"id":142346,"url_name":"rik0","profile_image_url":"https://qiita-image-store.s3.amazonaws.com/0/142346/profile-images/1516492855"}]}</script>
+    <div id="PublicCommentListContainer-react-component-a19a2c92-5ebd-40be-9869-a9881832a6d9"><div data-reactroot="" class="commentList"><!-- react-empty: 2 --><div class="comment"><div class="commentHeader"><div class="commentHeader_creator"><a href="https://qiita.com/msho"><span title="msho" itemprop="url" href="/msho"><img alt="" class="commentHeader_creatorIcon" itemprop="image" width="36" height="36" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1473720723"></span></a><div class="commentHeader_creatorInfo"><div class="commentHeader_publicUrlName"><a href="https://qiita.com/msho">msho</a></div><div class="commentHeader_contribution"><span class="commentHeader_contribution_count">2</span><span class="commentHeader_contribution_unit">contribution</span></div></div></div><div class="commentHeader_metadata pull-right"><div class="text-right"><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#comment-594f5b9efe7e2eb5a020"><time datetime="2016-12-19T15:35:56+09:00" itemprop="commentTime">2016-12-19 15:35</time></a></div><div class="LikeButton LikeButton--small"><button class="p-button"><span class="fa fa-fw fa-thumbs-up"></span><span>いいね</span></button><div class="LikeButton__balloon">2</div></div></div></div><div class="comment_content"><div class="markdownContent"><p>痒いところに手が届きました！<br>
+ありがとうございます！</p>
+</div><!-- react-text: 26 --><!-- /react-text --></div></div><div class="comment"><div class="commentHeader"><div class="commentHeader_creator"><a href="https://qiita.com/loverails"><span title="loverails" itemprop="url" href="/loverails"><img alt="" class="commentHeader_creatorIcon" itemprop="image" width="36" height="36" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/3e1b022fdb82a6e49887ad047c39a252"></span></a><div class="commentHeader_creatorInfo"><div class="commentHeader_publicUrlName"><a href="https://qiita.com/loverails">loverails</a></div><div class="commentHeader_contribution"><span class="commentHeader_contribution_count">18</span><span class="commentHeader_contribution_unit">contribution</span></div></div></div><div class="commentHeader_metadata pull-right"><div class="text-right"><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#comment-a38aa078bf94b34b9567"><time datetime="2017-09-19T13:36:36+09:00" itemprop="commentTime">2017-09-19 13:36</time></a></div><div class="LikeButton LikeButton--small"><button class="p-button"><span class="fa fa-fw fa-thumbs-up"></span><span>いいね</span></button><div class="LikeButton__balloon">1</div></div></div></div><div class="comment_content"><div class="markdownContent"><p>最高！！！<br>
+ありがとう</p>
+</div><!-- react-text: 50 --><!-- /react-text --></div></div><div class="comment"><div class="commentHeader"><div class="commentHeader_creator"><a href="https://qiita.com/rik0"><span title="rik0" itemprop="url" href="/rik0"><img alt="" class="commentHeader_creatorIcon" itemprop="image" width="36" height="36" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1516492855"></span></a><div class="commentHeader_creatorInfo"><div class="commentHeader_publicUrlName"><a href="https://qiita.com/rik0">rik0</a></div><div class="commentHeader_contribution"><span class="commentHeader_contribution_count">54</span><span class="commentHeader_contribution_unit">contribution</span></div></div></div><div class="commentHeader_metadata pull-right"><div class="text-right"><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#comment-6ca830a57e5a99b32806"><time datetime="2018-01-29T10:52:26+09:00" itemprop="commentTime">2018-01-29 10:52</time></a></div><div class="LikeButton LikeButton--small"><button class="p-button"><span class="fa fa-fw fa-thumbs-up"></span><span>いいね</span></button><div class="LikeButton__balloon">1</div></div></div></div><div class="comment_content"><div class="markdownContent"><p><a href="https://qiita.com/cigalecigales" class="user-mention js-hovercard" title="cigalecigales" data-hovercard-target-type="user" data-hovercard-target-name="cigalecigales">@cigalecigales</a> さんご丁寧な記事ありがとうございます。とても参考にしています。<br>
+現在、<a href="https://peing.net/" rel="nofollow noopener" target="_blank">Peing: 匿名で質問を受け取れる質問箱を作ろう！</a>のログインを参考に、</p>
+
+<p>・Twitterサインアップ後は、<strong>メールアドレス＋パスワードの入力なし</strong>でログイン<br>
+・通常サインアップ時は、<strong>useridとパスワードのみ</strong>でログイン<br>
+（いずれにしましても<strong>メールアドレスをサインアップ時に求めない</strong>）<br>
+このような仕様にしたいと考えています。</p>
+
+<p>(おそらく)なんらかの<code>devise</code>モジュールを無効にする必要がある、とは思ってはいますが、<br>
+思い当たる解決方法にがございます方いらっしゃっれば、是非ご教授頂けないでしょうか。<br>
+よろしくお願いします。</p>
+</div><!-- react-text: 74 --><!-- /react-text --></div></div><div class="comment"><div class="commentHeader"><div class="commentHeader_creator"><a href="https://qiita.com/cigalecigales"><span title="cigalecigales" itemprop="url" href="/cigalecigales"><img alt="" class="commentHeader_creatorIcon" itemprop="image" width="36" height="36" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/1473691524"></span></a><div class="commentHeader_creatorInfo"><div class="commentHeader_publicUrlName"><a href="https://qiita.com/cigalecigales">cigalecigales</a></div><div class="commentHeader_contribution"><span class="commentHeader_contribution_count">1408</span><span class="commentHeader_contribution_unit">contribution</span></div></div></div><div class="commentHeader_metadata pull-right"><div class="text-right"><a href="https://qiita.com/cigalecigales/items/f4274088f20832252374#comment-5854ef0bd783def009b1"><time datetime="2018-01-30T23:47:02+09:00" itemprop="commentTime">2018-01-30 23:47</time></a></div><div class="LikeButton LikeButton--small"><button class="p-button"><span class="fa fa-fw fa-thumbs-up"></span><span>いいね</span></button><div class="LikeButton__balloon">0</div></div></div></div><div class="comment_content"><div class="markdownContent"><p><a href="https://qiita.com/rik0" class="user-mention js-hovercard" title="rik0" data-hovercard-target-type="user" data-hovercard-target-name="rik0">@rik0</a> さん</p>
+
+<p>コメントありがとうございます。<br>
+<code>email</code>を使わずに<code>username</code>を使うというのは過去にやった記憶はあるのですが、<br>
+パッとサンプルが見つからなかったので参考情報程度となりますが。</p>
+
+<p>記載の内容だと、diviseのモジュールは、デフォルトのモジュール ＋ <code>omniauthable</code>で良いかと思います。</p>
+
+<p><strong>・Twitterサインアップ後は、メールアドレス＋パスワードの入力なしでログイン</strong></p>
+
+<p>この記事のサンプルだと、<code>app/controllers/omniauth_callbacks_controller.rb</code>で<br>
+登録されてないユーザーだった場合に登録画面にリダイレクトしているので、<br>
+Twitterでサインアップするとユーザーを登録してそのままサインインするようにすればよいかと思います。<br>
+パスワードはデフォルトでNOT NULL制約がついてるはずなのでそのへんの考慮は必要そうです。</p>
+
+<p><strong>・通常サインアップ時は、useridとパスワードのみでログイン<br>
+（いずれにしましてもメールアドレスをサインアップ時に求めない）</strong></p>
+
+<p>メールアドレスを使いたく無いという点に関しては、公式のWikiからですが、以下を参考にすればよいかと思います。<br>
+<a href="https://github.com/plataformatec/devise/wiki/How-To:-Allow-users-to-sign-in-with-something-other-than-their-email-address" rel="nofollow noopener" target="_blank">How To: Allow users to sign in with something other than their email address</a></p>
+</div><!-- react-text: 98 --><!-- /react-text --></div></div></div></div>
+    
+<div class="itemsShowCommentSignupOrLogin"><div class="itemsShowCommentSignupOrLogin_title">あなたもコメントしてみませんか :)</div><a class="btn btn-primary" href="https://qiita.com/signup?redirect_to=%2Fcigalecigales%2Fitems%2Ff4274088f20832252374%23comments">ユーザー登録(無料)</a><div class="itemsShowCommentSignupOrLogin_sub">すでにアカウントを持っている方は<a href="https://qiita.com/login?redirect_to=%2Fcigalecigales%2Fitems%2Ff4274088f20832252374%23comments">ログイン</a></div></div></div></div></div><div class="p-items_rightDummy"></div></div></article><div class="TagList__label" style="display:none"><span></span><span>Ruby</span></div><div class="TagList__label" style="display:none"><span></span><span>Rails</span></div><div class="TagList__label" style="display:none"><span></span><span>devise</span></div><div class="TagList__label" style="display:none"><span></span><span>omniauth-twitter</span></div><div class="js-report-form modal fade reportForm"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button name="button" type="submit" class="close" data-dismiss="modal">×</button><h4 class="modal-title">問題がある投稿を報告する</h4></div><div class="modal-body"><form class="new_public_issue_report" id="new_public_issue_report" action="https://qiita.com/api/internal/issue_reports" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="✓"><input type="hidden" name="authenticity_token" value="LCSw/Wfar5ag6mEspsxHUwtchO6IneFR+j/3zRRdhoDPQ/X835AfJd6mVSM6o60FVaovFqnRCoohj0cG397n4Q=="><input type="hidden" value="PublicDomainArticle" name="public_issue_report[target_type]" id="public_issue_report_target_type"><input type="hidden" value="437896" name="public_issue_report[target_id]" id="public_issue_report_target_id"><p>この投稿にどのような問題がありますか？</p><br><div class="form-group"><ul class="list-unstyled"><li><label><input required="required" type="radio" value="spam" name="public_issue_report[reason]" id="public_issue_report_reason_spam"> スパムです </label></li><li><label><input required="required" type="radio" value="harassment" name="public_issue_report[reason]" id="public_issue_report_reason_harassment"> 攻撃的または迷惑な内容を含んでいます </label></li><li><label><input required="required" type="radio" value="inappropriate_content" name="public_issue_report[reason]" id="public_issue_report_reason_inappropriate_content"> 不適切な内容を含んでいます </label></li></ul></div><div class="reportForm_submitButtonContainer"><button name="button" type="submit" class="btn btn-primary reportForm_submitButton"><i class="fa fa-send"></i> 送信</button></div></form></div></div></div></div></div>
+<script type="text/javascript" id="">(function(e,a){if(!a.__SV){var b=window;try{var n,k,l=b.location,g=l.hash;var c=function(a,b){return(n=a.match(RegExp(b+"\x3d([^\x26]*)")))?n[1]:null};g&&c(g,"state")&&(k=JSON.parse(decodeURIComponent(c(g,"state"))),"mpeditor"===k.action&&(b.sessionStorage.setItem("_mpcehash",g),history.replaceState(k.desiredHash||"",e.title,l.pathname+l.search)))}catch(p){}var m,h;window.mixpanel=a;a._i=[];a.init=function(b,c,f){function e(b,a){var c=a.split(".");2==c.length&&(b=b[c[0]],a=c[1]);b[a]=function(){b.push([a].concat(Array.prototype.slice.call(arguments,
+0)))}}var d=a;"undefined"!==typeof f?d=a[f]=[]:f="mixpanel";d.people=d.people||[];d.toString=function(b){var a="mixpanel";"mixpanel"!==f&&(a+="."+f);b||(a+=" (stub)");return a};d.people.toString=function(){return d.toString(1)+".people (stub)"};m="disable time_event track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config reset people.set people.set_once people.increment people.append people.union people.track_charge people.clear_charges people.delete_user".split(" ");
+for(h=0;h<m.length;h++)e(d,m[h]);a._i.push([b,c,f])};a.__SV=1.2;b=e.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===e.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";c=e.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c)}})(document,window.mixpanel||[]);
+mixpanel.init(google_tag_manager["GTM-TBQWPN"].macro('gtm14'));google_tag_manager["GTM-TBQWPN"].macro('gtm15')&&mixpanel.people.set(google_tag_manager["GTM-TBQWPN"].macro('gtm16'));google_tag_manager["GTM-TBQWPN"].macro('gtm18')&&mixpanel.identify(google_tag_manager["GTM-TBQWPN"].macro('gtm20'));google_tag_manager["GTM-TBQWPN"].macro('gtm21')&&mixpanel.register({"Layout Version":google_tag_manager["GTM-TBQWPN"].macro('gtm22')});</script>
+<footer class="footer"><div class="footer_inner"><div class="footer_container"><ul class="footer_links-left"><li class="footer_link"><a class="footer_copyright" href="http://increments.co.jp/">© 2011-2018 Increments Inc.</a></li><li class="footer_link"><a href="https://qiita.com/terms">利用規約</a></li><li class="footer_link"><a href="https://qiita.com/privacy">プライバシー</a></li><li class="footer_link"><a href="http://help.qiita.com/">ヘルプ</a></li><li class="footer_link"><a href="https://increments.zendesk.com/anonymous_requests/new">お問い合わせ</a></li></ul><ul class="footer_links-right"><li class="footer_link"><a href="https://qiita.com/about">Qiitaとは</a></li><li class="footer_link"><a href="https://qiita.com/users">ユーザー</a></li><li class="footer_link"><a href="https://qiita.com/tags">タグ</a></li><li class="footer_link"><a href="https://qiita.com/items">投稿</a></li><li class="footer_link"><a href="http://blog.qiita.com/">ブログ</a></li><li class="footer_link"><a href="https://qiita.com/api/v2/docs">API</a></li><li class="footer_link"><a href="https://teams.qiita.com/">Team</a></li><li class="footer_link"><a href="http://kobito.qiita.com/">Kobito</a></li><li class="footer_link"><a class="js-public-form-feedback-link" data-target=".js-feedback-form" data-toggle="modal" href="https://qiita.com/cigalecigales/items/f4274088f20832252374"><i class="fa fa-heart"></i> ご意見 <i class="fa fa-caret-down"></i></a></li></ul></div></div></footer><div class="js-feedback-form modal fade feedbackForm"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button name="button" type="submit" class="close" data-dismiss="modal">×</button><h4 class="modal-title">ご意見</h4></div><div class="modal-body"><form class="js-feedback-form-form" action="https://qiita.com/feedbacks" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="✓"><input type="hidden" name="authenticity_token" value="LCSw/Wfar5ag6mEspsxHUwtchO6IneFR+j/3zRRdhoDPQ/X835AfJd6mVSM6o60FVaovFqnRCoohj0cG397n4Q=="><input type="hidden" name="redirect_path" id="redirect_path" value="/cigalecigales/items/f4274088f20832252374"><div class="form-group"><textarea name="feedback[message]" id="feedback_message" class="form-control js-feedback-form-text-area" placeholder="Qiitaについてのご意見をお聞かせください。" required="required" rows="5"></textarea></div><div class="feedbackForm_submitButtonContainer"><button name="button" type="submit" class="btn btn-primary feedbackForm_submitButton"><i class="fa fa-send"></i> 送信</button><p class="feedbackForm_note">いただいたご意見への返信は行っておりません。<br>返信の必要な内容については、<a href="https://increments.zendesk.com/anonymous_requests/new">こちら</a> からお問い合わせください。</p></div><div style="position:fixed;top:-99999px;opacity:0.0001;"><input name="feedback[name]" type="text"></div></form></div></div></div></div><script>// if (window.mixpanel instanceof Element) {
+//   window.mixpanel = [];
+// }
+// (function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
+// for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2.2.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);</script><script src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/public-01e057aaed01662567bdda19b0d73895.min.js.ダウンロード"></script><div id="fb-root" class=" fb_reset"><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div></div></div><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div><iframe name="fb_xdm_frame_https" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" id="fb_xdm_frame_https" aria-hidden="true" title="Facebook Cross Domain Communication Frame" tabindex="-1" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/lY4eZXm_YWu.html" style="border: none;"></iframe></div></div></div><div class="ReactModalPortal"><div data-reactroot=""></div></div><iframe scrolling="no" frameborder="0" allowtransparency="true" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/widget_iframe.83d5793f6ebbe2046330abda6016ae93.html" style="display: none;"></iframe><iframe name="oauth2relay584605336" id="oauth2relay584605336" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/postmessageRelay.html" tabindex="-1" aria-hidden="true" style="width: 1px; height: 1px; position: absolute; top: -100px;"></iframe><div id="UMS_TOOLTIP" style="position: absolute; cursor: pointer; z-index: 2147483647; background: transparent; top: -100000px; left: -100000px;"></div><script type="text/javascript" id="" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/gpt.js.ダウンロード"></script><script type="text/javascript" id="" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/qiita_bigmining.js.ダウンロード"></script>
+<script type="text/javascript" id="">var googletag=googletag||{};googletag.cmd=googletag.cmd||[];
+(function(f,d){d.cmd.push(function(){for(var l=[],m=document.querySelectorAll(".it-Tags_item \x3e span"),r=[],t={"c++":"cpp","c#":"csharp"},p,q=0,u=m.length;q<u;q++)p=m[q].textContent.toLowerCase(),r.push(t[p]||p);d.pubads().setTargeting("article_tags",r);m=f.querySelector(".it-MdContent").clientWidth;var n=f.querySelector(".p-items_options");n&&(300<=n.clientWidth?(function(){var b="dfp-slot-sidebar-top",c=300,g=250;d.defineSlot("/383564218/qiita.com_items-show_sidebar-top",[c,g],b).addService(d.pubads());
+l.push(function(){var e=f.createElement("div");e.id=b;e.style.width=c+"px";e.style.height=g+"px";e.style.marginTop="16px";e.style.marginBottom="20px";n.appendChild(e);d.display(b)})}(),function(){var b="dfp-slot-sidebar-bottom",c=300,g=250;d.defineSlot("/383564218/qiita.com_items-show_sidebar-bottom",[c,g],b).addService(d.pubads());l.push(function(){var e=f.createElement("div");e.id=b;e.style.width=c+"px";e.style.height=g+"px";e.style.marginBottom="16px";n.appendChild(e);d.display(b)})}(),672<=m?
+function(){var b="dfp-slot-after-body-for-pc",c=["-left","-right"],g=336,e=280;c.forEach(function(a){d.defineSlot("/383564218/qiita.com_items-show_under-article"+a,[g,e],b+a).addService(d.pubads())});l.push(function(){var a=f.querySelector(".p-items_main .it-MdContent");if(a){a=a.parentElement;var h=f.createElement("div");h.style.textAlign="center";h.style.marginRight="-12px";h.style.marginLeft="-12px";c.forEach(function(a,d){var c=f.createElement("div");c.style.display="inline-block";c.style.marginTop=
+"24px";0===d&&(c.style.marginRight="8px");var k=f.createElement("div");k.id=b+a;k.style.height=e+"px";k.style.width=g+"px";h.appendChild(c);c.appendChild(k)});a.appendChild(h);c.forEach(function(a){d.display(b+a)})}})}():function(){var b="dfp-slot-after-body-for-mobile",c=336,g=280;d.defineSlot("/383564218/qiita.com_items-show_under-article-mobile",[c,g],b).addService(d.pubads());l.push(function(){var e=f.querySelector(".p-items_main .it-MdContent");if(e){e=e.parentElement;var a=f.createElement("div");
+a.style.textAlign="center";a.style.marginLeft="-14px";var h=f.createElement("div");h.style.display="inline-block";h.style.margin="10px auto";var k=f.createElement("div");k.id=b;k.style.height=g+"px";k.style.width=c+"px";a.appendChild(h);h.appendChild(k);e.appendChild(a);d.display(b)}})}()):(600<=m?function(){var b="dfp-slot-after-body-for-pc",c=["-top","-bottom"],g=300,e=250;c.forEach(function(a){d.defineSlot("/383564218/qiita.com_items-show_sidebar"+a,[g,e],b+a).addService(d.pubads())});l.push(function(){var a=
+f.querySelector(".p-items_main .it-MdContent");if(a){a=a.parentElement;var h=f.createElement("div");h.style.textAlign="center";h.style.marginRight="-12px";h.style.marginLeft="-12px";c.forEach(function(a,d){var c=f.createElement("div");c.style.display="inline-block";c.style.marginTop="24px";0===d&&(c.style.marginRight="8px");var k=f.createElement("div");k.id=b+a;k.style.height=e+"px";k.style.width=g+"px";h.appendChild(c);c.appendChild(k)});a.appendChild(h);c.forEach(function(a){d.display(b+a)})}})}():
+function(){var b=f.querySelector(".p-items_main .it-MdContent");if(b){var c=b.parentElement,g="dfp-slot-sidebar-bottom",e=300,a=250;d.defineSlot("/383564218/qiita.com_items-show_sidebar-bottom",[e,a],g).addService(d.pubads());l.push(function(){var b=f.createElement("div");b.id=g;b.style.width=e+"px";b.style.height=a+"px";b.style.marginTop="16px";b.style.marginRight="auto";b.style.marginLeft="auto";c.appendChild(b);d.display(g)})}}(),function(){var b="dfp-slot-after-body-for-mobile",c=336,g=280;d.defineSlot("/383564218/qiita.com_items-show_under-article-mobile",
+[c,g],b).addService(d.pubads());l.push(function(){var e=f.querySelector(".p-items_footnote"),a=f.createElement("div");a.style.textAlign="center";a.style.marginLeft="-14px";var h=f.createElement("div");h.style.display="inline-block";h.style.margin="10px auto";var k=f.createElement("div");k.id=b;k.style.height=g+"px";k.style.width=c+"px";a.appendChild(h);h.appendChild(k);e.appendChild(a);d.display(b)})}()));(function(){var b=f.querySelector(".p-items_Footer");if(b){var c="dfp-slot-article-footer",g=
+b.clientWidth,e=30;d.defineSlot("/383564218/p_qiita_textad",[g,e],c).addService(d.pubads());l.push(function(){var a=f.createElement("div");a.id=c;a.style.width=g+"px";a.style.height=e+"px";b.appendChild(a);d.display(c)})}})();d.pubads().enableSingleRequest();d.pubads().collapseEmptyDivs();d.enableServices();setTimeout(function(){l.forEach(function(b){b()})},1E3)})})(document,googletag);</script>
+<iframe id="rufous-sandbox" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" style="position: absolute; visibility: hidden; display: none; width: 0px; height: 0px; padding: 0px; border: none;" title="Twitter analytics iframe" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/saved_resource(2).html"></iframe><iframe id="google_osd_static_frame_1861318403052" name="google_osd_static_frame" style="display: none; width: 0px; height: 0px;" src="./[_Rails_] deviseの使い方（rails5版） - Qiita_files/saved_resource(3).html"></iframe></body><div id="TAG_ID4TOOLBAR_GUID" style="display: none;">F9614C3B-45CD-07B4-86C8-54BA774F9B83</div><div id="tmtoolbar_message" style="display: none;">init</div><div id="tmtoolbar_injected" style="display: none;">init</div><div id="TAG_ID4TOOLBAR_UMS_GUID" style="display: none;">0BB7F5A1-9CBC-ACCB-FF09-DABFF7A2413D</div><div id="tmtoolbar_ums_injected" style="display: none;">init_ums</div><div id="UMSSendDataEventElement" style="display: none;" data="https://camo.qiitausercontent.com/992418565fae30160cdb4cfc713262fc564e6f61/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f34383931322f61626638336536362d373230302d303832332d616630662d3466626339643233623536662e706e67" docguid="null">init_ums</div></html>
