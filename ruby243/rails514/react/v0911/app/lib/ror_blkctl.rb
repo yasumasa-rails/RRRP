@@ -11,7 +11,7 @@ module RorBlkctl
 			if @system_person_id
 				@system_person_id
 			else
-				logger.debug"  error missuing person_id = 0 "
+				Rails.logger.debug"  error missuing person_id = 0 "
 				raise
 			end
 		end
@@ -175,7 +175,7 @@ module RorBlkctl
 							end ### blkukyの時は　constrainも削除
 						end
 				else
-					logger.debug "command_r = '#{command_r}'"
+					Rails.logger.debug "command_r = '#{command_r}'"
 					raise
 				end   ## case iud
 				if command_r[:sio_classname] =~ /_add_|_edit_|_delete_/ and tblname !~ /tblink/  ## rec = command_c = sio_xxxxx
@@ -189,9 +189,9 @@ module RorBlkctl
           @sio_result_f = command_r[:sio_result_f] =   "9"  ##9:error
           command_r[:sio_message_contents] =  "class #{self} : LINE #{__LINE__} $!: #{$!} "    ###evar not defined
           command_r[:sio_errline] =  "class #{self} : LINE #{__LINE__} $@: #{$@} "[0..3999]
-          logger.debug"error class #{self} : #{Time.now}: #{$@} "
-          logger.debug"error class #{self} : $!: #{$!} "
-          logger.debug"  command_r: #{command_r} "
+          Rails.logger.debug"error class #{self} : #{Time.now}: #{$@} "
+          Rails.logger.debug"error class #{self} : $!: #{$!} "
+          Rails.logger.debug"  command_r: #{command_r} "
       else
           @sio_result_f = command_r[:sio_result_f] =  "1"   ## 1 normal end
           command_r[:sio_message_contents] = nil
@@ -200,7 +200,7 @@ module RorBlkctl
 					##crt_def_all if tblname =~ /rubycodings|tblink/
             ##crt_def_tb if  tblname == "blktbs"
       ensure
-            sub_insert_sio_r(command_r) if @pare_class != "batch"    ## 結果のsio書き込み
+            proc_insert_sio_r if @pare_class != "batch"    ## 結果のsio書き込み
       end ##begin
       raise if @sio_result_f ==   "9"
   	end
@@ -256,9 +256,9 @@ module RorBlkctl
 				ActiveRecord::Base.connection.commit_db_transaction()
 		rescue
 			ActiveRecord::Base.connection.rollback_db_transaction()
-			logger.debug"error class #{self}   #{Time.now}$@: #{$@} "
-			logger.debug"error class LINE #{__LINE__}   $!: #{$!} "
-			logger.debug"error class LINE #{__LINE__}   perform error: #{ tbls} "
+			Rails.logger.debug"error class #{self}   #{Time.now}$@: #{$@} "
+			Rails.logger.debug"error class LINE #{__LINE__}   $!: #{$!} "
+			Rails.logger.debug"error class LINE #{__LINE__}   perform error: #{ tbls} "
 		end
 	end
 	def vproc_tbl_mk
@@ -296,32 +296,32 @@ module RorBlkctl
 				end
 			end
 	end
-	def proc_insert_sio_c command_c   ###要求  無限ループにならないこと
+	def proc_insert_sio_c  ###要求  無限ループにならないこと
         ###command_c = char_to_number_data(command_c) ###画面イメージからデータtypeへ   入口に変更すること
-        command_c[:sio_term_id] =  request.remote_ip  if respond_to?("request.remote_ip")  ## batch処理ではrequestはnil　　？？
-        command_c[:sio_command_response] = "C"
-        command_c[:sio_add_time] = Time.now
+        @command_c[:sio_term_id] =  request.remote_ip  if respond_to?("request.remote_ip")  ## batch処理ではrequestはnil　　？？
+        @command_c[:sio_command_response] = "C"
+        @command_c[:sio_add_time] = Time.now
 		begin
-			command_c = vproc_command_c_dflt_set_fm_rubycoding(command_c) if command_c[:sio_classname] =~ /_add_|_edit_|_delete_/
-			if command_c[:sio_viewname] =~ /_inouts$/ and  command_c[:sio_classname] =~ /_add_|_edit_|_delete_/
+			###既定値をセット
+			@command_c = vproc_command_c_dflt_set_fm_rubycoding if @command_c[:sio_classname] =~ /_add_|_edit_|_delete_/
+			if @command_c[:sio_viewname] =~ /_inouts$/ and  @command_c[:sio_classname] =~ /_add_|_edit_|_delete_/
 			else
-				command_c[:sio_id] =  proc_get_nextval("SIO_#{command_c[:sio_viewname]}_SEQ")
-				proc_tbl_add_arel("sio_#{command_c[:sio_viewname]}",command_c)
+				@command_c[:sio_id] =  proc_get_nextval("SIO_#{@command_c[:sio_viewname]}_SEQ")
+				proc_tbl_add_arel("sio_#{@command_c[:sio_viewname]}",@command_c)
 			end
 		rescue
 			ActiveRecord::Base.connection.rollback_db_transaction()
-			logger.debug " proc_insert_sio_c err  ...command_c = #{command_c}"
-            logger.debug"error class #{self}  $@: #{$@} "
-            logger.debug"error class #{self} #{Time.now} $!: #{$!} "
+			Rails.logger.debug " proc_insert_sio_c err  ...command_c = #{@command_c}"
+            Rails.logger.debug"error class #{self}  $@: #{$@} "
+            Rails.logger.debug"error class #{self} #{Time.now} $!: #{$!} "
 			raise
 		end
-		return command_c
-  end   ## sub_insert_sio_c
+  	end   ## sub_insert_sio_c
 
-	def vproc_command_c_dflt_set_fm_rubycoding command_c  ###　引き数はcommand_cで固定
-		command_r = command_c.dup
+	def vproc_command_c_dflt_set_fm_rubycoding  ###　引き数はcommand_cで固定
+		command_r = @command_c.dup
 		tblnamechop = command_c[:sio_viewname].split("_",2)[1].chop
-		command_c.each do |key,val|
+		@command_c.each do |key,val|
 			if (val == "" or val.nil? or val == "dummy" ) and  key.to_s =~ /^#{tblnamechop}_/
 				if respond_to?("proc_view_field_#{key.to_s}_dflt_for_tbl_set")
 					command_r[key] = __send__("proc_view_field_#{key.to_s}_dflt_for_tbl_set",command_r)
@@ -376,16 +376,13 @@ module RorBlkctl
         parescreen[:expiredate] = Date.today + 1
         proc_tbl_add_arel("parescreen#{@sio_user_code.to_s}s",parescreen)
     end
-    def sub_insert_sio_r command_r   ####レスポンス
-        command_r[:sio_id] =  proc_get_nextval("SIO_#{command_r[:sio_viewname]}_SEQ")
-        command_r[:sio_command_response] = "R"
-        command_r[:sio_add_time] = Time.now
-		proc_tbl_add_arel  "SIO_#{command_r[:sio_viewname]}",command_r
-    end   ## sub_insert_sio_r
-    def proc_insert_sio_r command_r   ####レスポンス
-        sub_insert_sio_r command_r
-    end   ## sub_insert_sio_r
-    def char_to_number_data command_c   ###excel からのデータ取り込み　根本解決を
+    def proc_insert_sio_r   ####レスポンス
+        @command_c[:sio_id] =  proc_get_nextval("SIO_#{command_c[:sio_viewname]}_SEQ")
+        @command_c[:sio_command_response] = "R"
+        @command_c[:sio_add_time] = Time.now
+		proc_tbl_add_arel  "SIO_#{command_c[:sio_viewname]}",@command_c
+    end   ## 
+    def char_to_number_data    ###excel からのデータ取り込み　根本解決を
 		##rubyXl マッキントッシュ excel windows excel not perfect
 		@date1904 = nil
 		viewtype = proc_blk_columns("sio_#{command_c[:sio_viewname]}")
@@ -411,7 +408,6 @@ module RorBlkctl
 			end  ## if command_c
 		end  ## sho_data.each
 		command_c["id"] = command_c[(command_c[:sio_viewname].split("_")[1].chop + "_id")]
-		return command_c
     end ## defar_to....
 
     def num_to_date(num)
@@ -425,28 +421,27 @@ module RorBlkctl
       compare_date - 1 + num
     end
 
-    def proc_blk_paging  command_c,screen_code
-        ### strsqlにコーディングしてないときは、viewをしよう
+    def proc_blk_paging  screen_code
+        ### strsqlにコーディングしてないときは、viewを使用
         ### strdql はupdate insertには使用できない。
         ### command_c[:sio_strsql] = (select  ・・・・) a
 		tmp_sql = @screen_prototype[:screen_strwhere]  
-        if  command_c[:sio_strsql]     ## 親からの引き継ぎ検索ありの時
-			command_c[:sio_strsql].each do|key,val|
-				tmp_sql << " and #{key} = '#{val}' "
+        if  @command_c[:sio_strsql]     ## 親からの引き継ぎ検索ありの時
+			@command_c[:sio_strsql].each do|key,val|
+				tmp_sql << " and #{key} = #{val} "   ###親側で文字タイプの「'」はセットすること
 			end
 		end
 		###screen登録された　既定値の抽出条件
         ##strsql = "SELECT id FROM " + tmp_sql
         if command_c[:sio_search]  == "true"   ### proc_strwhere(command_c) 画論に入力された抽出条件
-				tmp_sql <<  RorBlkctl.proc_strwhere(command_c)
+				tmp_sql <<  RorBlkctl.proc_strwhere
 		else   ###画面からの抽出条件なし
 				tmp_sql
 		end
-        @screen_prototype[:total_cnt] = command_c[:sio_totalcount] =  ActiveRecord::Base.connection.select_value( "SELECT count(*) FROM " + tmp_sql)
-	    	all_sub_command_r = []
-				sort_tmp =  if tmp_str["screen_strorder"] then  " order by "  + tmp_str["screen_strorder"].sub(/order\s*by/,"") else "" end   ### sort 初期セット
+        @screen_prototype[:total_cnt] = @command_c[:sio_totalcount] =  ActiveRecord::Base.connection.select_value( "SELECT count(*) FROM " + tmp_sql)
+		sort_tmp =  if tmp_str["screen_strorder"] then  " order by "  + tmp_str["screen_strorder"].sub(/order\s*by/,"") else "" end   ### sort 初期セット
         sort_sql = ""
-        unless command_c[:sio_sidx].nil? or command_c[:sio_sidx] == ""  ###画面からsort keyを指定
+        unless @command_c[:sio_sidx].nil? or @command_c[:sio_sidx] == ""  ###画面からsort keyを指定
 	        sort_sql = " ROW_NUMBER() over (order by " +  command_c[:sio_sidx] + " " +  command_c[:sio_sord]  + " ) "
 					sort_tmp  = ""
 	      else
@@ -456,49 +451,41 @@ module RorBlkctl
 		        sort_sql = " ROW_NUMBER() over ( " +  sort_tmp  + " ) "  ### screensにsort keyがセットされているとき　sortの既定値
 					end
         end
-        case  command_c[:sio_totalcount]
+        case  @command_c[:sio_totalcount]
             when nil,0   ## 該当データなし　　回答
-	            command_c[:sio_recordcount] = 0
-                command_c[:sio_result_f] = "8"  ## no record
-                command_c[:sio_message_contents] = proc_blkgetpobj("not find record","err_msg",command_c[:email] )[0]
-                sub_insert_sio_r(command_c)
-	            all_sub_command_r[0] =  command_c
+	            @command_c[:sio_recordcount] = 0
+                @command_c[:sio_result_f] = "8"  ## no record
+                @command_c[:sio_message_contents] = proc_blkgetpobj("not find record","err_msg",@command_c[:email] )[0]
+                proc_insert_sio_r
             else
-                strsql = "select #{sub_getfield} from (SELECT #{sort_sql} cnt,a.* FROM #{tmp_sql} ) "
-                strsql  <<    " WHERE  cnt <= #{command_c[:sio_end_record]}  and  cnt >= #{command_c[:sio_start_record]} "
-                pagedata = ActiveRecord::Base.connection.select_all(strsql)
-                r_cnt = 0
+                strsql = "select #{@sqlrecstr} from (SELECT #{sort_sql} cnt,a.* FROM #{tmp_sql} ) "
+                strsql  <<    " WHERE  cnt <= #{@command_c[:sio_end_record]}  and  cnt >= #{@command_c[:sio_start_record]} "
+				pagedata = ActiveRecord::Base.connection.select_all(strsql)
+				@command_c[:sio_recordcount] = pagedata.size
+				show_records = "["
                 pagedata.each do |j|
-                    r_cnt += 1
                     ##   command_c.merge j なぜかうまく動かない。
                     j.each do |j_key,j_val|
-                        command_c[j_key]   = j_val ## unless j_key.to_s == "id" ## sioのidとｖｉｅｗのｉｄが同一になってしまう
-                        ## command_r[:id_tbl] = j_val if j_key.to_s == "id"
+                        @command_c[j_key]   = j_val ## 
                     end
-	                command_c[:sio_recordcount] = r_cnt
-                    command_c[:sio_result_f] = "1"
-                    command_c[:sio_message_contents] = nil
+                    @command_c[:sio_result_f] = "1"
+                    @command_c[:sio_message_contents] = nil
 	                ##tmp = {}
-                    sub_insert_sio_r(command_c)     ###回答
-	                ###tmp.merge! command_c
-	                all_sub_command_r <<  command_c.dup ## tmp   ### all_sub_command_r << command_c にすると以前の全ての配列が最新に変わってしまう
+                    proc_insert_sio_r  ###回答
 	            end  ##pagedata
+				@show_records = show_records.chop + "]"
         end   ## case
         ###p  "e: " + Time.now.to_s
-        return all_sub_command_r
     end   ##sub_blk_paging
 
-    def  proc_strwhere command_c
+    def proc_strwhere
 	  #日付　/ - 固定にしないようにできないか?
-        if command_c[:sio_strsql] then
-          strwhere =  if command_c[:sio_strsql].downcase.split(")")[-1] =~ /where/ then   " and " else  " where "  end
+        if @command_c[:sio_strsql] then
+          strwhere =  if @command_c[:sio_strsql].downcase.split(")")[-1] =~ /where/ then   " and " else  " where "  end
           else
            strwhere = " WHERE "
         end
-        ##xparams gridの生
-	    ###if (params[:commit]||="") == "Export" then search_key = params[:export].dup else search_key = params.dup end
-		###search_key = params.dup
-		strwhere = proc_search_key_strwhere params,strwhere,@show_data
+		strwhere = proc_search_key_strwhere strwhere
 	end
 	def proc_search_key_strwhere search_key,strwhere,show_data   ###search key:"xxxx"   not sym   ## search_key 画面と db_cud(データ選択)で使用
     search_key.each  do |i,j|  ##xparams gridの生
@@ -576,8 +563,8 @@ module RorBlkctl
   end   ## proc_strwhere
   def  proc_pdfwhere pdfscript,command_c
 	    reports_id = pdfscript[:id]
-	    viewname = command_c[:sio_viewname]
-        tmpwhere = proc_strwhere command_c
+	    viewname = @command_c[:sio_viewname]
+        tmpwhere = proc_strwhere 
         case  params[:initprnt]
             when  "1"  then
 	            tmpwhere <<  if tmpwhere.size > 1 then " and " else " where " end
@@ -607,31 +594,6 @@ module RorBlkctl
         return tmpwhere
     end
 
-  def subpaging  command_c,screen_code
-        tbldata = []
-        command_c[:sio_viewname]  = @show_data[:screen_code_view]
-        proc_insert_sio_c command_c    ###ページング要求
-        rcd = proc_blk_paging command_c,screen_code
-		### allf = @show_data[:allfields]
-		###allt = @show_data[:alltypes]
-        rcd.each do |j|
-            tmp_data = {}
-            @show_data[:allfields].each do |k|
-							if j[k]
-								case @show_data[:alltypes][k]
-								when /date/
-									tmp_data[k] = j[k].strftime("%Y/%m/%d")
-								when /time/
-									tmp_data[k] = j[k].strftime("%Y/%m/%d %H:%M")
-								else
-									tmp_data[k] = j[k] ## if k_to_s != "id"        ## 2dcのidを修正したほうがいいのかな
-								end
-							end
-            end
-	        	tbldata << tmp_data
-        end ## for
-        return [tbldata,rcd[0][:sio_totalcount]]    ###[データの中身,レコード件数]
-  end  ##subpagi
   def  sub_getfield
        @show_data[:allfields].join(",").to_s
   end   ##  sub_getfield
@@ -680,7 +642,7 @@ module RorBlkctl
 					if LocaTransport[fm_id.to_s + to_id.to_s]
 						return LocaTransport[fm_id.to_s + to_id.to_s]
 					else
-						logger.debug " line #{__LINE__} fm_id:#{fm_id}, to_id:#{to_id} "
+						Rails.logger.debug " line #{__LINE__} fm_id:#{fm_id}, to_id:#{to_id} "
 						raise
 					end
 				end
@@ -753,7 +715,7 @@ module RorBlkctl
 				end
 			end
 		else
-			logger.debug "logic err alloc = '#{alloc} "
+			Rails.logger.debug "logic err alloc = '#{alloc} "
 			raise
 		end
 	end
@@ -1072,7 +1034,7 @@ module RorBlkctl
 							:id=>"nditms_"+i["id"].to_s}  ###
 					ngantts << np
 			   else
-					logger.debug "logic error opeitms missing  line :#{__LINE_} select * from opeitms where id = #{i["opeitms_id"]} "
+					Rails.logger.debug "logic error opeitms missing  line :#{__LINE_} select * from opeitms where id = #{i["opeitms_id"]} "
 					@errmsg =  "logic error opeitms missing  line :#{__LINE_} select * from opeitms where id = #{i["opeitms_id"]} "
 					raise
 			   end
@@ -1156,7 +1118,7 @@ module RorBlkctl
 	    locas_id ||= 0
 	    dealers_id = ActiveRecord::Base.connection.select_value("select id from dealers where locas_id_dealer = #{locas_id} ")
 		if dealers_id.nil?
-	       logger.debug "err logic err?  locas_id:#{locas_id}"
+	       Rails.logger.debug "err logic err?  locas_id:#{locas_id}"
 		   raise
 	    end
 	    return dealers_id
@@ -1179,7 +1141,7 @@ module RorBlkctl
         if rec
 	        rec
 		  else
-            logger.debug "error class logic err proc_get_opeitms_rec itms_id = #{itms_id} ,locas_id = #{locas_id}, processseq = #{processseq ||= 999} ,
+            Rails.logger.debug "error class logic err proc_get_opeitms_rec itms_id = #{itms_id} ,locas_id = #{locas_id}, processseq = #{processseq ||= 999} ,
 					priority = = #{priority ||= 999} ,expiredate > #{Date.today}"
             raise
         end
@@ -1199,7 +1161,7 @@ module RorBlkctl
 				if chrgperson
 					chrgperson_id = chrgperson["id"]
 				else
-					logger.debug " proc_get_chrgperson_fm_loca  chrgpersons dummy code missing "
+					Rails.logger.debug " proc_get_chrgperson_fm_loca  chrgpersons dummy code missing "
 					raise
 				end
 	    end
@@ -1367,8 +1329,8 @@ module RorBlkctl
 						trec = ActiveRecord::Base.connection.select_one("select * from #{"r_" + tbl + "s"} where id = #{val}")
 					end
 					if trec.nil?  ###logic error
-						logger.debug " logic error rec = #{rec} "
-						logger.debug " key = '#{key}' val = #{val} "
+						Rails.logger.debug " logic error rec = #{rec} "
+						Rails.logger.debug " key = '#{key}' val = #{val} "
 						raise
 					end
 					trec.each do |reckey,recval|
@@ -1434,19 +1396,14 @@ module RorBlkctl
     def undefined
       nil
     end
-    def get_screen_code
+    def get_screen_code params
         case
-            when params[:sid]  ##disp
-               @sid   =  params[:sid]  
-	           @screen_code = params[:sid]  if params[:sid].split('_div_')[1].nil?    ##子画面無
-               @screen_code = params[:sid].split('_div_')[1]  if params[:sid].split('_div_')[1]    ##子画面
-            ##when params[:action]  == "index"  then
-            ##   @sid  = @screen_code = params[:id]   ## listからの初期画面の時 とcodeを求める時
+            when params[:sid]  ##disp  
+               @screen_code = (params[:sid].split('_div_')[1]||= params[:sid])   ##子画面
             when params[:nst_tbl_val]
-               @sid   =  params[:nst_tbl_val]
-               @screen_code =  params[:nst_tbl_val].split("_div_")[1]  ###chil_scree_code
+               @screen_code =  params[:nst_tbl_val].split("_div_")[1]  ###chil_screen_code
 		    when params[:dump]  ### import by excel
-               @screen_code = @sid = params[:dump][:screen_code]
+               @screen_code =  params[:dump][:screen_code]
 	    end
     end
     def crt_def_all
@@ -1463,8 +1420,8 @@ module RorBlkctl
 			end
 		rescue
 			if self.to_s != "main"
-				logger.debug" error class #{self} #{Time.now}:  $@: #{$@} "
-				logger.debug"  error class #{self} :  $!: #{$!} "
+				Rails.logger.debug" error class #{self} #{Time.now}:  $@: #{$@} "
+				Rails.logger.debug"  error class #{self} :  $!: #{$!} "
 			else
 				p " error class #{self} #{Time.now}:  $@: #{$@} "
 				p "  error class #{self} :  $!: #{$!} "
@@ -1476,7 +1433,7 @@ module RorBlkctl
 		strdef << src_tbl["rubycode"]
 	    strdef <<"\n end"
 		if self.to_s != "main"
-			logger.debug strdef
+			Rails.logger.debug strdef
 		else
 			p strdef[0..50]
 		end
@@ -1491,7 +1448,7 @@ module RorBlkctl
 		strdef << src_tbl["rubycode"]
 		strdef <<"\n end"
 		if self.to_s != "main"
-			logger.debug strdef
+			Rails.logger.debug strdef
 		else
 			p strdef[0..50]
 		end
@@ -1540,7 +1497,7 @@ module RorBlkctl
 					if streval
 						streval << str_sio_set(tblchop)
 						if self.to_s != "main"
-							logger.debug streval
+							Rails.logger.debug streval
 						else
 							p streval[0..50]
 						end
@@ -1575,7 +1532,7 @@ module RorBlkctl
 		    streval << %Q&\n command_c[(command_c[:sio_viewname].split("_")[1].chop+"_id").to_sym] = command_c[:id] &
 			streval << str_sio_set(tblchop)
 			if self.to_s != "main"
-				logger.debug streval
+				Rails.logger.debug streval
 			else
 				p streval[0..50]
 			end
@@ -1601,23 +1558,24 @@ module RorBlkctl
 		return dflt_rubycode
 	end
     def proc_set_fields_from_allfields  ## value ###画面の内容をcommand_rへ ###typeの変換を
-        command_c = params.dup
-		command_c[:sio_user_code] = @sio_user_code  ###########   LOGIN USER
-	    command_c[:sio_viewname]  = @show_data[:screen_code_view]
-	    command_c[:sio_code]  = @screen_code
-		command_c = char_to_number_data(command_c)
+        @command_c = params.dup
+	    @command_c[:sio_code]  = @screen_code
+		char_to_number_data
 	        ## nilは params[j] にセットされない。
 			### 下記の変換が未実施
 			###  1 (params == String ,command_c=float or integer
-        return command_c
     end
-    def init_from_screen current_user
-		get_screen_code
-		get_screen_and_fields_prototype current_user,@screen_code
+    def init_from_screen current_user,params
+		get_screen_code params
+		### popのため@screen_codeは使用できない。
+		get_screen_and_fields_prototype current_user,@screen_code   ###popのためget_screen_and_fields_prototypeでは@screen_codeは使用できない。
 		@sio_user_code = ActiveRecord::Base.connection.select_value("select id from persons where email = '#{current_user[:email]}'")
-		command_c = proc_set_fields_from_allfields
-		command_c[:email] = current_user[:email]
-        return command_c
+		@command_c={}
+		@command_c[:sio_user_code] = @sio_user_code  ###########   LOGIN USER
+		@command_c[:email] = current_user[:email]
+		@command_c[:sio_viewname]  = @screen_prototype[:pobject_code_view]
+		@command_c[:screen_strorder] = params.to_json.to_s[0..3999]
+		proc_insert_sio_c   ###画面からの要求内容を記録
 	end
 	def get_screen_and_fields_prototype current_user,screen_code
 		prototype = Rails.cache.fetch('screenfield'+RorBlkctl.grp_code(current_user[:email])+@screen_code) do
@@ -1653,7 +1611,7 @@ module RorBlkctl
 	def proc_save_alloc_id alloc
 		des_cmd = ActiveRecord::Base.connection.select_one("select * from r_#{alloc["destblname"]} where id = #{alloc["destblid"]}")
 		if des_cmd.nil?
-			logger.debug "error:not found  #{alloc["destblid"]} by alloctbls_id 'select * from r_#{alloc["destblname"]} where id = #{alloc["destblid"]} ' "
+			Rails.logger.debug "error:not found  #{alloc["destblid"]} by alloctbls_id 'select * from r_#{alloc["destblname"]} where id = #{alloc["destblid"]} ' "
 			raise   ##logic error
 		end
 		return des_cmd
@@ -1691,7 +1649,7 @@ module RorBlkctl
 		ActiveRecord::Base.uncached() do
 			case ActiveRecord::Base.configurations[Rails.env]['adapter']
 				when /post/
-					ActiveRecord::Base.connection.select_value("SELECT nextval('#{tbl_seq}')")  ##post
+					ActiveRecord::Base.connection.select_value("SELECT nextval('sio.#{tbl_seq}')")  ##post
 				when /oracle/
 					ActiveRecord::Base.connection.select_value("select #{tbl_seq}.nextval from dual")  ##oracle
 			end
@@ -1856,10 +1814,10 @@ module RorBlkctl
 			end
 		end
 	end
-	def proc_tbl_add_arel  tblname,hash ##
+	def proc_tbl_add_arel  tblname,tblarel ##
 		fields = ""
 		values = ""
-		hash.each do |key,val|
+		tblarel.each do |key,val|
 			fields << key.to_s + ","
 			values << case val.class.to_s
 				when "String"
@@ -1887,10 +1845,17 @@ module RorBlkctl
 				when "Hash"
 					"'#{val.to_query}',"
 				else
-					logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
+					Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
 			end
 		end
-		ActiveRecord::Base.connection.insert("insert into #{tblname}(#{fields.chop}) values(#{values.chop})")
+		case tblname
+		when  /^sio_/
+			ActiveRecord::Base.connection.insert("insert into sio.#{tblname}(#{fields.chop}) values(#{values.chop})")
+		when  /^bk_/
+			ActiveRecord::Base.connection.insert("insert into bk.#{tblname}(#{fields.chop}) values(#{values.chop})")
+		else
+			ActiveRecord::Base.connection.insert("insert into #{tblname}(#{fields.chop}) values(#{values.chop})")
+		end
 	end
 	def proc_tbl_rec_to_screen_field hash ##
 		strset = "{"
@@ -1914,7 +1879,7 @@ module RorBlkctl
 				when "NilClass"
 					"  #{key.to_s}: '',"
 				else
-					logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
+					Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
 					raise
 		   end
 		end
@@ -1941,7 +1906,7 @@ module RorBlkctl
 				when "NilClass"
 					"null,"
 				else
-					logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
+					Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
 					raise
 		   end
 		end
@@ -2070,7 +2035,7 @@ module RorBlkctl
 						if pare_contract
 							expiredate = vproc_price_expiredate_set(pare_contract["cust_contract_price"],command_c)
 							if expiredate.nil?
-								logger.debug "line #{__LINE__} strsql #{strsql}"
+								Rails.logger.debug "line #{__LINE__} strsql #{strsql}"
 								raise
 							end
 							pare_rule_price = pare_contract["cust_rule_price"]
@@ -2083,7 +2048,7 @@ module RorBlkctl
 						pare_contract = ActiveRecord::Base.connection.select_one(strsql)   ###画面のfield
 						expiredate = vproc_price_expiredate_set(pare_contract["dealer_contract_price"],command_c)
 						if expiredate.nil?
-							logger.debug "line #{__LINE__} strsql #{strsql}"
+							Rails.logger.debug "line #{__LINE__} strsql #{strsql}"
 							raise
 						end
 						pare_rule_price = pare_contract["dealer_rule_price"]
@@ -2095,7 +2060,7 @@ module RorBlkctl
 						pare_contract = ActiveRecord::Base.connection.select_one(strsql)   ###画面のfield
 						expiredate = vproc_price_expiredate_set(pare_contract["feepaym_contract_price"],command_c)
 						if expiredate.nil?
-							logger.debug "line #{__LINE__} strsql #{strsql}"
+							Rails.logger.debug "line #{__LINE__} strsql #{strsql}"
 							raise
 						end
 						pare_rule_price = pare_contract["feepaym_rule_price"]
@@ -2106,7 +2071,7 @@ module RorBlkctl
 				expiredate = ""
 		end
 		if expiredate.nil?
-			logger.debug "line #{__LINE__} proc_price_amt :master error ???"
+			Rails.logger.debug "line #{__LINE__} proc_price_amt :master error ???"
 		end
 		strsql = %Q& select * from r_pricemsts
 					where pricemst_tblname =  '#{pricetbl}' and
@@ -2337,7 +2302,7 @@ module RorBlkctl
 				if alloc["qty_stk"] != 0
 					proc_tbl_edit_arel(alloc["destblname"],{:qty_stk=>rec["qty_stk"] - qty_stk}," id = #{alloc["destblid"]} ")
 				else
-					logger.debug" error class #{self} #{Time.now}:  logic eror  line:#{__LINE__} alloc:#{alloc} lottrn:#{lottrn} new_alloc:#{new_alloc}  "
+					Rails.logger.debug" error class #{self} #{Time.now}:  logic eror  line:#{__LINE__} alloc:#{alloc} lottrn:#{lottrn} new_alloc:#{new_alloc}  "
 					raise
 				end
 			end
@@ -2407,8 +2372,7 @@ module RorBlkctl
             ##:depends=>"",:expiredate=>"2099/12/31".to_date,
 						##:created_at=>Time.now,
             :updated_at=>Time.now,:remark=>"pic dummy stk ",
-						:persons_id_upd=>system_person_id}
-						##proc_tbl_add_arel("trngantts",tmp_gantt)
+						:persons_id_upd=>system_person_id}						##proc_tbl_add_arel("trngantts",tmp_gantt)
 						proc_tbl_edit_arel("trngantts",tmp_gantt," id = #{tmp["id"]} ")
 				else
 					tmp_gantt = {:id=>proc_get_nextval("trngantts_seq"),:key=>"001",
@@ -2422,11 +2386,10 @@ module RorBlkctl
 						:qty_src=>trn["qty"],:depends=>"",:expiredate=>"2099/12/31".to_date,
 						:updated_at=>Time.now,:remark=>"pic dummy stk ",
 						:persons_id_upd=>system_person_id}
-						##proc_tbl_add_arel("trngantts",tmp_gantt)
 						proc_tbl_add_arel("trngantts",tmp_gantt)
 				end
 		else
-			logger.debug " error class line #{__LINE__} ,not found: table_name = 'trngantts' id = #{alloc["srctblid"]} "
+			Rails.logger.debug " error class line #{__LINE__} ,not found: table_name = 'trngantts' id = #{alloc["srctblid"]} "
 			raise
 		end
 		based_alloc[:remark] = " pic stk 4"
@@ -2549,11 +2512,11 @@ module RorBlkctl
 			if @itm_id
 				@opeitm_id = proc_get_opeitms_rec(@itm_id,@loca_id,processseq = nil,priority = nil)["id"]
 			else
-				logger.debug " error class line #{__LINE__} ,@opeitm_id not found:#{rec} "
+				Rails.logger.debug " error class line #{__LINE__} ,@opeitm_id not found:#{rec} "
 				raise
 			end
 			if @loca_id.nil?
-				logger.debug " line #{__LINE__} ,@opeitm_id not found:#{rec} "
+				Rails.logger.debug " line #{__LINE__} ,@opeitm_id not found:#{rec} "
 			end
 		end
 		@bgantts["000"] = {:mlevel=>0,
@@ -2576,7 +2539,7 @@ module RorBlkctl
 			cnt += 2
 			auto_cust = ActiveRecord::Base.connection.select_one("select * from  custrcvplcs where locas_id_custrcvplc = #{@loca_id_to} ")
 			if auto_cust.nil?
-				logger.debug " line #{__LINE__} ,loca_id_to:#{@loca_id_to}"
+				Rails.logger.debug " line #{__LINE__} ,loca_id_to:#{@loca_id_to}"
 				raise
 			end
 			@bgantts["001"] = {:seq=>"001",:mlevel=>1,
@@ -2673,7 +2636,7 @@ module RorBlkctl
 		case sio_classname
 			when /_add/
 				if based_alloc[:allocfree].nil?
-					logger.debug"error class #{Time.now}  based_alloc:#{based_alloc} "
+					Rails.logger.debug"error class #{Time.now}  based_alloc:#{based_alloc} "
                  	raise
 				end
 				based_alloc[:persons_id_upd] = system_person_id
@@ -2706,12 +2669,11 @@ module RorBlkctl
 					end
 					based_alloc[:qty] = old_alloc["qty"]
 					based_alloc[:qty_stk] = old_alloc["qty_stk"]
-					###proc_tbl_add_arel("alloctbls",based_alloc)
 					proc_decide_alloc_inout(based_alloc.with_indifferent_access)do
 					  "rvs"
 					end
 				else
-					logger.debug"error class #{Time.now}  based_alloc:#{based_alloc} "
+					Rails.logger.debug"error class #{Time.now}  based_alloc:#{based_alloc} "
 					raise
 				end
 		end
@@ -2959,7 +2921,7 @@ module RorBlkctl
 							and destblid = #{alloc[:destblid]} order by id desc &
 				c_allocs = ActiveRecord::Base.connection.select_all(strsql)
 				if c_allocs.size == 0 ##logic error
-				   logger.debug "strsql = #{strsql}"
+				   Rails.logger.debug "strsql = #{strsql}"
 				end
 				qty = 0
 				qty_stk = 0
@@ -3012,8 +2974,8 @@ module RorBlkctl
 																							and destblname ='#{pre_destblname}')&
 		rtn_alloc = ActiveRecord::Base.connection.select_one(strsql)
 		if rtn_alloc.nil?
-		   logger.debug " logic error"
-           logger.debug " strsql = #{strsql}"
+		   Rails.logger.debug " logic error"
+           Rails.logger.debug " strsql = #{strsql}"
 		end
 		proc_tbl_edit_arel("alloctbl" ,{:qty=>rtn_alloc["qty"] - c_alloc["qty"],:qty_stk=>rtn_alloc["qty_stk"] - c_alloc["qty_stk"]}," id = #{rtn_alloc["destblid"]} " )
 		proc_tbl_edit_arel("alloctbl" ,{:qty=>c_alloc["qty"],:qty_stk=>c_alloc["qty_stk"]}," id = #{rtn_alloc["id"]}" )
@@ -3340,7 +3302,7 @@ module RorBlkctl
 								lottrn[:tblname] = "lotstkhists"
 							end
 						else
-							 logger.debug"error class #{self} : #{Time.now}:  line #{__LINE__}  trn:#{trn}  "
+							 Rails.logger.debug"error class #{self} : #{Time.now}:  line #{__LINE__}  trn:#{trn}  "
 							 raise
 						end
 						proc_update_gantt_alloc_fm_acttrn lottrn,alloc.with_indifferent_access,trn[:qty]  ###trn[:qty]　イッタンｆｒｅｅになる在庫
@@ -3424,8 +3386,8 @@ module RorBlkctl
 						###proc_tbl_edit_arel("alloctbls",alloctbl," id = #{alloctbl["id"]}")
 						proc_alloctbls_update("_edit_",alloctbl.with_indifferent_access)
 					else
-						logger.debug " logic error   オーダー済以下にはできない。"
-						logger.debug " 画面でチェック　していること。"
+						Rails.logger.debug " logic error   オーダー済以下にはできない。"
+						Rails.logger.debug " 画面でチェック　していること。"
 						raise
 					end
 				else
@@ -3458,8 +3420,8 @@ module RorBlkctl
 					if alloctbl["qty"]  >= 0
 						proc_alloctbls_update("_edit_",alloctbl)
 					else
-						logger.debug " logic error   出荷済数以下にはできない。"
-						logger.debug " 画面でチェック　していること。"
+						Rails.logger.debug " logic error   出荷済数以下にはできない。"
+						Rails.logger.debug " 画面でチェック　していること。"
 						raise
 					end
 				else

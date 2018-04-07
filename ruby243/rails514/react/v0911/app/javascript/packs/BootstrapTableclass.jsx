@@ -5,15 +5,38 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
 import filterFactory, { textFilter, Comparator ,selectFilter } from 'react-bootstrap-table2-filter';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import axios from 'axios';
 
 
 //import { TableHeaderColumn } from 'react-bootstrap-table';
 //import { Button } from 'react-bootstrap';
 class BootstrapTableclass extends React.Component {
   render() {
-    return (
-  <BootstrapTable keyField='id' data={ showrecords() } columns={ showfields() } filter={ filterFactory()} 
+    let datashowrecords = showrecords;
+    let datashowfields = showfields;
+    const onTableChange = (type, newState) => {
+       let screenUrl;
+       switch(type){
+          case "filter":
+                break;
+          case "pagination":
+                screenUrl = "../screens/pagination"
+                break;
+          case "sort":
+                break;
+         case "cellEdit":
+              break;
+         } 
+     axios.get(screenUrl)
+         .then(res => {
+           datashowrecords = res.datashowrecords;
+           datashowfields = re.datashowfields
+         })                                        
+    }
+  return (
+  <BootstrapTable keyField='id' data={ datashowrecords } columns={ datashowfields } filter={ filterFactory()} 
     remote={ {  filter: true,    pagination: true,    filter: true,    sort: true,    cellEdit: true  } }
+    onTableChange={ onTableChange }
     pagination={ paginationFactory({
       page:1, // Specify the current page. It's necessary when remote is enabled
       sizePerPage:5, // Specify the size per page. It's necessary when remote is enabled
@@ -33,10 +56,7 @@ class BootstrapTableclass extends React.Component {
       //lastPageTitle: 'Go to last', // the title of last page button
       hideSizePerPage: false, // hide the size per page dropdown
       hidePageListOnlyOnePage: true, // hide pagination bar when only ones page, default is false
-      onPageChange: (page, sizePerPage) => {}, // callback function when page was changing
-      onSizePerPageChange: (sizePerPage, page) => {}, // callback function when page size was changing
     }) } 
-//  tableStyle={ { border: 'black 2px solid' } } containerStyle={ { border: 'black 2px solid' } } headerStyle={ { border: 'black 2px solid' } }
     />)
   }
 }
