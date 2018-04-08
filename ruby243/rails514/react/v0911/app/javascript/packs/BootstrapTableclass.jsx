@@ -12,8 +12,11 @@ import axios from 'axios';
 //import { Button } from 'react-bootstrap';
 class BootstrapTableclass extends React.Component {
   render() {
-    let datashowrecords = showrecords;
-    let datashowfields = showfields;
+    let datashowrecords = showrecords();
+    let datashowfields = showfields();
+    let datashowscreenprop   = showscreenprop();
+    let sizePerPage = datashowscreenprop.sizePerPageList;
+    sizePerPage.push({text:'all',value:datashowscreenprop.total_cnt});
     const onTableChange = (type, newState) => {
        let screenUrl;
        switch(type){
@@ -27,23 +30,25 @@ class BootstrapTableclass extends React.Component {
          case "cellEdit":
               break;
          } 
-     axios.get(screenUrl)
+     axios.get(screenUrl, { params: {keytype:type, keynewState:newState }})
          .then(res => {
            datashowrecords = res.datashowrecords;
-           datashowfields = re.datashowfields
-         })                                        
+           datashowfields = res.datashowfields;
+         });                                        
     }
   return (
   <BootstrapTable keyField='id' data={ datashowrecords } columns={ datashowfields } filter={ filterFactory()} 
     remote={ {  filter: true,    pagination: true,    filter: true,    sort: true,    cellEdit: true  } }
     onTableChange={ onTableChange }
     pagination={ paginationFactory({
-      page:1, // Specify the current page. It's necessary when remote is enabled
-      sizePerPage:5, // Specify the size per page. It's necessary when remote is enabled
-      totalSize:10, // Total data size. It's necessary when remote is enabled
+      page:datashowscreenprop.page, // Specify the current page. It's necessary when remote is enabled
+      currSizePerPage:datashowscreenprop.sizeperpage, // Specify the size per page. It's necessary when remote is enabled
+      sizePerPage:datashowscreenprop.sizeperpage, // Specify the size per page. It's necessary when remote is enabled
+      totalSize:datashowscreenprop.total_cnt, // Total data size. It's necessary when remote is enabled
       pageStartIndex: 1, // first page will be 0, default is 1
       paginationSize: 5,  // the pagination bar size, default is 5
-      sizePerPageList: [5,50 , {    text: 'all', value: 1000  }], 
+      sizePerPageList: datashowscreenprop.sizePerPageList, 
+      //sizePerPageList: [5,10,{text:'all',value:100}], 
       withFirstAndLast: false, // hide the going to first and last page button
       alwaysShowAllBtns: true, // always show the next and previous page button
       //firstPageText: 'First', // the text of first page button

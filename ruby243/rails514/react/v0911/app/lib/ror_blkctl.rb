@@ -296,22 +296,21 @@ module RorBlkctl
 				end
 			end
 	end
-	def proc_insert_sio_c  ###要求  無限ループにならないこと
-        ###command_c = char_to_number_data(command_c) ###画面イメージからデータtypeへ   入口に変更すること
-        @command_c[:sio_term_id] =  request.remote_ip  if respond_to?("request.remote_ip")  ## batch処理ではrequestはnil　　？？
-        @command_c[:sio_command_response] = "C"
-        @command_c[:sio_add_time] = Time.now
+	def proc_insert_sio_c  command_c ###要求  無限ループにならないこと
+        command_c[:sio_term_id] =  request.remote_ip  if respond_to?("request.remote_ip")  ## batch処理ではrequestはnil　　？？
+        command_c[:sio_command_response] = "C"
+        command_c[:sio_add_time] = Time.now
 		begin
 			###既定値をセット
-			@command_c = vproc_command_c_dflt_set_fm_rubycoding if @command_c[:sio_classname] =~ /_add_|_edit_|_delete_/
-			if @command_c[:sio_viewname] =~ /_inouts$/ and  @command_c[:sio_classname] =~ /_add_|_edit_|_delete_/
+			command_c = vproc_command_c_dflt_set_fm_rubycoding if command_c[:sio_classname] =~ /_add_|_edit_|_delete_/
+			if command_c[:sio_viewname] =~ /_inouts$/ and  command_c[:sio_classname] =~ /_add_|_edit_|_delete_/
 			else
-				@command_c[:sio_id] =  proc_get_nextval("SIO_#{@command_c[:sio_viewname]}_SEQ")
-				proc_tbl_add_arel("sio_#{@command_c[:sio_viewname]}",@command_c)
+				command_c[:sio_id] =  proc_get_nextval("SIO_#{command_c[:sio_viewname]}_SEQ")
+				proc_tbl_add_arel("sio_#{command_c[:sio_viewname]}",command_c)
 			end
 		rescue
 			ActiveRecord::Base.connection.rollback_db_transaction()
-			Rails.logger.debug " proc_insert_sio_c err  ...command_c = #{@command_c}"
+			Rails.logger.debug " proc_insert_sio_c err  ...command_c = #{command_c}"
             Rails.logger.debug"error class #{self}  $@: #{$@} "
             Rails.logger.debug"error class #{self} #{Time.now} $!: #{$!} "
 			raise
@@ -319,9 +318,9 @@ module RorBlkctl
   	end   ## sub_insert_sio_c
 
 	def vproc_command_c_dflt_set_fm_rubycoding  ###　引き数はcommand_cで固定
-		command_r = @command_c.dup
+		command_r = command_c.dup
 		tblnamechop = command_c[:sio_viewname].split("_",2)[1].chop
-		@command_c.each do |key,val|
+		command_c.each do |key,val|
 			if (val == "" or val.nil? or val == "dummy" ) and  key.to_s =~ /^#{tblnamechop}_/
 				if respond_to?("proc_view_field_#{key.to_s}_dflt_for_tbl_set")
 					command_r[key] = __send__("proc_view_field_#{key.to_s}_dflt_for_tbl_set",command_r)
@@ -376,13 +375,13 @@ module RorBlkctl
         parescreen[:expiredate] = Date.today + 1
         proc_tbl_add_arel("parescreen#{@sio_user_code.to_s}s",parescreen)
     end
-    def proc_insert_sio_r   ####レスポンス
-        @command_c[:sio_id] =  proc_get_nextval("SIO_#{command_c[:sio_viewname]}_SEQ")
-        @command_c[:sio_command_response] = "R"
-        @command_c[:sio_add_time] = Time.now
-		proc_tbl_add_arel  "SIO_#{command_c[:sio_viewname]}",@command_c
+    def proc_insert_sio_r  command_c ####レスポンス
+        command_c[:sio_id] =  proc_get_nextval("SIO_#{command_c[:sio_viewname]}_SEQ")
+        command_c[:sio_command_response] = "R"
+        command_c[:sio_add_time] = Time.now
+		proc_tbl_add_arel  "SIO_#{command_c[:sio_viewname]}",command_c
     end   ## 
-    def char_to_number_data    ###excel からのデータ取り込み　根本解決を
+    def char_to_number_data  command_c  ###excel からのデータ取り込み　根本解決を
 		##rubyXl マッキントッシュ excel windows excel not perfect
 		@date1904 = nil
 		viewtype = proc_blk_columns("sio_#{command_c[:sio_viewname]}")
@@ -407,7 +406,7 @@ module RorBlkctl
 				command_c.delete(key)
 			end  ## if command_c
 		end  ## sho_data.each
-		command_c["id"] = command_c[(command_c[:sio_viewname].split("_")[1].chop + "_id")]
+		command_c[:id] = command_c[(command_c[:sio_viewname].split("_")[1].chop + "_id")]
     end ## defar_to....
 
     def num_to_date(num)
@@ -421,67 +420,76 @@ module RorBlkctl
       compare_date - 1 + num
     end
 
-    def proc_blk_paging  screen_code
+    def proc_blk_paging  command_c,screen_prop,field_prop
         ### strsqlにコーディングしてないときは、viewを使用
         ### strdql はupdate insertには使用できない。
         ### command_c[:sio_strsql] = (select  ・・・・) a
-		tmp_sql = @screen_prototype[:screen_strwhere]  
-        if  @command_c[:sio_strsql]     ## 親からの引き継ぎ検索ありの時
-			@command_c[:sio_strsql].each do|key,val|
+		tmp_sql = screen_prop[:screen_strwhere]  
+        if  command_c[:sio_strsql]     ## 親からの引き継ぎ検索ありの時
+			command_c[:sio_strsql].each do|key,val|
 				tmp_sql << " and #{key} = #{val} "   ###親側で文字タイプの「'」はセットすること
 			end
 		end
 		###screen登録された　既定値の抽出条件
-        ##strsql = "SELECT id FROM " + tmp_sql
+		##strsql = "SELECT id FROM " + tmp_sql
         if command_c[:sio_search]  == "true"   ### proc_strwhere(command_c) 画論に入力された抽出条件
-				tmp_sql <<  RorBlkctl.proc_strwhere
-		else   ###画面からの抽出条件なし
-				tmp_sql
+				tmp_sql <<  proc_strwhere(command_c)
 		end
-        @screen_prototype[:total_cnt] = @command_c[:sio_totalcount] =  ActiveRecord::Base.connection.select_value( "SELECT count(*) FROM " + tmp_sql)
-		sort_tmp =  if tmp_str["screen_strorder"] then  " order by "  + tmp_str["screen_strorder"].sub(/order\s*by/,"") else "" end   ### sort 初期セット
+		case tmp_sql.strip
+		when /^where /   ###next
+		when /^and /
+			tmp_sql.sub!(/^and /,"where ") 
+		when ""   ### next
+		else
+			tmp_sql << "where " + tmp_sql
+		end
+		tmp_sql = screen_prop[:viewname] + " a  " + tmp_sql
+        command_c[:sio_totalcount] =  ActiveRecord::Base.connection.select_value( "SELECT count(*) FROM  #{tmp_sql}")
+		sort_tmp =  if screen_prop[:screen_strorder] then  " order by "  + screen_prop[:screen_strorder].sub(/order\s*by/,"") else "" end   ### sort 初期セット
         sort_sql = ""
-        unless @command_c[:sio_sidx].nil? or @command_c[:sio_sidx] == ""  ###画面からsort keyを指定
+        unless command_c[:sio_sidx].nil? or command_c[:sio_sidx] == ""  ###画面からsort keyを指定
 	        sort_sql = " ROW_NUMBER() over (order by " +  command_c[:sio_sidx] + " " +  command_c[:sio_sord]  + " ) "
 					sort_tmp  = ""
-	      else
-					if sort_tmp == ""
-	        	sort_sql = "rownum "
-					else
+	    else
+			if sort_tmp == ""
+	        	sort_sql = "ROW_NUMBER() over () "
+			else
 		        sort_sql = " ROW_NUMBER() over ( " +  sort_tmp  + " ) "  ### screensにsort keyがセットされているとき　sortの既定値
-					end
+			end
         end
-        case  @command_c[:sio_totalcount]
+        case  command_c[:sio_totalcount]
             when nil,0   ## 該当データなし　　回答
-	            @command_c[:sio_recordcount] = 0
-                @command_c[:sio_result_f] = "8"  ## no record
-                @command_c[:sio_message_contents] = proc_blkgetpobj("not find record","err_msg",@command_c[:email] )[0]
-                proc_insert_sio_r
+	            command_c[:sio_recordcount] = 0
+                command_c[:sio_result_f] = "8"  ## no record
+                command_c[:sio_message_contents] = proc_blkgetpobj("not find record","err_msg",command_c[:sio_email] )[0]
+                proc_insert_sio_r command_c
             else
-                strsql = "select #{@sqlrecstr} from (SELECT #{sort_sql} cnt,a.* FROM #{tmp_sql} ) "
-                strsql  <<    " WHERE  cnt <= #{@command_c[:sio_end_record]}  and  cnt >= #{@command_c[:sio_start_record]} "
+                strsql = "select #{screen_prop[:sqlrecstr]} from (SELECT #{sort_sql} cnt,a.* FROM #{tmp_sql} )  b "
+                strsql  <<    " WHERE  cnt <= #{command_c[:sio_end_record]}  and  cnt >= #{command_c[:sio_start_record]} "
 				pagedata = ActiveRecord::Base.connection.select_all(strsql)
-				@command_c[:sio_recordcount] = pagedata.size
+				command_c[:sio_recordcount] = pagedata.length
 				show_records = "["
                 pagedata.each do |j|
-                    ##   command_c.merge j なぜかうまく動かない。
+					show_records << "{"
                     j.each do |j_key,j_val|
-                        @command_c[j_key]   = j_val ## 
+						command_c[j_key]   = j_val ## 
+						show_records << proc_tbl_field_to_screen_field(j_key,j_val,field_prop) 
+						show_records << ","
                     end
-                    @command_c[:sio_result_f] = "1"
-                    @command_c[:sio_message_contents] = nil
-	                ##tmp = {}
-                    proc_insert_sio_r  ###回答
+                    command_c[:sio_result_f] = "1"
+                    command_c[:sio_message_contents] = nil
+					proc_insert_sio_r command_c ###回答
+					show_records = show_records.chop +  "},"					
 	            end  ##pagedata
-				@show_records = show_records.chop + "]"
+				show_records = show_records.chop + "]"
         end   ## case
-        ###p  "e: " + Time.now.to_s
+		return show_records
     end   ##sub_blk_paging
 
-    def proc_strwhere
+    def proc_strwhere command_c
 	  #日付　/ - 固定にしないようにできないか?
-        if @command_c[:sio_strsql] then
-          strwhere =  if @command_c[:sio_strsql].downcase.split(")")[-1] =~ /where/ then   " and " else  " where "  end
+        if command_c[:sio_strsql] then
+          strwhere =  if command_c[:sio_strsql].downcase.split(")")[-1] =~ /where/ then   " and " else  " where "  end
           else
            strwhere = " WHERE "
         end
@@ -563,8 +571,8 @@ module RorBlkctl
   end   ## proc_strwhere
   def  proc_pdfwhere pdfscript,command_c
 	    reports_id = pdfscript[:id]
-	    viewname = @command_c[:sio_viewname]
-        tmpwhere = proc_strwhere 
+	    viewname = command_c[:sio_viewname]
+        tmpwhere = proc_strwhere command_c
         case  params[:initprnt]
             when  "1"  then
 	            tmpwhere <<  if tmpwhere.size > 1 then " and " else " where " end
@@ -1399,12 +1407,13 @@ module RorBlkctl
     def get_screen_code params
         case
             when params[:sid]  ##disp  
-               @screen_code = (params[:sid].split('_div_')[1]||= params[:sid])   ##子画面
+               screen_code = (params[:sid].split('_div_')[1]||= params[:sid])   ##子画面
             when params[:nst_tbl_val]
-               @screen_code =  params[:nst_tbl_val].split("_div_")[1]  ###chil_screen_code
+               screen_code =  params[:nst_tbl_val].split("_div_")[1]  ###chil_screen_code
 		    when params[:dump]  ### import by excel
-               @screen_code =  params[:dump][:screen_code]
-	    end
+               screen_code =  params[:dump][:screen_code]
+		end
+		return screen_code
     end
     def crt_def_all
         eval("def dummy_def \n end")
@@ -1557,56 +1566,60 @@ module RorBlkctl
 		end
 		return dflt_rubycode
 	end
-    def proc_set_fields_from_allfields  ## value ###画面の内容をcommand_rへ ###typeの変換を
-        @command_c = params.dup
-	    @command_c[:sio_code]  = @screen_code
-		char_to_number_data
+    def proc_set_fields_from_allfields params ## value ###画面の内容をcommand_rへ ###typeの変換を
+        command_c = params.dup
+	    command_c[:sio_code]  = screen_code
+		char_to_number_data command_c
 	        ## nilは params[j] にセットされない。
 			### 下記の変換が未実施
 			###  1 (params == String ,command_c=float or integer
     end
-    def init_from_screen current_user,params
-		get_screen_code params
-		### popのため@screen_codeは使用できない。
-		get_screen_and_fields_prototype current_user,@screen_code   ###popのためget_screen_and_fields_prototypeでは@screen_codeは使用できない。
-		@sio_user_code = ActiveRecord::Base.connection.select_value("select id from persons where email = '#{current_user[:email]}'")
-		@command_c={}
-		@command_c[:sio_user_code] = @sio_user_code  ###########   LOGIN USER
-		@command_c[:email] = current_user[:email]
-		@command_c[:sio_viewname]  = @screen_prototype[:pobject_code_view]
-		@command_c[:screen_strorder] = params.to_json.to_s[0..3999]
-		proc_insert_sio_c   ###画面からの要求内容を記録
+	def init_from_screen current_user,params,screen_code   ###
+		sio_user_code = ActiveRecord::Base.connection.select_value("select id from persons where email = '#{current_user[:email]}'")
+		command_c = {}
+		command_c[:sio_user_code] = sio_user_code  ###########   LOGIN USER
+		command_c[:sio_email] = current_user[:email]
+	    command_c[:sio_code]  = screen_code
+		command_c[:sio_params] = params.to_json.to_s[0..3999]
+		return command_c
 	end
 	def get_screen_and_fields_prototype current_user,screen_code
-		prototype = Rails.cache.fetch('screenfield'+RorBlkctl.grp_code(current_user[:email])+@screen_code) do
+		prototype = Rails.cache.fetch('screenfield'+RorBlkctl.grp_code(current_user[:email])+screen_code) do
         	###  ダブルコーティション　「"」は使用できない。 
         	sqlstr = "select pobject_code_sfd,screenfield_hideflg,screenfield_editable,screenfield_indisp ,
-                    pobject_code_view,screen_strwhere,screen_rows_per_page,screen_rowlist
+					pobject_code_view,screen_strwhere,screen_rows_per_page,screen_rowlist,
+					screenfield_dataprecision,screenfield_datascale
                     from r_screenfields
                     where pobject_code_scr = '#{screen_code}' and screenfield_expiredate > current_date and screenfield_selection = 1
                     order by screenfield_seqno"
         	show_columns = "["
         	sqlrecstr = ""
-        	screen_prototype ={}
+			screen_prop ={}
+			field_prop ={}
         	ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
             	show_columns << %Q%{ dataField :"#{i["pobject_code_sfd"]}",
             	text:"#{RorBlkctl.proc_blkgetpobj(i["pobject_code_sfd"],"view_field",current_user[:email])[0]}",
             	hidden  :#{if i["screenfield_hideflg"] == "1" then true else false end}},%
-            	sqlrecstr << i["pobject_code_sfd"] + ","
+				sqlrecstr << i["pobject_code_sfd"] + ","
+				field_prop[i["pobject_code_sfd"]] ={:screenfield_editable=>i["screenfield_editable"],
+													:screenfield_indisp=>i["screenfield_indisp"],
+													:screenfield_dataprecision=>i["screenfield_dataprecision"],													
+													:screenfield_datascale=>i["screenfield_datascale"]}
             	if cnt == 0
-                	screen_prototype[:pobject_code_src] = i["pobject_code_src"]
-                	screen_prototype[:pobject_code_view] = i["pobject_code_view"]
-                	screen_prototype[:screen_strwhere] = i["screen_strwhere"]
-                	screen_prototype[:screen_rows_per_page] = i["screen_rows_per_page"]
-                	screen_prototype[:screen_rowlist] = i["screen_rowlist"]
+                	screen_prop[:sid] = screen_code
+                	screen_prop[:viewname] = i["pobject_code_view"]
+                	screen_prop[:screen_strwhere] = i["screen_strwhere"]
+                	screen_prop[:sizeperpage] = i["screen_rows_per_page"].to_i
+					screen_prop[:sizePerPageList] = []
+					i["screen_rowlist"].split(",").each do |list|
+						screen_prop[:sizePerPageList]  << list.to_i
+					end
             	end
 			end
 			show_columns = show_columns.chop.gsub(/\n/,"") + "]"
-			prototype = {:screen_prototype=>screen_prototype,:show_columns=>show_columns,:sqlrecstr=>sqlrecstr.chop}
+			screen_prop[:sqlrecstr] = sqlrecstr.chop
+			prototype = {:screen_prop=>screen_prop,:show_columns=>show_columns,:field_prop=>field_prop}
 		end
-		@screen_prototype = prototype[:screen_prototype]
-		@show_columns = prototype[:show_columns]
-		@sqlrecstr = prototype[:sqlrecstr]
 	end
 	def proc_save_alloc_id alloc
 		des_cmd = ActiveRecord::Base.connection.select_one("select * from r_#{alloc["destblname"]} where id = #{alloc["destblid"]}")
@@ -1820,41 +1833,42 @@ module RorBlkctl
 		tblarel.each do |key,val|
 			fields << key.to_s + ","
 			values << case val.class.to_s
-				when "String"
-					%Q&'#{val.gsub("'","''")}',&
-				when "Fixnum","Bignum","BigDecimal","Float"
-					"#{val},"
-				when "Date"
-					%Q& to_date('#{val.strftime("%Y/%m/%d")}','yyyy/mm/dd'),&
-				when "Time"
-					case key.to_s
-						when "created_at","updated_at"
-							%Q& to_date('#{val.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),&
-						else
-							%Q& to_date('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
-					end
-				when "DateTime"
-					case key.to_s
-						when "expiredate"
+						when "String"
+							%Q&'#{val.gsub("'","''")}',&
+						when "Fixnum","Bignum","BigDecimal","Float","Integer"
+							"#{val},"
+						when "Date"
 							%Q& to_date('#{val.strftime("%Y/%m/%d")}','yyyy/mm/dd'),&
+						when "Time"
+							case key.to_s
+							when "created_at","updated_at"
+									%Q& to_date('#{val.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),&
+							else
+									%Q& to_date('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
+							end
+						when "DateTime"
+							case key.to_s
+							when "expiredate"
+									%Q& to_date('#{val.strftime("%Y/%m/%d")}','yyyy/mm/dd'),&
+							else
+								%Q& to_date('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
+							end
+						when "NilClass"
+							"null,"
+						when "Hash"
+							"'#{val.to_query}',"
 						else
-							%Q& to_date('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
-					end
-				when "NilClass"
-					"null,"
-				when "Hash"
-					"'#{val.to_query}',"
-				else
-					Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
-			end
+							debugger
+							Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
+						end
 		end
-		case tblname
+		case tblname.downcase
 		when  /^sio_/
-			ActiveRecord::Base.connection.insert("insert into sio.#{tblname}(#{fields.chop}) values(#{values.chop})")
+			ActiveRecord::Base.connection.insert("insert into sio.#{tblname.downcase}(#{fields.chop}) values(#{values.chop})")
 		when  /^bk_/
-			ActiveRecord::Base.connection.insert("insert into bk.#{tblname}(#{fields.chop}) values(#{values.chop})")
+			ActiveRecord::Base.connection.insert("insert into bk.#{tblname.downcase}(#{fields.chop}) values(#{values.chop})")
 		else
-			ActiveRecord::Base.connection.insert("insert into #{tblname}(#{fields.chop}) values(#{values.chop})")
+			ActiveRecord::Base.connection.insert("insert into #{tblname.downcase}(#{fields.chop}) values(#{values.chop})")
 		end
 	end
 	def proc_tbl_rec_to_screen_field hash ##
@@ -1884,6 +1898,33 @@ module RorBlkctl
 		   end
 		end
 		return strset.chop + "},"
+	end
+	def proc_tbl_field_to_screen_field key,val,prop ##
+		strset = ""
+		strset << case val.class.to_s 
+				when "String"
+					%Q& #{key.to_s}: "#{val}"&
+				when "Fixnum","Bignum","BigDecimal","Float"
+					" #{key.to_s}: #{val.to_s}"
+					### 小数点編集等
+				when "Date"
+					%Q&  #{key.to_s}: '#{val.strftime("%Y/%m/%d")}'&
+				when "Time"
+					case key.to_s
+						when /created_at|updated_at/
+							%Q&  #{key.to_s}:  '#{val.strftime("%Y/%m/%d %H:%M:%S")}'&
+						when /expiredate/
+							%Q&  #{key.to_s}: '#{val.strftime("%Y/%m/%d")}'&
+						else
+							%Q&  #{key.to_s}: '#{val.strftime("%Y/%m/%d %H:%M")}'&
+					end
+				when "NilClass"
+					"  #{key.to_s}: ''"
+				else
+					Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
+					raise
+		   		end
+		return strset
 	end
 	def proc_tbl_edit_arel  tblname,hash,strwhere ##
 		strset = ""
@@ -2099,11 +2140,11 @@ module RorBlkctl
 			end
 		else
 			if pare_rule_price  == "0" and @pare_class != "batch"
-				price = proc_blkgetpobj("単価マスタなし","err_msg",command_c[:email] )[0]
+				price = proc_blkgetpobj("単価マスタなし","err_msg",command_c[:sio_email] )[0]
 				return {:price=>price.to_s,:amt=>"",:tax=>"",:pricef=>true,:amtf=>true,:contract_price => contract}
 			end
 			if @pare_class == "batch"
-				@errmsg = proc_blkgetpobj("単価マスタなし","err_msg",command_c[:email] )[0]
+				@errmsg = proc_blkgetpobj("単価マスタなし","err_msg",command_c[:sio_email] )[0]
 				return {:price=>"0",:amt=>"0",:tax=>"0",:pricef=>false,:amtf=>false,:contract_price => "X"}
 			end
             ###画面から単価入力された時

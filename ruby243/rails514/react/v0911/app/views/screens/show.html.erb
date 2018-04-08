@@ -11,6 +11,10 @@
         var records = <%=raw @show_records  %>;
         return records;
     }
+    function showscreenprop() {
+        var records = <%=raw @screen_prop.to_json  %>;
+        return records;
+    }
 </script>
 <style>
 </style>

@@ -2,7 +2,6 @@ class ScreensController < ApplicationController
     before_action :sign_in_required, only: [:index]
     before_action :set_users, only: [:show, :edit, :update, :destroy,:create]
     before_action :authenticate_user!
-  
     def index
          crtcachelist
     end
@@ -22,13 +21,24 @@ class ScreensController < ApplicationController
         @cate_list = cate_list.to_a
     end
     def show
-        RorBlkctl.init_from_screen current_user,params
-        @screen_prototype[:page] = 1
-        @command_c[:sio_start_record] = 1
-        @command_c[:sio_end_record] = @screen_prototype[:sizeperpage]
-        RorBlkctl.proc_blk_paging  @screen_code
-        ##debugger
-        ##@show_columns = "[{ dataField :'pobject_code_view',            text:'pobject_code_view',             hidden :false},{ dataField :'id',            text:'id',                   hidden :false}];"
-        ##@show_records = "[{pobject_code_view: 'r_prdrets',id : '12345' }]"
+		screen_code = RorBlkctl.get_screen_code params
+		prototype = RorBlkctl.get_screen_and_fields_prototype current_user,screen_code
+		@screen_prop = prototype[:screen_prop]
+		@show_columns = prototype[:show_columns]
+        command_c = RorBlkctl.init_from_screen current_user,params,screen_code
+		command_c[:sio_viewname]  = @screen_prop[:viewname]
+        RorBlkctl.proc_insert_sio_c  command_c  ###画面からの要求内容を記録
+        @screen_prop[:page] = 1
+        command_c[:sio_start_record] = 1
+        command_c[:sio_end_record] = @screen_prop[:sizeperpage]
+        @show_records = RorBlkctl.proc_blk_paging  command_c,@screen_prop,prototype[:field_prop]
+        @screen_prop[:total_cnt] = command_c[:sio_totalcount]
+        @field_prop = prototype[:field_prop]
+    end
+    def pagination
+        debugger
+        @res={}
+        @res[:datashowrecords] = show_records
+        @res[:datashowfields] = show_fields
     end
 end
