@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> title </title>
+    <%= csrf_meta_tags %>
+
+    <%= stylesheet_link_tag    'application' %>
+    <%= javascript_include_tag 'application' %>
+  </head>
+  <body>
+    <s class="notice"><%= notice %></s>
+    <s class="alert"><%= alert %></s>
+    <%= yield %>
+  </body>
+    <footer>
+            <% if user_signed_in? %>
+                <p> login user
+                <strong><%= link_to current_user.email, user_session_path %></strong>
+                <%= link_to 'プロフィール変更', edit_user_registration_path %>
+                <%= link_to 'ログアウト', destroy_user_session_path, method: :delete %>
+                </p>
+            <% else %>
+                <%= link_to 'サインアップ', new_user_registration_path %>
+                <%= link_to 'ログイン', new_user_session_path %>
+            <% end %>
+    </footer>
+</html>

@@ -17,6 +17,7 @@ class ScreensController < ApplicationController
              # 将来はグループ分けが必要
             end
             catelist
+            @title = "screen list"
         end  
         @cate_list = cate_list.to_a
     end
@@ -29,16 +30,39 @@ class ScreensController < ApplicationController
 		command_c[:sio_viewname]  = @screen_prop[:viewname]
         RorBlkctl.proc_insert_sio_c  command_c  ###画面からの要求内容を記録
         @screen_prop[:page] = 1
-        command_c[:sio_start_record] = 1
-        command_c[:sio_end_record] = @screen_prop[:sizeperpage]
+        command_c[:sio_start_record] = 0
+        command_c[:sio_end_record] = 0
         @show_records = RorBlkctl.proc_blk_paging  command_c,@screen_prop,prototype[:field_prop]
         @screen_prop[:total_cnt] = command_c[:sio_totalcount]
+        if @screen_prop[:sizePerPageList][-1].class ==  Hash
+        else    
+            @screen_prop[:sizePerPageList] << {:text =>'all',:value=>@screen_prop[:total_cnt]}
+        end    
         @field_prop = prototype[:field_prop]
+        @title = @screen_prop [:screen_name]
+        render  :layout => "screen"
     end
     def pagination
-        debugger
+		screen_code = RorBlkctl.get_screen_code params
+		prototype = RorBlkctl.get_screen_and_fields_prototype current_user,screen_code
+        command_c = RorBlkctl.init_from_screen current_user,params[:keynewState],screen_code
+		command_c[:sio_viewname]  = prototype[:screen_prop][:viewname]
+        RorBlkctl.proc_insert_sio_c  command_c  ###画面からの要求内容を記録
+        subParams = (JSON.parse params[:keynewState]).with_indifferent_access
+        command_c[:sio_start_record] =  1 + (subParams[:page] -1) * subParams[:sizePerPage]
+        command_c[:sio_end_record] = subParams[:sizePerPage] * subParams[:page] 
+        subParams[:sqlrecstr] = prototype[:screen_prop][:sqlrecstr]
+        show_records = RorBlkctl.proc_blk_paging  command_c,subParams,prototype[:field_prop]
         @res={}
         @res[:datashowrecords] = show_records
-        @res[:datashowfields] = show_fields
+        @res[:total_cnt] = command_c[:sio_totalcount]
+        render :partical =>"pagination", :layout => false
+    end
+    def showfields
+		screen_code = RorBlkctl.get_screen_code params
+        prototype = RorBlkctl.get_screen_and_fields_prototype current_user,screen_code
+        ##@res = {}
+        @res= prototype[:show_columns]
+        render 'showfields', formats: 'json', handlers: 'jbuilder'
     end
 end

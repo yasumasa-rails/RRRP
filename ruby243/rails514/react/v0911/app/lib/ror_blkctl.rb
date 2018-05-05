@@ -424,7 +424,7 @@ module RorBlkctl
         ### strsqlにコーディングしてないときは、viewを使用
         ### strdql はupdate insertには使用できない。
         ### command_c[:sio_strsql] = (select  ・・・・) a
-		tmp_sql = screen_prop[:screen_strwhere]  
+		tmp_sql = (screen_prop[:screen_strwhere]||="")  
         if  command_c[:sio_strsql]     ## 親からの引き継ぎ検索ありの時
 			command_c[:sio_strsql].each do|key,val|
 				tmp_sql << " and #{key} = #{val} "   ###親側で文字タイプの「'」はセットすること
@@ -443,7 +443,7 @@ module RorBlkctl
 		else
 			tmp_sql << "where " + tmp_sql
 		end
-		tmp_sql = screen_prop[:viewname] + " a  " + tmp_sql
+		tmp_sql = command_c[:sio_viewname] + " a  " + tmp_sql
         command_c[:sio_totalcount] =  ActiveRecord::Base.connection.select_value( "SELECT count(*) FROM  #{tmp_sql}")
 		sort_tmp =  if screen_prop[:screen_strorder] then  " order by "  + screen_prop[:screen_strorder].sub(/order\s*by/,"") else "" end   ### sort 初期セット
         sort_sql = ""
@@ -468,20 +468,19 @@ module RorBlkctl
                 strsql  <<    " WHERE  cnt <= #{command_c[:sio_end_record]}  and  cnt >= #{command_c[:sio_start_record]} "
 				pagedata = ActiveRecord::Base.connection.select_all(strsql)
 				command_c[:sio_recordcount] = pagedata.length
-				show_records = "["
-                pagedata.each do |j|
-					show_records << "{"
+				show_records = []
+				pagedata.each do |j|
+					phash = {}
                     j.each do |j_key,j_val|
 						command_c[j_key]   = j_val ## 
-						show_records << proc_tbl_field_to_screen_field(j_key,j_val,field_prop) 
-						show_records << ","
+						proc_tbl_field_to_screen_field_hash(j_key,j_val,field_prop,phash) 
                     end
+					show_records << phash
                     command_c[:sio_result_f] = "1"
                     command_c[:sio_message_contents] = nil
-					proc_insert_sio_r command_c ###回答
-					show_records = show_records.chop +  "},"					
+					proc_insert_sio_r command_c ###回答					
 	            end  ##pagedata
-				show_records = show_records.chop + "]"
+				##show_records = if show_records.size > 1 then show_records.chop + "]" else "[{}]" end 
         end   ## case
 		return show_records
     end   ##sub_blk_paging
@@ -1592,31 +1591,37 @@ module RorBlkctl
                     from r_screenfields
                     where pobject_code_scr = '#{screen_code}' and screenfield_expiredate > current_date and screenfield_selection = 1
                     order by screenfield_seqno"
-        	show_columns = "["
         	sqlrecstr = ""
-			screen_prop ={}
-			field_prop ={}
-        	ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
-            	show_columns << %Q%{ dataField :"#{i["pobject_code_sfd"]}",
-            	text:"#{RorBlkctl.proc_blkgetpobj(i["pobject_code_sfd"],"view_field",current_user[:email])[0]}",
-            	hidden  :#{if i["screenfield_hideflg"] == "1" then true else false end}},%
+			screen_prop ={}  ###view screen_cod  ・・・
+			field_prop ={}   ###項目の属性
+			show_columns = []
+			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
 				sqlrecstr << i["pobject_code_sfd"] + ","
 				field_prop[i["pobject_code_sfd"]] ={:screenfield_editable=>i["screenfield_editable"],
 													:screenfield_indisp=>i["screenfield_indisp"],
 													:screenfield_dataprecision=>i["screenfield_dataprecision"],													
 													:screenfield_datascale=>i["screenfield_datascale"]}
+				
+					show_columns << {:dataField =>"#{i["pobject_code_sfd"]}",
+									:text=>"#{RorBlkctl.proc_blkgetpobj(i["pobject_code_sfd"],"view_field",current_user[:email])[0]}",
+									:hidden => if i["screenfield_hideflg"] == "1" then true else false end}
+			
+								###	#{if i["screenfield_hideflg"] == "0" then ",filter: textFilter()" end }},%
+				
             	if cnt == 0
-                	screen_prop[:sid] = screen_code
+					screen_prop[:sid] = screen_code
+					screen_prop[:screen_name] = proc_blkgetpobj(screen_code,"screen",current_user[:email])[0]
                 	screen_prop[:viewname] = i["pobject_code_view"]
                 	screen_prop[:screen_strwhere] = i["screen_strwhere"]
-                	screen_prop[:sizeperpage] = i["screen_rows_per_page"].to_i
+                	screen_prop[:sizePerPage] = i["screen_rows_per_page"].to_i
 					screen_prop[:sizePerPageList] = []
 					i["screen_rowlist"].split(",").each do |list|
-						screen_prop[:sizePerPageList]  << list.to_i
+						##screen_prop[:sizePerPageList]  << {:text=> list.to_s,:value=> list.to_i}
+						screen_prop[:sizePerPageList]  <<  list.to_i
 					end
             	end
 			end
-			show_columns = show_columns.chop.gsub(/\n/,"") + "]"
+			##show_columns = show_columns.chop.gsub(/\n/,"") + "]"
 			screen_prop[:sqlrecstr] = sqlrecstr.chop
 			prototype = {:screen_prop=>screen_prop,:show_columns=>show_columns,:field_prop=>field_prop}
 		end
@@ -1925,6 +1930,32 @@ module RorBlkctl
 					raise
 		   		end
 		return strset
+	end
+	def proc_tbl_field_to_screen_field_hash key,val,prop,phach##
+		case val.class.to_s 
+			when "String"
+					phach[key]= val
+			when "Fixnum	","Bignum","BigDecimal","Float"
+					phach[key]=  val.to_s
+					### 小数点編集等
+			when "Date"
+					phach[key.to_s]= val.strftime("%Y/%m/%d")
+			when "Time"
+				case key.to_s
+					when /created_at|updated_at/
+							phach[key]= val.strftime("%Y/%m/%d %H:%M:%S")
+					when /expiredate/
+							phach[key]= val.strftime("%Y/%m/%d")
+					else
+							phach[key]= val.strftime("%Y/%m/%d %H:%M")
+				end
+			when "NilClass"
+					phach[key.to_s]= ""
+			else
+					Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
+					raise
+		   	end
+		return
 	end
 	def proc_tbl_edit_arel  tblname,hash,strwhere ##
 		strset = ""

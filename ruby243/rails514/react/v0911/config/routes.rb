@@ -5,4 +5,5 @@ Rails.application.routes.draw do
   get 'screens/index', :as => 'screens_index'
   resource :screens
   match 'screens/pagination', to: 'screens#pagination', via: [:get]
+  match 'screens/showfields', to: 'screens#showfields', via: [:get]
 end
