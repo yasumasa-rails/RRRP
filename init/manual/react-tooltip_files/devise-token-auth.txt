@@ -1,0 +1,3 @@
+https://github.com/saitoxu/react-devise-token-auth-sample
+https://devise-token-auth.gitbook.io/devise-token-auth/
+http://sainu.hatenablog.jp/entry/2018/08/11/194319

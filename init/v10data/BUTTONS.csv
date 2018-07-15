@@ -1,0 +1,69 @@
+﻿"ID","EXPIREDATE","REMARK","PERSONS_ID_UPD","UPDATE_IP","CREATED_AT","UPDATED_AT","SEQNO","CAPTION","TITLE","BUTTONICON","ONCLICKBUTTON","GETGRIDPARAM","EDITGRIDROW","AFTERSHOWFORM","CODE","CONTENTS"
+1,2099/12/31,,0,"127.0.0.1",,2014/10/13 17:40:09.790,10,,"Search","ui-icon-search","""mygrid[0].toggleToolbar()""",,,,"search",
+2,2099/12/31,"Form Add",0,,,2013/11/26 20:15:46,20,,"Add","ui-icon-circle-plus",,,"add",,"add",
+3,2099/12/31,,0,,,2013/11/10 2:21:54,30,,"Edit","ui-icon-pencil",,"selrow","edit",,"edit",
+4,2099/12/31,,0,,,2014/01/18 11:07:25,40,,"Copy and Add","ui-icon-copy",,"selrow","copyandadd",,"copy_and_add",
+5,2099/12/31,,0,,,2013/12/22 19:38:25,50,,"Delete","ui-icon-trash",,"selrow","delete",,"delete",
+6,2099/12/31,"undefined",0,"127.0.0.1",,2015/05/08 21:22:03.770,60,,"export to xlsx","ui-icon-arrowthickstop-1-n","xlsexport = %Q|function nWinxlsexport#{@jqgrid_id}() {var pdata = jQuery(""##{@jqgrid_id}"").getPostData(); 
+                        var strparam;jQuery.each(pdata, function(key, value) {strparam = strparam + key + ""="" + value + ""&"" }); strparam = strparam.replace(/%/g, ""%25""); strparam = strparam + ""jqgrid_id=#{@jqgrid_id}"";
+                        var url = ""/excelexport/export?""+strparam;window.open(url);};
+                        jQuery(function() {jQuery("".#{@jqgrid_id}_filterbuttonclass"").click(nWinxlsexport#{@jqgrid_id});});|
+                %Q% jQuery("".#{@jqgrid_id}_filterformclass"").remove();jQuery(""##{@jqgrid_id}_cust_buttonA_id"").filterGrid(""##{@jqgrid_id}"",
+                        {formclass:""#{@jqgrid_id}_filterformclass"",buttonclass:""#{@jqgrid_id}_filterbuttonclass"",enableSearch:true,searchButton:""Excel Export"",autosearch:true,url:""/screen/disp?jqgrid_id=#{@jqgrid_id}"",
+                        filterModel:[{label:"" #{proc_blkgetpobj(""max_output_cnt"",""fix_char"")}"", name: ""maxcount"", stype: ""select"", sopt:{value:""1000:1000 ;10000:10000;100000:100000 ""}}]}); #{xlsexport}%
+						",,,"undefined","export",
+7,2099/12/31,"undefined",0,"127.0.0.1",,2015/05/08 21:22:22.862,70,,"import from xlsx","ui-icon-arrowthickstop-1-s","%Q%document.location = ""/importfmxlsx/index?jqgrid_id="" + id%
+###export とは違い別画面になる。",,,"undefined","import",
+8,2099/12/31,"test",0,"127.0.0.1",,2015/10/12 20:34:39.174,75,,"pdf","ui-icon-print","        pdflists = ActiveRecord::Base.connection.select_all(""select * from r_reports where pobject_code_scr = '#{@screen_code}' and REPORT_EXPIREDATE >sysdate"")                
+        if pdflists.size > 0	
+            pdfvalue = """"		
+            pdflists.each do |i|
+	          pdfvalue << i[""pobject_code_rep""] + "":"" + proc_blkgetpobj(i[""pobject_code_rep""],""report"") + "";""             
+            end
+            if pdfvalue.size > 0
+                pdfdata = %Q%function nWinPdf#{@jqgrid_id}() {var pdata = jQuery(""##{@jqgrid_id}"").getPostData(); 
+                        var strparam;jQuery.each(pdata, function(key, value) {strparam = strparam + key + ""="" + value + ""&"" }); strparam = strparam + ""jqgrid_id=#{@jqgrid_id}"";
+                        var url = ""/pdf/index?""+strparam;window.open(url);};
+                        jQuery(function() {jQuery("".#{@jqgrid_id}_filterbuttonclass"").click(nWinPdf#{@jqgrid_id});});
+						jQuery("".#{@jqgrid_id}_filterformclass"").remove();jQuery(""##{@jqgrid_id}_cust_buttonA_id"").filterGrid(""##{@jqgrid_id}"",
+                        {formclass:""#{@jqgrid_id}_filterformclass"",buttonclass:""#{@jqgrid_id}_filterbuttonclass"",enableSearch:true,searchButton:""pdf"",autosearch:true,url:""/screen/preview_prnt?jqgrid_id=#{@jqgrid_id}"",
+                        filterModel:[{label:"".  pdf list"", name: ""pdflist"", stype: ""select"", sopt:{value:""#{pdfvalue}""}},
+                        {label:"" #{proc_blkgetpobj(""first_printing ?"",""fix_char"")}"", name: ""initprnt"", stype: ""select"", sopt:{value:""1:yes ;9:all ""}},
+                        {label:"" #{proc_blkgetpobj(""editing_after_printing ?"",""fix_char"")}"", name: ""afterprnt"", stype: ""select"", sopt:{value:""1:yes ;9:all ""}},
+                        {label:"" #{proc_blkgetpobj(""You_update_records?"",""fix_char"")}"", name: ""whoupdate"", stype: ""select"",sopt:{value:""1:yes ;9:all ""}}]}); #{pdfdata}%
+			else
+		        %Q|jQuery(""##{@jqgrid_id}_cust_buttonA_id b"").remove();jQuery(""##{@jqgrid_id}_cust_buttonA_id"").append(""<b>screen has no pdf_list<\/b>"").toggle();| 
+            end	
+        else
+		    %Q|jQuery(""##{@jqgrid_id}_cust_buttonA_id b"").remove();jQuery(""##{@jqgrid_id}_cust_buttonA_id"").append(""<b>screen has no pdf_list<\/b>"").toggle();|
+		end
+		",,,"undefined","pdf",
+21,2099/12/31,"undefined",0,"127.0.0.1",2013/09/14 2:24:43,2016/03/28 21:41:22,90,,"ganttchart","ui-icon-calculator","%Q%
+jQuery(""[name='appear_by_insert']"").hide();
+if(jQuery(""#ganttcharthtml"").is("":hidden"")){
+  ge.init(jQuery(""#workSpace""));
+  var workSpace = jQuery(""#workSpace""); 
+  workSpace.css({width:jQuery(window).width() - 10,heigt:jQuery(window).height() - 250});
+}
+ var gsr = jQuery(""##{@screen_code}"").getGridParam(""selrow"");
+ if(gsr){jQuery.getJSON(""/gantt/index"",{id:gsr,screen_code:""#{@screen_code}"",authenticity_token:p_authenticity_token},function(ganttdata){ jQuery(""#ganttcharthtml"").show(); ge.loadProject( ganttdata);})} else {alert(""Please select a row""); }         return false;
+%
+",,,"undefined","ganntchart",
+102,2099/12/31,,0,,2013/11/10 2:32:05,2013/11/26 20:26:23,100,,"inLine Edit","ui-icon-disk",,"selrow","inlineedit",,"inlineedit",
+104,2099/12/31,,0,,2013/11/10 13:59:16,2013/11/10 13:59:50,110,,"inLine Add","ui-icon-plusthick",,"selrow","inlineadd",,"inlineadd",
+121,2099/12/31,"pobject_code = ""bkltables"" and pobjecttype=""tbl""
+でしか使用しないこと。",0,"127.0.0.1",2013/11/26 22:55:15,2017/06/25 18:22:07,220,,"create tbl,view,screen","ui-icon-script","%Q%
+ var gsr = jQuery(""##{@screen_code}"").getGridParam(""selrow"");     if (gsr) {  document.location = ""/crttblviewscreen/index?jqgrid_code=#{@screen_code};jqgrid_id="" + gsr;  } else {            alert(""Please select a row"");          }         return false;
+%",,,"undefined","crt_tbl_view_screen",
+141,2099/12/31,"pobject_code = ""bkltables"" and pobjecttype=""tbl""でしか使用しないこと。",0,"127.0.0.1",2013/12/09 19:49:44,2015/05/08 21:32:03.221,210,,"import_fields_from_oracle","ui-icon-transferthick-e-w","%Q% 
+var gsr = jQuery(""#r_blktbs"").getGridParam(""selrow"");     if (gsr) {  document.location = ""/importfieldsfromoracle/index?jqgrid_id="" + gsr;  } else {            alert(""Please select a row"");          }         return false; 
+%",,,"undefined","imp_fields_from_ora",
+161,2099/12/31,"undefined",0,"127.0.0.1",2014/04/13 0:36:28,2015/05/13 22:02:47.465,230,,"create ext_view,screen","ui-icon-contact","%Q% 
+var gsr = jQuery(""#r_screens"").getGridParam(""selrow"");     if (gsr) {  document.location = ""/crttblviewscreen/index?jqgrid_id="" + gsr;  } else {            alert(""Please select a row"");          }         return false; 
+%",,"undefined","undefined","crt_ext_view_screen",
+181,2099/12/31,"undefined",0,"127.0.0.1",2014/11/03 22:29:48.109,2015/05/08 21:29:32.539,300,,"create_pdf","ui-icon-script ","%Q%document.location = ""/crtpdfscript/index?jqgrid_id="" + id%",,,"undefined","prawn",
+201,2099/12/31,"undefined",0,"127.0.0.1",2014/12/20 22:22:30.437,2015/05/17 13:02:13.165,500,,"batchrun","ui-icon-gear","%Q%jQuery.getJSON(""/screen/batchrun"",
+                                          {""jqgrid_id"":""#{@screen_code}""},function(data){
+											jQuery("".notice"").append(data.msg)}
+																				)
+%",,"undefined","undefined","batchrun",

@@ -1,0 +1,15 @@
+current directory: /mnt/c/ubuntu/RRRp/ruby243/rails516/v0915/vendor/bundle/ruby/2.4.0/gems/bindex-0.5.0/ext/bindex
+/home/ky/.rbenv/versions/2.4.3/bin/ruby -r ./siteconf20180930-14625-npa4cx.rb extconf.rb
+creating Makefile
+
+current directory: /mnt/c/ubuntu/RRRp/ruby243/rails516/v0915/vendor/bundle/ruby/2.4.0/gems/bindex-0.5.0/ext/bindex
+make "DESTDIR=" clean
+
+current directory: /mnt/c/ubuntu/RRRp/ruby243/rails516/v0915/vendor/bundle/ruby/2.4.0/gems/bindex-0.5.0/ext/bindex
+make "DESTDIR="
+compiling cruby.c
+linking shared-object bindex/cruby.so
+
+current directory: /mnt/c/ubuntu/RRRp/ruby243/rails516/v0915/vendor/bundle/ruby/2.4.0/gems/bindex-0.5.0/ext/bindex
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 cruby.so ./.gem.20180930-14625-1qsd9i9/bindex

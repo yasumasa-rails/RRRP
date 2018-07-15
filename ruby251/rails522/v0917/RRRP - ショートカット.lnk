@@ -1,0 +1,2 @@
+web: rails server -p 3000  # rails 起動($PORTは5000がデフォ)
+worker: ./bin/webpack-dev-server      # バッチ起動
