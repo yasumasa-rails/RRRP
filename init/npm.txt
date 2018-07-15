@@ -1,0 +1,81 @@
+Railsからnpmを使ってフロントエンドのライブラリをインストールして使うまで。
+
+asset pipelineフレンドリーで使うための方法で、browserifyとかwebpackとか言いたい人は別途検討したほうがいいかもしれない（そうでないかもしれない）。
+package.jsonを作る
+
+railsプロジェクト以下にpackage.jsonを作りましょう。
+package.json
+
+{
+  "name": "project name",
+  "version": "1.0.0",
+  "private": true,
+}
+
+ポイントは"private":trueを書いておくことです。
+これを書かないと、ライセンスやオーナーを書けと怒られます。
+
+オープンソースのプロジェクトでもない限り、ライセンスもオーナーも書く必要なんてないですよね？
+ライブラリのインストール
+
+コマンドラインから通常、npmを使う感覚でインストールしてあげればいい。
+
+npm install --save [library]
+
+--saveとオプションをつけておくと、インストール後にpackage.jsonを自動で更新してくれる。
+
+インストールパッケージはpackage.jsonに書いておいて、npm installするだけでもいい。
+Railsの設定
+
+Bowerを使う時とおなじ感覚でconfig/initializers/assets.rbを編集してあげれば良い。
+config/initializers/assets.rb
+
+Rails.application.config.assets.paths << Rails.root.join('node_modules')
+
+assetの書き方
+
+node_modules以下のパスを見ながらrequireしてあげる。
+
+例えば、jqueryをインストールしたなら、node_modules以下は下記のようになっている（はず）。
+
+node_modules/
+  jquery/
+    dist/
+      jquery.js
+      jquery.min.js
+      jquery.min.map.js
+    src/
+     .
+     .
+     .
+
+使いたいのはjquery/dist/jquery.jsなので、このパスをapp/assets/javascriptsの中のjsファイルでrequireする。
+app/assets/javascripts/example.js
+
+//= require jquery/dist/jquery
+
+デプロイ
+
+デプロイにcapistranoを利用していない場合は、自前でrakeタスクとか書きましょう。
+
+capistranoを利用している場合は、capistrano-npmというgemがあるので利用するといいかも。
+
+細かい設定などを考えないならgemをインストールしてCapfieleでrequireしてあげるだけで、
+デプロイ時にnpm installしてくれるようになる。
+Gemfile
+
+  group :development # 環境は適宜変えるんだよ
++   gem 'capistrano-npm'
+  end
+
+Capfile
+
++ require 'capistrano-npm'
+
+    ただし、そのまま使うと、releaseディレクトリ直下にnpm installされるんで本格的に使うには色々いじってあげないといけません。
+
+npmに登録されるライブラリは新しいなんて、噂に聞くけどフロントエンドのものに限定すれば、そんなこともないように見える。
+
+bowerかnpmか？というところの判断は、スポンサーの存在で決めるのが良いのかなぁと考えています。
+
+スポンサーという点においては、bowerが個人の寄付で成立しているのに大して、npmはnpm.incという企業がスポンサーになっているのでnpmのほうが有利であるように感じる。

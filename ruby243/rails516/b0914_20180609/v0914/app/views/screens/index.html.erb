@@ -1,0 +1,18 @@
+<%= javascript_pack_tag 'menu_react' %>
+<h3>Menus</h3>
+<div id="menu" ></div>
+<script >
+    function showMenuNames() {
+        var menu_names = <%=raw @cate_list.to_json  %>;
+        return menu_names;
+    }
+</script>
+<style>
+	p {
+    display: block;
+    -webkit-margin-before: 0.25em;
+    -webkit-margin-after: 0.25em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}  //chromのみ有効
+</style>
