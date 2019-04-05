@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+﻿<<<<<<< HEAD
 ﻿PostgreSQLのインストール
 $ sudo apt-get update
 
@@ -32,7 +32,7 @@ postgres=# \l
 Railの設定
 アプリの作成
 
-$ rails new myapp -d postgresql
+$ rails new myapp -d postgresql --api
 config/database.ymlの設定
 
 default: &default
@@ -166,3 +166,32 @@ postgres=# \copy tablename(column1,column2,・・・・) from filename CSV HEADE
 postgres=# \i filename.sql
 ファイルから入力を読み取り、実行する。
 >>>>>>> 843829d17aa56bb9d40c70f15ccfde4646042b07
+
+
+
+cd  #{rails-directory}
+create-react-app client
+
+package
+
+
+corsb.rb
+# Be sure to restart your server when you modify this file.
+
+# Avoid CORS issues when API is called from the frontend app.
+# Handle Cross-Origin Resource Sharing (CORS) in order to accept cross-origin AJAX requests.
+
+# Read more: https://github.com/cyu/rack-cors
+##RailsとReactを使ってアプリを作っているのですが、
+##ローカル環境で別々のサーバを立ててaxiosでRailsのAPIにアクセスしたところレスポンスのheadersが空でした。
+## https://qiita.com/owll/items/a6e5ec7f0cdf89365e8c
+ Rails.application.config.middleware.insert_before 0, Rack::Cors do
+   allow do
+     origins 'localhost:3000'
+
+     resource '*',
+       headers: :any,
+       expose: ['access-token', 'uid','client','expiry'], ## 追加
+       methods: [:get, :post, :put, :patch, :delete, :options, :head]
+   end
+ end

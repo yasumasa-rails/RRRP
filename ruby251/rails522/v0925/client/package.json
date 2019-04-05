@@ -1,25 +1,94 @@
 {
-  "name": "client",
-  "version": "0.1.0",
+  "name": "formik-saga",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-scripts": "2.1.8"
+    "@material-ui/core": "^3.9.2",
+    "axios": "^0.18.0",
+    "connected-react-router": "^6.0.0",
+    "formik": "^1.5.1",
+    "history": "^4.7.2",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0",
+    "react-redux": "^6.0.0",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
+    "react-router-redux": "^4.0.8",
+    "react-tabs": "^3.0.0",
+    "redux": "^3.7.2",
+    "redux-actions": "^2.2.1",
+    "redux-data-structures": "^0.1.6",
+    "redux-persist": "^5.10.0",
+    "redux-saga": "0.16.0",
+    "styled-components": "3.1.4",
+    "yup": "^0.24.0"
+  },
+  "devDependencies": {
+    "react-scripts": "1.1.0",
+    "redux-devtools-extension": "^2.13.2",
+    "serve": "^6.4.9",
+    "standard": "^10.0.3"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "NODE_PATH=src/ react-scripts start",
+    "now-start": "serve -s ./build",
+    "build": "NODE_PATH=src/ react-scripts build",
+    "test": "NODE_PATH=src/ react-scripts test --env=jsdom",
+    "coverage": "yarn test -- --coverage",
+    "lint": "standard --fix"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!node_modules/",
+      "!src/state/store.js",
+      "!src/state/sagas/*",
+      "!src/index.js"
+    ]
   },
   "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+    "parser": "babel-eslint",
+    "extends": "airbnb",
+    "globals": {
+      "localStorage": true,
+      "document": true,
+      "fetch": true
+    },
+    "rules": {
+      "semi": [
+        "error",
+        "never"
+      ],
+      "space-before-function-paren": [
+        "error",
+        "always"
+      ],
+      "jsx-quotes": [
+        "error",
+        "prefer-double"
+      ],
+      "no-unused-vars": [
+        "error",
+        {
+          "varsIgnorePattern": "React"
+        }
+      ],
+      "no-shadow": 0,
+      "react/jsx-uses-vars": [
+        2
+      ],
+      "react/require-default-props": [
+        0
+      ],
+      "react/jsx-filename-extension": [
+        1,
+        {
+          "extensions": [
+            ".js",
+            ".jsx"
+          ]
+        }
+      ]
+    }
+  }
 }
