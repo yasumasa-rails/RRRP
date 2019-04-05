@@ -1,0 +1,554 @@
+目次 [閉じる]
+
+1 ベースを作る
+2 devise token auth
+3 initializeの設定
+4 postmanを使って、試してみる
+4.1 登録できるか確認する
+4.2 ログイン
+4.3 パスワードの変更
+4.4 ユーザー情報の変更
+5 パスワードを忘れた際の変更処理
+6 発展編
+
+1.ベースを作る
+まずはrails new します
+
+$ rails new devise_token_auth --api -d postgresql
+
+update Gemfile
+
+source 'https://rubygems.org'
+
+git_source(:github) do |repo_name|
+  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+  "https://github.com/#{repo_name}.git"
+end
+
+#
+
+# トークンベースの認証を行うためのgem
+gem 'devise'
+gem 'devise_token_auth'
+gem 'omniauth'
+
+# jsonを扱うためのgem
+gem 'jbuilder'
+
+# クロスドメイン対策のgem
+gem 'rack-cors'
+
+group :development, :test do
+  gem 'byebug', platform: :mri
+end
+
+group :development do
+  gem 'listen', '~> 3.0.5'
+  gem 'spring'
+  gem 'spring-watcher-listen', '~> 2.0.0'
+end
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+1
+32
+33
+34
+source 'https://rubygems.org'
+ 
+git_source(:github) do |repo_name|
+  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+  "https://github.com/#{repo_name}.git"
+end
+ 
+bundle installします
+$ bundle install
+
+
+devise token auth
+devise token auth をインストールします
+
+$ rails g devise_token_auth:install User auth
+1
+◎rootes.rbには　　　devise...for Userを含めないこと
+　→この段階で含んでいると'method_missing': undefined method 'devise' for User (call 'User.connection' 
+    to establish a connection):Class (NoMethodError)が発生する。
+
+データベース作成
+$ rake db:create
+コマンドを走らせるとマイグレーションファイルが生成されるので、それを編集します
+今回は、ユーザーが新規に登録する際に、
+
+企業名
+メールアドレス
+名前
+を入力してもらえるようにカラムを追加しておきます
+
+twitterやfacebookでログインする機能は今回は触れないのでコメントします
+メールを送信して登録する、といった機能もつけることはしないので、
+モデルは以下のように編集してください
+
+class User < ActiveRecord::Base
+  # Include default devise modules.
+  devise :database_authenticatable, :registerable,
+          :recoverable, :rememberable, :trackable, :validatable
+          :confirmable, :omniauthable
+  include DeviseTokenAuth::Concerns::User
+end
+1
+2
+6
+7
+次にカラムを追加するために、devise token authのマイグレーションファイルを修正します
+
+class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[5.0]
+  def change
+    create_table(:users) do |t|
+      ## Required
+      t.string :provider, :null => false, :default => "email"
+      t.string :uid, :null => false, :default => ""
+
+      ## Database authenticatable
+      t.string :encrypted_password, :null => false, :default => ""
+
+      ## Recoverable
+      t.string   :reset_password_token
+      t.datetime :reset_password_sent_at
+
+      ## Rememberable
+      t.datetime :remember_created_at
+
+      ## Trackable
+      t.integer  :sign_in_count, :default => 0, :null => false
+      t.datetime :current_sign_in_at
+      t.datetime :last_sign_in_at
+      t.string   :current_sign_in_ip
+      t.string   :last_sign_in_ip
+
+
+
+      ## コメント！
+
+      ## Confirmable
+       t.string   :confirmation_token
+       t.datetime :confirmed_at
+       t.datetime :confirmation_sent_at
+       t.string   :unconfirmed_email # Only if using reconfirmable
+
+      ## Lockable
+      # t.integer  :failed_attempts, :default => 0, :null => false # Only if lock strategy is :failed_attempts
+      # t.string   :unlock_token # Only if unlock strategy is :email or :both
+      # t.datetime :locked_at
+
+
+      ##ここも修正！
+
+      ## User Info
+      ##t.string :company
+      t.string :email
+      t.string :name
+
+      ## Tokens
+      t.text :tokens
+
+      t.timestamps
+    end
+
+    add_index :users, :email,                unique: true
+    add_index :users, [:uid, :provider],     unique: true
+    add_index :users, :reset_password_token, unique: true
+
+    ## コメント！
+
+    # add_index :users, :confirmation_token,   unique: true
+    # add_index :users, :unlock_token,       unique: true
+  end
+end
+
+
+21
+$ rake db:migrate
+ 
+
+このままだとデフォルトのコントローラーが使用されてしまうので、オーバーライドして、
+
+##:company(企業名)
+##を登録できるように修正します
+
+controllersディレクトリに api ディレクトリを作成して、さらにauthディレクトリの中にregistrations_controllerを作成します
+
+$ rails g controller api/auth/registrations
+1
+$ rails g controller api/auth/registrations
+内容は以下のようにします
+
+module Api
+  module Auth
+    class RegistrationsController < DeviseTokenAuth::RegistrationsController
+ 
+      private
+      # :company( 企業名 )を追加できるようにpravateメソッドに修正を加える
+      def sign_up_params
+        params.permit(:name, :email, :company, :password, :password_confirmation)
+      end
+ 
+      def account_update_params
+        params.permit(:name, :email, :company)
+      end
+ 
+    end
+  end
+end
+
+
+$ rails g controller api/auth/sessions
+内容は以下のようにします
+
+
+
+
+
+ルートを修正して、デフォルトのコントローラーではなく、継承したコントローラーを使えるようにします
+
+
+$ rake routes
+ 
+  Prefix Verb   URI Pattern                    Controller#Action
+        new_user_session GET    /auth/sign_in(.:format)        devise_token_auth/sessions#new
+            user_session POST   /auth/sign_in(.:format)        devise_token_auth/sessions#create
+    destroy_user_session DELETE /auth/sign_out(.:format)       devise_token_auth/sessions#destroy
+       new_user_password GET    /auth/password/new(.:format)   devise_token_auth/passwords#new
+      edit_user_password GET    /auth/password/edit(.:format)  devise_token_auth/passwords#edit
+           user_password PATCH  /auth/password(.:format)       devise_token_auth/passwords#update
+                         PUT    /auth/password(.:format)       devise_token_auth/passwords#update
+                         POST   /auth/password(.:format)       devise_token_auth/passwords#create
+cancel_user_registration GET    /auth/cancel(.:format)         devise_token_auth/registrations#cancel
+   new_user_registration GET    /auth/sign_up(.:format)        devise_token_auth/registrations#new
+  edit_user_registration GET    /auth/edit(.:format)           devise_token_auth/registrations#edit
+       user_registration PATCH  /auth(.:format)                devise_token_auth/registrations#update
+                         PUT    /auth(.:format)                devise_token_auth/registrations#update
+                         DELETE /auth(.:format)                devise_token_auth/registrations#destroy
+                         POST   /auth(.:format)                devise_token_auth/registrations#create
+     auth_validate_token GET    /auth/validate_token(.:format) devise_token_auth/token_validations#validate_token
+
+Rails.application.routes.draw do
+
+  namespace :api do
+    mount_devise_token_auth_for 'User', at: 'auth', controllers: {
+        registrations: 'api/auth/registrations'
+    }
+  end
+
+end
+1
+2
+rake routesして、 api/auth/registrations# **** が使われていたらOKです！
+
+
+initializeの設定
+デフォルトだと、毎回トークンを変更しないと認証しないように設定されていますので、lifespanを１ヶ月有効にします
+
+DeviseTokenAuth.setup do |config|
+
+  # config.change_headers_on_each_request を true にしていると、
+  # リクエストごとに token を新しくする必要がある という設定になってしまう
+  # 毎回トークンを変更するのは手間なので false にしておく
+  # config.token_lifspan はトークンの有効期限
+  # セキュリティを重視するなら短めの設定にするなど、ここは個人の判断で
+  
+  config.change_headers_on_each_request = false
+  config.token_lifespan = 1.month
+
+  config.headers_names = {:'access-token' => 'access-token',
+                          :'client' => 'client',
+                          :'expiry' => 'expiry',
+                          :'uid' => 'uid',
+                          :'token-type' => 'token-type' }
+end
+1
+
+postmanを使って、試してみる
+postmanはjsonベースでルートやコントローラーのレスポンスを確認できる便利なツールです
+
+Postman
+
+登録できるか確認する
+localhost:3000/api/auth に以下の内容でPOSTします
+
+{
+    "company": "株式会社せんべい",
+    "name": "せんべい太郎",
+    "email": "admin@example.com",
+    "password": "11111111"
+}
+1
+2
+6
+{
+    "company": "株式会社せんべい",
+    "name": "せんべい太郎",
+    "email": "admin@example.com",
+    "password": "11111111"
+}
+content-typeでapplication/jsonを指定しないとエラーが出てしまうので、指定します
+
+
+
+エラーなどが起きなければこんな感じで返ってきます
+
+ログイン
+ログインは
+localhost:3000/api/auth/sign_inにPOSTします
+ログインもcontent-typeを指定してやります
+
+ちなみに、ログインして返ってくる情報がとても重要なのでそれは後述します
+
+{
+    "email": "admin@example.com",
+    "password": "11111111",
+    "password_confirmation": "11111111"
+}
+1
+2
+3
+4
+5
+{
+    "email": "admin@example.com",
+    "password": "11111111",
+    "password_confirmation": "11111111"
+}
+
+
+
+
+
+
+responseのheaderの確認( ログインして返って来る情報 )
+deviseなどの認証をするとなると、ほとんどの場合がログイン制限をかけたい、コンテンツを制限したいといった理由で使用する事が多いと思います
+
+ログインして返ってきた
+
+access-token ->
+FqK_4zPogpbaAgc1rEZaVA
+
+client ->
+CP7XfS16PGFjk_d7P-87gA
+
+uid ->
+admin@example.com
+1
+2
+3
+4
+5
+6
+7
+8
+access-token ->
+FqK_4zPogpbaAgc1rEZaVA
+ 
+client ->
+CP7XfS16PGFjk_d7P-87gA
+ 
+uid ->
+admin@example.com
+この３つをheaderに追加してリクエストする事でdeviseと同じように制限をかけたりパスワードの変更等に使用できます
+
+headersの部分を見ると詳しい内容を確認できます↓
+
+
+パスワードの変更
+パスワードの変更方法は、ログインして返ってきたこの３つをheaderに付与することで可能になります
+※それぞれの値が異なりますが、ログインするたびに変わるものなので気にしないでください
+
+access-token ->
+FqK_4zPogpbaAgc1rEZaVA
+
+client ->
+CP7XfS16PGFjk_d7P-87gA
+
+uid ->
+admin@example.com
+1
+2
+3
+4
+5
+6
+7
+8
+access-token ->
+FqK_4zPogpbaAgc1rEZaVA
+ 
+client ->
+CP7XfS16PGFjk_d7P-87gA
+ 
+uid ->
+admin@example.com
+localhost:3000/api/auth/password に PUTします
+送信する値は新しいパスワードと確認用の新しいパスワードです
+
+
+
+
+問題なく変更されれば、以下の様なレスポンスが返ってきます
+
+
+ユーザー情報の変更
+ユーザー情報もパスワードの変更と同じで、headerにログインした際に発行された情報を付与します
+
+access-token ->
+FqK_4zPogpbaAgc1rEZaVA
+
+client ->
+CP7XfS16PGFjk_d7P-87gA
+
+uid　->
+admin@example.com
+1
+2
+3
+4
+5
+6
+7
+8
+access-token ->
+FqK_4zPogpbaAgc1rEZaVA
+ 
+client ->
+CP7XfS16PGFjk_d7P-87gA
+ 
+uid　->
+admin@example.com
+名前や企業名などを
+localhost:3000/api/auth に PUTして変更します
+
+
+
+
+
+
+
+うまくいってればこんな感じになってると思います！
+
+パスワードを忘れた際の変更処理
+Webサービスを利用していると、パスワードを忘れてしまったりすることがありますがdevise token authはとても簡単に実装することができます
+
+変更するための処理は localhost:3000/api/auth/password に postします
+※メール送信の設定をしていないとこの機能は使えないので、まずはメールを送信することができる様にしてから進んでください
+
+# 送るデータは emailと メールに記載される redirect_url の2つです
+# redirect_urlは送信されたメールのリンクをクリックした際に飛ばされるリンクを指定します
+# 通常であれば、password変更ページに飛ばすのがいいでしょう
+{
+	"email":"admin@example.com",
+	"redirect_url": "http://localhost:3000"
+}
+1
+2
+3
+4
+5
+6
+7
+# 送るデータは emailと メールに記載される redirect_url の2つです
+# redirect_urlは送信されたメールのリンクをクリックした際に飛ばされるリンクを指定します
+# 通常であれば、password変更ページに飛ばすのがいいでしょう
+{
+	"email":"admin@example.com",
+	"redirect_url": "http://localhost:3000"
+}
+上記をPOSTすると登録してあるアドレスにメールが送信されるので、受信したメールの中に記載されているリンクをクリックします
+
+Hello world admin@example.com
+
+Someone has requested a link to change your password. You can do this through the link below.
+
+Change my password # ここをクリック
+
+If you didn't request this, please ignore this email.
+
+Your password won't change until you access the link above and create a new one.
+1
+2
+3
+4
+5
+6
+7
+8
+9
+Hello world admin@example.com
+ 
+Someone has requested a link to change your password. You can do this through the link below.
+ 
+Change my password # ここをクリック
+ 
+If you didn't request this, please ignore this email.
+ 
+Your password won't change until you access the link above and create a new one.
+すると、 redirect_url のパラメーターで指定したリンクに飛ばされ、リンクにパスワード変更に必要である
+
+access-token
+client
+uid
+が付与されています
+
+※ここから先はパスワード変更と全く同じです！。パスワードをリセットするためにはaccess-token、client、uidの３つが必要ですが、パスワードを忘れてしまってはどうしようもありません。なので、ユーザーが登録した情報(email)と同じデータがあればそのemailにredirect_urlを付与して送信することでユーザーは情報を変更するために必要な３つのデータが生成され再び修正できるようになる、というロジックです。ただ、セキュリティなどを考えると、emailだけではちょっと甘い感じがするので「秘密の質問」や「親の旧姓」といった項目をパスしたらemailを飛ばすといったクッションを入れてやるとなおいいですね
+
+ 
+
+
+
+# リンクにはこんな感じで長い文字列が並んでいます
+http://localhost:3000/?client_id=dthD_VfdGCTE49RRPeagVg&config=default&expiry=1498908383&reset_password=true&token=-CZlEHQHUczqobr4kkRWTw&uid=admin%40example.com
+
+
+access-token ->
+-CZlEHQHUczqobr4kkRWTw
+
+client -> 
+dthD_VfdGCTE49RRPeagVg
+
+uid ->
+自分のアドレス
+
+# をパスワード変更でPUTする
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+# リンクにはこんな感じで長い文字列が並んでいます
+http://localhost:3000/?client_id=dthD_VfdGCTE49RRPeagVg&config=default&expiry=1498908383&reset_password=true&token=-CZlEHQHUczqobr4kkRWTw&uid=admin%40example.com
+ 
+ 
+access-token ->
+-CZlEHQHUczqobr4kkRWTw
+ 
+client -> 
+dthD_VfdGCTE49RRPeagVg
+ 
+uid ->
+自分のアドレス
+ 
+# をパスワード変更でPUTする
+リンクから得られる情報を使ってパスワードを変更してみます
+
+
+
+
+これで無事に変更できます！
+
+config/initializers/devise_token_auth.rb
+  # 以下を追加
+  config.default_confirm_success_url = "confirmed"
