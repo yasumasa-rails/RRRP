@@ -8,5 +8,5 @@ Rails.application.routes.draw do
     resources :screens, only: [:show, :update, :create, :destroy]
     resources :menu
   end
-  ###
+  get '/confirm_success' => 'home#confirm_success'
 end

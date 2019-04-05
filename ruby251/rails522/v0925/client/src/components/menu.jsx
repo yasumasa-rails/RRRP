@@ -35,7 +35,9 @@ class Menu extends React.Component {
                 <Tabs forceRenderTabPanel>
                 <TabList>
                   {menuListData.map((val,index) => 
-                    grp_name===val.grp_name&&<Tab key={index}> {val.scr_name}</Tab>)}
+                    grp_name===val.grp_name&&
+                    <Tab key={index}><Link to={"/screen?"+val.scr_name} color="primary" >{val.scr_name}</Link> 
+                    </Tab>)}
                 </TabList>
                   {menuListData.map((val,index) => 
                     grp_name===val.grp_name&&
