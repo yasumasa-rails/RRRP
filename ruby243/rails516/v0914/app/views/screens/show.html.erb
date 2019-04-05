@@ -1,0 +1,8 @@
+
+<%= react_component('BootstrapTableinit', 
+                        {sid:@prototype[:screen_prop][:sid],
+                        totalCnt: 0, page:0,
+                         sizePerPage: @prototype[:screen_prop][:sizePerPage],
+                        sizePerPageList:  @prototype[:screen_prop][:sizePerPageList],
+                        screenName:  @prototype[:screen_prop][:screen_name],
+                        datashowfields:@prototype[:show_columns]},prerender: true) %>

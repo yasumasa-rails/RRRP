@@ -25,9 +25,9 @@ CREATE TABLE Persons
   ,UsrGrps_id numeric(38)
   ,Sects_id numeric(38)
   ,scrlvs_id numeric(38)
+  ,Email VARCHAR(50)
   ,contents VARCHAR(4000)
   ,Remark VARCHAR(4000)
-  ,email VARCHAR(40)
   ,Expiredate date
   ,Persons_id_Upd numeric(38)
   ,Update_IP varchar(40)
@@ -46,73 +46,6 @@ create sequence Persons_seq
  from persons person
 
  ;
-CREATE OR REPLACE VIEW R_USRGRPS (ID, USRGRP_ID, USRGRP_REMARK, USRGRP_EXPIREDATE, USRGRP_UPDATE_IP, USRGRP_CREATED_AT, USRGRP_UPDATED_AT, USRGRP_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, USRGRP_CODE, USRGRP_NAME, USRGRP_CONTENTS) AS 
-  select usrgrp.id id,usrgrp.id usrgrp_id ,usrgrp.remark usrgrp_remark ,usrgrp.expiredate usrgrp_expiredate ,
-  usrgrp.update_ip usrgrp_update_ip ,usrgrp.created_at usrgrp_created_at ,usrgrp.updated_at usrgrp_updated_at ,
-  usrgrp.persons_id_upd usrgrp_person_id_upd , person_upd.person_id_upd person_id_upd,
-   person_upd.person_code_upd person_code_upd, person_upd.person_name_upd person_name_upd,
-  usrgrp.code usrgrp_code , usrgrp.name usrgrp_name ,usrgrp.contents usrgrp_contents 
- from usrgrps usrgrp ,upd_persons  person_upd
- where  person_upd.id = usrgrp.persons_id_upd
-;
-
-
-
- CREATE OR REPLACE VIEW R_PERSONS (ID, PERSON_ID, PERSON_REMARK, PERSON_EXPIREDATE, PERSON_UPDATE_IP, PERSON_CREATED_AT, PERSON_UPDATED_AT, PERSON_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, PERSON_CODE, PERSON_NAME, PERSON_SECT_ID, SECT_ID, SECT_REMARK, SECT_LOCA_ID, LOCA_CODE_SECT, LOCA_ABBR_SECT, LOCA_PRFCT_SECT, LOCA_TEL_SECT, LOCA_COUNTRY_SECT, LOCA_NAME_SECT, LOCA_REMARK_SECT, LOCA_MAIL_SECT, LOCA_ADDR1_SECT, LOCA_ZIP_SECT, LOCA_FAX_SECT, LOCA_ADDR2_SECT, LOCA_ID_SECT, PERSON_EMAIL, PERSON_SCRLV_ID, SCRLV_LEVEL1, SCRLV_ID, SCRLV_REMARK, SCRLV_CODE, PERSON_USRGRP_ID, USRGRP_ID, USRGRP_REMARK, USRGRP_CODE, USRGRP_NAME, USRGRP_CONTENTS) AS 
-  select
-  person.id id
-  , person.id person_id
-  , person.remark person_remark
-  , person.expiredate person_expiredate
-  , person.update_ip person_update_ip
-  , person.created_at person_created_at
-  , person.updated_at person_updated_at
-  , person.persons_id_upd person_person_id_upd
-  , person_upd.person_id_upd updperson_id_upd
-  , person_upd.person_code_upd updperson_code_upd
-  , person_upd.person_name_upd updperson_name_upd
-  , person.code person_code
-  , person.name person_name
-  , person.sects_id person_sect_id
-  , sect.sect_id sect_id
-  , sect.sect_remark sect_remark
-  , sect.sect_loca_id_sect sect_loca_id
-  , sect.loca_code_sect loca_code_sect
-  , sect.loca_abbr_sect loca_abbr_sect
-  , sect.loca_prfct_sect loca_prfct_sect
-  , sect.loca_tel_sect loca_tel_sect
-  , sect.loca_country_sect loca_country_sect
-  , sect.loca_name_sect loca_name_sect
-  , sect.loca_remark_sect loca_remark_sect
-  , sect.loca_mail_sect loca_mail_sect
-  , sect.loca_addr1_sect loca_addr1_sect
-  , sect.loca_zip_sect loca_zip_sect
-  , sect.loca_fax_sect loca_fax_sect
-  , sect.loca_addr2_sect loca_addr2_sect
-  , sect.SECT_loca_id_sect loca_id_sect
-  , person.email person_email
-  , person.scrlvs_id person_scrlv_id
-  , scrlv.scrlv_level1 scrlv_level1
-  , scrlv.scrlv_id scrlv_id
-  , scrlv.scrlv_remark scrlv_remark
-  , scrlv.scrlv_code scrlv_code
-  , person.usrgrps_id person_usrgrp_id
-  , usrgrp.usrgrp_id usrgrp_id
-  , usrgrp.usrgrp_remark usrgrp_remark
-  , usrgrp.usrgrp_code usrgrp_code
-  , usrgrp.usrgrp_name usrgrp_name
-  , usrgrp.usrgrp_contents usrgrp_contents 
-from
-  persons person
-  , upd_persons person_upd
-  , r_sects sect
-  , r_scrlvs scrlv
-  , r_usrgrps usrgrp
-where person.persons_id_upd = person_upd.ID
-and person.sects_id = sect.ID
-and person.SCRLVS_ID = scrlv.ID
-and person.USRGRPS_ID = usrgrp.ID
-;
 -----DROP TABLE Locas;
 CREATE TABLE Locas
   ( id numeric(38)
@@ -141,14 +74,6 @@ CREATE TABLE Locas
 ----drop sequence Locas_seq;
 create sequence Locas_seq
 ;
-
-CREATE OR REPLACE VIEW R_LOCAS (ID, LOCA_ID, LOCA_REMARK, LOCA_EXPIREDATE, LOCA_UPDATE_IP, LOCA_CREATED_AT, LOCA_UPDATED_AT, LOCA_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, LOCA_CODE, LOCA_NAME, LOCA_ABBR, LOCA_ZIP, LOCA_COUNTRY, LOCA_PRFCT, LOCA_ADDR1, LOCA_ADDR2, LOCA_TEL, LOCA_FAX, LOCA_MAIL) AS 
-  select loca.id id,loca.id loca_id ,loca.remark loca_remark ,loca.expiredate loca_expiredate ,loca.update_ip loca_update_ip ,loca.created_at loca_created_at ,loca.updated_at loca_updated_at ,loca.persons_id_upd loca_person_id_upd , person_upd.person_id_upd person_id_upd, person_upd.person_code_upd person_code_upd, person_upd.person_name_upd person_name_upd,loca.code loca_code ,loca.name loca_name ,loca.abbr loca_abbr ,loca.zip loca_zip ,loca.country loca_country ,loca.prfct loca_prfct ,loca.addr1 loca_addr1 ,loca.addr2 loca_addr2 ,loca.tel loca_tel ,loca.fax loca_fax ,loca.mail loca_mail 
- from locas loca ,upd_persons  person_upd
- where  person_upd.id = loca.persons_id_upd
-;
-
-
 ------------DROP TABLE Sects;
 CREATE TABLE Sects
   ( id numeric(38)
@@ -167,54 +92,6 @@ CREATE TABLE Sects
 create sequence Sects_seq
 ;
 
-
-
-CREATE OR REPLACE VIEW R_SECTS (ID, SECT_ID, SECT_LOCA_ID_SECT, LOCA_CODE_SECT, LOCA_NAME_SECT, LOCA_ABBR_SECT, LOCA_ZIP_SECT, LOCA_COUNTRY_SECT, LOCA_PRFCT_SECT, LOCA_ADDR1_SECT, LOCA_ADDR2_SECT, LOCA_TEL_SECT, LOCA_FAX_SECT, LOCA_MAIL_SECT, LOCA_REMARK_SECT, SECT_REMARK, SECT_EXPIREDATE, SECT_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, PERSON_EMAIL_UPD, SECT_UPDATE_IP, SECT_CREATED_AT, SECT_UPDATED_AT) AS 
-  select
-  sect.id
-  , sect.id sect_id
-  , loca_sect.loca_id loca_id_sect
-  , loca_sect.loca_code loca_code_sect
-  , loca_sect.loca_name loca_name_sect
-  , loca_sect.loca_abbr loca_abbr_sect
-  , loca_sect.loca_zip loca_zip_sect
-  , loca_sect.loca_country loca_country_sect
-  , loca_sect.loca_prfct loca_prfct_sect
-  , loca_sect.loca_addr1 loca_addr1_sect
-  , loca_sect.loca_addr2 loca_addr2_sect
-  , loca_sect.loca_tel loca_tel_sect
-  , loca_sect.loca_fax loca_fax_sect
-  , loca_sect.loca_mail loca_mail_sect
-  , loca_sect.loca_remark loca_remark_sect
-  , sect.remark sect_remark
-  , sect.expiredate sect_expiredate
-  , sect.persons_id_upd sect_person_id_upd
-  , person_upd.id person_id_upd
-  , person_upd.code person_code_upd
-  , person_upd.name person_name_upd
-  , person_upd.email person_email_upd
-  , sect.update_ip sect_update_ip
-  , sect.created_at sect_created_at
-  , sect.updated_at sect_updated_at 
-from
-  sects sect
-  , r_locas loca_sect
-  , persons person_upd 
-where
-  loca_sect.loca_id = sect.locas_id_sect 
-  and person_upd.id = sect.persons_id_upd
-  ;
----------------00022222222222222
-
-CREATE OR REPLACE VIEW R_SCRLVS (SCRLV_LEVEL1, ID, SCRLV_ID, SCRLV_REMARK, SCRLV_EXPIREDATE, SCRLV_UPDATE_IP, SCRLV_CREATED_AT, SCRLV_UPDATED_AT, SCRLV_PERSON_ID_UPD, UPDPERSON_ID_UPD, UPDPERSON_CODE_UPD, UPDPERSON_NAME_UPD, SCRLV_CODE) AS 
-  select scrlv.level1 scrlv_level1 ,scrlv.id id,scrlv.id scrlv_id ,scrlv.remark scrlv_remark ,
-  scrlv.expiredate scrlv_expiredate ,scrlv.update_ip scrlv_update_ip ,scrlv.created_at scrlv_created_at ,
-  scrlv.updated_at scrlv_updated_at ,scrlv.persons_id_upd scrlv_person_id_upd , person_upd.person_id_upd person_id_upd,
-   person_upd.person_code_upd person_code_upd, person_upd.person_name_upd person_name_upd,scrlv.code scrlv_code 
- from scrlvs scrlv ,upd_persons  person_upd
- where  person_upd.id = scrlv.persons_id_upd
-;
-
 CREATE TABLE SCRLVS
   (	CODE VARCHAR(50),
  CREATED_AT TIMESTAMP (6),
@@ -231,6 +108,96 @@ CREATE TABLE SCRLVS
  ;
 create sequence ScrLVS_seq
 ;
+
+CREATE OR REPLACE  VIEW R_SCRLVS (SCRLV_LEVEL1, ID, SCRLV_ID, SCRLV_CONTENTS, SCRLV_REMARK, SCRLV_EXPIREDATE, SCRLV_UPDATE_IP, SCRLV_CREATED_AT, SCRLV_UPDATED_AT, SCRLV_PERSON_ID_UPD,
+                                      PERSON_CODE_UPD, PERSON_NAME_UPD, SCRLV_CODE) AS
+select scrlv.level1 scrlv_level1 ,scrlv.id id,scrlv.id scrlv_id ,scrlv.contents scrlv_contents ,scrlv.remark scrlv_remark ,
+scrlv.expiredate scrlv_expiredate ,scrlv.update_ip scrlv_update_ip ,scrlv.created_at scrlv_created_at ,
+scrlv.updated_at scrlv_updated_at ,scrlv.persons_id_upd scrlv_person_id_upd ,
+ person_upd.code person_code_upd, person_upd.name person_name_upd,scrlv.code scrlv_code
+from scrlvs scrlv ,persons  person_upd
+where  person_upd.id = scrlv.persons_id_upd
+;
+CREATE OR REPLACE  VIEW R_LOCAS
+(ID , LOCA_ID, LOCA_CODE, LOCA_NAME, LOCA_ABBR
+,LOCA_ZIP,LOCA_COUNTRY,LOCA_PRFCT,LOCA_ADDR1,LOCA_ADDR2
+, LOCA_TEL, LOCA_FAX, LOCA_MAIL, LOCA_REMARK, LOCA_EXPIREDATE
+, LOCA_PERSON_ID_UPD
+, PERSON_ID_UPD,PERSON_CODE_UPD, PERSON_NAME_UPD , PERSON_EMAIL_UPD
+, LOCA_UPDATE_IP, LOCA_CREATED_AT, LOCA_UPDATED_AT
+) AS
+  select loca.id id ,loca.id loca_id ,loca.code loca_code ,loca.name loca_name ,loca.abbr loca_abbr
+  ,loca.zip loca_zip , loca.country loca_country ,loca.prfct loca_prfct ,loca.addr1 loca_addr1 ,loca.addr2 loca_addr2
+  ,loca.tel loca_tel ,  loca.fax loca_fax ,loca.mail loca_mail ,loca.remark loca_remark ,loca.expiredate loca_expiredate
+   ,loca.persons_id_upd loca_person_id_upd
+ , person_upd.id person_id_upd,    person_upd.code person_code_upd, person_upd.name person_name_upd,person_upd.email person_email_upd
+, loca.update_ip loca_update_ip ,loca.created_at loca_created_at ,loca.updated_at loca_updated_at
+ from locas loca ,persons  person_upd
+  where  person_upd.id = loca.persons_id_upd
+;
+
+
+CREATE
+OR REPLACE  VIEW R_SECTS (
+  ID
+  , SECT_ID
+  , SECT_LOCA_ID_SECT
+  , LOCA_CODE_SECT
+  , LOCA_NAME_SECT
+  , LOCA_ABBR_SECT
+  , LOCA_ZIP_SECT
+  , LOCA_COUNTRY_SECT
+  , LOCA_PRFCT_SECT
+  , LOCA_ADDR1_SECT
+  , LOCA_ADDR2_SECT
+  , LOCA_TEL_SECT
+  , LOCA_FAX_SECT
+  , LOCA_MAIL_SECT
+  , SECT_contents
+  , SECT_REMARK
+  , SECT_EXPIREDATE
+  , SECT_PERSON_ID_UPD
+  , PERSON_ID_UPD
+  , PERSON_CODE_UPD
+  , PERSON_NAME_UPD
+  , PERSON_EMAIL_UPD
+  , SECT_UPDATE_IP
+  , SECT_CREATED_AT
+  , SECT_UPDATED_AT
+) AS
+select
+  sect.id
+  , sect.id sect_id
+  , loca_sect.loca_id loca_id_sect
+  , loca_sect.loca_code loca_code_sect
+  , loca_sect.loca_name loca_name_sect
+  , loca_sect.loca_abbr loca_abbr_sect
+  , loca_sect.loca_zip loca_zip_sect
+  , loca_sect.loca_country loca_country_sect
+  , loca_sect.loca_prfct loca_prfct_sect
+  , loca_sect.loca_addr1 loca_addr1_sect
+  , loca_sect.loca_addr2 loca_addr2_sect
+  , loca_sect.loca_tel loca_tel_sect
+  , loca_sect.loca_fax loca_fax_sect
+  , loca_sect.loca_mail loca_mail_sect
+  , sect.contents sect_contents
+  , sect.remark sect_remark
+  , sect.expiredate sect_expiredate
+  , sect.persons_id_upd sect_person_id_upd
+  , person_upd.id person_id_upd
+  , person_upd.code person_code_upd
+  , person_upd.name person_name_upd
+  , person_upd.email person_email_upd
+  , sect.update_ip sect_update_ip
+  , sect.created_at sect_created_at
+  , sect.updated_at sect_updated_at
+from
+  sects sect
+  , r_locas loca_sect
+  , persons person_upd
+where
+  loca_sect.loca_id = sect.locas_id_sect
+  and person_upd.id = sect.persons_id_upd;
 
 -----DROP TABLE usrgrps;
 CREATE TABLE usrgrps
@@ -253,7 +220,116 @@ CREATE TABLE usrgrps
 create sequence usrgrps_seq
 ;
 
+CREATE OR REPLACE  VIEW R_USRGRPS
+(ID, USRGRP_ID, USRGRP_REMARK, USRGRP_EXPIREDATE, USRGRP_UPDATE_IP, USRGRP_CREATED_AT,
+ USRGRP_UPDATED_AT, USRGRP_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD,
+  PERSON_NAME_UPD,
+  USRGRP_CODE,USRGRP_NAME, USRGRP_CONTENTS) AS
+  select usrgrp.id id,usrgrp.id usrgrp_id ,usrgrp.remark usrgrp_remark ,usrgrp.expiredate usrgrp_expiredate ,
+  usrgrp.update_ip usrgrp_update_ip ,usrgrp.created_at usrgrp_created_at ,usrgrp.updated_at usrgrp_updated_at ,
+  usrgrp.persons_id_upd usrgrp_person_id_upd , person_upd.person_id_upd person_id_upd,
+   person_upd.person_code_upd person_code_upd, person_upd.person_name_upd person_name_upd,
+  usrgrp.code usrgrp_code , usrgrp.name usrgrp_name ,usrgrp.contents usrgrp_contents
+ from usrgrps usrgrp ,upd_persons  person_upd
+ where  person_upd.id = usrgrp.persons_id_upd
+ ;
+  ----drop table SIO_R_SECTS;
 
+ CREATE
+OR REPLACE  VIEW R_PERSONS (
+  ID
+  , PERSON_ID
+  , PERSON_REMARK
+  , PERSON_contents
+  , PERSON_EXPIREDATE
+  , PERSON_UPDATE_IP
+  , PERSON_CREATED_AT
+  , PERSON_UPDATED_AT
+  , PERSON_PERSON_ID_UPD
+  , PERSON_ID_UPD
+  , PERSON_CODE_UPD
+  , PERSON_NAME_UPD
+  , PERSON_CODE
+  , PERSON_NAME
+  , PERSON_SECT_ID
+  , SECT_ID
+  , SECT_contents
+  , SECT_LOCA_ID
+  , LOCA_CODE_SECT
+  , LOCA_ABBR_SECT
+  , LOCA_PRFCT_SECT
+  , LOCA_TEL_SECT
+  , LOCA_COUNTRY_SECT
+  , LOCA_NAME_SECT
+  , LOCA_MAIL_SECT
+  , LOCA_ADDR1_SECT
+  , LOCA_ZIP_SECT
+  , LOCA_FAX_SECT
+  , LOCA_ADDR2_SECT
+  , LOCA_ID_SECT
+  , PERSON_EMAIL
+  , PERSON_SCRLV_ID
+  , SCRLV_LEVEL1
+  , SCRLV_ID
+  , SCRLV_CODE
+  , PERSON_USRGRP_ID
+  , USRGRP_ID
+  , USRGRP_CODE
+  , USRGRP_NAME
+  , USRGRP_CONTENTS
+) AS
+select
+  person.id id
+  , person.id person_id
+  , person.remark person_remark
+  , person.contents person_contents
+  , person.expiredate person_expiredate
+  , person.update_ip person_update_ip
+  , person.created_at person_created_at
+  , person.updated_at person_updated_at
+  , person.persons_id_upd person_person_id_upd
+  , person_upd.id person_id_upd
+  , person_upd.code person_code_upd
+  , person_upd.name person_name_upd
+  , person.code person_code
+  , person.name person_name
+  , person.sects_id person_sect_id
+  , sect.sect_id sect_id
+  , sect.sect_contents sect_contents
+  , sect.sect_loca_id_sect sect_loca_id
+  , sect.loca_code_sect loca_code_sect
+  , sect.loca_abbr_sect loca_abbr_sect
+  , sect.loca_prfct_sect loca_prfct_sect
+  , sect.loca_tel_sect loca_tel_sect
+  , sect.loca_country_sect loca_country_sect
+  , sect.loca_name_sect loca_name_sect
+  , sect.loca_mail_sect loca_mail_sect
+  , sect.loca_addr1_sect loca_addr1_sect
+  , sect.loca_zip_sect loca_zip_sect
+  , sect.loca_fax_sect loca_fax_sect
+  , sect.loca_addr2_sect loca_addr2_sect
+  , sect.SECT_loca_id_sect loca_id_sect
+  , person.email person_email
+  , person.scrlvs_id person_scrlv_id
+  , scrlv.scrlv_level1 scrlv_level1
+  , scrlv.scrlv_id scrlv_id
+  , scrlv.scrlv_code scrlv_code
+  , person.usrgrps_id person_usrgrp_id
+  , usrgrp.usrgrp_id usrgrp_id
+  , usrgrp.usrgrp_code usrgrp_code
+  , usrgrp.usrgrp_name usrgrp_name
+  , usrgrp.usrgrp_contents usrgrp_contents
+from
+  persons person
+  , persons person_upd
+  , r_sects sect
+  , r_scrlvs scrlv
+  , r_usrgrps usrgrp
+where person.persons_id_upd = person_upd.ID
+and person.sects_id = sect.ID
+and person.SCRLVS_ID = scrlv.ID
+and person.USRGRPS_ID = usrgrp.ID
+  ;
   CREATE TABLE PRJNOS
    (	CONTENTS VARCHAR(4000),
   REMARK VARCHAR(4000),
@@ -367,199 +443,29 @@ CREATE UNIQUE INDEX POBJECTS_UKYS1 ON POBJECTS (CODE, OBJECTTYPE)
 
 create sequence POBJECTS_seq
 ;
-CREATE OR REPLACE VIEW R_POBJECTS (POBJECT_CODE, POBJECT_OBJECTTYPE, POBJECT_EXPIREDATE, POBJECT_UPDATED_AT, 
-POBJECT_REMARK, POBJECT_CREATED_AT, POBJECT_UPDATE_IP, ID, POBJECT_ID, POBJECT_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD,
- PERSON_NAME_UPD, POBJECT_CONTENTS) AS 
-  select
-  pobject.code pobject_code
-  , pobject.objecttype pobject_objecttype
-  , pobject.expiredate pobject_expiredate
-  , pobject.updated_at pobject_updated_at
-  , pobject.remark pobject_remark
-  , pobject.created_at pobject_created_at
-  , pobject.update_ip pobject_update_ip
-  , pobject.id id
-  , pobject.id pobject_id
-  , pobject.persons_id_upd pobject_person_id_upd
-  , person_upd.person_id_upd person_id_upd
-  , person_upd.person_code_upd person_code_upd
-  , person_upd.person_name_upd person_name_upd
-  , pobject.contents pobject_contents
+CREATE OR REPLACE VIEW R_POBJECTS (POBJECT_CODE, POBJECT_OBJECTTYPE, POBJECT_EXPIREDATE, POBJECT_UPDATED_AT, POBJECT_REMARK, POBJECT_CREATED_AT,
+POBJECT_UPDATE_IP, ID, POBJECT_ID, POBJECT_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, POBJECT_CONTENTS) AS
+select
+pobject.code pobject_code
+, pobject.objecttype pobject_objecttype
+, pobject.expiredate pobject_expiredate
+, pobject.updated_at pobject_updated_at
+, pobject.remark pobject_remark
+, pobject.created_at pobject_created_at
+, pobject.update_ip pobject_update_ip
+, pobject.id id
+, pobject.id pobject_id
+, pobject.persons_id_upd pobject_person_id_upd
+, person_upd.person_id_upd person_id_upd
+, person_upd.person_code_upd person_code_upd
+, person_upd.person_name_upd person_name_upd
+, pobject.contents pobject_contents
 from
-  pobjects pobject
-  , upd_persons person_upd 
+pobjects pobject
+, upd_persons person_upd
 where
-  person_upd.id = pobject.persons_id_upd
+person_upd.id = pobject.persons_id_upd
 ;
-
-
-   CREATE OR REPLACE  VIEW SCR_POBJECTS
- (POBJECT_CODE,  POBJECT_EXPIREDATE, POBJECT_UPDATED_AT,
-  POBJECT_REMARK, POBJECT_CONTENTS,POBJECT_CREATED_AT, POBJECT_UPDATE_IP, ID, POBJECT_ID,
- PERSON_CODE_UPD, PERSON_NAME_UPD, POBJECT_PERSON_ID_UPD) AS
-   select
-   pobject.code pobject_code
-   , pobject.expiredate pobject_expiredate
-   , pobject.updated_at pobject_updated_at
-   , pobject.remark pobject_remark
-   , pobject.contents pobject_contents
-   , pobject.created_at pobject_created_at
-   , pobject.update_ip pobject_update_ip
-   , pobject.id id
-   , pobject.id pobject_id
-   , person_upd.code updperson_code_upd
-   , person_upd.name updperson_name_upd
-   ,pobject.persons_id_upd pobject_person_id_upd
- from
-   pobjects pobject
-   , persons person_upd
- where
-   person_upd.id = pobject.persons_id_upd
-
-   and pobject.objecttype = 'screen'
-   ;
-
-   CREATE
- OR REPLACE  VIEW VIEW_POBJECTS (
-   POBJECT_CODE
-   , POBJECT_EXPIREDATE
-   , POBJECT_UPDATED_AT
-   , POBJECT_REMARK
-   , POBJECT_CONTENTS
-   , POBJECT_CREATED_AT
-   , POBJECT_UPDATE_IP
-   , ID
-   , POBJECT_ID
-   , POBJECT_PERSON_ID_UPD
-   , PERSON_ID_UPD
-   , PERSON_CODE_UPD
-   , PERSON_NAME_UPD
- ) AS
- select
-   pobject.code pobject_code
-   , pobject.expiredate pobject_expiredate
-   , pobject.updated_at pobject_updated_at
-   , pobject.remark pobject_remark
-   , pobject.contents pobject_contents
-   , pobject.created_at pobject_created_at
-   , pobject.update_ip pobject_update_ip
-   , pobject.id id
-   , pobject.id pobject_id
-   , pobject.persons_id_upd pobject_person_id_upd
-   , person_upd.id person_id_upd
-   , person_upd.code person_code_upd
-   , person_upd.name person_name_upd
- from
-   pobjects pobject
-   , persons person_upd
- where
-   person_upd.id = pobject.persons_id_upd
-   and pobject.objecttype = 'view';
-
-
-   CREATE OR REPLACE  VIEW TBL_POBJECTS
- (POBJECT_CODE,  POBJECT_EXPIREDATE, POBJECT_UPDATED_AT,
-  POBJECT_REMARK, POBJECT_CREATED_AT, POBJECT_UPDATE_IP, ID, POBJECT_ID, POBJECT_PERSON_ID_UPD,
- PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD) AS
- select
-   pobject.code pobject_code
-   , pobject.expiredate pobject_expiredate
-   , pobject.updated_at pobject_updated_at
-   , pobject.remark pobject_remark
-   , pobject.created_at pobject_created_at
-   , pobject.update_ip pobject_update_ip
-   , pobject.id id
-   , pobject.id pobject_id
-   , pobject.persons_id_upd pobject_person_id_upd
-   , person_upd.id updperson_id_upd
-   , person_upd.code updperson_code_upd
-   , person_upd.name updperson_name_upd
- from
-   pobjects pobject
-   , persons person_upd
- where
-   person_upd.id = pobject.persons_id_upd
-   and pobject.objecttype = 'tbl'
-   ;
-
-
-   CREATE OR REPLACE  VIEW FLD_POBJECTS
- (POBJECT_CODE,  POBJECT_EXPIREDATE, POBJECT_UPDATED_AT,
- POBJECT_REMARK, POBJECT_CREATED_AT, POBJECT_UPDATE_IP, ID, POBJECT_ID, POBJECT_PERSON_ID_UPD,
- POBJECT_CONTENTS,
- PERSON_CODE_UPD, PERSON_ID_UPD,PERSON_NAME_UPD) AS
-   select
-   pobject.code pobject_code
-   , pobject.expiredate pobject_expiredate
-   , pobject.updated_at pobject_updated_at
-   , pobject.remark pobject_remark
-   , pobject.created_at pobject_created_at
-   , pobject.update_ip pobject_update_ip
-   , pobject.id
-   , pobject.id pobject_id
-     , pobject.persons_id_upd pobject_person_id_upd
- 	,pobject.contents pobject_contents
-   , person_upd.code updperson_code_upd
-   , person_upd.id updperson_id_upd
-   , person_upd.name updperson_name_upd
- from
-   pobjects pobject
-   , persons person_upd
- where
-   person_upd.id = pobject.persons_id_upd
-   and pobject.objecttype = 'tbl_field'
-   ;
-
-
-     CREATE OR REPLACE  VIEW SFD_POBJECTS
- (POBJECT_CODE,  POBJECT_EXPIREDATE, POBJECT_UPDATED_AT,
-  POBJECT_REMARK, POBJECT_CREATED_AT, POBJECT_UPDATE_IP, ID, POBJECT_ID,POBJECT_PERSON_ID_UPD,
- PERSON_ID_UPD, PERSON_CODE_UPD,PERSON_NAME_UPD) AS
-   select
-   pobject.code pobject_code
-   , pobject.expiredate pobject_expiredate
-   , pobject.updated_at pobject_updated_at
-   , pobject.remark pobject_remark
-   , pobject.created_at pobject_created_at
-   , pobject.update_ip pobject_update_ip
-   , pobject.id id  , pobject.id pobject_id
-   , pobject.PERSONS_ID_UPD pobject_person_id_upd
-   , person_upd.id person_id_upd
-   , person_upd.code person_code_upd
-   , person_upd.name person_name_upd
- from
-   pobjects pobject
-   , persons person_upd
- where
-   person_upd.id = pobject.persons_id_upd
-   and pobject.objecttype = 'view_field'
-   ;
-
-
-     CREATE OR REPLACE  VIEW SGRP_POBJECTS
- (POBJECT_CODE,  POBJECT_EXPIREDATE, POBJECT_UPDATED_AT,
-  POBJECT_REMARK, POBJECT_CREATED_AT, POBJECT_UPDATE_IP, ID, POBJECT_ID,POBJECT_PERSON_ID_UPD,
- PERSON_ID_UPD, PERSON_CODE_UPD,PERSON_NAME_UPD) AS
-   select
-   pobject.code pobject_code
-   , pobject.expiredate pobject_expiredate
-   , pobject.updated_at pobject_updated_at
-   , pobject.remark pobject_remark
-   , pobject.created_at pobject_created_at
-   , pobject.update_ip pobject_update_ip
-   , pobject.id id  , pobject.id pobject_id
-   , pobject.PERSONS_ID_UPD pobject_person_id_upd
-   , person_upd.id person_id_upd
-   , person_upd.code person_code_upd
-   , person_upd.name person_name_upd
- from
-   pobjects pobject
-   , persons person_upd
- where
-   person_upd.id = pobject.persons_id_upd
-   and pobject.objecttype = 'screen_group'
-   ;
-
 CREATE TABLE POBJGRPS
    (	ID numeric(38,0),
 	POBJECTS_ID numeric(38,0),
@@ -584,7 +490,42 @@ CREATE TABLE POBJGRPS
 
 create sequence POBJGRPS_seq
 ;
-  
+  CREATE OR REPLACE  VIEW R_POBJGRPS (POBJGRP_POBJECT_ID, POBJECT_CODE, POBJECT_OBJECTTYPE,   POBJECT_ID, POBJECT_CONTENTS, ID, POBJGRP_ID, POBJGRP_contents,POBJGRP_REMARK,
+    POBJGRP_EXPIREDATE, POBJGRP_UPDATE_IP, POBJGRP_CREATED_AT, POBJGRP_UPDATED_AT, POBJGRP_PERSON_ID_UPD, UPDPERSON_ID_UPD, UPDPERSON_CODE_UPD, UPDPERSON_NAME_UPD,
+     POBJGRP_NAME, POBJGRP_USRGRP_ID, USRGRP_NAME, USRGRP_CODE,  USRGRP_ID) AS
+  select
+  pobjgrp.pobjects_id pobjgrp_pobject_id
+  , pobject.pobject_code pobject_code
+  , pobject.pobject_objecttype pobject_objecttype
+  , pobject.pobject_id pobject_id
+  , pobject.pobject_contents pobject_contents
+  , pobjgrp.id id
+  , pobjgrp.id pobjgrp_id
+  , pobjgrp.contents pobjgrp_contents
+  , pobjgrp.remark pobjgrp_remark
+  , pobjgrp.expiredate pobjgrp_expiredate
+  , pobjgrp.update_ip pobjgrp_update_ip
+  , pobjgrp.created_at pobjgrp_created_at
+  , pobjgrp.updated_at pobjgrp_updated_at
+  , pobjgrp.persons_id_upd pobjgrp_person_id_upd
+  , person_upd.person_id_upd person_id_upd
+  , person_upd.person_code_upd person_code_upd
+  , person_upd.person_name_upd person_name_upd
+  , pobjgrp.name pobjgrp_name
+  , pobjgrp.USRGRPs_id pobjgrp_USRGRP_id
+  , USRGRP.USRGRP_name USRGRP_name
+  , USRGRP.USRGRP_code USRGRP_code
+  , USRGRP.USRGRP_id USRGRP_id
+from
+  pobjgrps pobjgrp
+  , r_pobjects pobject
+  , upd_persons person_upd
+  , r_USRGRPs USRGRP
+where
+  pobject.id = pobjgrp.pobjects_id
+  and person_upd.id = pobjgrp.persons_id_upd
+  and USRGRP.id = pobjgrp.USRGRPs_id;
+
   CREATE TABLE BLKTBS
    (	ID numeric(38,0),
 	POBJECTS_ID_TBL numeric(38,0),
@@ -654,18 +595,17 @@ CREATE TABLE SCREENS
 	CDRFLAYOUT varchar(10),
 	EXPIREDATE DATE,
 	REMARK varchar(4000),
-  PERSONS_ID_UPD numeric(38,0),
+    PERSONS_ID_UPD numeric(38,0),
 	UPDATE_IP varchar(40),
 	CREATED_AT TIMESTAMP (6),
 	UPDATED_AT TIMESTAMP (6),
 	POBJECTS_ID_SCR numeric(38,0),
 	POBJECTS_ID_VIEW numeric(38,0),
-	POBJECTS_ID_SGRP numeric(38,0),
-	seqno numeric(38,0),
 	ROWS_PER_PAGE numeric(38,0),
 	ROWLIST varchar(30),
 	HEIGHT numeric(38,0),
 	FORM_PS varchar(4000),
+	GRPCODENAME varchar(50),
 	SCRLVS_ID numeric(38,0),
 	CONTENTS varchar(4000),
 	strorder varchar(4000),
@@ -674,8 +614,6 @@ CREATE TABLE SCREENS
 	 CONSTRAINT SCREEN_POBJECTS_ID_SCR FOREIGN KEY (POBJECTS_ID_SCR)
 	  REFERENCES POBJECTS (ID) ,
 	 CONSTRAINT SCREEN_POBJECTS_ID_VIEW FOREIGN KEY (POBJECTS_ID_VIEW)
-	  REFERENCES POBJECTS (ID) ,
-	 CONSTRAINT SCREEN_POBJECTS_ID_SGRP FOREIGN KEY (POBJECTS_ID_SGRP)
 	  REFERENCES POBJECTS (ID) ,
 	 CONSTRAINT SCREEN_PERSONS_ID_UPD FOREIGN KEY (PERSONS_ID_UPD)
 	  REFERENCES PERSONS (ID) ,
@@ -689,6 +627,102 @@ CREATE TABLE SCREENS
 create sequence SCREENS_seq
 ;
 
+  CREATE
+OR REPLACE  VIEW R_SCREENS (
+  SCREEN_EXPIREDATE
+  , SCREEN_UPDATED_AT
+  , SCREEN_STRWHERE
+  , SCREEN_STRGROUPORDER
+  , SCREEN_ROWS_PER_PAGE
+  , SCREEN_ROWLIST
+  , SCREEN_HEIGHT
+  , SCREEN_POBJECT_ID_VIEW
+  , POBJECT_CODE_VIEW
+  , POBJECT_OBJECTTYPE_VIEW
+  , POBJECT_ID_VIEW
+  , POBJECT_CONTENTS_VIEW
+  , SCREEN_FORM_PS
+  , SCREEN_STRSELECT
+  , SCREEN_REMARK
+  , SCREEN_CREATED_AT
+  , SCREEN_UPDATE_IP
+  , SCREEN_CDRFLAYOUT
+  , SCREEN_YMLCODE
+  , ID
+  , SCREEN_ID
+  , SCREEN_GRPCODENAME
+  , SCREEN_PERSON_ID_UPD
+  , PERSON_ID_UPD
+  , PERSON_CODE_UPD
+  , PERSON_NAME_UPD
+  , SCREEN_POBJECT_ID_SCR
+  , POBJECT_CODE_SCR
+  , POBJECT_OBJECTTYPE_SCR
+  , POBJECT_ID_SCR
+  , POBJECT_CONTENTS_SCR
+  , SCREEN_CONTENTS
+  , SCREEN_strorder
+  , SCREEN_SCRLV_ID
+  , SCRLV_LEVEL1
+  , SCRLV_ID
+  , SCRLV_CODE
+ --- , pobject_id_gscr
+ --- , pobject_code_gscr
+) AS
+select
+  screen.expiredate screen_expiredate
+  , screen.updated_at screen_updated_at
+  , screen.strwhere screen_strwhere
+  , screen.STRGROUPORDER screen_STRGROUPORDER
+  , screen.rows_per_page screen_rows_per_page
+  , screen.rowlist screen_rowlist
+  , screen.height screen_height
+  , screen.pobjects_id_view screen_pobject_id_view
+  , pobject_view.pobject_code pobject_code_view
+  , pobject_view.pobject_objecttype pobject_objecttype_view
+  , pobject_view.pobject_id pobject_id_view
+  , pobject_view.pobject_contents pobject_contents_view
+  , screen.form_ps screen_form_ps
+  , screen.strselect screen_strselect
+  , screen.remark screen_remark
+  , screen.created_at screen_created_at
+  , screen.update_ip screen_update_ip
+  , screen.cdrflayout screen_cdrflayout
+  , screen.ymlcode screen_ymlcode
+  , screen.id id
+  , screen.id screen_id
+  , screen.grpcodename screen_grpcodename
+  , screen.persons_id_upd screen_person_id_upd
+  , person_upd.person_id_upd person_id_upd
+  , person_upd.person_code_upd person_code_upd
+  , person_upd.person_name_upd person_name_upd
+  , screen.pobjects_id_scr screen_pobject_id_scr
+  , pobject_scr.pobject_code pobject_code_scr
+  , pobject_scr.pobject_objecttype pobject_objecttype_scr
+  , pobject_scr.pobject_id pobject_id_scr
+  , pobject_scr.pobject_contents pobject_contents_scr
+  , screen.contents screen_contents
+  , screen.strorder screen_strorder
+  , screen.scrlvs_id screen_scrlv_id
+  , scrlv.scrlv_level1 scrlv_level1
+  , scrlv.scrlv_id scrlv_id
+  , scrlv.scrlv_code scrlv_code
+ --- , pobject_gscr.pobject_id pobject_id_gscr
+ --- , pobject_gscr.pobject_code pobject_code_gscr
+from
+  screens screen
+  , r_pobjects pobject_view
+  , upd_persons person_upd
+  , r_pobjects pobject_scr
+  , r_scrlvs scrlv
+ --- , r_pobjects pobject_gscr
+where
+  pobject_view.id = screen.pobjects_id_view
+  and person_upd.id = screen.persons_id_upd
+  and pobject_scr.id = screen.pobjects_id_scr
+---  and pobject_gscr.id = screen.pobjects_id_scr
+  and scrlv.id = screen.scrlvs_id
+;
 
 
 
@@ -2109,6 +2143,148 @@ create sequence TBLINKFLDS_seq
  from tblinkflds tblinkfld ,r_tblfields  tblfield,upd_persons  person_upd,r_tblinks  tblink
  where  tblfield.id = tblinkfld.tblfields_id and  person_upd.id = tblinkfld.persons_id_upd and  tblink.id = tblinkfld.tblinks_id
  ;
+
+   CREATE OR REPLACE  VIEW SCR_POBJECTS
+ (POBJECT_CODE,  POBJECT_EXPIREDATE, POBJECT_UPDATED_AT,
+  POBJECT_REMARK, POBJECT_CONTENTS,POBJECT_CREATED_AT, POBJECT_UPDATE_IP, ID, POBJECT_ID,
+ PERSON_CODE_UPD, PERSON_NAME_UPD, POBJECT_PERSON_ID_UPD) AS
+   select
+   pobject.code pobject_code
+   , pobject.expiredate pobject_expiredate
+   , pobject.updated_at pobject_updated_at
+   , pobject.remark pobject_remark
+   , pobject.contents pobject_contents
+   , pobject.created_at pobject_created_at
+   , pobject.update_ip pobject_update_ip
+   , pobject.id id
+   , pobject.id pobject_id
+   , person_upd.code updperson_code_upd
+   , person_upd.name updperson_name_upd
+   ,pobject.persons_id_upd pobject_person_id_upd
+ from
+   pobjects pobject
+   , persons person_upd
+ where
+   person_upd.id = pobject.persons_id_upd
+
+   and pobject.objecttype = 'screen'
+   ;
+
+   CREATE
+ OR REPLACE  VIEW VIEW_POBJECTS (
+   POBJECT_CODE
+   , POBJECT_EXPIREDATE
+   , POBJECT_UPDATED_AT
+   , POBJECT_REMARK
+   , POBJECT_CONTENTS
+   , POBJECT_CREATED_AT
+   , POBJECT_UPDATE_IP
+   , ID
+   , POBJECT_ID
+   , POBJECT_PERSON_ID_UPD
+   , PERSON_ID_UPD
+   , PERSON_CODE_UPD
+   , PERSON_NAME_UPD
+ ) AS
+ select
+   pobject.code pobject_code
+   , pobject.expiredate pobject_expiredate
+   , pobject.updated_at pobject_updated_at
+   , pobject.remark pobject_remark
+   , pobject.contents pobject_contents
+   , pobject.created_at pobject_created_at
+   , pobject.update_ip pobject_update_ip
+   , pobject.id id
+   , pobject.id pobject_id
+   , pobject.persons_id_upd pobject_person_id_upd
+   , person_upd.id person_id_upd
+   , person_upd.code person_code_upd
+   , person_upd.name person_name_upd
+ from
+   pobjects pobject
+   , persons person_upd
+ where
+   person_upd.id = pobject.persons_id_upd
+   and pobject.objecttype = 'view';
+
+
+   CREATE OR REPLACE  VIEW TBL_POBJECTS
+ (POBJECT_CODE,  POBJECT_EXPIREDATE, POBJECT_UPDATED_AT,
+  POBJECT_REMARK, POBJECT_CREATED_AT, POBJECT_UPDATE_IP, ID, POBJECT_ID, POBJECT_PERSON_ID_UPD,
+ PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD) AS
+ select
+   pobject.code pobject_code
+   , pobject.expiredate pobject_expiredate
+   , pobject.updated_at pobject_updated_at
+   , pobject.remark pobject_remark
+   , pobject.created_at pobject_created_at
+   , pobject.update_ip pobject_update_ip
+   , pobject.id id
+   , pobject.id pobject_id
+   , pobject.persons_id_upd pobject_person_id_upd
+   , person_upd.id updperson_id_upd
+   , person_upd.code updperson_code_upd
+   , person_upd.name updperson_name_upd
+ from
+   pobjects pobject
+   , persons person_upd
+ where
+   person_upd.id = pobject.persons_id_upd
+   and pobject.objecttype = 'tbl'
+   ;
+
+
+   CREATE OR REPLACE  VIEW FLD_POBJECTS
+ (POBJECT_CODE,  POBJECT_EXPIREDATE, POBJECT_UPDATED_AT,
+ POBJECT_REMARK, POBJECT_CREATED_AT, POBJECT_UPDATE_IP, ID, POBJECT_ID, POBJECT_PERSON_ID_UPD,
+ POBJECT_CONTENTS,
+ PERSON_CODE_UPD, PERSON_ID_UPD,PERSON_NAME_UPD) AS
+   select
+   pobject.code pobject_code
+   , pobject.expiredate pobject_expiredate
+   , pobject.updated_at pobject_updated_at
+   , pobject.remark pobject_remark
+   , pobject.created_at pobject_created_at
+   , pobject.update_ip pobject_update_ip
+   , pobject.id
+   , pobject.id pobject_id
+     , pobject.persons_id_upd pobject_person_id_upd
+ 	,pobject.contents pobject_contents
+   , person_upd.code updperson_code_upd
+   , person_upd.id updperson_id_upd
+   , person_upd.name updperson_name_upd
+ from
+   pobjects pobject
+   , persons person_upd
+ where
+   person_upd.id = pobject.persons_id_upd
+   and pobject.objecttype = 'tbl_field'
+   ;
+
+
+     CREATE OR REPLACE  VIEW SFD_POBJECTS
+ (POBJECT_CODE,  POBJECT_EXPIREDATE, POBJECT_UPDATED_AT,
+  POBJECT_REMARK, POBJECT_CREATED_AT, POBJECT_UPDATE_IP, ID, POBJECT_ID,POBJECT_PERSON_ID_UPD,
+ PERSON_ID_UPD, PERSON_CODE_UPD,PERSON_NAME_UPD) AS
+   select
+   pobject.code pobject_code
+   , pobject.expiredate pobject_expiredate
+   , pobject.updated_at pobject_updated_at
+   , pobject.remark pobject_remark
+   , pobject.created_at pobject_created_at
+   , pobject.update_ip pobject_update_ip
+   , pobject.id id  , pobject.id pobject_id
+   , pobject.PERSONS_ID_UPD pobject_person_id_upd
+   , person_upd.id person_id_upd
+   , person_upd.code person_code_upd
+   , person_upd.name person_name_upd
+ from
+   pobjects pobject
+   , persons person_upd
+ where
+   person_upd.id = pobject.persons_id_upd
+   and pobject.objecttype = 'view_field'
+   ;
 
 
      CREATE TABLE RUBYCODINGS

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿PostgreSQLのインストール
 $ sudo apt-get update
 
@@ -85,3 +86,83 @@ rails new xxxx --api --database=postgresql
 .env.stating	staging環境境用の環境変数ファイル
 .env.production	本番環境用の環境変数ファイル
 .env.local	ローカル環境用
+=======
+﻿PostgreSQLのインストール
+$ sudo apt-get update
+
+$ sudo apt-get install -y postgresql-9.6
+
+$ sudo apt-get install -y postgresql-10
+
+
+PostgreSQLの起動
+sudo /etc/init.d/postgresql start
+
+ * Starting PostgreSQL 10.4 database server                 [ OK ]
+$ sudo /etc/init.d/postgresql status
+10.4/main (port 5432): online
+
+$ su - postgres
+
+
+postgres=# CREATE ROLE v10_development LOGIN CREATEDB PASSWORD 'v10_development';
+CREATE ROLE
+postgres=# \du
+
+
+
+
+postgres=# CREATE DATABASE v10_development OWNER v10_development;
+CREATE DATABASE
+postgres=# \l
+                  
+
+
+
+Railの設定
+アプリの作成
+
+$ rails new myapp -d postgresql
+config/database.ymlの設定
+
+default: &default
+  adapter: postgresql
+  encoding: utf8
+  pool: 5
+  username: [username]
+  password: [password] 
+
+development:
+  <<: *default
+  database: myapp_development
+
+test:
+  <<: *default
+  database: myapp_test
+
+production:
+  <<: *default
+  database: myapp_production
+
+Create Data Base
+
+launch psql
+
+
+
+接続
+ky@MyComputer:~$  su - postgres
+Password:
+postgres@MyComputer:~$ psql -p 5433 -U postgres -d v10_development
+
+
+カレントディレクトリ変更
+postgres=# \cd directory
+カレントディレクトリをdirectoryに変更する。
+
+CSV形式のファイルをテーブルに挿入
+postgres=# \copy tablename(column1,column2,・・・・) from filename CSV HEADER ;
+ファイルからコマンドを実行
+postgres=# \i filename.sql
+ファイルから入力を読み取り、実行する。
+>>>>>>> 843829d17aa56bb9d40c70f15ccfde4646042b07
