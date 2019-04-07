@@ -1,4 +1,4 @@
 class ApplicationController < ActionController::API
         include DeviseTokenAuth::Concerns::SetUserByToken
-        before_action :authenticate_api_user!, except: [:show, :create]
+       ## before_action :authenticate_api_user!
 end

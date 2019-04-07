@@ -16,6 +16,11 @@ export const MENU_REQUEST = 'MENU_REQUEST'
 export const MENU_SUCCESS = 'MENU_SUCCESS'
 export const MENU_FAILURE = 'MENU_FAILURE'
 
+
+export const SCREEN_REQUEST = 'SCREEN_REQUEST'
+export const SCREEN_SUCCESS = 'SCREEN_SUCCESS'
+export const SCREEN_FAILURE = 'SCREEN_FAILURE'
+
 // LOGIN
 // Attach our Formik actions as meta-data to our action.
 
@@ -39,5 +44,11 @@ export const SignupRequest = createAction(
 export const MenuRequest = (token,client,uid) => ({
   type:  MENU_REQUEST,
   payload: { token,client,uid }
+})
+
+
+export const ScreenRequest = (search,token,client,uid) => ({
+  type:  SCREEN_REQUEST,
+  payload: { search,token,client,uid }
 })
 

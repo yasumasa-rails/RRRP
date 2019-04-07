@@ -3,6 +3,7 @@
 module Api
   module Auth
     class RegistrationsController < DeviseTokenAuth::RegistrationsController
+      before_action :authenticate_api_user!, except: [:create]
       private
       def sign_up_params
         params.permit( :email,  :password, :password_confirmation)

@@ -5,8 +5,10 @@ Rails.application.routes.draw do
         registrations: 'api/auth/registrations',
         sessions: 'api/auth/sessions'
     }
-    resources :screens, only: [:show, :update, :create, :destroy]
-    resources :menu
+    ##resources :screens
+    ##resources :menus
   end
-  get '/confirm_success' => 'home#confirm_success'
+  namespace :api do
+    resources :menus
+  end  
 end

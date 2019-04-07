@@ -17,7 +17,8 @@ const loginreducer =  (state= initialValues , actions) =>{
         errors:[],
         messages: [{ body: 'Logging in...', time: new Date() }],
         isAuthenticated:false,
-        email:actions.payload.email
+        email:actions.payload.email,
+        auth:{}
       }
 
     // Successful?  Reset the login state.

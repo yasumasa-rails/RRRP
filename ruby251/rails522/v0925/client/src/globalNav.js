@@ -17,7 +17,7 @@ class GlobalNav extends React.Component {
       <div>
       <AppBar title="RRRP" position="static">
          <Toolbar>
-          <Link to="/menu">Menu</Link>
+          <Link to="/menus">Menu</Link>
           <Typography variant="caption" color="inherit" >
             RRRP 
           </Typography>

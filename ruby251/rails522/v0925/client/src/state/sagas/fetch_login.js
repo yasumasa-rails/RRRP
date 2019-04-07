@@ -33,7 +33,7 @@ export function * LoginSaga ({payload: values, meta: actions}) {
   const response =  yield call(loginAPI, values.email, values.password)
   if(response){
      yield put({ type: LOGIN_SUCCESS, actions: response}) 
-     yield call(history.push, '/menu')
+     yield call(history.push, '/menus')
     // Reset the form just to be clean, then send the user to our Dashboard which "requires"
     // authentication.
     }

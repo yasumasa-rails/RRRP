@@ -11,7 +11,7 @@ import {store,persistor} from './state/store'
 import GlobalNav from './globalNav'
 import {Login} from './components/login'
 import {Signup} from './components/signup'
-import Menu from './components/menu'
+import Menus from './components/menus'
 
 ReactDOM.render(
   <Provider store={store}>
@@ -19,8 +19,8 @@ ReactDOM.render(
   <PersistGate loading={null} persistor={persistor}>
     <GlobalNav />
     <Switch>
-      <Route exact path="/" component={Menu} />
-      <Route path="/menu" component={Menu} />
+      <Route exact path="/" component={Menus} />
+      <Route exact path="/menus" component={Menus} />
       <Route path="/signup" component={Signup} />
       <Route path="/login" component={Login} />
     </Switch>
