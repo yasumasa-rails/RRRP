@@ -9,7 +9,7 @@ import "react-tabs/style/react-tabs.css"
 
 import { Signup } from './signup'
 import { Login } from './login'
-import  {ScreenGrid}  from './screengrid'
+import  ScreenGrid  from './screengrid'
 import {ScreenRequest} from '../actions'
 
 class Menus extends React.Component {
@@ -18,7 +18,10 @@ class Menus extends React.Component {
     // id が変更されたら
     if (this.props.location.search !== prevProps.location.search
        && this.props.location.pathname === '/menus') {
-      this.props.dispatch(ScreenRequest(this.props.location.search,token,client,uid) )
+      this.props.dispatch(ScreenRequest(this.props.location.search,
+                                        this.props.token,
+                                        this.props.client,
+                                        this.props.uid,) )        
     }
   }
   render() {
@@ -49,7 +52,6 @@ class Menus extends React.Component {
                   {menuListData.map((val,index) => 
                     grp_name===val.grp_name&&
                     <Tab key={index}><Link to={"/menus?id="+val.scr_name} color="primary" >{val.scr_name}</Link> 
-                        <Route path={"/menus?id="+val.scr_name}  component={ScreenGrid} />
                     
                     </Tab>)}
                 </TabList>
@@ -62,7 +64,8 @@ class Menus extends React.Component {
                 </TabPanel> 
               )}
             </Tabs>
-            </div>        
+            <ScreenGrid/>    
+            </div>    
       )
     }
      return(

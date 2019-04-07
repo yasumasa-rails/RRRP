@@ -1,6 +1,6 @@
-import { SCREEN_REQUEST,SCREEN_SUCCESS,SCREEN_FAILURE} from '../../actions'
+import { SCREEN_REQUEST,SCREEN_SUCCESS,SCREEN_FAILURE,LOGOUT_REQUEST} 
+          from '../../actions'
 const initialValues = {
-  path:"",
   errors:[],
 }
 
@@ -20,7 +20,7 @@ const screenreducer =  (state= initialValues , action) =>{
     case SCREEN_SUCCESS:
       return {...state,
         messages: [],
-        response: action.actions.response,
+        response: action.response,
       }
 
     // Append the error returned from our api
@@ -30,6 +30,10 @@ const screenreducer =  (state= initialValues , action) =>{
           body: action.errors.toString(),
           time: new Date(),
       }
+
+      case LOGOUT_REQUEST:
+      return {}
+  
 
     default:
       return state
