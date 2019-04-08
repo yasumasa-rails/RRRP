@@ -6,16 +6,16 @@ import history from 'histrory'
 
 function MenuGetApi({ token,client,uid}) {
   const url = 'http://localhost:3001/api/menus'
-  const params =  {'uid':uid,
-                    'access-token':token, 
+  const headers =  { 'access-token':token, 
                     'client':client,
-                                }
+                    'uid':uid,}
+  const params =  { 'uid':uid,}
 
   let getApi = (url, params) => {
     return axios({
-      method: "GET",
+      method: "POST",
       url: url,
-      params: params,responseType: 'json',
+      params: params,headers:headers,
     });
   };
   return getApi(url, params)

@@ -5,10 +5,10 @@ import {SCREEN_SUCCESS,SCREEN_FAILURE} from '../../actions'
 function screenApi(search ,token,client,uid) {
   const url = 'http://localhost:3001/api/menus'
   const id = search.split("id=")[1]
-  const params =  JSON.stringify({'id':id})
-  const headers = {'Authorization' : 'Bearer', }
+  const params =  JSON.stringify({'id':id,})
+  const headers = {"access-token":token,"client":client,"uid":uid }
 
-  let postApi = (params) => {
+  let postApi = (url, params, headers) => {
     return axios({
         method: "POST",
         url: url,
