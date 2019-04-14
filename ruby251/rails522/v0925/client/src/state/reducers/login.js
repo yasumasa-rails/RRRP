@@ -1,5 +1,4 @@
-import { LOGIN_REQUEST,LOGIN_SUCCESS,LOGIN_FAILURE,LOGOUT_REQUEST,
-          MENU_REQUEST, MENU_SUCCESS, MENU_FAILURE,} from 'actions'
+import { LOGIN_REQUEST,LOGIN_SUCCESS,LOGIN_FAILURE,LOGOUT_REQUEST, } from 'actions'
 const initialValues = {
   isSubmitting:false,
   errors:[],
@@ -42,22 +41,6 @@ const loginreducer =  (state= initialValues , actions) =>{
     case LOGOUT_REQUEST:
     return {}
 
-    
-    case MENU_REQUEST:
-      return {...state}
-
-    case MENU_SUCCESS:
-      return {...state,
-        menuListData:actions.action,
-      }
-
-    case MENU_FAILURE:
-      return {errors: {
-        body: actions.errors.toString(),
-       },       
-        messages: [],
-        isAuthenticated:false,
-    }      
 
     default:
       return state

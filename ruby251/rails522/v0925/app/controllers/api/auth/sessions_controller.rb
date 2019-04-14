@@ -2,7 +2,7 @@
 module Api
   module Auth
     class SessionsController < DeviseTokenAuth::SessionsController
-      before_action :authenticate_api_user!, except: [:create]
+      before_action :authenticate_api_user!, except: [:create,:destroy]
         # Prevent session parameter from being passed
         # Unpermitted parameter: session
         wrap_parameters format: []

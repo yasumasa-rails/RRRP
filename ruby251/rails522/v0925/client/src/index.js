@@ -12,6 +12,7 @@ import GlobalNav from './globalNav'
 import {Login} from './components/login'
 import {Signup} from './components/signup'
 import Menus from './components/menus'
+import ScreenGrid from './components/screengrid'
 
 ReactDOM.render(
   <Provider store={store}>
@@ -20,7 +21,7 @@ ReactDOM.render(
     <GlobalNav />
     <Switch>
       <Route exact path="/" component={Menus} />
-      <Route exact path="/menus" component={Menus} />
+      <Route path="/menus" component={Menus} />
       <Route path="/signup" component={Signup} />
       <Route path="/login" component={Login} />
     </Switch>

@@ -418,8 +418,30 @@ module RorBlkctl
       end
       # subtract one day to compare date for erroneous 1900 leap year compatibility
       compare_date - 1 + num
-    end
+		end
+		def create_filteredstr filtered,where
+			""
+		end	
+		def fetch_data id,select_fields,page_info,filter,sorting
+				strwhere = ""
+				strsorting = ""
+				strfilter = ""
+				if sorting
+				end
+				if filter
+				end		
+				strsql = "select #{select_fields} from (SELECT ROW_NUMBER() OVER (#{strsorting}) ,#{select_fields}
+																	 FROM #{id} #{if strfilter == '' then '' else 'where '+strfilter end } ) x
+																	where ROW_NUMBER > #{(page_info[:pageNo] -1)*page_info[:sizePerPage] } 
+																 and ROW_NUMBER <= #{(page_info[:pageNo] )*page_info[:sizePerPage] } 
+																  "
+				pagedata = ActiveRecord::Base.connection.select_all(strsql)
 
+				strsql = "SELECT count(*) FROM #{id} #{if strfilter == '' then '' else 'where '+strfilter end } "
+				total_cnt = ActiveRecord::Base.connection.select_value(strsql)
+				page_info[:totalPage] = (total_cnt.to_f/page_info[:sizePerPage].to_f).ceil
+				return  pagedata,	page_info
+		end	
     def proc_blk_paging  command_c,screen_prop,field_prop
         ### strsqlにコーディングしてないときは、viewを使用
         ### strdql はupdate insertには使用できない。
@@ -1625,6 +1647,42 @@ module RorBlkctl
 			screen_prop[:sqlrecstr] = sqlrecstr.chop
 			prototype = {:screen_prop=>screen_prop,:show_columns=>show_columns,:field_prop=>field_prop}
 		end
+	end
+	
+	def create_grid_columns_info screen_code,email
+			grid_columns_info = Rails.cache.fetch('screenfield'+RorBlkctl.grp_code(email)+screen_code) do
+        	###  ダブルコーティション　「"」は使用できない。 
+        	sqlstr = "select * from  func_get_screenfield_grpname('#{email}','#{screen_code}')"
+				columns_info = []
+				page_info = {}
+				where_info = {}
+				select_fields = ""
+				ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
+					case  i["screenfield_type"] 
+						when  'numeric'
+						when 'date'
+						when 'timestamp'
+							 ##renderer
+					end	
+					columns_info <<{:Header=>i["screenfield_name"],
+													:accessor=>i["pobject_code_sfd"],
+													:show=>if i["screenfield_hideflg"] == 1 then false else true end,
+												##	:editable=>if i["screenfield_hideflg"] == 1 then true else false end
+													}
+					select_fields = 	select_fields + 		i["screenfield_name"] + ','
+          if cnt == 0
+                	where_info[:filter] = i["screen_strwhere"]
+                	page_info[:sizePerPage] = i["screen_rows_per_page"].to_i
+                	page_info[:pageNo] = 1
+									page_info[:sizePerPageList] = []
+									i["screen_rowlist"].split(",").each do |list|
+										##screen_prop[:sizePerPageList]  << {:text=> list.to_s,:value=> list.to_i}
+										page_info[:sizePerPageList]  <<  list.to_i
+									end
+       		end
+				end
+				grid_columns_info = [columns_info,page_info,where_info,select_fields.chop]
+			end
 	end
 	def proc_save_alloc_id alloc
 		des_cmd = ActiveRecord::Base.connection.select_one("select * from r_#{alloc["destblname"]} where id = #{alloc["destblid"]}")

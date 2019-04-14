@@ -1,11 +1,13 @@
 
 import {createAction} from 'redux-actions'
+// create actionの使用は止める
 
 export const LOGIN_REQUEST = 'LOGIN_REQUEST'
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
 export const LOGIN_FAILURE = 'LOGIN_FAILURE'
 
 export const LOGOUT_REQUEST = 'LOGOUT_REQUEST'
+export const SCREEN_RESET_REQUEST = 'SCREEN_RESET_REQUEST'
 
 
 export const SIGNUP_REQUEST = 'SIGNUP_REQUEST'
@@ -30,9 +32,10 @@ export const authorize = (email, password) => ({
 })
 
 
-export const LogoutRequest = createAction(
-  LOGOUT_REQUEST,
-)
+export const LogoutRequest = (email, token,client,uid) => ({
+  type: LOGOUT_REQUEST,
+  payload: { email, token,client,uid }
+})
 
 export const SignupRequest = createAction(
   SIGNUP_REQUEST,
@@ -47,8 +50,8 @@ export const MenuRequest = (token,client,uid) => ({
 })
 
 
-export const ScreenRequest = (search,token,client,uid) => ({
+export const ScreenRequest = (params,token,client,uid) => ({
   type:  SCREEN_REQUEST,
-  payload: { search,token,client,uid }
+  payload: { params,token,client,uid }
 })
 

@@ -1,30 +1,32 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link ,withRouter} from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import { LogoutRequest } from './actions'
+import { LogoutRequest,LOGOUT_REQUEST } from './actions'
 
 class GlobalNav extends React.Component {
-  signout(e) {
-    e.preventDefault()
-    this.props.dispatch(LogoutRequest())
-  }
+  //signout(e) {
+  //  e.preventDefault()
+  //  const {email, password,token,client,uid} = this.props
+  //  this.props.dispatch(LogoutRequest(email, password,token,client,uid))    
+  //}
   render() {
-    const { isAuthenticated, isSubmitting, } = this.props
+    //email, password,token,client,uid うまく渡らない
+    const { isAuthenticated, isSubmitting,LogoutClick } = this.props
     return (
       <div>
       <AppBar title="RRRP" position="static">
          <Toolbar>
-          <Link to="/menus">Menu</Link>
           <Typography variant="caption" color="inherit" >
             RRRP 
           </Typography>
           <Typography variant="caption" color="inherit" >
           { !isAuthenticated &&<Link to="/signup" color="primary" >Signup</Link>}
           { !isAuthenticated &&<Link to="/login">Login</Link>  }
-          { isAuthenticated && <button type='submit' disabled={false} href="#" onClick={this.signout.bind(this)}>
+          { isAuthenticated && <button type='submit' disabled={false}
+            onClick ={(e) => LogoutClick("logout", e)}>
              Logout{isSubmitting && <i className='fa fa-spinner fa-spin' />}</button> }
           </Typography>
           </Toolbar>
@@ -34,10 +36,21 @@ class GlobalNav extends React.Component {
   }
 }
 
-
+//this.ownProps.history.replace(`/login`),
+const mapDispatchToProps = (dispatch,ownProps ) => {
+  const { email, password,auth} = ownProps.login?ownProps.login:{ email:"", password:"",auth:[]}
+  const {client,uid} = auth?auth:{client:"",uid:""}
+  const token = auth?{token:auth["access-token"]}:{token:""}
+  return{
+         LogoutClick: () => dispatch(LogoutRequest(email, password,token,client,uid),
+                          )
+        }
+}
 function mapStateToProps(state) {
-  const { isSubmitting ,isAuthenticated} = state.login
-  return { isSubmitting ,isAuthenticated}
+  const { isSubmitting ,isAuthenticated,email, password,auth} = state.login
+  const {client,uid} = auth?auth:{client:"",uid:""}
+  const {token} = auth?{token:auth["access-token"]}:{token:""}
+  return { isSubmitting ,isAuthenticated,email, password,token,client,uid}
 }
 
-export default connect(mapStateToProps)(GlobalNav)
+export default connect(mapStateToProps, mapDispatchToProps )(GlobalNav)

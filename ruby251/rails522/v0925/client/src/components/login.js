@@ -7,7 +7,7 @@ import {authorize} from 'actions'
 // @NOTE For forms that can be reused for both create/update you would move this form to its own
 // file and import it with different initialValues depending on the use-case. An over-optimization
 // for this simple login form however.
-const LoginForm = ({isSubmitting,errors,values}) => (
+const LoginForm = ({isSubmitting,errors,values,}) => (
   <div>
   <Form {...values} >
     email:
@@ -36,6 +36,13 @@ const initialValues = {
   password: '',
 }
 
+function mapStateToProps(state) {
+  return { isAuthenticated:state.login.isAuthenticated ,
+    token:(state.login.auth?state.login.auth["access-token"]:"") ,
+    client:(state.login.auth?state.login.auth.client:""),
+    uid:(state.login.auth?state.login.auth.uid:"") ,
+    }
+}
 const Container = ({onSubmit}) => (
       <Formik 
         initialValues={initialValues}
@@ -46,4 +53,4 @@ const Container = ({onSubmit}) => (
       />
 )
 
-export  const  Login = connect(null,mapDispatchToProps)(Container)
+export  const  Login = connect(mapStateToProps,mapDispatchToProps)(Container)

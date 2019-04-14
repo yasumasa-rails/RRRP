@@ -550,8 +550,113 @@ where
    and pobject.objecttype = 'screen_group'
    ;
 
+CREATE OR REPLACE  VIEW R_BLKTBS (BLKTB_CONTENTS, ID, BLKTB_ID, BLKTB_POBJECT_ID_TBL, POBJECT_CODE_TBL, POBJECT_OBJECTTYPE_TBL, POBJECT_REMARK_TBL, POBJECT_ID_TBL, POBJECT_CONTENTS_TBL, BLKTB_REMARK, BLKTB_EXPIREDATE, BLKTB_UPDATE_IP, BLKTB_CREATED_AT, BLKTB_UPDATED_AT, BLKTB_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, BLKTB_SELTBLS) AS 
+  select
+  blktb.contents blktb_contents
+  , blktb.id id
+  , blktb.id blktb_id
+  , blktb.pobjects_id_tbl blktb_pobject_id_tbl
+  , pobject_tbl.pobject_code pobject_code_tbl
+  , pobject_tbl.pobject_objecttype pobject_objecttype_tbl
+  , pobject_tbl.pobject_remark pobject_remark_tbl
+  , pobject_tbl.pobject_id pobject_id_tbl
+  , pobject_tbl.pobject_contents pobject_contents_tbl
+  , blktb.remark blktb_remark
+  , blktb.expiredate blktb_expiredate
+  , blktb.update_ip blktb_update_ip
+  , blktb.created_at blktb_created_at
+  , blktb.updated_at blktb_updated_at
+  , blktb.persons_id_upd blktb_person_id_upd
+  , person_upd.person_id_UPD updperson_id_upd
+  , person_upd.person_code_UPD updperson_code_upd
+  , person_upd.person_name_UPD updperson_name_upd
+  , blktb.seltbls blktb_seltbls 
+from
+  blktbs blktb
+  , r_pobjects pobject_tbl
+  , upd_persons person_upd 
+where
+  pobject_tbl.id = blktb.pobjects_id_tbl 
+  and person_upd.id = blktb.persons_id_upd
+;
 
- 
+CREATE OR REPLACE  VIEW R_TBLFIELDS (TBLFIELD_CONTENTS, TBLFIELD_BLKTB_ID, BLKTB_CONTENTS, BLKTB_ID, BLKTB_POBJECT_ID_TBL, POBJECT_CODE_TBL, POBJECT_OBJECTTYPE_TBL, POBJECT_ID_TBL, POBJECT_CONTENTS_TBL, BLKTB_SELTBLS, TBLFIELD_FIELDCODE_ID, FIELDCODE_SEQNO, FIELDCODE_FTYPE, FIELDCODE_DATASCALE, FIELDCODE_DATAPRECISION, FIELDCODE_FIELDLENGTH, FIELDCODE_ID, FIELDCODE_CONTENTS, FIELDCODE_POBJECT_ID_FLD, POBJECT_CODE_FLD, POBJECT_OBJECTTYPE_FLD, POBJECT_CONTENTS_FLD, ID, TBLFIELD_ID, TBLFIELD_REMARK, TBLFIELD_EXPIREDATE, TBLFIELD_UPDATE_IP, TBLFIELD_CREATED_AT, TBLFIELD_UPDATED_AT, TBLFIELD_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, TBLFIELD_SEQNO, TBLFIELD_VIEWFLMK) AS 
+  select tblfield.contents tblfield_contents ,
+   tblfield.blktbs_id tblfield_blktb_id ,
+    blktb.blktb_contents blktb_contents,
+	 blktb.blktb_id blktb_id,
+	  blktb.blktb_pobject_id_tbl blktb_pobject_id_tbl,
+	   blktb.pobject_code_tbl pobject_code_tbl,
+	    blktb.pobject_objecttype_tbl pobject_objecttype_tbl, 
+		blktb.pobject_id_tbl pobject_id_tbl,
+		 blktb.pobject_contents_tbl pobject_contents_tbl,
+		  blktb.blktb_seltbls blktb_seltbls,
+		  tblfield.fieldcodes_id tblfield_fieldcode_id , 
+		  fieldcode.fieldcode_seqno fieldcode_seqno, 
+		  fieldcode.fieldcode_ftype fieldcode_ftype,
+		   fieldcode.fieldcode_datascale fieldcode_datascale,
+		    fieldcode.fieldcode_dataprecision fieldcode_dataprecision,
+			 fieldcode.fieldcode_fieldlength fieldcode_fieldlength,
+			  fieldcode.fieldcode_id fieldcode_id,
+			   fieldcode.fieldcode_contents fieldcode_contents,
+			    fieldcode.fieldcode_pobject_id_fld fieldcode_pobject_id_fld,
+				 fieldcode.pobject_code_fld pobject_code_fld, 
+				 fieldcode.pobject_objecttype_fld pobject_objecttype_fld,
+				    fieldcode.pobject_contents_fld pobject_contents_fld,
+					tblfield.id id,
+					tblfield.id tblfield_id ,
+					tblfield.remark tblfield_remark ,
+					tblfield.expiredate tblfield_expiredate ,
+					tblfield.update_ip tblfield_update_ip ,
+					tblfield.created_at tblfield_created_at ,
+					tblfield.updated_at tblfield_updated_at ,
+					tblfield.persons_id_upd tblfield_person_id_upd ,
+					 person_upd.person_id_upd person_id_upd, 
+					 person_upd.person_code_upd person_code_upd,
+					  person_upd.person_name_upd person_name_upd,
+					  tblfield.seqno tblfield_seqno ,
+					  tblfield.viewflmk tblfield_viewflmk 
+ from tblfields tblfield ,r_blktbs  blktb,r_fieldcodes  fieldcode,upd_persons  person_upd
+ where  blktb.id = tblfield.blktbs_id and  fieldcode.id = tblfield.fieldcodes_id and  person_upd.id = tblfield.persons_id_upd
+ ;
+CREATE OR REPLACE VIEW R_SCREENFIELDS (SCREENFIELD_POBJECT_ID_SFD, POBJECT_CODE_SFD, POBJECT_OBJECTTYPE_SFD, POBJECT_ID_SFD, POBJECT_CONTENTS_SFD, SCREENFIELD_EXPIREDATE, SCREENFIELD_UPDATED_AT,
+ SCREENFIELD_EDOPTCOLS, SCREENFIELD_EDOPTROW, SCREENFIELD_WIDTH, SCREENFIELD_INDISP, SCREENFIELD_ROWPOS, SCREENFIELD_SEQNO, SCREENFIELD_HIDEFLG, SCREENFIELD_MAXVALUE, SCREENFIELD_EDITABLE, 
+SCREENFIELD_PARAGRAPH, SCREENFIELD_SELECTION, SCREENFIELD_CRTFIELD, SCREENFIELD_EDOPTVALUE, SCREENFIELD_SUBINDISP, SCREENFIELD_TYPE, SCREENFIELD_SUMKEY, SCREENFIELD_REMARK, SCREENFIELD_CREATED_AT,
+ SCREENFIELD_UPDATE_IP, SCREENFIELD_EDOPTMAXLENGTH, SCREENFIELD_DATASCALE, SCREENFIELD_DATAPRECISION, SCREENFIELD_MINVALUE, SCREENFIELD_EDOPTSIZE, SCREENFIELD_COLPOS, ID, SCREENFIELD_ID, 
+SCREENFIELD_FORMATTER, SCREENFIELD_TBLFIELD_ID, TBLFIELD_CONTENTS, TBLFIELD_BLKTB_ID, BLKTB_CONTENTS, BLKTB_ID, BLKTB_POBJECT_ID_TBL, POBJECT_CODE_TBL, POBJECT_OBJECTTYPE_TBL, POBJECT_ID_TBL,
+ POBJECT_CONTENTS_TBL, BLKTB_SELTBLS, TBLFIELD_FIELDCODE_ID, FIELDCODE_SEQNO, FIELDCODE_FTYPE, FIELDCODE_DATASCALE, FIELDCODE_DATAPRECISION, FIELDCODE_FIELDLENGTH, FIELDCODE_ID, FIELDCODE_CONTENTS,
+ POBJECT_CODE_FLD, POBJECT_OBJECTTYPE_FLD, POBJECT_CONTENTS_FLD, TBLFIELD_ID, TBLFIELD_SEQNO, TBLFIELD_VIEWFLMK, SCREENFIELD_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD,
+ SCREENFIELD_CONTENTS, SCREENFIELD_SCREEN_ID, SCREEN_STRWHERE, SCREEN_ROWS_PER_PAGE, SCREEN_ROWLIST, SCREEN_HEIGHT, SCREEN_POBJECT_ID_VIEW, POBJECT_CODE_VIEW, POBJECT_OBJECTTYPE_VIEW, 
+POBJECT_ID_VIEW, POBJECT_CONTENTS_VIEW, SCREEN_FORM_PS, SCREEN_STRGROUPORDER, SCREEN_STRSELECT, SCREEN_CDRFLAYOUT, SCREEN_YMLCODE, SCREEN_ID, 
+SCREEN_POBJECT_ID_SCR, POBJECT_CODE_SCR, POBJECT_OBJECTTYPE_SCR, POBJECT_ID_SCR, POBJECT_CONTENTS_SCR, SCREEN_CONTENTS, SCREEN_SCRLV_ID, SCRLV_LEVEL1, SCRLV_ID, SCRLV_CODE) AS 
+  select screenfield.pobjects_id_sfd screenfield_pobject_id_sfd , pobject_sfd.pobject_code pobject_code_sfd, pobject_sfd.pobject_objecttype pobject_objecttype_sfd, 
+ pobject_sfd.pobject_id pobject_id_sfd, pobject_sfd.pobject_contents pobject_contents_sfd,screenfield.expiredate screenfield_expiredate ,screenfield.updated_at screenfield_updated_at ,
+screenfield.edoptcols screenfield_edoptcols ,screenfield.edoptrow screenfield_edoptrow ,screenfield.width screenfield_width ,screenfield.indisp screenfield_indisp ,
+screenfield.rowpos screenfield_rowpos ,screenfield.seqno screenfield_seqno ,screenfield.hideflg screenfield_hideflg ,screenfield.maxvalue screenfield_maxvalue ,screenfield.editable screenfield_editable ,
+screenfield.paragraph screenfield_paragraph ,screenfield.selection screenfield_selection ,screenfield.crtfield screenfield_crtfield ,screenfield.edoptvalue screenfield_edoptvalue ,
+screenfield.subindisp screenfield_subindisp ,screenfield.type screenfield_type ,screenfield.sumkey screenfield_sumkey ,screenfield.remark screenfield_remark ,
+screenfield.created_at screenfield_created_at ,screenfield.update_ip screenfield_update_ip ,screenfield.edoptmaxlength screenfield_edoptmaxlength ,screenfield.datascale screenfield_datascale ,
+screenfield.dataprecision screenfield_dataprecision ,screenfield.minvalue screenfield_minvalue ,screenfield.edoptsize screenfield_edoptsize ,screenfield.colpos screenfield_colpos ,
+screenfield.id id,screenfield.id screenfield_id ,screenfield.formatter screenfield_formatter ,screenfield.tblfields_id screenfield_tblfield_id , tblfield.tblfield_contents tblfield_contents, 
+tblfield.tblfield_blktb_id tblfield_blktb_id, tblfield.blktb_contents blktb_contents, tblfield.blktb_id blktb_id, tblfield.blktb_pobject_id_tbl blktb_pobject_id_tbl, tblfield.pobject_code_tbl pobject_code_tbl, 
+tblfield.pobject_objecttype_tbl pobject_objecttype_tbl,  tblfield.pobject_id_tbl pobject_id_tbl, tblfield.pobject_contents_tbl pobject_contents_tbl, tblfield.blktb_seltbls blktb_seltbls,
+ tblfield.tblfield_fieldcode_id tblfield_fieldcode_id, tblfield.fieldcode_seqno fieldcode_seqno, tblfield.fieldcode_ftype fieldcode_ftype, tblfield.fieldcode_datascale fieldcode_datascale,
+ tblfield.fieldcode_dataprecision fieldcode_dataprecision, tblfield.fieldcode_fieldlength fieldcode_fieldlength, tblfield.fieldcode_id fieldcode_id, tblfield.fieldcode_contents fieldcode_contents,
+ tblfield.pobject_code_fld pobject_code_fld, tblfield.pobject_objecttype_fld pobject_objecttype_fld,  tblfield.pobject_contents_fld pobject_contents_fld, tblfield.tblfield_id tblfield_id, 
+tblfield.tblfield_seqno tblfield_seqno, tblfield.tblfield_viewflmk tblfield_viewflmk,screenfield.persons_id_upd screenfield_person_id_upd , person_upd.person_id_upd person_id_upd, 
+person_upd.person_code_upd person_code_upd, person_upd.person_name_upd person_name_upd,screenfield.contents screenfield_contents ,screenfield.screens_id screenfield_screen_id ,
+ screen.screen_strwhere screen_strwhere, screen.screen_rows_per_page screen_rows_per_page, screen.screen_rowlist screen_rowlist, screen.screen_height screen_height, 
+screen.screen_pobject_id_view screen_pobject_id_view, screen.pobject_code_view pobject_code_view, screen.pobject_objecttype_view pobject_objecttype_view,  screen.pobject_id_view pobject_id_view,
+ screen.pobject_contents_view pobject_contents_view, screen.screen_form_ps screen_form_ps, screen.screen_strgrouporder screen_strgrouporder, screen.screen_strselect screen_strselect,
+ screen.screen_cdrflayout screen_cdrflayout, screen.screen_ymlcode screen_ymlcode, screen.screen_id screen_id, screen.screen_pobject_id_scr screen_pobject_id_scr,
+ screen.pobject_code_scr pobject_code_scr, screen.pobject_objecttype_scr pobject_objecttype_scr, screen.pobject_id_scr pobject_id_scr, screen.pobject_contents_scr pobject_contents_scr,
+ screen.screen_contents screen_contents, screen.screen_scrlv_id screen_scrlv_id, screen.scrlv_level1 scrlv_level1, screen.scrlv_id scrlv_id, screen.scrlv_code scrlv_code
+ from screenfields screenfield ,r_pobjects  pobject_sfd,r_tblfields  tblfield,upd_persons  person_upd,r_screens  screen
+ where  pobject_sfd.id = screenfield.pobjects_id_sfd and  tblfield.id = screenfield.tblfields_id and  person_upd.id = screenfield.persons_id_upd and  screen.id = screenfield.screens_id
+
+ ;
+
+
  CREATE OR REPLACE  VIEW R_RUBYCODINGS (RUBYCODING_POBJECT_ID, POBJECT_CODE, POBJECT_OBJECTTYPE,
           POBJECT_ID, POBJECT_CONTENTS, RUBYCODING_CONTENTS, ID, RUBYCODING_ID, RUBYCODING_REMARK, RUBYCODING_EXPIREDATE,
          RUBYCODING_UPDATE_IP, RUBYCODING_CREATED_AT, RUBYCODING_UPDATED_AT, RUBYCODING_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD,
