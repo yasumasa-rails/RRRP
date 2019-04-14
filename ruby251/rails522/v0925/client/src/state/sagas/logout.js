@@ -6,24 +6,24 @@ import {  MENU_FAILURE } from '../../actions';
 
 function logoutApi({ email,token,client,uid}) {
   const url = 'http://localhost:3001/api/auth/sign_out'
-  const headers =  { 'access-token':token.token, 
-                    client,uid,}
+  const headers =  { 'access-token':token.token, client,uid}
   const params =  { uid}
 
   let getApi = (url, params,headers) => {
     return axios({
       method: "DELETE",
       url: url,
-      params: params,headers:headers,
+      params, headers
     });
   };
-  return getApi(url, params)
+  return getApi(url, params,headers)
 }
 
 export function* LogoutSaga({ payload: { email,token,client,uid} }) {
   try{
       yield call(logoutApi, {email, token,client,uid } )
       yield call(history.push('/login'))  ///有効にならない
+      // persistor.purge() これを実行すると、Storageに保存された情報がクリアされる
   }catch (error)
      {  
       let message;
@@ -32,5 +32,7 @@ export function* LogoutSaga({ payload: { email,token,client,uid} }) {
               case 401: message = 'Menu Invalid credentials'; break;
               default: message = error.errors;}
       yield put({ type: MENU_FAILURE, payload: message })
+      // persistor.purge() これを実行すると、Storageに保存された情報がクリアされる
   }
  }      
+//  送信されてない。

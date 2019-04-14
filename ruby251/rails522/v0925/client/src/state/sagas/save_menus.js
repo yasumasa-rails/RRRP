@@ -11,17 +11,16 @@ function MenuGetApi({ token,client,uid}) {
                     'uid':uid,}
   const params =  { 'uid':uid,}
 
-  let getApi = (url, params,headers) => {
+  let getApi = (url, params) => {
     return axios({
       method: "POST",
       url: url,
-      params,headers,
+      params: params,headers:headers,
     });
   };
-  return getApi(url, params,headers)
+  return getApi(url, params)
 }
 
-// MenuSaga({ payload: { token,client,uid} })  出し手と合わすこと
 export function* MenuSaga({ payload: { token,client,uid} }) {
   try{
       let ret  = yield call(MenuGetApi, { token,client,uid } )

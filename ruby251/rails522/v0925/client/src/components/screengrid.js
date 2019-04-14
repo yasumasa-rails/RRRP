@@ -12,23 +12,25 @@ import {ScreenRequest} from '../actions'
 class ScreenGrid extends React.Component {
 
   render() {
-    const {match,columns,uid,token,client,state} = this.props
-    const id = match?match.params.id:null
+    const {columns,uid,token,client,state} = this.props
+    const id = state.params?state.params.id:null
     return(
       <div>
+      {id?
       <ReactTable
         columns={columns?columns:[]} 
         data={state.data?state.data:[]} // should default to []
-        pages={state.pages?state.pageInfo.pages:-1} // should default to -1 (which means we don't know how many pages we have)
+        pages={state.pages?state.pageInfo.totalPage:0} // should default to -1 (which means we don't know how many pages we have)
         manual // informs React Table that you'll be handling sorting and pagination server-side
         onFetchData={(state, instance) => {
           let  params= {  page: state.page,  pageSize: state.pageSize,
                         sorted: state.sorted,  filtered: state.filtered,      
-                        id:id}   
+                        id:id,uid:uid}   
                         this.props.dispatch(ScreenRequest(params,
                              token,client,uid,) ) 
         }}
        />
+       :"select menu"}
         </div>
        )
     }

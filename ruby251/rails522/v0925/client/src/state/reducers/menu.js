@@ -1,4 +1,4 @@
-import {  MENU_REQUEST, MENU_SUCCESS, MENU_FAILURE,} from 'actions'
+import {  MENU_REQUEST, MENU_SUCCESS, MENU_FAILURE,LOGOUT_REQUEST} from 'actions'
 const initialValues = {
   isSubmitting:false,
   errors:[],
@@ -21,7 +21,10 @@ const menureducer =  (state= initialValues , actions) =>{
        },       
         messages: [],
         isAuthenticated:false,
-    }      
+    }    
+
+    case  LOGOUT_REQUEST:
+    return {}  
 
     default:
       return state

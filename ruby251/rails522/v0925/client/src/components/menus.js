@@ -3,7 +3,7 @@
 //import axios from 'axios'
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link,BrowserRouter,Route,withRouter , } from 'react-router-dom'
+import { Link,BrowserRouter,Route,} from 'react-router-dom'
 import { Tab, Tabs, TabList, TabPanel, } from 'react-tabs'
 import "react-tabs/style/react-tabs.css"
 
@@ -12,10 +12,8 @@ import { Login } from './login'
 import {ScreenRequest} from '../actions'
 import ScreenGrid from './screengrid'
 
-
  
 class Menus extends React.Component {
- 
   render() {
     const { isAuthenticated ,menuListData,token,client,uid,getScreen} = this.props
     
@@ -45,9 +43,10 @@ class Menus extends React.Component {
                   {menuListData.map((val,index) => 
                     grp_name===val.grp_name&&
                     <Tab key={index}>
-                      <Link color="primary"  to={`/menus/${val.scr_name}`} > 
+                      <button color="primary"  type="submit"
+                      onClick ={() => getScreen(val.scr_code,token,client,uid)}>
                       {val.scr_name}       
-                      </Link>             
+                      </button>             
                     </Tab>)}
                 </TabList>
                   {menuListData.map((val,index) => 
@@ -90,10 +89,9 @@ const  mapStateToProps = (state,ownProps) =>({
 
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-      getScreen : () =>{
-        const params = {id:ownProps.scr_name}
-        const {token, client, uid} = ownProps
+      getScreen : (id, token, client, uid) =>{
+        const params = {"id":id,"uid":uid}
        dispatch(ScreenRequest(params, token, client, uid))}
           })    
 
-export default withRouter(connect(mapStateToProps,mapDispatchToProps)(Menus))
+export default connect(mapStateToProps,mapDispatchToProps)(Menus)

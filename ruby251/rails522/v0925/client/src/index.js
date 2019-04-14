@@ -12,7 +12,6 @@ import GlobalNav from './globalNav'
 import {Login} from './components/login'
 import {Signup} from './components/signup'
 import Menus from './components/menus'
-import ScreenGrid from './components/screengrid'
 
 ReactDOM.render(
   <Provider store={store}>

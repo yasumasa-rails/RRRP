@@ -1,10 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link ,withRouter} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import { LogoutRequest,LOGOUT_REQUEST } from './actions'
+import { LogoutRequest, } from './actions'
 
 class GlobalNav extends React.Component {
   //signout(e) {
@@ -14,7 +14,7 @@ class GlobalNav extends React.Component {
   //}
   render() {
     //email, password,token,client,uid うまく渡らない
-    const { isAuthenticated, isSubmitting,LogoutClick } = this.props
+    const { isAuthenticated, isSubmitting,LogoutClick,email, password,token,client,uid } = this.props
     return (
       <div>
       <AppBar title="RRRP" position="static">
@@ -26,7 +26,7 @@ class GlobalNav extends React.Component {
           { !isAuthenticated &&<Link to="/signup" color="primary" >Signup</Link>}
           { !isAuthenticated &&<Link to="/login">Login</Link>  }
           { isAuthenticated && <button type='submit' disabled={false}
-            onClick ={(e) => LogoutClick("logout", e)}>
+            onClick ={() => LogoutClick(email, password,token,client,uid)}>
              Logout{isSubmitting && <i className='fa fa-spinner fa-spin' />}</button> }
           </Typography>
           </Toolbar>
@@ -38,11 +38,12 @@ class GlobalNav extends React.Component {
 
 //this.ownProps.history.replace(`/login`),
 const mapDispatchToProps = (dispatch,ownProps ) => {
-  const { email, password,auth} = ownProps.login?ownProps.login:{ email:"", password:"",auth:[]}
-  const {client,uid} = auth?auth:{client:"",uid:""}
-  const token = auth?{token:auth["access-token"]}:{token:""}
+//  mapDispatchToPropsの処理がmapStateToPropsよりも早くされる?
+//  const { email, password,auth} = ownProps.login?ownProps.login:{ email:"", password:"",auth:[]}
+//  const {client,uid} = auth?auth:{client:"",uid:""}
+//  const token = auth?{token:auth["access-token"]}:{token:""}
   return{
-         LogoutClick: () => dispatch(LogoutRequest(email, password,token,client,uid),
+         LogoutClick: (email, password,token,client,uid) => dispatch(LogoutRequest(email, password,token,client,uid),
                           )
         }
 }
