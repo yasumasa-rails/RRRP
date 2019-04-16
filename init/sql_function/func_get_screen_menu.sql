@@ -1,8 +1,8 @@
-﻿create or replace function func_get_screen_menu(email text) returns table(grp_name text,scr_name text,scr_code text,contents text )
+﻿create or replace function func_get_screen_menu(email text) returns table(grp_name text,scr_name text,screen_code text,page_size numeric,contents text )
 as $$
 select case  when q.name is null then s.pobject_code_sgrp else q.name end as grp_name ,
 	case  when x.name is null then s.pobject_code_scr else x.name end as scr_name ,
-	s.pobject_code_scr scr_code,x.contents
+	s.pobject_code_scr screen_code,screen_rows_per_page page_size,x.contents
 from r_screens s
       left join  ( select t.pobjects_id,t.name from pobjgrps t 
 			inner join  persons  p on p.usrgrps_id = t.usrgrps_id and email= $1) q
@@ -13,4 +13,3 @@ from r_screens s
 where s.pobject_code_sgrp !='#' order by  s.pobject_code_sgrp,s.screen_seqno
 $$
 language sql
-

@@ -52,6 +52,6 @@ export const MenuRequest = (token,client,uid) => ({
 
 export const ScreenRequest = (params,token,client,uid) => ({
   type:  SCREEN_REQUEST,
-  payload: { params,token,client,uid }
+  payload: { params,token,client,uid }  //
 })
 

@@ -44,7 +44,7 @@ class Menus extends React.Component {
                     grp_name===val.grp_name&&
                     <Tab key={index}>
                       <button color="primary"  type="submit"
-                      onClick ={() => getScreen(val.scr_code,token,client,uid)}>
+                      onClick ={() => getScreen(val.screen_code,val.page_size,token,client,uid)}>
                       {val.scr_name}       
                       </button>             
                     </Tab>)}
@@ -89,9 +89,12 @@ const  mapStateToProps = (state,ownProps) =>({
 
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-      getScreen : (id, token, client, uid) =>{
-        const params = {"id":id,"uid":uid}
-       dispatch(ScreenRequest(params, token, client, uid))}
+      getScreen : (screenCode,pageSize, token, client, uid) =>{
+        let  params= {  page: 0,  
+                        pageSize :pageSize,
+                        sorted: "",  filtered: "",      
+                         screenCode:screenCode,uid:uid} 
+        dispatch(ScreenRequest(params, token, client, uid))}
           })    
 
 export default connect(mapStateToProps,mapDispatchToProps)(Menus)

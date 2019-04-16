@@ -12,20 +12,24 @@ const screenreducer =  (state= initialValues , action) =>{
     // Set the requesting flag and append a message to be shown
     case SCREEN_REQUEST:
       return {
-        params:action.payload.params,
-        token:action.payload.token,
-        client:action.payload.client,
-        uid:action.payload.uid,
+        pageSize:action.payload.params.pageSize,
+        page:action.payload.params?action.payload.params.page:0,
+        screenCode:action.payload.params.screenCode, 
+        sort:action.payload.params.sort, 
+        filter:action.payload.params.filter, 
+        token:action.payload.token, 
+        client:action.payload.client, 
+        uid:action.payload.uid, 
         messages: [{ body: 'screen loading ...', time: new Date() }],
       }
 
-    // Successful?  Reset the signup state.
+    // Successful?  .
     case SCREEN_SUCCESS:
       return {...state,
         messages: [],
         columns: action.action.data.columns,
         data: action.action.data.data,
-        pageInfo: action.action.data.pageInfo?action.action.data.pageInfo:{},
+        pages: action.action.data.pageInfo.totalPage 
       }
 
     // Append the error returned from our api

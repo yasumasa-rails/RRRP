@@ -9,41 +9,48 @@ import {ScreenRequest} from '../actions'
 // file and import it with different initialValues depending on the use-case. An over-optimization
 // for this simple login form however.
 
+
 class ScreenGrid extends React.Component {
 
   render() {
-    const {columns,uid,token,client,state} = this.props
-    const id = state.params?state.params.id:null
+  
+    const {screenCode,pageSize,uid,token,client,state} = this.props
     return(
       <div>
-      {id?
+      {screenCode?  
       <ReactTable
-        columns={columns?columns:[]} 
-        data={state.data?state.data:[]} // should default to []
-        pages={state.pages?state.pageInfo.totalPage:0} // should default to -1 (which means we don't know how many pages we have)
+      columns={state.columns?state.columns:[]} 
+      data={state.data?state.data:[]} // should default to [] / 
+      pages={state.pages?state.pages:0}
+      pageSize={state.pageSize}
+      
         manual // informs React Table that you'll be handling sorting and pagination server-side
         onFetchData={(state, instance) => {
-          let  params= {  page: state.page,  pageSize: state.pageSize,
+          let  params= {  page: state.page,  
+                        pageSize :state.pageSize?state.pageSize:pageSize,
                         sorted: state.sorted,  filtered: state.filtered,      
-                        id:id,uid:uid}   
+                        screenCode:screenCode,uid:uid}   
                         this.props.dispatch(ScreenRequest(params,
-                             token,client,uid,) ) 
+                             token,client,uid,) )                  
         }}
-       />
-       :"select menu"}
+      className="-striped -highlight" 
+       style={{
+        height: "800px" // This will force the table body to overflow and scroll, since there is not enough room
+      }}
+       /> 
+        :"please select"}
         </div>
        )
     }
   }
 function mapStateToProps(state) {
-  return {  columns:state.screen.columns,
-            uid:state.login.auth?state.login.auth.uid:"",
+  return {  uid:state.login.auth?state.login.auth.uid:"",
             token:state.login.auth?state.login.auth["access-token"]:"",
             client:state.login.auth?state.login.auth.client:"",
-            state:state.screen,
-            match:state.match
+            screenCode:state.screen.screenCode,
+            pageSize:state.screen.pageSize,
+            state:state.screen
             }
 }
-
 
 export default connect(mapStateToProps)(ScreenGrid)

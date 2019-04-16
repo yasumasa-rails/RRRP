@@ -432,8 +432,8 @@ module RorBlkctl
 				end		
 				strsql = "select #{select_fields} from (SELECT ROW_NUMBER() OVER (#{strsorting}) ,#{select_fields}
 																	 FROM #{id} #{if strfilter == '' then '' else 'where '+strfilter end } ) x
-																	where ROW_NUMBER > #{(page_info[:pageNo] -1)*page_info[:sizePerPage] } 
-																 and ROW_NUMBER <= #{(page_info[:pageNo] )*page_info[:sizePerPage] } 
+																	where ROW_NUMBER > #{(page_info[:pageNo]-1.0)*page_info[:sizePerPage] } 
+																 and ROW_NUMBER <= #{(page_info[:pageNo])*page_info[:sizePerPage] } 
 																  "
 				pagedata = ActiveRecord::Base.connection.select_all(strsql)
 
