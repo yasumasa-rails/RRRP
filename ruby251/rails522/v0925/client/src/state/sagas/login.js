@@ -4,7 +4,7 @@ import {LOGIN_SUCCESS,LOGIN_FAILURE,MenuRequest} from '../../actions'
 
 function loginApi({ email, password}) {
   const url = 'http://localhost:3001/api/auth/sign_in'
-  const params =  JSON.stringify({'email':email, 'password':password  })
+  const params =  {'email':email, 'password':password  }
   const headers = { 'Content-Type': 'application/json',
                }
 
@@ -12,7 +12,7 @@ function loginApi({ email, password}) {
     return axios({
       method: "POST",
       url: url,
-      data: params,
+      params: params,
       headers: headers
     });
   };
@@ -20,21 +20,23 @@ function loginApi({ email, password}) {
 }
 
 export function* LoginSaga({ payload: { email, password } }) {
-  try{
-      let response  = yield call(loginApi, { email, password} )
+  
+  let response  = yield call(loginApi, { email, password} )
+    if(response.headers){
       yield put({ type: LOGIN_SUCCESS, action: response.headers })
-      const token = response.headers["access-token"]
-      const client = response.headers["client"]
-      const uid = response.headers["uid"]
+      const token = {token:response.headers["access-token"]}
+      const client = {client:response.headers["client"]}
+      const uid = {uid:response.headers["uid"]}
       //yield put({ type: MENU_REQUEST, action: (token,client,uid) })
+
       yield put(MenuRequest(token,client,uid) )
-  }catch (error)
+  }else
      {  
       let message;
-      switch (error.response) {
+      switch (response.status) {
               case 500: message = 'Internal Server Error'; break;
               case 401: message = 'Invalid credentials'; break;
-              default: message = 'Something went wrong';}
+              default: message = `Something went wrong ${response.error}`;}
       yield put({ type: LOGIN_FAILURE, payload: message })
   }
  }      

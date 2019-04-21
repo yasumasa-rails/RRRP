@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import ReactTable from 'react-table'
 import "react-table/react-table.css"
 import {ScreenRequest,ScreenParamsSet} from '../actions'
-//import Upload from './upload'
 
 // LOGIN FORM
 // @NOTE For forms that can be reused for both create/update you would move this form to its own
@@ -15,47 +14,46 @@ class ScreenGrid extends React.Component {
 
   render() {
   
-    const {screenCode, pageSize,
-      //screenName,view,token,client,uid,
-      //      page,sorted,filtered,
-            handleLineEdit,handleScreenParamsSet,columns,data,pages,
-            } = this.props
+    const {screenCode,pageSize,columns,data,pages,view,page,sorted,filtered,
+          uid,token,client,} = this.props
     
-    //let  params= {  page: page?page:0,  
-    //        pageSize :pageSize?pageSize:20,
-    //        sorted: sorted,  filtered: filtered,      
-    //        screenCode:screenCode,uid:uid}         
+    let  params= {  page: page?page:0,  
+            pageSize :pageSize?pageSize:20,
+            sorted: sorted,  filtered: filtered,      
+            screenCode:screenCode,uid:uid}         
    
     return(
       <div>
       {screenCode?  
       <ReactTable
       columns={columns?columns:[]} 
-      pages={pages?pages:0}  //
-      pageSize={pageSize?pageSize:0}  //
+      pages={pages?pages:-1}  //kick onFetchData
       data={data?data:[]} // should default to [] / 
         manual // informs React Table that you'll be handling sorting and pagination server-side
         onFetchData={( subparams,instance) => {                      
-                            handleScreenParamsSet(subparams)  
+                       this.props.dispatch(ScreenParamsSet(subparams))   
+                        view&&this.props.dispatch(ScreenRequest(params,
+                                         token,client,uid,) )                            
         }}
       className="-striped -highlight" //-striped  奇数行、偶数行色分け　 -highlight：マウスがヒットした時の色の強調
        style={{
-       height: "900px" // This will force the table body to overflow and scroll, since there is not enough room
+       height: "800px" // This will force the table body to overflow and scroll, since there is not enough room
        }}
 
       filterable={true}
 
-       >                       
+       >
 
 {(state, makeTable, instance) => {
     return (
       <div
         style={{
-          borderRadius: "5px",  overflow: "hidden", padding: "5px"
+          borderRadius: "5px",
+          overflow: "hidden",
+          padding: "5px"
         }}
       >
         {makeTable()}
-        <button onClick={() => handleLineEdit()}>line Edit</button>
       </div>
     );
   }}
@@ -65,12 +63,11 @@ class ScreenGrid extends React.Component {
        )
     }
   }
-const  mapStateToProps = (state) => {
+function mapStateToProps(state) {
   return {  uid:state.login.auth?state.login.auth.uid:"",
             token:state.login.auth?state.login.auth["access-token"]:"",
             client:state.login.auth?state.login.auth.client:"",
             screenCode:state.screen.screenCode,
-            screenName:state.screen.screenName,
             columns:state.screen.columns,
             data:state.screen.data,
             pages:state.screen.pages,
@@ -81,14 +78,5 @@ const  mapStateToProps = (state) => {
             filtered:state.screen.filtered
             }
 }
-   
 
-const mapDispatchToProps = (dispatch,ownProps ) => ({
-  handleLineEdit : (screenCode,pageSize, page,token, client, uid) =>{
-    let  params= {  page: page, pageSize : pageSize,    
-                     screenCode:screenCode,uid:uid,lineEdit:true} 
-  //  dispatch(ScreenRequest(params, token, client, uid))
-  },
-    handleScreenParamsSet:  (subparams) =>{dispatch(ScreenParamsSet(subparams))},
-  })   
-export default connect(mapStateToProps,mapDispatchToProps)(ScreenGrid)
+export default connect(mapStateToProps)(ScreenGrid)

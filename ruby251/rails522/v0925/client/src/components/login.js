@@ -9,6 +9,7 @@ import {authorize} from 'actions'
 // for this simple login form however.
 const LoginForm = ({isSubmitting,errors,values,}) => (
   <div>
+    <p>Login</p>
   <Form {...values} >
     email:
     <Field type="email" name="email" />

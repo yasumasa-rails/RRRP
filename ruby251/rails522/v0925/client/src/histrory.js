@@ -1,5 +1,5 @@
-import createHistory from 'history/createBrowserHistory'
+import { createBrowserHistory } from 'history'
 
 // configure, create, and export the project's history instance
-const history = createHistory();
+const history = createBrowserHistory();
 export default  history

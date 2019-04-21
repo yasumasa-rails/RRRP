@@ -1667,6 +1667,7 @@ module RorBlkctl
 					columns_info <<{:Header=>i["screenfield_name"],
 													:accessor=>i["pobject_code_sfd"],
 													:show=>if i["screenfield_hideflg"] == 1 then false else true end,
+														:show=>if i["screenfield_editable"] == 1 then false else true end,
 												##	:editable=>if i["screenfield_hideflg"] == 1 then true else false end
 													}
 					select_fields = 	select_fields + 		i["screenfield_name"] + ','

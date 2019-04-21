@@ -50,3 +50,8 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # 「dotenv」は環境変数を環境ごとにファイルベースで管理するのに便利なGemです。
 gem 'dotenv-rails'
+
+gem 'rubyXL'
+gem 'json'
+##gem 'fog'
+gem 'carrierwave'

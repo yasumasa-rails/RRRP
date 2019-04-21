@@ -1,35 +1,43 @@
-import { SCREEN_REQUEST,SCREEN_SUCCESS,SCREEN_FAILURE,  LOGOUT_REQUEST} 
+import { SCREEN_REQUEST,SCREEN_SUCCESS,SCREEN_FAILURE,  LOGOUT_REQUEST,SCREEN_PARAMS_SET} 
           from '../../actions'
 const initialValues = {
   errors:[],
   columns:[{name:"loadung"}],
   data:[{name:"loadung"}],
   pageInfo:{totalpage:0},
+  view:false,
 }
 
 const screenreducer =  (state= initialValues , action) =>{
   switch (action.type) {
     // Set the requesting flag and append a message to be shown
     case SCREEN_REQUEST:
-      return {
-        pageSize:action.payload.params.pageSize,
-        page:action.payload.params?action.payload.params.page:0,
+      return {...state,
         screenCode:action.payload.params.screenCode, 
-        sort:action.payload.params.sort, 
-        filter:action.payload.params.filter, 
-        token:action.payload.token, 
-        client:action.payload.client, 
-        uid:action.payload.uid, 
+        pageSize:action.payload.params.pageSize, 
+        view:true,
+        screenName:action.payload.screenName, 
         messages: [{ body: 'screen loading ...', time: new Date() }],
       }
+
+      case SCREEN_PARAMS_SET:
+      return {...state,
+        pageSize:action.payload.subparams.pageSize,
+        page:action.payload.subparams.page,
+        sort:action.payload.subparams.sorted, 
+        filter:action.payload.subparams.filtered, 
+        messages: [],
+      }
+
 
     // Successful?  .
     case SCREEN_SUCCESS:
       return {...state,
         messages: [],
-        columns: action.action.data.columns,
+        columns: action.action.data.columns,　　/// payloadに統一
         data: action.action.data.data,
-        pages: action.action.data.pageInfo.totalPage 
+        pages: action.action.data.pageInfo.totalPage,
+        view:false,
       }
 
     // Append the error returned from our api

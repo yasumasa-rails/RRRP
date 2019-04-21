@@ -16,17 +16,17 @@ function screenApi({params,token,client,uid}) {
   return postApi(url, params, headers)
 }
 
-export function* ScreenSaga({ payload: {params,token,client,uid}  }) {
-  try{
-      let response  = yield call(screenApi,{params ,token,client,uid} )
+export function* ScreenSaga({ payload: {params,token,client,uid,lineEdit,screenName}  }) {
+  let response  = yield call(screenApi,{params ,token,client,uid} )
+  if(response){
       yield put({ type: SCREEN_SUCCESS, action: response })
-  }catch (error)
+  }else
      {  
       let message;
-      switch (error.response) {
+      switch (response.status) {
               case 500: message = 'Internal Server Error'; break;
               case 401: message = 'Invalid credentials'; break;
-              default: message = 'Something went wrong';}
-      yield put({ type: SCREEN_FAILURE, payload: message })
+              default: message = `Something went wrong ${response.error}` ;}
+      yield put({ type: SCREEN_FAILURE, errors: message })
   }
  }      

@@ -6,6 +6,7 @@ import  loginreducer  from './login'
 import  signupreducer  from './signup'
 import  menureducer  from './menu'
 import  screenreducer  from './screen'
+import  uploadreducer  from './upload'
 
 
 const reducer = combineReducers({
@@ -13,6 +14,7 @@ const reducer = combineReducers({
   signup:signupreducer,
   menu:menureducer,
   screen:screenreducer,
+  upload:uploadreducer,
   routing: routerReducer,
 })
 
