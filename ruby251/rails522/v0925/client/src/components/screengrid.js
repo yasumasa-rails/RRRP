@@ -2,7 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux'
 import ReactTable from 'react-table'
 import "react-table/react-table.css"
-import {ScreenRequest,ScreenParamsSet} from '../actions'
+import {ScreenParamsSet} from '../actions'
+import ButtonList from './buttonlist'
 //import Upload from './upload'
 
 // LOGIN FORM
@@ -18,7 +19,7 @@ class ScreenGrid extends React.Component {
     const {screenCode, pageSize,
       //screenName,view,token,client,uid,
       //      page,sorted,filtered,
-            handleLineEdit,handleScreenParamsSet,columns,data,pages,
+            handleScreenParamsSet,columns,data,pages,
             } = this.props
     
     //let  params= {  page: page?page:0,  
@@ -40,7 +41,7 @@ class ScreenGrid extends React.Component {
         }}
       className="-striped -highlight" //-striped  奇数行、偶数行色分け　 -highlight：マウスがヒットした時の色の強調
        style={{
-       height: "900px" // This will force the table body to overflow and scroll, since there is not enough room
+       height: "800px" // This will force the table body to overflow and scroll, since there is not enough room
        }}
 
       filterable={true}
@@ -55,7 +56,7 @@ class ScreenGrid extends React.Component {
         }}
       >
         {makeTable()}
-        <button onClick={() => handleLineEdit()}>line Edit</button>
+        <ButtonList/>
       </div>
     );
   }}
@@ -76,7 +77,6 @@ const  mapStateToProps = (state) => {
             pages:state.screen.pages,
             page:state.screen.page,
             pageSize:state.screen.pageSize,
-            view:state.screen.view,
             sorted:state.screen.sorted,
             filtered:state.screen.filtered
             }
@@ -84,11 +84,6 @@ const  mapStateToProps = (state) => {
    
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-  handleLineEdit : (screenCode,pageSize, page,token, client, uid) =>{
-    let  params= {  page: page, pageSize : pageSize,    
-                     screenCode:screenCode,uid:uid,lineEdit:true} 
-  //  dispatch(ScreenRequest(params, token, client, uid))
-  },
     handleScreenParamsSet:  (subparams) =>{dispatch(ScreenParamsSet(subparams))},
   })   
 export default connect(mapStateToProps,mapDispatchToProps)(ScreenGrid)

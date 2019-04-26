@@ -2,7 +2,7 @@
 import {takeLatest} from 'redux-saga/effects'
 
 import {LOGIN_REQUEST,SIGNUP_REQUEST,MENU_REQUEST,
-        LOGOUT_REQUEST,SCREEN_REQUEST,
+        LOGOUT_REQUEST,SCREEN_REQUEST,BUTTONLIST_REQUEST,
       //  UPLOAD_REQUEST,
       } from  'actions'
 
@@ -11,6 +11,7 @@ import {LoginSaga} from './login'
 import {SignupSaga} from './signup'
 import {MenuSaga} from './menus'
 import {ScreenSaga} from './screen'
+import {ButtonListSaga} from './buttonlist'
 import {LogoutSaga} from './logout'
 //import {UploadSaga} from './upload'
 
@@ -21,6 +22,7 @@ export function * sagas () {
   yield takeLatest(SIGNUP_REQUEST,SignupSaga)
   yield takeLatest(MENU_REQUEST,MenuSaga)
   yield takeLatest(SCREEN_REQUEST,ScreenSaga)
+  yield takeLatest(BUTTONLIST_REQUEST,ButtonListSaga)
   yield takeLatest(LOGOUT_REQUEST,LogoutSaga)
   //yield takeLatest(UPLOAD_REQUEST,UploadSaga)
 }

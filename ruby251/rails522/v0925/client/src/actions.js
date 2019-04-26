@@ -25,10 +25,15 @@ export const SCREEN_SUCCESS = 'SCREEN_SUCCESS'
 export const SCREEN_PARAMS_SET = 'SCREEN_PARAMS_SET'
 export const SCREEN_FAILURE = 'SCREEN_FAILURE'
 
+export const BUTTONLIST_REQUEST = 'BUTTONLIST_REQUEST'
+export const BUTTONLIST_SUCCESS = 'BUTTONLIST_SUCCESS'
+export const BUTTONLIST_FAILFURE = 'BUTTONLIST_FAILURE'
+
+export const BUTTONFLG_REQUEST = 'BUTTONFLG_REQUEST'
 
 export const UPLOAD_REQUEST = 'UPLOAD_REQUEST'
-export const UPLOAD_SUCCESS = 'UPLOAD_SUCCESS'
-export const UPLOAD_FAILURE = 'UPLOAD_FAILURE'
+
+export const DOWNLOAD_REQUEST = 'UPLOAD_REQUEST'
 
 // LOGIN
 // Attach our Formik actions as meta-data to our action.
@@ -46,12 +51,10 @@ export const authorize = (email, password) => ({
   payload: { email, password }
 })
 
-
 export const LogoutRequest = (token,client,uid) => ({
   type: LOGOUT_REQUEST,
   payload: {token:token,client:client,uid:uid }
 })
-
 export const LogoutSuccess = () => ({
   type: LOGOUT_SUCCESS,
  // payload: {token,client,uid }
@@ -63,17 +66,14 @@ export const MenuRequest = (token,client,uid) => ({
   type:  MENU_REQUEST,
   payload:{token,client,uid} 
 })
-
-
 export const MenuFailure = (errors) => ({
   type: MENU_FAILURE,
   errors: { errors }  //
 })
 
-
-export const ScreenRequest = (params,token,client,uid,lineEdit,screenName) => ({
+export const ScreenRequest = (params,token,client,uid,screenName) => ({
   type:  SCREEN_REQUEST,
-  payload: { params,token,client,uid ,lineEdit,screenName}  //
+  payload: { params,token,client,uid ,screenName}  //
 })
 
 export const ScreenParamsSet = (subparams) => ({
@@ -91,4 +91,29 @@ export const UploadRequest = (formPayLoad) => ({
   payload: { formPayLoad}
 })
 
+
+export const DownloadRequest = (formPayLoad) => ({
+  type: DOWNLOAD_REQUEST,
+  payload: { formPayLoad}
+})
+
+
+export const ButtonListRequest = (token,client,uid) => ({
+  type:  BUTTONLIST_REQUEST,
+  payload:{token,client,uid} 
+})
+export const ButtonListSuccess = (buttonListData) => ({
+  type:  BUTTONLIST_SUCCESS,
+  payload:{buttonListData} 
+})
+export const ButtonListFailure = (error) => ({
+  type:  BUTTONLIST_FAILFURE,
+  payload:{error} 
+})
+
+
+export const ButtonFlgRequest = (buttonflg) => ({
+  type: BUTTONFLG_REQUEST,
+  payload: { buttonflg}
+})
 

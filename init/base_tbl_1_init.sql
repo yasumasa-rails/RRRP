@@ -605,7 +605,6 @@ CREATE TABLE SCREENS
 	ROWLIST varchar(30),
 	HEIGHT numeric(38,0),
 	FORM_PS varchar(4000),
-	GRPCODENAME varchar(50),
 	SCRLVS_ID numeric(38,0),
 	CONTENTS varchar(4000),
 	strorder varchar(4000),
@@ -650,7 +649,6 @@ OR REPLACE  VIEW R_SCREENS (
   , SCREEN_YMLCODE
   , ID
   , SCREEN_ID
-  , SCREEN_GRPCODENAME
   , SCREEN_PERSON_ID_UPD
   , PERSON_ID_UPD
   , PERSON_CODE_UPD
@@ -691,7 +689,6 @@ select
   , screen.ymlcode screen_ymlcode
   , screen.id id
   , screen.id screen_id
-  , screen.grpcodename screen_grpcodename
   , screen.persons_id_upd screen_person_id_upd
   , person_upd.person_id_upd person_id_upd
   , person_upd.person_code_upd person_code_upd
@@ -1032,7 +1029,6 @@ OR REPLACE  VIEW R_SCREENFIELDS (
   , SCREEN_CDRFLAYOUT
   , SCREEN_YMLCODE
   , SCREEN_ID
-  , SCREEN_GRPCODENAME
   , SCREEN_POBJECT_ID_SCR
   , POBJECT_CODE_SCR
   , POBJECT_OBJECTTYPE_SCR
@@ -1103,7 +1099,6 @@ select
   , screen.screen_cdrflayout screen_cdrflayout
   , screen.screen_ymlcode screen_ymlcode
   , screen.screen_id screen_id
-  , screen.screen_grpcodename screen_grpcodename
   , screen.screen_pobject_id_scr screen_pobject_id_scr
   , screen.pobject_code_scr pobject_code_scr
   , screen.pobject_objecttype_scr pobject_objecttype_scr
@@ -1206,7 +1201,6 @@ OR REPLACE  VIEW R_CHILSCREENS (
   , SCREEN_CDRFLAYOUT
   , SCREEN_YMLCODE
   , SCREEN_ID
-  , SCREEN_GRPCODENAME
   , SCREEN_POBJECT_ID_SCR
   , POBJECT_CODE_SCR
   , POBJECT_OBJECTTYPE_SCR
@@ -1265,7 +1259,6 @@ OR REPLACE  VIEW R_CHILSCREENS (
   , SCREEN_CDRFLAYOUT_CH
   , SCREEN_YMLCODE_CH
   , SCREEN_ID_CH
-  , SCREEN_GRPCODENAME_CH
   , SCREEN_POBJECT_ID_SCR_CH
   , POBJECT_CODE_SCR_CH
   , POBJECT_OBJECTTYPE_SCR_CH
@@ -1339,7 +1332,6 @@ select
   , screenfield.screen_cdrflayout screen_cdrflayout
   , screenfield.screen_ymlcode screen_ymlcode
   , screenfield.screen_id screen_id
-  , screenfield.screen_grpcodename screen_grpcodename
   , screenfield.screen_pobject_id_scr screen_pobject_id_scr
   , screenfield.pobject_code_scr pobject_code_scr
   , screenfield.pobject_objecttype_scr pobject_objecttype_scr
@@ -1398,7 +1390,6 @@ select
   , screenfield_ch.screen_cdrflayout screen_cdrflayout_ch
   , screenfield_ch.screen_ymlcode screen_ymlcode_ch
   , screenfield_ch.screen_id screen_id_ch
-  , screenfield_ch.screen_grpcodename screen_grpcodename_ch
   , screenfield_ch.screen_pobject_id_scr screen_pobject_id_scr_ch
   , screenfield_ch.pobject_code_scr pobject_code_scr_ch
   , screenfield_ch.pobject_objecttype_scr pobject_objecttype_scr_ch
@@ -1582,7 +1573,6 @@ OR REPLACE  VIEW R_USEBUTTONS (
   , SCREEN_CDRFLAYOUT_UB
   , SCREEN_YMLCODE_UB
   , SCREEN_ID_UB
-  , SCREEN_GRPCODENAME_UB
   , SCREEN_POBJECT_ID_SCR_UB
   , POBJECT_CODE_SCR_UB
   , POBJECT_OBJECTTYPE_SCR_UB
@@ -1633,7 +1623,6 @@ select
   , screen_ub.screen_cdrflayout screen_cdrflayout_ub
   , screen_ub.screen_ymlcode screen_ymlcode_ub
   , screen_ub.screen_id screen_id_ub
-  , screen_ub.screen_grpcodename screen_grpcodename_ub
   , screen_ub.screen_pobject_id_scr screen_pobject_id_scr_ub
   , screen_ub.pobject_code_scr pobject_code_scr_ub
   , screen_ub.pobject_objecttype_scr pobject_objecttype_scr_ub
@@ -1718,7 +1707,6 @@ OR REPLACE  VIEW R_REPORTS (
   , SCREEN_CDRFLAYOUT
   , SCREEN_YMLCODE
   , SCREEN_ID
-  , SCREEN_GRPCODENAME
   , SCREEN_POBJECT_ID_SCR
   , POBJECT_CODE_SCR
   , POBJECT_OBJECTTYPE_SCR
@@ -1768,7 +1756,6 @@ select
   , screen.screen_cdrflayout screen_cdrflayout
   , screen.screen_ymlcode screen_ymlcode
   , screen.screen_id screen_id
-  , screen.screen_grpcodename screen_grpcodename
   , screen.screen_pobject_id_scr screen_pobject_id_scr
   , screen.pobject_code_scr pobject_code_scr
   , screen.pobject_objecttype_scr pobject_objecttype_scr
@@ -1988,7 +1975,6 @@ OR REPLACE  VIEW R_TBLINKS (
   , SCREEN_CDRFLAYOUT_SRC
   , SCREEN_YMLCODE_SRC
   , SCREEN_ID_SRC
-  , SCREEN_GRPCODENAME_SRC
   , SCREEN_POBJECT_ID_SCR_SRC
   , POBJECT_CODE_SCR_SRC
   , POBJECT_OBJECTTYPE_SCR_SRC
@@ -2041,7 +2027,6 @@ select
   , screen_src.screen_cdrflayout screen_cdrflayout_src
   , screen_src.screen_ymlcode screen_ymlcode_src
   , screen_src.screen_id screen_id_src
-  , screen_src.screen_grpcodename screen_grpcodename_src
   , screen_src.screen_pobject_id_scr screen_pobject_id_scr_src
   , screen_src.pobject_code_scr pobject_code_scr_src
   , screen_src.pobject_objecttype_scr pobject_objecttype_scr_src
@@ -2106,7 +2091,7 @@ create sequence TBLINKFLDS_seq
   TBLINK_BEFOREAFTER, TBLINK_HIKISU, TBLINK_SCREEN_ID_SRC, SCREEN_STRWHERE_SRC, SCREEN_ROWS_PER_PAGE_SRC, SCREEN_ROWLIST_SRC,
   SCREEN_HEIGHT_SRC, SCREEN_POBJECT_ID_VIEW_SRC, POBJECT_CODE_VIEW_SRC, POBJECT_OBJECTTYPE_VIEW_SRC,
   POBJECT_ID_VIEW_SRC, POBJECT_CONTENTS_VIEW_SRC, SCREEN_FORM_PS_SRC,  SCREEN_STRSELECT_SRC,
-  SCREEN_CDRFLAYOUT_SRC, SCREEN_YMLCODE_SRC, SCREEN_ID_SRC, SCREEN_GRPCODENAME_SRC, SCREEN_POBJECT_ID_SCR_SRC, POBJECT_CODE_SCR_SRC,
+  SCREEN_CDRFLAYOUT_SRC, SCREEN_YMLCODE_SRC, SCREEN_ID_SRC,  SCREEN_POBJECT_ID_SCR_SRC, POBJECT_CODE_SCR_SRC,
   POBJECT_OBJECTTYPE_SCR_SRC,  POBJECT_ID_SCR_SRC, POBJECT_CONTENTS_SCR_SRC, SCREEN_CONTENTS_SRC,
   SCREEN_SCRLV_ID_SRC, SCRLV_LEVEL1_SRC, SCRLV_ID_SRC, SCRLV_CODE_SRC, TBLINK_CODEL, TBLINKFLD_COMMAND_C) AS
   select tblinkfld.expiredate tblinkfld_expiredate ,tblinkfld.updated_at tblinkfld_updated_at ,tblinkfld.seqno tblinkfld_seqno ,
@@ -2135,7 +2120,7 @@ create sequence TBLINKFLDS_seq
   tblink.pobject_objecttype_view_src pobject_objecttype_view_src, tblink.pobject_id_view_src pobject_id_view_src,
   tblink.pobject_contents_view_src pobject_contents_view_src, tblink.screen_form_ps_src screen_form_ps_src,
   tblink.screen_strselect_src screen_strselect_src, tblink.screen_cdrflayout_src screen_cdrflayout_src, tblink.screen_ymlcode_src screen_ymlcode_src,
-  tblink.screen_id_src screen_id_src, tblink.screen_grpcodename_src screen_grpcodename_src, tblink.screen_pobject_id_scr_src screen_pobject_id_scr_src,
+  tblink.screen_id_src screen_id_src,  tblink.screen_pobject_id_scr_src screen_pobject_id_scr_src,
   tblink.pobject_code_scr_src pobject_code_scr_src, tblink.pobject_objecttype_scr_src pobject_objecttype_scr_src,
   tblink.pobject_id_scr_src pobject_id_scr_src, tblink.pobject_contents_scr_src pobject_contents_scr_src, tblink.screen_contents_src screen_contents_src,
   tblink.screen_scrlv_id_src screen_scrlv_id_src, tblink.scrlv_level1_src scrlv_level1_src, tblink.scrlv_id_src scrlv_id_src, tblink.scrlv_code_src scrlv_code_src,

@@ -51,7 +51,11 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 # 「dotenv」は環境変数を環境ごとにファイルベースで管理するのに便利なGemです。
 gem 'dotenv-rails'
 
+### before fog
+## sudo apt-get install libxml2-dev
+## sudo apt-get install build-essential libcurl4-openssl-dev
+## gem install ovirt-engine-sdk -v '4.3.0' --source 'https://rubygems.org/'
+gem 'fog'
 gem 'rubyXL'
 gem 'json'
-##gem 'fog'
 gem 'carrierwave'

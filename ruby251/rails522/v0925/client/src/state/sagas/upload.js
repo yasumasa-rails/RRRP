@@ -1,5 +1,5 @@
 import { call, put } from 'redux-saga/effects'
-import {UPLOAD_SUCCESS,UPLOAD_FAILURE} from '../../actions'
+import {UPLOAD_SUCCESS,MENU_FAILURE} from '../../actions'
 
 
 
@@ -42,6 +42,6 @@ export function* UploadSaga({ payload: { formPayLoad } }) {
               case 500: message = 'Internal Server Error'; break;
               case 401: message = 'Invalid credentials'; break;
               default: message = 'Something went wrong';}
-      yield put({ type: UPLOAD_FAILURE, payload: message })
+      yield put({ type: MENU_FAILURE, payload: message })
   }
  }      

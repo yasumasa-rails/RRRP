@@ -19,7 +19,6 @@ import ScreenGrid from './screengrid'
     const { isAuthenticated ,menuListData,token,client,uid,getScreen, 
             pageSize,page,sorted,filtered} = this.props
     
-    let lineEdit = false
     if (isAuthenticated) {
       if(menuListData){
       let tmpgrpscr =[]   
@@ -48,7 +47,7 @@ import ScreenGrid from './screengrid'
                     <Tab key={index} >
                       <Button   type="submit"
                       onClick ={() => getScreen(val.screen_code,pageSize?pageSize:val.page_size,
-                                                page,sorted,filtered,lineEdit,val.scr_name,
+                                                page,sorted,filtered,val.scr_name,
                                                 token,client,uid)}>
                       {val.scr_name}       
                       </Button>             
@@ -98,11 +97,11 @@ const  mapStateToProps = (state,ownProps) =>({
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-      getScreen : (screenCode,pageSize, page,sorted,filtered,lineEdit,screenName,token, client, uid) =>{
+      getScreen : (screenCode,pageSize, page,sorted,filtered,screenName,token, client, uid) =>{
         let  params= {  page: page, pageSize : pageSize,
                         sorted:sorted,  filtered:filtered,      
-                         screenCode:screenCode,uid:uid} 
-        dispatch(ScreenRequest(params, token, client, uid,lineEdit,screenName))}
+                         screenCode:screenCode,uid:uid,req:"viewtablereq"} 
+        dispatch(ScreenRequest(params, token, client, uid,screenName))}
           })    
 
 export default connect(mapStateToProps,mapDispatchToProps)(Menus)

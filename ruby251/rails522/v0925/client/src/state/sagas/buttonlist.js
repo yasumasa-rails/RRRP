@@ -1,15 +1,14 @@
 import { call, put} from 'redux-saga/effects'
 import axios         from 'axios'
 
-import { MENU_SUCCESS, MENU_FAILURE, } from 'actions';
-import history from 'histrory'
+import { BUTTONLIST_SUCCESS, MENU_FAILURE} from 'actions';
 
-function MenuGetApi({token,client,uid}) {
+function ButtonListGetApi({token,client,uid}) {
   const url = 'http://localhost:3001/api/menus'
   const headers =  { 'access-token':token.token, 
                     client:client.client,
                     uid:uid.uid,}
-  const params =  {uid:uid.uid,req:"menureq"}
+  const params =  {uid:uid.uid,req:'bottunlistreq'}
 
   let getApi = (url, params,headers) => {
     return axios({
@@ -22,11 +21,10 @@ function MenuGetApi({token,client,uid}) {
 }
 
 // MenuSaga({ payload: { token,client,uid} })  出し手と合わすこと
-export function* MenuSaga({ payload: {token,client,uid} }) {
-  let response   = yield call(MenuGetApi, ({token,client,uid} ) )
+export function* ButtonListSaga({ payload: {token,client,uid} }) {
+  let response   = yield call(ButtonListGetApi, ({token,client,uid} ) )
   if(response.data){
-      yield put({ type: MENU_SUCCESS, action: response.data })
-      yield call(history.push,'/menus')}
+      yield put({ type: BUTTONLIST_SUCCESS, payload: response.data })}
   else{    
       let message = `error ${response}`;
       if(response.error){

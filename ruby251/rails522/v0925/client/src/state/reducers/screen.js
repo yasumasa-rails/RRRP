@@ -5,7 +5,6 @@ const initialValues = {
   columns:[{name:"loadung"}],
   data:[{name:"loadung"}],
   pageInfo:{totalpage:0},
-  view:false,
 }
 
 const screenreducer =  (state= initialValues , action) =>{
@@ -15,7 +14,6 @@ const screenreducer =  (state= initialValues , action) =>{
       return {...state,
         screenCode:action.payload.params.screenCode, 
         pageSize:action.payload.params.pageSize, 
-        view:true,
         screenName:action.payload.screenName, 
         messages: [{ body: 'screen loading ...', time: new Date() }],
       }
@@ -37,7 +35,6 @@ const screenreducer =  (state= initialValues , action) =>{
         columns: action.action.data.columns,　　/// payloadに統一
         data: action.action.data.data,
         pages: action.action.data.pageInfo.totalPage,
-        view:false,
       }
 
     // Append the error returned from our api
