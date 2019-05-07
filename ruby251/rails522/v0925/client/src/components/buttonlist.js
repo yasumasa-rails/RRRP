@@ -10,12 +10,9 @@ import "./index.css"
 import {ButtonFlgRequest,ScreenRequest} from '../actions'
 
 
- class ButtonList extends React.Component {
-  render() {
-    const { buttonListData,setButtonFlg,buttonflg,
-            screenCode,token,client,uid,screenName,
-            pageSize,page,sorted,filtered,} = this.props
-    
+ const  ButtonList = ({buttonListData,setButtonFlg,buttonflg,
+                        screenCode,token,client,uid,screenName,
+                        pageSize,page,sorted,filtered}) =>{
       let tmpbuttonlist = {}
       if(buttonListData){
          buttonListData.map((cate) => {
@@ -54,7 +51,6 @@ import {ButtonFlgRequest,ScreenRequest} from '../actions'
         </div>    
       )
     }
- }    
 
 const  mapStateToProps = (state,ownProps) =>({
   buttonListData:state.button.buttonListData ,  

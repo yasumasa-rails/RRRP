@@ -35,6 +35,7 @@ CREATE TABLE Persons
   ,Updated_at timestamp(6)
   ,CONSTRAINT Persons_id_pk PRIMARY KEY (id)
   , CONSTRAINT Persons_16_uk  UNIQUE (Code)
+  , CONSTRAINT Persons_17_uk  UNIQUE (Email)  /*各人一人づづ　グループでの共有emailは不可　*/
 )
 ;
 ----drop sequence Persons_seq;

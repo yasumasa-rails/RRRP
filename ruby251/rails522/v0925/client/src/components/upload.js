@@ -1,38 +1,59 @@
-// joemusacchia/ReactCarrierwaveImageUploadBlogPost.md
-//Upload images with React and the carrierwave Ruby gem for Rails 5
-//https://medium.com/@ebenwoodward/linking-a-react-app-to-rails-active-storage-d414afa4bc7f
-
-
-import React from 'react'
+import React from 'react';
 import { connect } from 'react-redux'
-import {UploadRequest} from '../actions'
+//import PropTypes from 'prop-types';
+import EditableUpload from './subupload/editableupload';
+import NonEditableUpload from './subupload/noneditableupload';
+import {ChangeUploadableRequest,ChangeUnUploadRequest} from '../actions'
 
-const Upload = (uid,token,client,screenCode,screenName,readFile) => {
-  return(
-    <div>
-       import Table {screenName}
-      <input type='file' onClick={(files)=>readFile(files,uid,token,client,screenCode)}/>
-    </div>
-  )
-}
+const Upload = ({ uploadlist,isUpload ,onClieckChangeUploadable}) => (
+       
+    <React.Fragment>
+    <div className="has-text-right buttons-padding">
+    
+    </div>    
+            {isUpload?
+            <div>
+            <a
+            className="button is-primary"
+             onClick={()=>onClieckChangeUploadable(isUpload)}>
+              {isUpload ? 'Close' : 'Uploadへの変換'}
+            </a>
+              <EditableUpload />
+            </div>
+              :
+              <div>
+              <p>過去のuploadデータの参照
+                <a
+                className="button is-primary"
+                 onClick={()=>onClieckChangeUploadable(isUpload)}>
+                  {isUpload ? 'Close　　　' : '　　　　Uploadへ'}
+                </a></p>
+              <NonEditableUpload uploadlist={uploadlist} />
+            </div>
+            }
+     </React.Fragment>   
+    )
 
-const  mapStateToProps = (state) => ({
-              uid:state.login.auth?state.login.auth.uid:"",
-              token:state.login.auth?state.login.auth["access-token"]:"",
-              client:state.login.auth?state.login.auth.client:"",
-              screenCode:state.screen.screenCode,
-              screenName:state.screen.screenName,
-              
+
+const mapDispatchToProps = dispatch => ({
+    onClieckChangeUploadable: (isUpload) => {
+                                isUpload = !isUpload
+                                isUpload?
+                                    dispatch(ChangeUploadableRequest(isUpload))
+                                    :dispatch(ChangeUnUploadRequest(isUpload))
+                                }
   })
-     
   
-  const mapDispatchToProps = (dispatch,ownProps ) => ({
-      readFile: (files,uid,token,client,screenCode) =>{
-                  if(files && files[0]){
-                    let formPayLoad = new FormData();
-                    formPayLoad.append('uploaded_image', files[0]);
-                    dispatch(UploadRequest(formPayLoad,uid,token,client,screenCode))
-                  }}
-    })
+const mapStateToProps = state =>({
+    isAuthenticated:state.login.isAuthenticated ,
+      token:(state.login.auth?state.login.auth["access-token"]:"") ,
+      client:(state.login.auth?state.login.auth.client:""),
+      uid:(state.login.auth?state.login.auth.uid:"") ,
+      isEditable:state.upload.isEditable,
+      isUpload:state.upload.isUpload,
+      uploads:state.button.uploads
+    
+  })
+  
 
 export default  connect(mapStateToProps,mapDispatchToProps)(Upload)

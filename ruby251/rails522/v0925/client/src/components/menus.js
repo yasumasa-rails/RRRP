@@ -17,7 +17,7 @@ import ScreenGrid from './screengrid'
  class Menus extends React.Component {
   render() {
     const { isAuthenticated ,menuListData,token,client,uid,getScreen, 
-            pageSize,page,sorted,filtered} = this.props
+            pageSize,page,sorted,filtered,} = this.props
     
     if (isAuthenticated) {
       if(menuListData){
@@ -63,7 +63,7 @@ import ScreenGrid from './screengrid'
               )}
             </Tabs>
             <ScreenGrid/>
-            </div>    
+           </div>    
       )
     }
      return(

@@ -4,7 +4,6 @@ import ReactTable from 'react-table'
 import "react-table/react-table.css"
 import {ScreenParamsSet} from '../actions'
 import ButtonList from './buttonlist'
-//import Upload from './upload'
 
 // LOGIN FORM
 // @NOTE For forms that can be reused for both create/update you would move this form to its own

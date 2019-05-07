@@ -10,10 +10,31 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_05_082725) do
+ActiveRecord::Schema.define(version: 2019_04_28_055925) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.bigint "byte_size", null: false
+    t.string "checksum", null: false
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
 
   create_table "blktbs", id: :decimal, precision: 38, force: :cascade do |t|
     t.decimal "pobjects_id_tbl", precision: 38
@@ -88,6 +109,28 @@ ActiveRecord::Schema.define(version: 2019_04_05_082725) do
     t.decimal "dataprecision", precision: 38
     t.decimal "seqno", precision: 38
     t.string "contents", limit: 4000
+  end
+
+  create_table "itms", id: :decimal, precision: 38, force: :cascade do |t|
+    t.string "code", limit: 50
+    t.string "name", limit: 100
+    t.decimal "units_id", precision: 38
+    t.string "std", limit: 50
+    t.string "model", limit: 50
+    t.string "material", limit: 50
+    t.string "design", limit: 50
+    t.decimal "weight", precision: 38, scale: 6
+    t.decimal "length", precision: 38, scale: 6
+    t.decimal "wide", precision: 38, scale: 6
+    t.decimal "deth", precision: 38, scale: 6
+    t.string "remark", limit: 200
+    t.date "expiredate"
+    t.decimal "persons_id_upd", precision: 38
+    t.string "update_ip", limit: 40
+    t.datetime "created_at", precision: 6
+    t.datetime "updated_at", precision: 6
+    t.decimal "datascale", precision: 38
+    t.index ["code"], name: "itms_ukys1", unique: true
   end
 
   create_table "locas", id: :decimal, precision: 38, force: :cascade do |t|
@@ -284,6 +327,104 @@ ActiveRecord::Schema.define(version: 2019_04_05_082725) do
     t.datetime "updated_at", precision: 6
   end
 
+  create_table "sio_r_itms", primary_key: "sio_id", id: :decimal, precision: 38, force: :cascade do |t|
+    t.decimal "sio_user_code", precision: 38
+    t.string "sio_term_id", limit: 30
+    t.decimal "sio_session_id"
+    t.string "sio_command_response", limit: 1
+    t.decimal "sio_session_counter", precision: 38
+    t.string "sio_classname", limit: 50
+    t.string "sio_viewname", limit: 30
+    t.string "sio_code", limit: 30
+    t.string "sio_strsql", limit: 4000
+    t.decimal "sio_totalcount", precision: 38
+    t.decimal "sio_recordcount", precision: 38
+    t.decimal "sio_start_record", precision: 38
+    t.decimal "sio_end_record", precision: 38
+    t.string "sio_sord", limit: 256
+    t.string "sio_search", limit: 10
+    t.string "sio_sidx", limit: 256
+    t.decimal "person_id_upd", precision: 22
+    t.string "person_code_upd", limit: 50
+    t.string "person_name_upd", limit: 100
+    t.string "itm_code", limit: 50
+    t.string "itm_std", limit: 50
+    t.date "itm_expiredate"
+    t.string "itm_model", limit: 50
+    t.datetime "itm_updated_at", precision: 6
+    t.decimal "itm_wide", precision: 22, scale: 6
+    t.string "itm_name", limit: 100
+    t.string "itm_remark", limit: 200
+    t.decimal "itm_deth", precision: 22, scale: 6
+    t.datetime "itm_created_at", precision: 6
+    t.string "itm_update_ip", limit: 40
+    t.decimal "itm_length", precision: 22, scale: 6
+    t.decimal "itm_weight", precision: 22, scale: 6
+    t.string "itm_design", limit: 50
+    t.decimal "itm_datascale", precision: 22
+    t.string "itm_material", limit: 50
+    t.decimal "id", precision: 22
+    t.decimal "itm_id", precision: 22
+    t.decimal "itm_unit_id", precision: 22
+    t.string "unit_contents", limit: 4000
+    t.decimal "unit_id", precision: 22
+    t.string "unit_remark", limit: 200
+    t.string "unit_code", limit: 50
+    t.string "unit_name", limit: 100
+    t.decimal "itm_person_id_upd", precision: 22
+    t.string "sio_errline", limit: 4000
+    t.string "sio_org_tblname", limit: 30
+    t.decimal "sio_org_tblid", precision: 38
+    t.date "sio_add_time"
+    t.date "sio_replay_time"
+    t.string "sio_result_f", limit: 1
+    t.string "sio_message_code", limit: 10
+    t.string "sio_message_contents", limit: 4000
+    t.string "sio_chk_done", limit: 1
+  end
+
+  create_table "sio_r_units", primary_key: "sio_id", id: :decimal, precision: 38, force: :cascade do |t|
+    t.decimal "sio_user_code", precision: 38
+    t.string "sio_term_id", limit: 30
+    t.decimal "sio_session_id"
+    t.string "sio_command_response", limit: 1
+    t.decimal "sio_session_counter", precision: 38
+    t.string "sio_classname", limit: 50
+    t.string "sio_viewname", limit: 30
+    t.string "sio_code", limit: 30
+    t.string "sio_strsql", limit: 4000
+    t.decimal "sio_totalcount", precision: 38
+    t.decimal "sio_recordcount", precision: 38
+    t.decimal "sio_start_record", precision: 38
+    t.decimal "sio_end_record", precision: 38
+    t.string "sio_sord", limit: 256
+    t.string "sio_search", limit: 10
+    t.string "sio_sidx", limit: 256
+    t.decimal "id", precision: 22
+    t.decimal "unit_id", precision: 22
+    t.string "unit_remark", limit: 4000
+    t.date "unit_expiredate"
+    t.string "unit_update_ip", limit: 40
+    t.datetime "unit_created_at", precision: 6
+    t.datetime "unit_updated_at", precision: 6
+    t.decimal "unit_person_id_upd", precision: 22
+    t.decimal "person_id_upd", precision: 22
+    t.string "person_code_upd", limit: 50
+    t.string "person_name_upd", limit: 100
+    t.string "unit_code", limit: 50
+    t.string "unit_name", limit: 100
+    t.string "unit_contents", limit: 4000
+    t.string "sio_errline", limit: 4000
+    t.string "sio_org_tblname", limit: 30
+    t.decimal "sio_org_tblid", precision: 38
+    t.date "sio_add_time"
+    t.date "sio_replay_time"
+    t.string "sio_result_f", limit: 1
+    t.string "sio_message_code", limit: 10
+    t.string "sio_message_contents", limit: 4000
+    t.string "sio_chk_done", limit: 1
+  end
+
   create_table "tblfields", id: :decimal, precision: 38, force: :cascade do |t|
     t.decimal "blktbs_id", precision: 38
     t.decimal "fieldcodes_id", precision: 38
@@ -330,6 +471,27 @@ ActiveRecord::Schema.define(version: 2019_04_05_082725) do
     t.string "hikisu", limit: 400
     t.string "codel", limit: 50
     t.index ["screens_id_src", "blktbs_id_dest", "beforeafter", "seqno"], name: "tblinks_ukys1", unique: true
+  end
+
+  create_table "units", id: :decimal, precision: 38, force: :cascade do |t|
+    t.string "code", limit: 50
+    t.string "name", limit: 100
+    t.string "remark", limit: 4000
+    t.decimal "persons_id_upd", precision: 38
+    t.date "expiredate"
+    t.string "update_ip", limit: 40
+    t.datetime "created_at", precision: 6
+    t.datetime "updated_at", precision: 6
+    t.string "contents", limit: 4000
+  end
+
+  create_table "uploads", force: :cascade do |t|
+    t.string "title"
+    t.string "contents"
+    t.string "result"
+    t.string "persons_id_upd"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "usebuttons", id: :decimal, precision: 38, force: :cascade do |t|
@@ -397,6 +559,7 @@ ActiveRecord::Schema.define(version: 2019_04_05_082725) do
     t.index ["code", "expiredate"], name: "usrgrps_16_uk", unique: true
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "blktbs", "persons", column: "persons_id_upd", name: "blktb_persons_id_upd"
   add_foreign_key "blkukys", "persons", column: "persons_id_upd", name: "blkuky_persons_id_upd"
   add_foreign_key "blkukys", "tblfields", column: "tblfields_id", name: "blkuky_tblfields_id"
@@ -405,6 +568,8 @@ ActiveRecord::Schema.define(version: 2019_04_05_082725) do
   add_foreign_key "chilscreens", "screenfields", column: "screenfields_id", name: "chilscreen_screenfields_id"
   add_foreign_key "chilscreens", "screenfields", column: "screenfields_id_ch", name: "chilscreen_screenfields_id_ch"
   add_foreign_key "fieldcodes", "persons", column: "persons_id_upd", name: "fieldcode_persons_id_upd"
+  add_foreign_key "itms", "persons", column: "persons_id_upd", name: "itm_persons_id_upd"
+  add_foreign_key "itms", "units", column: "units_id", name: "itm_units_id"
   add_foreign_key "persons", "persons", column: "persons_id_upd", name: "persons_persons_id_upd"
   add_foreign_key "persons", "scrlvs", column: "scrlvs_id", name: "persons_scrlvs_id"
   add_foreign_key "persons", "sects", column: "sects_id", name: "persons_sects_id"

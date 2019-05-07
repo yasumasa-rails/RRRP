@@ -55,7 +55,10 @@ gem 'dotenv-rails'
 ## sudo apt-get install libxml2-dev
 ## sudo apt-get install build-essential libcurl4-openssl-dev
 ## gem install ovirt-engine-sdk -v '4.3.0' --source 'https://rubygems.org/'
-gem 'fog'
+##gem 'fog'
+##gem 'carrierwave'
 gem 'rubyXL'
 gem 'json'
-gem 'carrierwave'
+gem 'active_model_serializers'
+
+###gem 'ngrok-tunnel'

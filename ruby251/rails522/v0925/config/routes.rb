@@ -9,6 +9,9 @@ Rails.application.routes.draw do
     ##resources :menus
   end
   namespace :api do
-    resources :menus
+    resources :menus 
+    resources :uploads
   end  
+  post '/rails/active_storage/direct_uploads' => 'active_storage/direct_uploads#create'
+  ##post "/rails/active_storage/direct_uploads" => "active_storage/direct_uploads#create", as: :rails_direct_uploads
 end

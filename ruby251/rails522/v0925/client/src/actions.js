@@ -32,8 +32,19 @@ export const BUTTONLIST_FAILFURE = 'BUTTONLIST_FAILURE'
 export const BUTTONFLG_REQUEST = 'BUTTONFLG_REQUEST'
 
 export const UPLOAD_REQUEST = 'UPLOAD_REQUEST'
+export const UPLOADLIST_REQUEST = 'UPLOADLIST_REQUEST'
+export const UPLOAD_SUCCESS = 'UPLOAD_SUCCESS'
+export const UPLOADLIST_SUCCESS = 'UPLOADLIST_SUCCESS'
+export const CHANGEUPLOADABLE_REQUEST = 'CHANGEUPLOADABLE_REQUEST'
+export const CHANGEUNUPLOAD_REQUEST = 'CHANGEUNUPLOAD_REQUEST'
+export const CHANGEUPLOADTITLE_REQUEST = 'CHANGEUPLOADTITLE_REQUEST'
+export const CHANGEUPLOADTITLEEDITABLE_REQUEST = 'CHANGEUPLOADTITLEEDITABLE_REQUEST'
+export const EDITUPLOADTITLE_REQUEST = 'EDITUPLOADTITLE_REQUEST'
+export const EDITUPLOADTITLE_SUCCESS = 'EDITUPLOADTITLE_SUCCESS'
+export const EDITUPLOAD_REQUEST = 'EDITUPLOAD_REQUEST'
+export const EDITUPLOAD_RESULT = 'EDITUPLOAD_RESULT'
 
-export const DOWNLOAD_REQUEST = 'UPLOAD_REQUEST'
+export const DOWNLOAD_REQUEST = 'DOWNLOAD_REQUEST'
 
 // LOGIN
 // Attach our Formik actions as meta-data to our action.
@@ -86,12 +97,6 @@ export const ScreenFailure = (errors) => ({
   errors: { errors }  //
 })
 
-export const UploadRequest = (formPayLoad) => ({
-  type: UPLOAD_REQUEST,
-  payload: { formPayLoad}
-})
-
-
 export const DownloadRequest = (formPayLoad) => ({
   type: DOWNLOAD_REQUEST,
   payload: { formPayLoad}
@@ -116,4 +121,68 @@ export const ButtonFlgRequest = (buttonflg) => ({
   type: BUTTONFLG_REQUEST,
   payload: { buttonflg}
 })
+
+export const ChangeUploadableRequest = (isUpload) => ({
+  type: CHANGEUPLOADABLE_REQUEST,
+  payload: {isUpload}
+})
+
+export const ChangeUnUploadRequest = (isUpload) => ({
+  type: CHANGEUNUPLOAD_REQUEST,
+  payload: {isUpload}
+})
+
+
+export const UploadRequest = (values) => ({
+  type: UPLOAD_REQUEST,
+  payload: { values}
+})
+
+export const UploadSuccess = (imageFromController) => ({
+  type: UPLOAD_SUCCESS,
+  payload: {imageFromController}
+})
+
+export const UploadListRequest = (values) => ({
+  type: UPLOADLIST_REQUEST,
+  payload: { values }
+})
+
+export const UploadListSuccess = (uploadlists) => ({
+  type: UPLOADLIST_SUCCESS,
+  payload: { uploadlists}
+})
+
+export const ChangeUploadTitleEditableRequest = () => ({
+  type: CHANGEUPLOADTITLEEDITABLE_REQUEST,
+  payload: {}
+})
+
+export const ChangeUploadTitleRequest = (upload) => ({
+  type: CHANGEUPLOADTITLE_REQUEST,
+  payload: { upload}
+})
+
+
+export const EditUploadTitleRequest = (upload) => ({
+  type: EDITUPLOADTITLE_REQUEST,
+  payload: { upload}
+})
+
+export const EditUploadTitleSuccess = (data) => ({
+  type: EDITUPLOADTITLE_SUCCESS,
+  payload: { data}
+})
+
+
+export const EditUploadRequest = (values) => ({
+  type: EDITUPLOAD_REQUEST,
+  payload: { values}
+})
+
+export const EditUploadResult = (message) => ({
+  type: EDITUPLOAD_RESULT,
+  payload: { message}
+})
+
 

@@ -29,21 +29,24 @@ const LoginForm = ({isSubmitting,errors,values,}) => (
 // FORM CONFIGURATION
 
 // LOGIN CONTAINER
-const mapDispatchToProps = dispatch => ({
-  onSubmit: (values) => dispatch(authorize(values.email, values.password))
-})
+
 const initialValues = {
   email: '',
   password: '',
 }
 
-function mapStateToProps(state) {
-  return { isAuthenticated:state.login.isAuthenticated ,
+const mapDispatchToProps = dispatch => ({
+  onSubmit: (values) => dispatch(authorize(values.email, values.password))
+})
+
+const mapStateToProps = state =>({
+  isAuthenticated:state.login.isAuthenticated ,
     token:(state.login.auth?state.login.auth["access-token"]:"") ,
     client:(state.login.auth?state.login.auth.client:""),
     uid:(state.login.auth?state.login.auth.uid:"") ,
-    }
-}
+  
+})
+
 const Container = ({onSubmit}) => (
       <Formik 
         initialValues={initialValues}

@@ -1,0 +1,69 @@
+
+【本題】
+
+他にもあった！ローカル環境でHTTPS通信を行う方法
+下記の記事でも取り上げたローカル環境で
+HTTPS通信を行う方法についてです。
+
+
+
+FacebookアプリはSSL接続が必須となっているので、
+通常通りの方法（http通信）では、ローカル環境で動作を検証出来ません。
+
+そこで前回は、「ngrok」を導入する方法を試しました。
+
+しかし、この方法だと起動し直すとURLが変わってしまい、
+その都度、Facebookのリダイレクト先のURLの設定を
+いちいち変更するのが面倒だった為、他の方法も探しました。
+
+pumaサーバーをSSLでアクセス可能にする
+その方法として、今回試したのは、
+pumaサーバーをSSLでアクセス可能にする方法です。
+
+pumaサーバーとは
+アプリケーションサーバの1つで、rails5からは標準のWebサーバとなっています。
+ローカル環境で動作確認する時、「rails s」をしますが、その際に起動しています。
+
+f:id:ryoutaku_jo:20190211214750p:plain
+
+手順１：SSL証明書を自前で作成する
+今回は、ローカル環境に限ってアクセスできればよいので、
+以下のコマンドで証明書を作成します。
+
+# RSA暗号方式で秘密鍵を作成
+openssl genrsa 2048 > tmp/server.key
+# 秘密鍵からCSRを作成
+openssl req -new -key tmp/server.key > tmp/server.csr
+# 秘密鍵からSSL自己証明書を作成
+openssl x509 -days 3650 -req -signkey tmp/server.key < tmp/server.csr > tmp/server.crt
+なお、2つ目のコマンド実行時に国名などを聞かれるので、
+最初の国名のみJAと入力して、その後は何も入力せず［Enter］キーのみ押下すれば問題ありません。
+
+f:id:ryoutaku_jo:20190211215015p:plain
+
+手順２：pumaサーバー用の設定ファイルを編集する
+次に、pumaサーバー用の設定ファイル（config/puma.rb）の末尾に以下の通り追記します。
+このように記述することでポート9292でSSL接続することができるようになります。
+
+#config/puma.rb
+if ENV.fetch('RAILS_ENV') { 'development' } == 'development'
+  ssl_bind '0.0.0.0', '9292', {
+    key: 'tmp/server.key',
+    cert: 'tmp/server.crt'
+  }
+end
+手順３：pumaサーバーを起動する
+config/puma.rbの設定を反映させて
+pumaサーバーを起動するには以下のコマンドを実行します。
+
+bundle exec puma -C config/puma.rb
+f:id:ryoutaku_jo:20190211215450p:plain
+
+手順４：ページにアクセスする
+最後は、下記のURLでページにアクセスします。
+「https://127.0.0.1:9292」
+
+f:id:ryoutaku_jo:20190211220223p:plain
+
+自分で発行したSSLなので、証明書がエラーになっていますが、
+URLはhttpsになりました。

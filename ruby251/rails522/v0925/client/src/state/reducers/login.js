@@ -25,7 +25,7 @@ const loginreducer =  (state= initialValues , actions) =>{
       return {...state,
         messages: [],
         isAuthenticated:true,
-        auth:actions.action,
+        auth:actions.action,  /// payloadに統一
       }
 
     // Append the error returned from our api

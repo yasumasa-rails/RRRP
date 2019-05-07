@@ -17,7 +17,7 @@ const signupreducer =  (state= initialValues , action) =>{
     case SIGNUP_SUCCESS:
       return {...state,
         messages: [],
-        email: action.actions.email,
+        email: action.actions.email,    /// payloadに統一
       }
 
     // Append the error returned from our api

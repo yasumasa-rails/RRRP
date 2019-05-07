@@ -65,4 +65,9 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: 'localhost', port: 3001 }
 
   config.action_controller.asset_host = 'http://localhost:3001'
+  
+  config.action_controller.forgery_protection_origin_check = false
+  config.consider_all_requests_local = false
+
+  config.logger = Logger.new(STDOUT)
 end

@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  contens: MyString
+  result: MyString
+  persons_id_upd: MyString
+
+two:
+  title: MyString
+  contens: MyString
+  result: MyString
+  persons_id_upd: MyString

@@ -1,5 +1,4 @@
 // joemusacchia/ReactCarrierwaveImageUploadBlogPost.md
-//Upload images with React and the carrierwave Ruby gem for Rails 5
 
 import React from 'react'
 import { connect } from 'react-redux'
