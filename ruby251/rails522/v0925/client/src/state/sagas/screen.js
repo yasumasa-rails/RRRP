@@ -21,26 +21,7 @@ function screenApi({params,token,client,uid}) {
 export function* ScreenSaga({ payload: {params,token,client,uid}  }) {
   let response  = yield call(screenApi,{params ,token,client,uid} )
   if(response){
-      let temp =[]
-      if(params["req"]==="editabletablereq")
-        {
-          response.data.columns.map((val,index) =>{ 
-           if(val["Cell"] === '1'||val["Cell"] === '2')
-              {val["Cell"] = (row=>(<input type='text' defaultValue={row.value} 
-              />))}
-              else{val["Cell"]=""}
-           if(val["show"] === '0')
-                 {val["show"] =  true}
-            else{val["show"] =  false}     
-            return   temp.push(val)
-        }) 
-      } else{ response.data.columns.map((val,index) =>{ 
-        if(val["show"] === '0')
-              {val["show"] =  true}
-         else{val["show"] =  false}     
-          return  temp.push(val)})
-      }   
-      response.data.columns = temp    
+      response.data["params"] = params
       yield put({ type: SCREEN_SUCCESS, action: response })
   }else
      {  
@@ -52,3 +33,4 @@ export function* ScreenSaga({ payload: {params,token,client,uid}  }) {
       yield put({ type: SCREEN_FAILURE, errors: message })
   }
  }      
+

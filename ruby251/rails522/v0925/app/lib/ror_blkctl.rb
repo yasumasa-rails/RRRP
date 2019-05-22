@@ -1694,13 +1694,15 @@ def create_grid_editable_columns_info screen_code,email
 					when 'timestamp'
 						 ##renderer
 				end	
-				
-				columns_info <<{:Header=>i["screenfield_name"],
-												:accessor=>i["pobject_code_sfd"],
-												:show=>i["screenfield_hideflg"] ,
-												:Cell=>i["screenfield_editable"] 
-											##	:editable=>if i["screenfield_hideflg"] == 1 then true else false end
-												}
+				columns_info <<{:Header=>"#{i["screenfield_name"]}",
+												:accessor=>"#{i["pobject_code_sfd"]}",
+												:show=>i["screenfield_hideflg"],
+												:Cell=>if i["screenfield_editable"] === "1" or i["screenfield_editable"] === "2"
+																	"renderEditable"
+																else	
+																	"renderNonEditable"
+																end	
+															}
 				select_fields = 	select_fields + 		i["screenfield_name"] + ','
 				if cnt == 0
 								where_info[:filter] = i["screen_strwhere"]

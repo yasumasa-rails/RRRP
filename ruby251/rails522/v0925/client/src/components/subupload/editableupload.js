@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import { Form, Field,withFormik, setNestedObjectValues } from 'formik'
+import { Form, Field,withFormik, } from 'formik'
 import ActiveStorageProvider from 'react-activestorage-provider'
 import ClassNames from "classnames"
 import "../../index.css"

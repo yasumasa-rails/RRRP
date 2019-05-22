@@ -34,6 +34,7 @@ const screenreducer =  (state= initialValues , action) =>{
         messages: [],
         columns: action.action.data.columns,　　/// payloadに統一
         data: action.action.data.data,
+        params: action.action.data.params,
         pages: action.action.data.pageInfo.totalPage,
       }
 

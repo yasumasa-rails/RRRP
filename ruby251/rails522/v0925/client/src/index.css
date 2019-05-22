@@ -22,6 +22,23 @@ a {
   color: #08c;
 }
 
+.normalInputClass {
+  padding: .5rem;
+  font-size: 16px;
+  width: 100%;
+  display: block;
+  border-radius: 4px;
+  border: 3px solid #ccc;
+  background-color:  rgb(128, 178, 243);
+}
+
+.setInputMarkClass {
+  width: 100%;
+  border: 3px solid #0def;
+  background-color: #5F81f5;
+}
+
+
 input {
   padding: .5rem;
   font-size: 16px;
@@ -29,10 +46,11 @@ input {
   display: block;
   border-radius: 4px;
   border: 3px solid #ccc;
+  background-color: "#0fffff";  
 }
 
 input:focus {
-  border-color: #007eff;
+  border-color: #f391db;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
     0 0 0 3px rgba(0, 126, 255, 0.1);
   outline: none;

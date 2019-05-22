@@ -21,7 +21,7 @@ import ScreenGrid from './screengrid'
     
     if (isAuthenticated) {
       if(menuListData){
-      let tmpgrpscr =[]   
+      let tmpgrpscr =[]   //グルーブ化されたメニュー
       let ii = 0
       menuListData.map((cate) => {
             if(tmpgrpscr[ii-1]!==cate.grp_name){tmpgrpscr[ii]=cate.grp_name;ii=ii+1}    

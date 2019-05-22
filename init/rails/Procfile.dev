@@ -1,0 +1,2 @@
+web: /RRRP/ruby251/rails522/v0917/rails server -p 3000  # rails 起動($PORTは5000がデフォ)
+worker:/RRRP/ruby251/rails522/v0917/bin/webpack-dev-server      # バッチ起動

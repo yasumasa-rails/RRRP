@@ -12,7 +12,8 @@ class CreateUploadService
       if file?(@params[:excel])
         @upload.create({:title=>@param[:title],:excel=>@param[:excel]}) 
       else
-        debugger
+        logger.debug "CreateUploadService logic error ?"
+        raise
       end  
     end
   
