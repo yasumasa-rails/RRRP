@@ -195,15 +195,14 @@ module RorBlkctl
       else
           @sio_result_f = command_r[:sio_result_f] =  "1"   ## 1 normal end
           command_r[:sio_message_contents] = nil
-          command_r[(tblname.chop + "_id")] =  command_r[:id] = @src_tbl[:id]
-					proc_delayjob_or_optiontbl(tblname,command_r[:id]) ###  if vproc_optiontabl(tblname)
+          command_r[(tblname.chop + "_id")] =  command_r["id"] = @src_tbl[:id]
+					proc_delayjob_or_optiontbl(tblname,command_r["id"]) ###  if vproc_optiontabl(tblname)
 					##crt_def_all if tblname =~ /rubycodings|tblink/
             ##crt_def_tb if  tblname == "blktbs"
       ensure
-            proc_insert_sio_r if @pare_class != "batch"    ## 結果のsio書き込み
+            proc_insert_sio_r( command_r) #### if @pare_class != "batch"    ## 結果のsio書き込み
       end ##begin
-      raise if @sio_result_f ==   "9"
-  	end
+	end
 	##def vproc_optiontabl tblname
 	##	if tblname =~ /rplies$|mksch|mkords|results$/ then true else false end  ###mkinsts,mkactsは使用してない　12/9
 	##end
@@ -305,7 +304,7 @@ module RorBlkctl
 			command_c = vproc_command_c_dflt_set_fm_rubycoding if command_c[:sio_classname] =~ /_add_|_edit_|_delete_/
 			if command_c[:sio_viewname] =~ /_inouts$/ and  command_c[:sio_classname] =~ /_add_|_edit_|_delete_/
 			else
-				command_c[:sio_id] =  proc_get_nextval("SIO_#{command_c[:sio_viewname]}_SEQ")
+				command_c[:sio_id] =  proc_get_nextval("sio.SIO_#{command_c[:sio_viewname]}_SEQ")  ## 別スキーマ
 				proc_tbl_add_arel("sio_#{command_c[:sio_viewname]}",command_c)
 			end
 		rescue
@@ -376,37 +375,37 @@ module RorBlkctl
         proc_tbl_add_arel("parescreen#{@sio_user_code.to_s}s",parescreen)
     end
     def proc_insert_sio_r  command_c ####レスポンス
-        command_c[:sio_id] =  proc_get_nextval("SIO_#{command_c[:sio_viewname]}_SEQ")
+        command_c[:sio_id] =  proc_get_nextval("sio.SIO_#{command_c[:sio_viewname]}_SEQ")
         command_c[:sio_command_response] = "R"
-        command_c[:sio_add_time] = Time.now
-		proc_tbl_add_arel  "SIO_#{command_c[:sio_viewname]}",command_c
+				command_c[:sio_add_time] = Time.now
+				proc_tbl_add_arel  "SIO_#{command_c[:sio_viewname]}",command_c
     end   ## 
     def char_to_number_data  command_c  ###excel からのデータ取り込み　根本解決を
-		##rubyXl マッキントッシュ excel windows excel not perfect
-		@date1904 = nil
-		viewtype = proc_blk_columns("sio_#{command_c[:sio_viewname]}")
-		##@show_data[:allfields].each do |i|
-		command_c.each do |key,j|
-			if viewtype[key]
-				###case @show_data[:alltypes][i]
-				case viewtype[key][:data_type].downcase
-					when /date|^timestamp/ then
+				##rubyXl マッキントッシュ excel windows excel not perfect
+				@date1904 = nil
+				viewtype = proc_blk_columns("sio_#{command_c[:sio_viewname]}")
+				##@show_data[:allfields].each do |i|
+				command_c.each do |key,j|
+					if viewtype[key]
+						###case @show_data[:alltypes][i]
+						case viewtype[key][:data_type].downcase
+						when /date|^timestamp/ then
 			        begin
 						command_c[key] = Time.parse(command_c[key].gsub(/\W/,"")) if command_c[key].class == String
 						command_c[key] = num_to_date(command_c[key])  if command_c[key].class == Fixnum  or command_c[key].class == Float
 			        rescue
                        command_c[key] = Time.now
 			        end
-					when /number/ then
-						command_c[key] = command_c[key].gsub(/,|\(|\)|\\/,"").to_f if command_c[key].class == String
-					when /char/
-						command_c[key] = command_c[key].to_i.to_s if command_c[key].class == Fixnum
-				end  #case show_data
-			else
-				command_c.delete(key)
-			end  ## if command_c
-		end  ## sho_data.each
-		command_c[:id] = command_c[(command_c[:sio_viewname].split("_")[1].chop + "_id")]
+						when /number/ then
+							command_c[key] = command_c[key].gsub(/,|\(|\)|\\/,"").to_f if command_c[key].class == String
+						when /char/
+							command_c[key] = command_c[key].to_i.to_s if command_c[key].class == Fixnum
+						end  #case show_data
+					else
+						command_c.delete(key)
+					end  ## if command_c
+				end  ## sho_data.each
+				command_c[:id] = command_c[(command_c[:sio_viewname].split("_")[1].chop + "_id")]
     end ## defar_to....
 
     def num_to_date(num)
@@ -419,38 +418,126 @@ module RorBlkctl
       # subtract one day to compare date for erroneous 1900 leap year compatibility
       compare_date - 1 + num
 		end
-		def create_filteredstr filtered,where
-			""
+		def create_filteredstr filtered,where_info
+			if where_info[:filtered]
+				 where_str =  where_info[:filtered] + "    and "
+			else
+				 where_str = "  where "	 
+			end	
+			filtered.each  do |strjson|  ##xparams gridの生
+				ff = JSON.parse(strjson)
+	      case where_info[ff["id"].to_sym]
+				when nil
+					next
+	      when /number/
+					where_str << " #{ff["id"]} = #{ff["value"]}     AND "
+					where_str << " #{ff["id"]}  #{ff["value"][0]}  #{ff["value"][1..-1]}      AND "   if ff["value"] =~ /^</   or  ff["value"] =~ /^>/
+					where_str << " #{ff["id"]} #{ff["value"][0..1]} #{ff["value"][2..-1]}      AND "    if ff["value"] =~ /^<=/  or ff["value"] =~ /^>=/ or j =~ /^!=/
+	      when /^date|^timestamp/
+		      case  ff["value"].size
+			          when 4
+									where_str << " to_char( #{ff["id"]},'yyyy') = '#{ff["value"]}'       AND "
+			          when 5
+									where_str << " to_char( #{ff["id"]},'yyyy') #{ff["value"][0]} '#{ff["value"][1..-1]}'      AND "  if  ( ff["value"]=~ /^</   or ff["value"] =~ /^>/ )
+                when 6
+									where_str << " to_char( #{ff["id"]},'yyyy')  #{ff["value"][0..1]} '#{ff["value"][2..-1]}'      AND "  if   (ff["value"] =~ /^<=/  or ff["value"] =~ /^>=/ )
+			          when 7
+									where_str <<" to_char( #{ff["id"]},'yyyy/mm') = '#{ff["value"]}'       AND "  if Date.valid_date?(ff["value"].split("/")[0].to_i,ff["value"].split("/")[1].to_i,01)
+			          when 8
+									where_str << " to_char( #{ff["id"]},'yyyy/mm') #{ff["value"][0]} '#{ff["value"][1..-1]}'      AND "  if Date.valid_date?(ff["value"][1..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,01)  and ( ff["value"] =~ /^</   or  ff["value"] =~ /^>/ )
+                when 9
+									where_str << " to_char( #{ff["id"]},'yyyy/mm')  #{ff["value"][0..1]} '#{ff["value"][2..-1]}'      AND "  if Date.valid_date?(ff["value"][1..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,01)   and (ff["value"] =~ /^<=/  or ff["value"]=~ /^>=/ )
+			          when 10
+									where_str << " to_char( #{ff["id"]},'yyyy/mm/dd') = '#{ff["value"]}'       AND "  if Date.valid_date?(j.split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2].to_i)
+			          when 11
+									where_str << " to_char( #{ff["id"]},'yyyy/mm/dd') #{ff["ivalue"][0]} '#{ff["value"][1..-1]}'      AND "  if Date.valid_date?(ff["value"][1..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2].to_i)  and ( ff["value"] =~ /^</   or  ff["value"] =~ /^>/ )
+                when 12
+									where_str << " to_char( #{ff["id"]},'yyyy/mm/dd')  #{ff["value"][0..1]} '#{ff["value"][2..-1]}'      AND "  if Date.valid_date?(ff["value"][2..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2].to_i)   and (ff["value"] =~ /^<=/  or ff["value"]=~ /^>=/ )
+			          when 16
+			            if Date.valid_date?(ff["value"].split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2][0..1].to_i)
+												hh = ff["value"].split(" ")[1][0..1]
+												mi = ff["value"].split(" ")[1][3..4]
+												delm = ff["value"].split(" ")[1][2.2]
+												if  Array(0..24).index(hh.to_i) and Array(0..60).index(mi.to_i) and delm ==":"
+													where_str << " to_char( #{ff["id"]},'yyyy/mm/dd hh24:mi') = '#{ff["value"]}'       AND "
+												end
+									end
+			          when 17
+									if Date.valid_date?(ff["value"][1..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2][0..1].to_i)  and ( ff["value"] =~ /^</   or ff["value"] =~ /^>/ or  ff["value"] =~ /^=/ )
+										hh = ff["value"].split(" ")[1][0..1]
+										mi = ff["value"].split(" ")[1][3..4]
+										delm = ff["value"].split(" ")[1][2.2]
+										if  Array(0..24).index(hh.to_i) and Array(0..60).index(mi.to_i) and delm ==":"
+											where_str << " to_char( #{ff["id"]},'yyyy/mm/dd hh24:mi') #{ff["id"][0]} '#{ff["id"][1..-1]}'      AND "
+										end
+									end
+                when 18
+			                if Date.valid_date?(j[2..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2][0..1].to_i)   and (ff["value"]=~ /^<=/  or ff["value"]=~ /^>=/ )
+												hh = ff["value"].split(" ")[1][0..1]
+												mi = ff["value"].split(" ")[1][3..4]
+												delm = ff["value"].split(" ")[1][2.2]
+												if  Array(0..24).index(hh.to_i) and Array(0..60).index(mi.to_i) and delm ==":"
+													where_str << " to_char( #{ff["id"]},'yyyy/mm/dd hh24:mi')  #{ff["id"][0..1]} '#{ff["id"][2..-1]}'      AND "
+												end
+											end
+                end ## ff["value"].size
+				when /char|text/
+					if  (ff["value"] =~ /^%/ or ff["value"] =~ /%$/ ) then 
+						where_str << " #{ff["id"]} like '#{ff["value"]}'     AND "
+					elsif ff["value"] =~ /^<=/  or ff["value"] =~ /^>=/ then 
+						where_str << " #{ff["id"]} #{ff["id"][0..1]} '#{ff["id"][2..-1]}'     AND "
+					elsif 	ff["value"] =~ /^</   or  ff["value"] =~ /^>/
+						where_str << " #{ff["id"]}   #{ff["value"][0]}  '#{ff["value"][1..-1]}'         AND " 
+					else
+						where_str << " #{ff["id"]} = '#{ff["value"]}'         AND "
+					end
+	      when "select"
+					where_str << " #{ff["id"]} = '#{ff["value"]}'         AND "
+        end   ##show_data[:alltypes][i]
+        tmpwhere = " #{ff["id"]} #{ff["value"]}    AND " if  ff["value"] =~/is\s*null/ or ff["value"]=~/is\s*not\s*null/
+	      where_str << (tmpwhere||="")
+			end ### command_c.each  do |i,j|###
+    	return where_str[0..-7]
 		end	
-		def fetch_data id,select_fields,page_info,filter,sorting
-				strwhere = ""
+		def fetch_data id,select_fields,page_info,strwhere,sorting
 				strsorting = ""
-				strfilter = ""
 				if sorting
 				end
-				if filter
-				end		
 				strsql = "select #{select_fields} from (SELECT ROW_NUMBER() OVER (#{strsorting}) ,#{select_fields}
-																	 FROM #{id} #{if strfilter == '' then '' else 'where '+strfilter end } ) x
+																	 FROM #{id} #{if strwhere == '' then '' else strwhere end } ) x
 																	where ROW_NUMBER > #{(page_info[:pageNo]-1.0)*page_info[:sizePerPage] } 
 																 and ROW_NUMBER <= #{(page_info[:pageNo])*page_info[:sizePerPage] } 
 																  "
 				pagedata = ActiveRecord::Base.connection.select_all(strsql)
 
-				strsql = "SELECT count(*) FROM #{id} #{if strfilter == '' then '' else 'where '+strfilter end } "
+				strsql = "SELECT count(*) FROM #{id} #{if strwhere == '' then '' else strwhere end } "
 				total_cnt = ActiveRecord::Base.connection.select_value(strsql)
 				page_info[:totalPage] = (total_cnt.to_f/page_info[:sizePerPage].to_f).ceil
+				return  pagedata,	page_info
+		end	
+		def add_empty_data id,columns_info,page_info
+				num = page_info[:sizePerPage]
+				pagedata =[]
+				until num <= 0 do
+							temp ={}
+							columns_info.each do |cell|
+									temp[cell[:accessor]] = ""
+							end	
+							pagedata << temp
+							num = num - 1
+				end
+				page_info[:totalPage] = 1
 				return  pagedata,	page_info
 		end	
     def proc_blk_paging  command_c,screen_prop,field_prop
         ### strsqlにコーディングしてないときは、viewを使用
         ### strdql はupdate insertには使用できない。
         ### command_c[:sio_strsql] = (select  ・・・・) a
-		tmp_sql = (screen_prop[:screen_strwhere]||="")  
+				tmp_sql = (screen_prop[:screen_strwhere]||="")  
         if  command_c[:sio_strsql]     ## 親からの引き継ぎ検索ありの時
-			command_c[:sio_strsql].each do|key,val|
-				tmp_sql << " and #{key} = #{val} "   ###親側で文字タイプの「'」はセットすること
-			end
+				command_c[:sio_strsql].each do|key,val|
+					tmp_sql << " and #{key} = #{val} "   ###親側で文字タイプの「'」はセットすること
+				end
 		end
 		###screen登録された　既定値の抽出条件
 		##strsql = "SELECT id FROM " + tmp_sql
@@ -1301,36 +1388,39 @@ module RorBlkctl
         end
         return
     end
-    def proc_tblinks command_c
-		if command_c[:sio_code] !~ /blktbs/ and command_c[:sio_code] !~ /tblink/
-			strsql = " select * from r_tblinks where pobject_code_scr_src = '#{command_c[:sio_code]}' and tblink_expiredate > current_date "
-			strsql << " and tblink_beforeafter = '#{yield}' order by tblink_seqno "
-			do_all = ActiveRecord::Base.connection.select_all(strsql)
-			do_all.each do |dorec|
-				if respond_to?(dorec["tblink_codel"])
-					__send__(dorec["tblink_codel"],eval(dorec["tblink_hikisu"]))
-				else
-					proc_crt_def_rubycode({"codel"=> dorec["tblink_codel"],"hikisu"=>dorec["tblink_hikisu"],"rubycode"=>dorec["tblink_rubycode"]})
-					__send__(dorec["tblink_codel"],eval(dorec["tblink_hikisu"]))
+  def proc_tblinks command_c
+			if command_c[:sio_code] !~ /blktbs/ and command_c[:sio_code] !~ /tblink/
+				strsql = " select * from r_tblinks where pobject_code_scr_src = '#{command_c[:sio_code]}' and tblink_expiredate > current_date "
+				strsql << " and tblink_beforeafter = '#{yield}' order by tblink_seqno "
+				do_all = ActiveRecord::Base.connection.select_all(strsql)
+				do_all.each do |dorec|
+					if respond_to?(dorec["tblink_codel"])
+						__send__(dorec["tblink_codel"],eval(dorec["tblink_hikisu"]))
+					else
+						proc_crt_def_rubycode({"codel"=> dorec["tblink_codel"],"hikisu"=>dorec["tblink_hikisu"],"rubycode"=>dorec["tblink_rubycode"]})
+						__send__(dorec["tblink_codel"],eval(dorec["tblink_hikisu"]))
+					end
 				end
 			end
-		end
 	end
 	def proc_set_src_tbl rec  ##rec["xxxxx"]
-        @src_tbl = {}   ###テーブル更新
-		tblnamechop = rec[:sio_viewname].split("_",2)[1].chop
+  		  @src_tbl = {}   ###テーブル更新
+				tblnamechop = rec[:sio_viewname].split("_",2)[1].chop
         rec.each do |j,k|
-            j_to_stbl,j_to_sfld = j.to_s.split("_",2)
+          j_to_stbl,j_to_sfld = j.to_s.split("_",2)
             if   j_to_stbl == tblnamechop   ##本体の更新
-			    if  k
+			    			if  k
 	                @src_tbl[j_to_sfld.sub("_id","s_id").to_sym] = k
-                    @src_tbl[j_to_sfld.to_sym] = nil  if k  == "\#{nil}"  ##
-				end
+                  @src_tbl[j_to_sfld.to_sym] = nil  if k  == "\#{nil}"  ##
+								end
             end   ## if j_to_s.
         end ## rec.each
-        @src_tbl[:persons_id_upd] =  @sio_user_code
-        @src_tbl[:updated_at] = Time.now
-        @src_tbl[:created_at] = Time.now  if rec[:sio_classname] =~ /_add_/
+        @src_tbl[:persons_id_upd] = rec["#{tblnamechop}_person_id_upd"] = @sio_user_code
+        @src_tbl[:updated_at] = rec["#{tblnamechop}_updated_at"] = Time.now
+				if rec[:sio_classname] =~ /_add_/
+						@src_tbl[:created_at] =  rec["#{tblnamechop}_created_at"] = Time.now
+						@src_tbl[:id] =proc_get_nextval("#{tblnamechop}s_seq")
+				end	
 	end
 	def proc_save_rec_btch_sub rec
 		tmp = {}
@@ -1595,59 +1685,59 @@ module RorBlkctl
 			### 下記の変換が未実施
 			###  1 (params == String ,command_c=float or integer
     end
-	def init_from_screen current_user,params,screen_code   ###
-		sio_user_code = ActiveRecord::Base.connection.select_value("select id from persons where email = '#{current_user[:email]}'")
+	def init_from_screen current_user,params  ###
+		@sio_user_code = ActiveRecord::Base.connection.select_value("select id from persons where email = '#{current_user[:email]}'")
 		command_c = {}
-		command_c[:sio_user_code] = sio_user_code  ###########   LOGIN USER
+		command_c[:sio_user_code] = @sio_user_code  ###########   LOGIN USER
 		command_c[:sio_email] = current_user[:email]
-	    command_c[:sio_code]  = screen_code
+	  command_c[:sio_code]  = params[:screenCode]
 		command_c[:sio_params] = params.to_json.to_s[0..3999]
 		return command_c
 	end
-	def get_screen_and_fields_prototype current_user,screen_code
-		prototype = Rails.cache.fetch('screenfield'+RorBlkctl.grp_code(current_user[:email])+screen_code) do
+	##def get_screen_and_fields_prototype current_user
+	#	prototype = Rails.cache.fetch('screenfield'+RorBlkctl.grp_code(current_user[:email])+screen_code) do
         	###  ダブルコーティション　「"」は使用できない。 
-        	sqlstr = "select pobject_code_sfd,screenfield_hideflg,screenfield_editable,screenfield_indisp ,
-					pobject_code_view,screen_strwhere,screen_rows_per_page,screen_rowlist,
-					screenfield_dataprecision,screenfield_datascale
-                    from r_screenfields
-                    where pobject_code_scr = '#{screen_code}' and screenfield_expiredate > current_date and screenfield_selection = 1
-                    order by screenfield_seqno"
-        	sqlrecstr = ""
-			screen_prop ={}  ###view screen_cod  ・・・
-			field_prop ={}   ###項目の属性
-			show_columns = []
-			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
-				sqlrecstr << i["pobject_code_sfd"] + ","
-				field_prop[i["pobject_code_sfd"]] ={:screenfield_editable=>i["screenfield_editable"],
-													:screenfield_indisp=>i["screenfield_indisp"],
-													:screenfield_dataprecision=>i["screenfield_dataprecision"],													
-													:screenfield_datascale=>i["screenfield_datascale"]}
-				
-					show_columns << {:dataField =>"#{i["pobject_code_sfd"]}",
-									:text=>"#{RorBlkctl.proc_blkgetpobj(i["pobject_code_sfd"],"view_field",current_user[:email])[0]}",
-									:hidden => if i["screenfield_hideflg"] == "1" then true else false end}
-			
-								###	#{if i["screenfield_hideflg"] == "0" then ",filter: textFilter()" end }},%
-				
-            	if cnt == 0
-					screen_prop[:sid] = screen_code
-					screen_prop[:screen_name] = proc_blkgetpobj(screen_code,"screen",current_user[:email])[0]
-                	screen_prop[:viewname] = i["pobject_code_view"]
-                	screen_prop[:screen_strwhere] = i["screen_strwhere"]
-                	screen_prop[:sizePerPage] = i["screen_rows_per_page"].to_i
-					screen_prop[:sizePerPageList] = []
-					i["screen_rowlist"].split(",").each do |list|
-						##screen_prop[:sizePerPageList]  << {:text=> list.to_s,:value=> list.to_i}
-						screen_prop[:sizePerPageList]  <<  list.to_i
-					end
-            	end
-			end
-			##show_columns = show_columns.chop.gsub(/\n/,"") + "]"
-			screen_prop[:sqlrecstr] = sqlrecstr.chop
-			prototype = {:screen_prop=>screen_prop,:show_columns=>show_columns,:field_prop=>field_prop}
-		end
-	end
+  #      	sqlstr = "select pobject_code_sfd,screenfield_hideflg,screenfield_editable,screenfield_indisp ,
+	#				pobject_code_view,screen_strwhere,screen_rows_per_page,screen_rowlist,
+	#				screenfield_dataprecision,screenfield_datascale
+  #                  from r_screenfields
+  #                  where pobject_code_scr = '#{screen_code}' and screenfield_expiredate > current_date and screenfield_selection = 1
+  #                  order by screenfield_seqno"
+  #      	sqlrecstr = ""
+	#		screen_prop ={}  ###view screen_cod  ・・・
+	#		field_prop ={}   ###項目の属性
+	#		show_columns = []
+	#		ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
+	#			sqlrecstr << i["pobject_code_sfd"] + ","
+  # 		field_prop[i["pobject_code_sfd"]] ={:screenfield_editable=>i["screenfield_editable"],
+	#												:screenfield_indisp=>i["screenfield_indisp"],
+	#												:screenfield_dataprecision=>i["screenfield_dataprecision"],													
+	#												:screenfield_datascale=>i["screenfield_datascale"]}
+	#			
+	#				show_columns << {:dataField =>"#{i["pobject_code_sfd"]}",
+	#								:text=>"#{RorBlkctl.proc_blkgetpobj(i["pobject_code_sfd"],"view_field",current_user[:email])[0]}",
+	#								:hidden => if i["screenfield_hideflg"] == "1" then true else false end}
+	#		
+	#							###	#{if i["screenfield_hideflg"] == "0" then ",filtered: textFilter()" end }},%
+	#			
+  #          	if cnt == 0
+	#				screen_prop[:sid] = screen_code
+	#				screen_prop[:screen_name] = proc_blkgetpobj(screen_code,"screen",current_user[:email])[0]
+  #              	screen_prop[:viewname] = i["pobject_code_view"]
+  #              	screen_prop[:screen_strwhere] = i["screen_strwhere"]
+  #              	screen_prop[:sizePerPage] = i["screen_rows_per_page"].to_i
+	#				screen_prop[:sizePerPageList] = []
+	#				i["screen_rowlist"].split(",").each do |list|
+	#					##screen_prop[:sizePerPageList]  << {:text=> list.to_s,:value=> list.to_i}
+	#					screen_prop[:sizePerPageList]  <<  list.to_i
+	#				end
+  #          	end
+	#		end
+	#		##show_columns = show_columns.chop.gsub(/\n/,"") + "]"
+	#		screen_prop[:sqlrecstr] = sqlrecstr.chop
+	#		prototype = {:screen_prop=>screen_prop,:show_columns=>show_columns,:field_prop=>field_prop}
+	#	end
+	#end
 	
 	def create_grid_columns_info screen_code,email
 			grid_columns_info = Rails.cache.fetch('screenfield'+RorBlkctl.grp_code(email)+screen_code) do
@@ -1660,11 +1750,12 @@ module RorBlkctl
 				ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
 							columns_info <<{:Header=>i["screenfield_name"],
 													:accessor=>i["pobject_code_sfd"],
-													:show=> i["screenfield_hideflg"]
+													:show=>if  i["screenfield_hideflg"] == "0" then true else false end,
+												##	:filterable=>i["screenfield_hideflg"] 
 													}
 					select_fields = 	select_fields + 		i["pobject_code_sfd"] + ','
           if cnt == 0
-                	where_info[:filter] = i["screen_strwhere"]
+                	where_info[:filtered] = i["screen_strwhere"]
                 	page_info[:sizePerPage] = i["screen_rows_per_page"].to_i
                 	page_info[:pageNo] = 1
 									page_info[:sizePerPageList] = []
@@ -1677,9 +1768,8 @@ module RorBlkctl
 				grid_columns_info = [columns_info,page_info,where_info,select_fields.chop]
 			end
 	end
-
 	
-def create_grid_editable_columns_info screen_code,email
+	def create_grid_editable_columns_info screen_code,email,req
 		grid_columns_info = Rails.cache.fetch('screenfield'+RorBlkctl.grp_code(email)+screen_code) do
 				###  ダブルコーティション　「"」は使用できない。 
 				sqlstr = "select * from  func_get_screenfield_grpname('#{email}','#{screen_code}')"
@@ -1696,16 +1786,27 @@ def create_grid_editable_columns_info screen_code,email
 				end	
 				columns_info <<{:Header=>"#{i["screenfield_name"]}",
 												:accessor=>"#{i["pobject_code_sfd"]}",
-												:show=>i["screenfield_hideflg"],
-												:Cell=>if i["screenfield_editable"] === "1" or i["screenfield_editable"] === "2"
-																	"renderEditable"
-																else	
-																	"renderNonEditable"
-																end	
-															}
-				select_fields = 	select_fields + 		i["screenfield_name"] + ','
+												:show=>if  i["screenfield_hideflg"] == "0" then true else false end,
+												:filtered=>true,
+												:id=>"#{i["screenfield_id"]}",
+											##	:Cell=>if (req==='editabletablereq' or req==="inlineaddreq") and 
+											##							  (i["screenfield_editable"] === "1" or i["screenfield_editable"] === "2")
+											##						"renderEditable"
+											##					else	
+											##						"renderNonEditable"
+											##					end	
+											##				}
+												:classname=>if (req==='editabletablereq' or req==="inlineaddreq") and 
+																		  (i["screenfield_editable"] === "1" or i["screenfield_editable"] === "2")
+																			"renderEditable"
+																		else	
+																			"renderNonEditable"
+																		end	
+																	}
+				where_info[i["pobject_code_sfd"].to_sym] = 	i["screenfield_type"]								
+				select_fields = 	select_fields + 	i["pobject_code_sfd"] + ','
 				if cnt == 0
-								where_info[:filter] = i["screen_strwhere"]
+								where_info[:filtered] = i["screen_strwhere"]
 								page_info[:sizePerPage] = i["screen_rows_per_page"].to_i
 								page_info[:pageNo] = 1
 								page_info[:sizePerPageList] = []
@@ -1717,7 +1818,39 @@ def create_grid_editable_columns_info screen_code,email
 			end
 			grid_columns_info = [columns_info,page_info,where_info,select_fields.chop]
 		end
-end
+	end
+	def get_fetch_rec params
+			strsql = ""
+			mainviewflg = true
+			keys = ""
+			tblnamechop = ""
+			JSON.parse(params["fetchcode"]).each do |key,val|
+						if strsql == ""
+							tblnamechop = key.split("_")[0]
+							strsql = "select * from r_#{tblnamechop}s 
+												where #{key} = '#{val}' "
+							if params["screenCode"].split("_")[1].chop != key.to_s.split("_")[0]
+									mainviewflg = false
+							end	 
+							keys << key
+						else
+							 strsql << " and  #{key.to_s} = '#{val}' " 
+							 keys << "," + key
+						end	
+			end							
+			rec =  ActiveRecord::Base.connection.select_one(strsql)	
+			fetch_data = {}
+			JSON.parse(params["rowInfo"])["original"].each do |key,val|
+				if rec
+						if rec[key] and tblnamechop ==  key.split("_")[0]
+							 fetch_data[key] =  rec[key]
+							 idkey = params["screenCode"].split("_")[1].chop + "_" + key.split("_")[0] + "_id"
+							 fetch_data[idkey] = rec["id"]
+						end
+				end			
+			end	
+			return fetch_data,mainviewflg,keys
+	end	
 	def proc_save_alloc_id alloc
 		des_cmd = ActiveRecord::Base.connection.select_one("select * from r_#{alloc["destblname"]} where id = #{alloc["destblid"]}")
 		if des_cmd.nil?
@@ -1759,7 +1892,7 @@ end
 		ActiveRecord::Base.uncached() do
 			case ActiveRecord::Base.configurations[Rails.env]['adapter']
 				when /post/
-					ActiveRecord::Base.connection.select_value("SELECT nextval('sio.#{tbl_seq}')")  ##post
+					ActiveRecord::Base.connection.select_value("SELECT nextval('#{tbl_seq}')")  ##post
 				when /oracle/
 					ActiveRecord::Base.connection.select_value("select #{tbl_seq}.nextval from dual")  ##oracle
 			end

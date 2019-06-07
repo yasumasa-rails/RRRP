@@ -46,6 +46,13 @@ export const EDITUPLOAD_RESULT = 'EDITUPLOAD_RESULT'
 
 export const DOWNLOAD_REQUEST = 'DOWNLOAD_REQUEST'
 
+export const SCREEN_LINEEDIT = 'SCREEN_LINEEDIT'
+
+
+export const FETCH_REQUEST = 'FETCH_REQUEST'
+export const FETCH_RESULT = 'FETCH_RESULT'
+export const INPUTFIELDPROTECT_REQUEST = ' INPUTFIELDPROTECT_REQUEST'
+
 // LOGIN
 // Attach our Formik actions as meta-data to our action.
 
@@ -82,14 +89,14 @@ export const MenuFailure = (errors) => ({
   errors: { errors }  //
 })
 
-export const ScreenRequest = (params,token,client,uid,screenName) => ({
+export const ScreenRequest = (params,token,client,uid,screenName,editableflg) => ({
   type:  SCREEN_REQUEST,
-  payload: { params,token,client,uid ,screenName}  //
+  payload: { params,token,client,uid ,screenName,editableflg}  //
 })
 
-export const ScreenParamsSet = (subparams) => ({
+export const ScreenParamsSet = (state) => ({
   type:  SCREEN_PARAMS_SET,
-  payload: { subparams }  //
+  payload: { state }  //
 })
 
 export const ScreenFailure = (errors) => ({
@@ -184,5 +191,23 @@ export const EditUploadResult = (message) => ({
   type: EDITUPLOAD_RESULT,
   payload: { message}
 })
+
+
+export const FetchRequest = (params,token,client,uid) => ({
+  type: FETCH_REQUEST,
+  payload: { params ,token,client,uid}
+})
+
+export const InputFieldProtect = (columns) => ({
+  type: INPUTFIELDPROTECT_REQUEST,
+  payload: { columns}
+})
+
+//export const FetchResult = (data) => ({
+//  type: FETCH_RESULT,
+//  payload: { data}
+//})
+
+
 
 

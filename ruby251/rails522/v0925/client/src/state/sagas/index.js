@@ -4,6 +4,7 @@ import {takeLatest} from 'redux-saga/effects'
 import {LOGIN_REQUEST,SIGNUP_REQUEST,MENU_REQUEST,
         LOGOUT_REQUEST,SCREEN_REQUEST,BUTTONLIST_REQUEST,
         EDITUPLOAD_REQUEST,UPLOADLIST_REQUEST,EDITUPLOADTITLE_REQUEST,
+        FETCH_REQUEST,
       //  UPLOAD_REQUEST,
       } from  'actions'
 
@@ -25,6 +26,7 @@ export function * sagas () {
   yield takeLatest(SIGNUP_REQUEST,SignupSaga)
   yield takeLatest(MENU_REQUEST,MenuSaga)
   yield takeLatest(SCREEN_REQUEST,ScreenSaga)
+  yield takeLatest(FETCH_REQUEST,ScreenSaga)
   yield takeLatest(BUTTONLIST_REQUEST,ButtonListSaga)
   yield takeLatest(EDITUPLOAD_REQUEST,EditUploadSaga)
   yield takeLatest(UPLOADLIST_REQUEST,UploadListSaga)

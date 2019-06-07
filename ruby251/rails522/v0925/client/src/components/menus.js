@@ -91,8 +91,8 @@ const  mapStateToProps = (state,ownProps) =>({
 //画面移動前のpageSize,・・・を持ってくるようにする。  
   pageSize:state.screen?state.screen.pageSize:null,
   page:state.screen?state.screen.page:0,
-  sorted:state.screen?state.screen.sorted:[], 
-  filtered:state.screen?state.screen.filtered:[], 
+  sorted:state.screen?state.screen.sorted:null, 
+  filtered:state.screen?state.screen.filtered:null, 
   
 })
 
@@ -100,7 +100,7 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
       getScreen : (screenCode,pageSize, page,sorted,filtered,screenName,token, client, uid) =>{
         let  params= {  page: page, pageSize : pageSize,
                         sorted:sorted,  filtered:filtered,      
-                         screenCode:screenCode,uid:uid,req:"viewtablereq"} 
+                         screenCode:screenCode,uid:uid,req:"viewtablereq",} 
         dispatch(ScreenRequest(params, token, client, uid,screenName))}
           })    
 

@@ -12,7 +12,7 @@ import {ButtonFlgRequest,ScreenRequest} from '../actions'
 
  const  ButtonList = ({buttonListData,setButtonFlg,buttonflg,
                         screenCode,token,client,uid,screenName,
-                        pageSize,page,sorted,filtered}) =>{
+                        pageSize,page,sorted,filtered,editableflg}) =>{
       let tmpbuttonlist = {}
       if(buttonListData){
          buttonListData.map((cate) => {
@@ -31,9 +31,9 @@ import {ButtonFlgRequest,ScreenRequest} from '../actions'
                   {tmpbuttonlist[screenCode].map((val,index) => 
                     <Tab key={index} >
                       <Button  
-                      type={val[1]==='inlineedit'||'edit'||'copy and add'?"submit":"button"}
+                      type={val[1]==='inlineedit'||'inlineadd'||'edit'||'copy and add'?"submit":"button"}
                       onClick ={() => setButtonFlg(val[1],screenCode,token,client,uid,screenName,
-                                                    pageSize,page,sorted,filtered)}>
+                                                    pageSize,page,sorted,filtered,editableflg)}>
                       {val[0]}       
                       </Button>             
                     </Tab>
@@ -64,21 +64,29 @@ const  mapStateToProps = (state,ownProps) =>({
   page:state.screen?state.screen.page:0,
   sorted:state.screen?state.screen.sorted:[], 
   filtered:state.screen?state.screen.filtered:[], 
+  editableflg:state.screen.editableflg,
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-        setButtonFlg : (buttonCode,screenCode,token,client,uid,screenName,
-                        pageSize,page,sorted,filtered) =>{
+  setButtonFlg : (buttonCode,screenCode,token,client,uid,screenName,
+                        pageSize,page,sorted,filtered,editableflg) =>{
         let  buttonflg = "";
         buttonflg = buttonCode;
         dispatch(ButtonFlgRequest(buttonflg));
-        if(buttonCode==="edit"||buttonCode==="copy and add"||buttonCode==="inlineedit")
+        if(buttonCode==="inlineedit")
           { let  params= {  page: page, pageSize : pageSize,
             sorted:sorted,  filtered:filtered,      
              screenCode:screenCode,uid:uid,req:"editabletablereq"}
-          dispatch(ScreenRequest(params,token,client,uid,screenName)) //menu
+          editableflg = true
+          dispatch(ScreenRequest(params,token,client,uid,screenName,editableflg)) //menu
          }
-        } 
-    })    
+         if(buttonCode==="inlineadd")
+           { let  params= {  page: page, pageSize : pageSize,pages:1,
+              screenCode:screenCode,uid:uid,req:"inlineaddreq"}
+            editableflg = true
+            dispatch(ScreenRequest(params,token,client,uid,screenName,editableflg)) //menu
+          }
+      } 
+  })    
 
 export default connect(mapStateToProps,mapDispatchToProps)(ButtonList)

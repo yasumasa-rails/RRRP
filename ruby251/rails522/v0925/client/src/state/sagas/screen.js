@@ -1,8 +1,8 @@
-
-import React from 'react'
-import { call, put } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import axios         from 'axios'
-import {SCREEN_SUCCESS,SCREEN_FAILURE} from '../../actions'
+import {SCREEN_SUCCESS,SCREEN_FAILURE,SCREEN_LINEEDIT, FETCH_RESULT} from '../../actions'
+import {getScreenState} from '../reducers/screen'
+//import { ReactReduxContext } from 'react-redux';
 
 function screenApi({params,token,client,uid}) {
   const url = 'http://localhost:3001/api/menus'
@@ -21,8 +21,29 @@ function screenApi({params,token,client,uid}) {
 export function* ScreenSaga({ payload: {params,token,client,uid}  }) {
   let response  = yield call(screenApi,{params ,token,client,uid} )
   if(response){
-      response.data["params"] = params
-      yield put({ type: SCREEN_SUCCESS, action: response })
+      switch(params.req) {
+        case 'viewtablereq':
+          response.data["params"] = params
+          return yield put({ type: SCREEN_SUCCESS, action: response })    //action --> payload
+        case 'editabletablereq':
+          response.data["params"] = params
+          return yield put({ type: SCREEN_SUCCESS, action: response })     
+        case 'inlineaddreq':
+            response.data["params"] = params
+            return yield put({ type: SCREEN_SUCCESS, action: response })    
+        case "updateGridLineData":
+          return yield put({ type: SCREEN_LINEEDIT, payload: response })    
+        case "fetch_request":
+            const screenState = yield select(getScreenState)
+            let tmp =  response.data.params.fetchdata
+            Object.keys(tmp).map((key)=>{
+              screenState.data[params.rowInfo.index][key]= response.data.params.fetchdata[key]
+              return screenState.data
+            })
+            return yield put({ type: FETCH_RESULT, payload: {data:screenState.data} })  
+        default:
+          return {}
+      }
   }else
      {  
       let message;

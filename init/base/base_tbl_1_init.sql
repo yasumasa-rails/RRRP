@@ -671,6 +671,12 @@ OR REPLACE  VIEW R_SCREENS (
   , SCRLV_CODE
  --- , pobject_id_gscr
  --- , pobject_code_gscr
+  ,screen_pobject_id_sgrp
+  , pobject_code_sgrp
+  , pobject_objecttype_sgrp
+  , pobject_id_sgrp
+  , pobject_contents_sgrp
+  , screen_seqno
 ) AS
 select
   screen.expiredate screen_expiredate
@@ -711,17 +717,25 @@ select
   , scrlv.scrlv_code scrlv_code
  --- , pobject_gscr.pobject_id pobject_id_gscr
  --- , pobject_gscr.pobject_code pobject_code_gscr
+  , screen.pobjects_id_sgrp screen_pobject_id_sgrp
+  , pobject_sgrp.pobject_code pobject_code_sgrp
+  , pobject_sgrp.pobject_objecttype pobject_objecttype_sgrp
+  , pobject_sgrp.pobject_id pobject_id_sgrp
+  , pobject_sgrp.pobject_contents pobject_contents_sgrp
+  , screen.seqno screen_seqno
 from
   screens screen
   , r_pobjects pobject_view
   , upd_persons person_upd
   , r_pobjects pobject_scr
+  , r_pobjects pobject_sgrp
   , r_scrlvs scrlv
  --- , r_pobjects pobject_gscr
 where
   pobject_view.id = screen.pobjects_id_view
   and person_upd.id = screen.persons_id_upd
   and pobject_scr.id = screen.pobjects_id_scr
+  and pobject_sgrp.id = screen.pobjects_id_sgrp
 ---  and pobject_gscr.id = screen.pobjects_id_scr
   and scrlv.id = screen.scrlvs_id
 ;
@@ -1558,6 +1572,7 @@ OR REPLACE  VIEW R_USEBUTTONS (
   , BUTTON_CODE
   , BUTTON_SEQNO
   , BUTTON_TITLE
+  , BUTTON_CONTENTS
   , BUTTON_ID
   , BUTTON_CAPTION
   , BUTTON_BUTTONICON
@@ -1608,6 +1623,7 @@ select
   , button.button_code button_code
   , button.button_seqno button_seqno
   , button.button_title button_title
+  , button.button_contents button_contents
   , button.button_id button_id
   , button.button_caption button_caption
   , button.button_buttonicon button_buttonicon
@@ -1680,8 +1696,8 @@ CREATE TABLE REPORTS
 CREATE  SEQUENCE   REPORTS_seq INCREMENT BY 1 START WITH 10000   
 ;
 
-CREATE OR REPLACE  VIEW R_REPORTS (REPORT_CONTENTS, REPORT_POBJECT_ID_REP, POBJECT_CODE_REP, POBJECT_OBJECTTYPE_REP, POBJECT_EXPIREDATE_REP,  POBJECT_ID_REP, POBJECT_CONTENTS_REP, ID, REPORT_ID, REPORT_REMARK, REPORT_EXPIREDATE, REPORT_UPDATE_IP, REPORT_CREATED_AT, REPORT_UPDATED_AT, REPORT_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, REPORT_SCREEN_ID, SCREEN_POBJECT_ID_VIEW, POBJECT_CODE_VIEW, POBJECT_OBJECTTYPE_VIEW, POBJECT_EXPIREDATE_VIEW, POBJECT_ID_VIEW, POBJECT_CONTENTS_VIEW, SCREEN_FORM_PS, SCREEN_ROWS_PER_PAGE, SCREEN_ROWLIST, SCREEN_HEIGHT, SCREEN_STRSELECT, SCREEN_STRWHERE, SCREEN_STRGROUPORDER, SCREEN_YMLCODE, SCREEN_CDRFLAYOUT, SCREEN_CONTENTS,  SCREEN_ID, SCREEN_EXPIREDATE, SCREEN_POBJECT_ID_SCR, POBJECT_CODE_SCR, POBJECT_OBJECTTYPE_SCR, POBJECT_EXPIREDATE_SCR, POBJECT_ID_SCR, POBJECT_CONTENTS_SCR, SCREEN_SCRLV_ID, SCRLV_LEVEL1, SCRLV_ID, SCRLV_EXPIREDATE, SCRLV_CODE, SCREEN_STRORDER, REPORT_FILENAME, REPORT_USRGRP_ID, USRGRP_ID, USRGRP_EXPIREDATE, USRGRP_CODE, USRGRP_NAME, USRGRP_CONTENTS) AS 
-  select report.contents report_contents ,report.pobjects_id_rep report_pobject_id_rep , pobject_rep.pobject_code pobject_code_rep, pobject_rep.pobject_objecttype pobject_objecttype_rep, pobject_rep.pobject_expiredate pobject_expiredate_rep, pobject_rep.pobject_id pobject_id_rep, pobject_rep.pobject_contents pobject_contents_rep,report.id id,report.id report_id ,report.remark report_remark ,report.expiredate report_expiredate ,report.update_ip report_update_ip ,report.created_at report_created_at ,report.updated_at report_updated_at ,report.persons_id_upd report_person_id_upd , person_upd.person_id_upd person_id_upd, person_upd.person_code_upd person_code_upd, person_upd.person_name_upd person_name_upd,report.screens_id report_screen_id , screen.screen_pobject_id_view screen_pobject_id_view, screen.pobject_code_view pobject_code_view, screen.pobject_objecttype_view pobject_objecttype_view, screen.pobject_expiredate_view pobject_expiredate_view, screen.pobject_id_view pobject_id_view, screen.pobject_contents_view pobject_contents_view, screen.screen_form_ps screen_form_ps, screen.screen_rows_per_page screen_rows_per_page, screen.screen_rowlist screen_rowlist, screen.screen_height screen_height, screen.screen_strselect screen_strselect, screen.screen_strwhere screen_strwhere, screen.screen_strgrouporder screen_strgrouporder, screen.screen_ymlcode screen_ymlcode, screen.screen_cdrflayout screen_cdrflayout, screen.screen_contents screen_contents, screen.screen_id screen_id, screen.screen_expiredate screen_expiredate, screen.screen_pobject_id_scr screen_pobject_id_scr, screen.pobject_code_scr pobject_code_scr, screen.pobject_objecttype_scr pobject_objecttype_scr, screen.pobject_expiredate_scr pobject_expiredate_scr, screen.pobject_id_scr pobject_id_scr, screen.pobject_contents_scr pobject_contents_scr, screen.screen_scrlv_id screen_scrlv_id, screen.scrlv_level1 scrlv_level1, screen.scrlv_id scrlv_id, screen.scrlv_expiredate scrlv_expiredate, screen.scrlv_code scrlv_code, screen.screen_strorder screen_strorder,report.filename report_filename ,report.usrgrps_id report_usrgrp_id , usrgrp.usrgrp_id usrgrp_id, usrgrp.usrgrp_expiredate usrgrp_expiredate, usrgrp.usrgrp_code usrgrp_code, usrgrp.usrgrp_name usrgrp_name, usrgrp.usrgrp_contents usrgrp_contents
+CREATE OR REPLACE  VIEW R_REPORTS (REPORT_CONTENTS, REPORT_POBJECT_ID_REP, POBJECT_CODE_REP, POBJECT_OBJECTTYPE_REP, POBJECT_EXPIREDATE_REP,  POBJECT_ID_REP, POBJECT_CONTENTS_REP, ID, REPORT_ID, REPORT_REMARK, REPORT_EXPIREDATE, REPORT_UPDATE_IP, REPORT_CREATED_AT, REPORT_UPDATED_AT, REPORT_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, REPORT_SCREEN_ID, SCREEN_POBJECT_ID_VIEW, POBJECT_CODE_VIEW, POBJECT_OBJECTTYPE_VIEW,  POBJECT_ID_VIEW, POBJECT_CONTENTS_VIEW, SCREEN_FORM_PS, SCREEN_ROWS_PER_PAGE, SCREEN_ROWLIST, SCREEN_HEIGHT, SCREEN_STRSELECT, SCREEN_STRWHERE, SCREEN_STRGROUPORDER, SCREEN_YMLCODE, SCREEN_CDRFLAYOUT, SCREEN_CONTENTS,  SCREEN_ID, SCREEN_EXPIREDATE, SCREEN_POBJECT_ID_SCR, POBJECT_CODE_SCR, POBJECT_OBJECTTYPE_SCR, POBJECT_ID_SCR, POBJECT_CONTENTS_SCR, SCREEN_SCRLV_ID, SCRLV_LEVEL1, SCRLV_ID,  SCRLV_CODE, SCREEN_STRORDER, REPORT_FILENAME, REPORT_USRGRP_ID, USRGRP_ID, USRGRP_EXPIREDATE, USRGRP_CODE, USRGRP_NAME, USRGRP_CONTENTS) AS 
+  select report.contents report_contents ,report.pobjects_id_rep report_pobject_id_rep , pobject_rep.pobject_code pobject_code_rep, pobject_rep.pobject_objecttype pobject_objecttype_rep, pobject_rep.pobject_expiredate pobject_expiredate_rep, pobject_rep.pobject_id pobject_id_rep, pobject_rep.pobject_contents pobject_contents_rep,report.id id,report.id report_id ,report.remark report_remark ,report.expiredate report_expiredate ,report.update_ip report_update_ip ,report.created_at report_created_at ,report.updated_at report_updated_at ,report.persons_id_upd report_person_id_upd , person_upd.person_id_upd person_id_upd, person_upd.person_code_upd person_code_upd, person_upd.person_name_upd person_name_upd,report.screens_id report_screen_id , screen.screen_pobject_id_view screen_pobject_id_view, screen.pobject_code_view pobject_code_view, screen.pobject_objecttype_view pobject_objecttype_view, screen.pobject_id_view pobject_id_view, screen.pobject_contents_view pobject_contents_view, screen.screen_form_ps screen_form_ps, screen.screen_rows_per_page screen_rows_per_page, screen.screen_rowlist screen_rowlist, screen.screen_height screen_height, screen.screen_strselect screen_strselect, screen.screen_strwhere screen_strwhere, screen.screen_strgrouporder screen_strgrouporder, screen.screen_ymlcode screen_ymlcode, screen.screen_cdrflayout screen_cdrflayout, screen.screen_contents screen_contents, screen.screen_id screen_id, screen.screen_expiredate screen_expiredate, screen.screen_pobject_id_scr screen_pobject_id_scr, screen.pobject_code_scr pobject_code_scr, screen.pobject_objecttype_scr pobject_objecttype_scr,  screen.pobject_id_scr pobject_id_scr, screen.pobject_contents_scr pobject_contents_scr, screen.screen_scrlv_id screen_scrlv_id, screen.scrlv_level1 scrlv_level1, screen.scrlv_id scrlv_id, screen.scrlv_code scrlv_code, screen.screen_strorder screen_strorder,report.filename report_filename ,report.usrgrps_id report_usrgrp_id , usrgrp.usrgrp_id usrgrp_id, usrgrp.usrgrp_expiredate usrgrp_expiredate, usrgrp.usrgrp_code usrgrp_code, usrgrp.usrgrp_name usrgrp_name, usrgrp.usrgrp_contents usrgrp_contents
  from reports report ,r_pobjects  pobject_rep,upd_persons  person_upd,r_screens  screen,r_usrgrps  usrgrp
  where  pobject_rep.id = report.pobjects_id_rep and  person_upd.id = report.persons_id_upd and  screen.id = report.screens_id and  usrgrp.id = report.usrgrps_id
 
@@ -1740,10 +1756,8 @@ OR REPLACE  VIEW R_BLKUKYS (
   , FIELDCODE_FIELDLENGTH
   , FIELDCODE_ID
   , FIELDCODE_CONTENTS
-  , FIELDCODE_POBJECT_ID_FLD
   , POBJECT_CODE_FLD
   , POBJECT_OBJECTTYPE_FLD
-  , POBJECT_ID_FLD
   , TBLFIELD_BLKTB_ID
   , BLKTB_ID
   , BLKTB_POBJECT_ID_TBL
@@ -1780,10 +1794,8 @@ select
   , TBLFIELD.fieldcode_fieldlength fieldcode_fieldlength
   , TBLFIELD.fieldcode_id fieldcode_id
   , TBLFIELD.fieldcode_contents fieldcode_contents
-  , TBLFIELD.fieldcode_pobject_id_fld fieldcode_pobject_id_fld
   , TBLFIELD.pobject_code_fld pobject_code_fld
   , TBLFIELD.pobject_objecttype_fld pobject_objecttype_fld
-  , TBLFIELD.pobject_id_fld pobject_id_fld
   , TBLFIELD.TBLFIELD_blktb_id TBLFIELD_blktb_id
   , TBLFIELD.blktb_id blktb_id
   , TBLFIELD.blktb_pobject_id_tbl blktb_pobject_id_tbl
@@ -1951,6 +1963,8 @@ where
   and blktb_dest.id = tblink.blktbs_id_dest
   and screen_src.id = tblink.screens_id_src
   ;
+
+
 CREATE TABLE TBLINKFLDS
    (	ID numeric(38,0),
 	REMARK varchar(4000),
@@ -1987,7 +2001,7 @@ CREATE   SEQUENCE   TBLINKS_seq  INCREMENT BY 1 START WITH 10000
   TBLFIELD_CONTENTS, TBLFIELD_BLKTB_ID, BLKTB_CONTENTS, BLKTB_ID, BLKTB_POBJECT_ID_TBL, POBJECT_CODE_TBL, POBJECT_OBJECTTYPE_TBL,
   POBJECT_ID_TBL, POBJECT_CONTENTS_TBL, BLKTB_SELTBLS, TBLFIELD_FIELDCODE_ID, FIELDCODE_SEQNO,
   FIELDCODE_FTYPE, FIELDCODE_DATASCALE, FIELDCODE_DATAPRECISION, FIELDCODE_FIELDLENGTH, FIELDCODE_ID, FIELDCODE_CONTENTS,
-  FIELDCODE_POBJECT_ID_FLD, POBJECT_CODE_FLD, POBJECT_OBJECTTYPE_FLD, POBJECT_ID_FLD, POBJECT_CONTENTS_FLD,
+  FIELDCODE_POBJECT_ID_FLD, 
   TBLFIELD_ID, TBLFIELD_EXPIREDATE, TBLFIELD_SEQNO, TBLFIELD_VIEWFLMK, TBLINKFLD_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD,
   PERSON_NAME_UPD, TBLINKFLD_CONTENTS, TBLINKFLD_TBLINK_ID, TBLINK_CONTENTS, TBLINK_ID, TBLINK_EXPIREDATE,
   TBLINK_SEQNO, TBLINK_BLKTB_ID_DEST, BLKTB_CONTENTS_DEST, BLKTB_ID_DEST, BLKTB_POBJECT_ID_TBL_DEST, POBJECT_CODE_TBL_DEST,
@@ -2007,9 +2021,8 @@ CREATE   SEQUENCE   TBLINKS_seq  INCREMENT BY 1 START WITH 10000
   tblfield.pobject_contents_tbl pobject_contents_tbl, tblfield.blktb_seltbls blktb_seltbls, tblfield.tblfield_fieldcode_id tblfield_fieldcode_id,
   tblfield.fieldcode_seqno fieldcode_seqno, tblfield.fieldcode_ftype fieldcode_ftype, tblfield.fieldcode_datascale fieldcode_datascale,
   tblfield.fieldcode_dataprecision fieldcode_dataprecision, tblfield.fieldcode_fieldlength fieldcode_fieldlength, tblfield.fieldcode_id fieldcode_id,
-  tblfield.fieldcode_contents fieldcode_contents, tblfield.fieldcode_pobject_id_fld fieldcode_pobject_id_fld, tblfield.pobject_code_fld pobject_code_fld,
-  tblfield.pobject_objecttype_fld pobject_objecttype_fld, tblfield.pobject_id_fld pobject_id_fld,
-  tblfield.pobject_contents_fld pobject_contents_fld, tblfield.tblfield_id tblfield_id, tblfield.tblfield_expiredate tblfield_expiredate,
+  tblfield.fieldcode_contents fieldcode_contents, tblfield.fieldcode_pobject_id_fld fieldcode_pobject_id_fld, 
+ tblfield.tblfield_id tblfield_id, tblfield.tblfield_expiredate tblfield_expiredate,
   tblfield.tblfield_seqno tblfield_seqno, tblfield.tblfield_viewflmk tblfield_viewflmk,tblinkfld.persons_id_upd tblinkfld_person_id_upd ,
   person_upd.person_id_upd person_id_upd, person_upd.person_code_upd person_code_upd, person_upd.person_name_upd person_name_upd,
   tblinkfld.contents tblinkfld_contents ,tblinkfld.tblinks_id tblinkfld_tblink_id , tblink.tblink_contents tblink_contents, tblink.tblink_id tblink_id,
@@ -2259,6 +2272,35 @@ CREATE OR REPLACE  VIEW R_CHRGS (ID, CHRG_ID, CHRG_REMARK, CHRG_EXPIREDATE, CHRG
 
 ;
 
+CREATE TABLE CRRS 
+   (	CONTENTS VARCHAR(4000), 
+	AMTDECIMAL NUMERIC(38,0), 
+	CODE VARCHAR(50), 
+	CREATED_AT TIMESTAMP (6), 
+	EXPIREDATE DATE, 
+	ID NUMERIC(38,0), 
+	NAME VARCHAR(100), 
+	PERSONS_ID_UPD NUMERIC(38,0), 
+	PRICEDECIMAL NUMERIC(38,0), 
+	REMARK VARCHAR(100), 
+	UPDATE_IP VARCHAR(40), 
+	UPDATED_AT TIMESTAMP (6), 
+	 CONSTRAINT CRRS_ID_PK PRIMARY KEY (ID), 
+	 CONSTRAINT CRR_PERSONS_ID_UPD FOREIGN KEY (PERSONS_ID_UPD)
+	  REFERENCES PERSONS (ID) 
+   ) 
+;
+
+
+CREATE  SEQUENCE  CRRS_seq  INCREMENT BY 1 START WITH 10000   
+;
+
+
+CREATE OR REPLACE VIEW R_CRRS (ID, CRR_ID, CRR_REMARK, CRR_EXPIREDATE, CRR_UPDATE_IP, CRR_CREATED_AT, CRR_UPDATED_AT, CRR_PERSON_ID_UPD, PERSON_ID_UPD_UPD, PERSON_CODE_UPD_UPD, PERSON_NAME_UPD_UPD, CRR_CODE, CRR_NAME, CRR_CONTENTS, CRR_PRICEDECIMAL, CRR_AMTDECIMAL) AS 
+  select crr.id id,crr.id crr_id ,crr.remark crr_remark ,crr.expiredate crr_expiredate ,crr.update_ip crr_update_ip ,crr.created_at crr_created_at ,crr.updated_at crr_updated_at ,crr.persons_id_upd crr_person_id_upd , person_upd.person_id_upd person_id_upd_upd, person_upd.person_code_upd person_code_upd_upd, person_upd.person_name_upd person_name_upd_upd,crr.code crr_code ,crr.name crr_name ,crr.contents crr_contents ,crr.pricedecimal crr_pricedecimal ,crr.amtdecimal crr_amtdecimal 
+ from crrs crr ,upd_persons  person_upd
+ where  person_upd.id = crr.persons_id_upd
+;
 
 COMMIT
 ;
