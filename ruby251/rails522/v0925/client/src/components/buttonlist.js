@@ -6,13 +6,15 @@ import Upload from './upload'
 import Download from './download'
 import "react-tabs/style/react-tabs.css"
 import Button from '@material-ui/core/Button'
-import "./index.css"
-import {ButtonFlgRequest,ScreenRequest} from '../actions'
+import "../index.css"
+import {ScreenRequest,ButtonFlgRequest} from '../actions'
 
 
  const  ButtonList = ({buttonListData,setButtonFlg,buttonflg,
-                        screenCode,token,client,uid,screenName,
-                        pageSize,page,sorted,filtered,editableflg}) =>{
+                        screenCode,uid,screenName,
+                        page,sorted,params,
+                      //  editableflg,message
+                      }) =>{
       let tmpbuttonlist = {}
       if(buttonListData){
          buttonListData.map((cate) => {
@@ -25,15 +27,20 @@ import {ButtonFlgRequest,ScreenRequest} from '../actions'
       return (
         <div>
         {tmpbuttonlist[screenCode]&&   //画面のボタンが用意されてないときはskip
-            <Tabs   forceRenderTabPanel defaultIndex={0}  selectedTabClassName="react-tabs--selected_custom_head">
+            <Tabs   forceRenderTabPanel defaultIndex={0}  selectedTabClassName="react-tabs--selected_custom_footer">
               
                 <TabList>
                   {tmpbuttonlist[screenCode].map((val,index) => 
                     <Tab key={index} >
                       <Button  
-                      type={val[1]==='inlineedit'||'inlineadd'||'edit'||'copy and add'?"submit":"button"}
-                      onClick ={() => setButtonFlg(val[1],screenCode,token,client,uid,screenName,
-                                                    pageSize,page,sorted,filtered,editableflg)}>
+                      type={val[1]==='inlineedit'||'inlineadd'||'yup'?"submit":"button"}
+                      onClick ={() =>{ setButtonFlg(val[1],  // buttonCode
+                                                    //screenCode,uid,screenName,
+                                                    page,sorted,params
+                                                    //editableflg,
+                                                    )
+                                      }
+                                     }>
                       {val[0]}       
                       </Button>             
                     </Tab>
@@ -48,6 +55,7 @@ import {ButtonFlgRequest,ScreenRequest} from '../actions'
         }
         {buttonflg==='import'&&<Upload/>}
         {buttonflg==='export'&&<Download/>}
+        <React.Fragment> </React.Fragment>
         </div>    
       )
     }
@@ -55,37 +63,38 @@ import {ButtonFlgRequest,ScreenRequest} from '../actions'
 const  mapStateToProps = (state,ownProps) =>({
   buttonListData:state.button.buttonListData ,  
   buttonflg:state.button.buttonflg ,  
-  screenCode:state.screen.screenCode ,  
-  screenName:state.screen.screenName ,  
-  token:(state.login.auth?state.login.auth["access-token"]:"") ,
-  client:(state.login.auth?state.login.auth.client:""),
-  uid:(state.login.auth?state.login.auth.uid:"") ,
-  pageSize:state.screen?state.screen.pageSize:null,
+  params:state.screen.params ,  
+  screenCode:state.screen.params.screenCode ,  
+  screenName:state.screen.params.screenName ,  
+  uid:state.login.auth?state.login.auth.uid:"" ,
   page:state.screen?state.screen.page:0,
   sorted:state.screen?state.screen.sorted:[], 
-  filtered:state.screen?state.screen.filtered:[], 
-  editableflg:state.screen.editableflg,
+  //editableflg:state.screen.editableflg,
+  message:state.screen.message
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-  setButtonFlg : (buttonCode,screenCode,token,client,uid,screenName,
-                        pageSize,page,sorted,filtered,editableflg) =>{
-        let  buttonflg = "";
-        buttonflg = buttonCode;
-        dispatch(ButtonFlgRequest(buttonflg));
+  setButtonFlg : (buttonCode,
+                  //editableflg,screenCode,uid,screenName,
+                    page,sorted,params) =>{
+        let buttonflg = buttonCode;
+        dispatch(ButtonFlgRequest(buttonflg)) // import export 画面用
         if(buttonCode==="inlineedit")
-          { let  params= {  page: page, pageSize : pageSize,
-            sorted:sorted,  filtered:filtered,      
-             screenCode:screenCode,uid:uid,req:"editabletablereq"}
-          editableflg = true
-          dispatch(ScreenRequest(params,token,client,uid,screenName,editableflg)) //menu
+          { params= { ...params, page: page, 
+            sorted:sorted,   req:"editabletablereq"}
+          //editableflg = true
+              dispatch(ScreenRequest(params)) //menu
          }
          if(buttonCode==="inlineadd")
-           { let  params= {  page: page, pageSize : pageSize,pages:1,
-              screenCode:screenCode,uid:uid,req:"inlineaddreq"}
-            editableflg = true
-            dispatch(ScreenRequest(params,token,client,uid,screenName,editableflg)) //menu
+           { params= {...params,  page: page, pages:1,req:"inlineaddreq"}
+          //  editableflg = true
+              dispatch(ScreenRequest(params)) //menu
           }
+          if(buttonCode==="yup")
+            { params= { ...params,req:"yup"}
+           //  editableflg = false
+                dispatch(ScreenRequest(params)) //menu
+           }
       } 
   })    
 

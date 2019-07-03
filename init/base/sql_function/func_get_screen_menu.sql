@@ -2,7 +2,7 @@
 as $$
 select case  when q.name is null then s.pobject_code_sgrp else q.name end as grp_name ,
 	case  when x.name is null then s.pobject_code_scr else x.name end as scr_name ,
-	s.pobject_code_scr screen_code,screen_rows_per_page page_size,x.contents
+	s.pobject_code_scr screen_code,to_number(split_part(s.screen_rowlist,',',1),'9999') page_size,x.contents
 from r_screens s
       inner join persons on screen_scrlv_id = persons.scrlvs_id and  persons.email = $1
       left join  ( select t.pobjects_id,t.name from pobjgrps t 

@@ -4,9 +4,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import {DownloadRequest} from '../actions'
 
-const Download = (uid,token,client,screenCode,screenName,readFile) => (
+const Download = ({uid,token,client,screenCode,screenName,readFile}) => (
     <div>
-       import Table {screenName}
+       export Table {screenName}
       <input type='file' onClick={(files)=>readFile(files,uid,token,client,screenCode)}/>
     </div>
   )
@@ -16,8 +16,8 @@ const  mapStateToProps = (state) => ({
               uid:state.login.auth?state.login.auth.uid:"",
               token:state.login.auth?state.login.auth["access-token"]:"",
               client:state.login.auth?state.login.auth.client:"",
-              screenCode:state.screen.screenCode,
-              screenName:state.screen.screenName,
+              screenCode:state.screen.params.screenCode,
+              screenName:state.screen.params.screenName,
     
   })
        

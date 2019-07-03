@@ -1,13 +1,11 @@
 import { SCREEN_REQUEST,SCREEN_SUCCESS,SCREEN_FAILURE,
           LOGOUT_REQUEST,SCREEN_PARAMS_SET,
-          SCREEN_LINEEDIT,FETCH_REQUEST,FETCH_RESULT,INPUTFIELDPROTECT_REQUEST} 
+          SCREEN_LINEEDIT,SCREEN_ERR_CHECK,SCREEN_ERR_CHECK_RESULT,
+          FETCH_REQUEST,FETCH_RESULT,FETCH_FAILURE,
+          YUP_RESULT,
+        //  INPUTFIELDPROTECT_REQUEST
+        } 
           from '../../actions'
-/* const initialValues = {
-  errors:[],
-  columns:[{name:"loadung"}],
-  data:[{name:"loadung"}],
-  pageInfo:{totalpage:0},
-} */
 
 export let getScreenState = state => state.screen
 const screenreducer =  (state= {} , action) =>{
@@ -17,9 +15,10 @@ const screenreducer =  (state= {} , action) =>{
       return {...state,
         screenCode:action.payload.params.screenCode, 
         pageSize:action.payload.params.pageSize, 
-        screenName:action.payload.screenName, 
-        messages: [{ body: 'screen loading ...', time: new Date() }],
-        editableflg:action.payload.editableflg
+        screenName:action.payload.params.screenName, 
+        loading:true,
+        message: [{ body: 'screen loading ...', time: new Date() }],
+       // editableflg:action.payload.editableflg
       }
 
       case SCREEN_PARAMS_SET:
@@ -28,30 +27,47 @@ const screenreducer =  (state= {} , action) =>{
           page:action.payload.state.page,
           sorted:action.payload.state.sorted, 
           filtered:action.payload.state.filtered, 
-          messages: [],
       }
 
+
+      case SCREEN_ERR_CHECK:
+          return {...state,
+            schema:action.payload.schema,
+            data:action.payload.data,
+            index:action.payload.index,
+            field:action.payload.field,
+            params:action.payload.params,
+            loading : true
+        }
+        
+      case SCREEN_ERR_CHECK_RESULT:
+        return {...state,
+          data:action.payload.data,
+          loading:false,
+          filterable:false,          
+      }
 
     // Successful?  .
     case SCREEN_SUCCESS:
       return {...state,
-        messages: [],
+        message: [],
         columns: action.action.data.columns,　　/// payloadに統一
         data: action.action.data.data,
         params: action.action.data.params,
         pages: action.action.data.pageInfo.totalPage,
+        sizePerPageList: action.action.data.pageInfo.sizePerPageList,
+        yup:action.action.data.yup,
         status: action.action.data.status,
+        loading:false,
+        filterable:action.action.data.params.req==="viewtablereq"?true:false,
       }
     
     
       case SCREEN_LINEEDIT:
         return {...state,
-          messages: [],
-          editableflg:true
-        /*  params: action.payload.data.params,
-          pages: action.payload.data.params.pages,
-          page: action.payload.data.params.page, */
-      //    status: action.payload.data.status,
+          data:action.payload.data,
+          loading:false,
+          filterable:false,  
         }  
 
     // Append the error returned from our api
@@ -68,22 +84,35 @@ const screenreducer =  (state= {} , action) =>{
           token:action.payload.token, 
           client:action.payload.client, 
           uid:action.payload.uid, 
-          editableflg:false
+          loading:true,
+          //editableflg:false
         }
   
-      case FETCH_RESULT:
+      case FETCH_FAILURE:
             return {...state,
-              messages: [],
-              data:action.payload.data, 
-              editableflg:true
+              data:action.payload.data,  
+              loading:false,
+              filterable:false,
             }
-      case INPUTFIELDPROTECT_REQUEST:
-                return {...state,
-                  //columns:action.payload.columns, 
-                  editableflg:false
-                }
-      
 
+      case FETCH_RESULT:
+                  return {...state,
+                    data:action.payload.data, 
+                    loading:false,
+                    filterable:false,
+            }
+
+    //  case INPUTFIELDPROTECT_REQUEST:
+    //            return {...state,
+    //              //columns:action.payload.columns, 
+    //              editableflg:false
+    //            }
+
+      case YUP_RESULT:
+            return {...state,
+              message: action.payload.message,
+            }
+    
     case  LOGOUT_REQUEST:
       return {}  
 

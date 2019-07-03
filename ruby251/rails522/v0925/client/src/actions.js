@@ -24,6 +24,9 @@ export const SCREEN_REQUEST = 'SCREEN_REQUEST'
 export const SCREEN_SUCCESS = 'SCREEN_SUCCESS'
 export const SCREEN_PARAMS_SET = 'SCREEN_PARAMS_SET'
 export const SCREEN_FAILURE = 'SCREEN_FAILURE'
+export const SCREEN_ERR_SET = 'SCREEN_ERR_SET'
+export const SCREEN_ERR_CHECK_RESULT = 'SCREEN_ERR_CHECK_RESULT'
+export const SCREEN_ERR_CHECK = 'SCREEN_ERR_CHECK'
 
 export const BUTTONLIST_REQUEST = 'BUTTONLIST_REQUEST'
 export const BUTTONLIST_SUCCESS = 'BUTTONLIST_SUCCESS'
@@ -51,7 +54,10 @@ export const SCREEN_LINEEDIT = 'SCREEN_LINEEDIT'
 
 export const FETCH_REQUEST = 'FETCH_REQUEST'
 export const FETCH_RESULT = 'FETCH_RESULT'
+export const FETCH_FAILURE = 'FETCH_FAILURE'
 export const INPUTFIELDPROTECT_REQUEST = ' INPUTFIELDPROTECT_REQUEST'
+
+export const YUP_RESULT = 'YUP_RESULT'
 
 // LOGIN
 // Attach our Formik actions as meta-data to our action.
@@ -89,14 +95,25 @@ export const MenuFailure = (errors) => ({
   errors: { errors }  //
 })
 
-export const ScreenRequest = (params,token,client,uid,screenName,editableflg) => ({
+export const ScreenRequest = (params) => ({
   type:  SCREEN_REQUEST,
-  payload: { params,token,client,uid ,screenName,editableflg}  //
+  payload: { params}  //
 })
 
 export const ScreenParamsSet = (state) => ({
   type:  SCREEN_PARAMS_SET,
   payload: { state }  //
+})
+
+export const ScreenErrSet = (data,token,client,uid) => ({
+  type:  SCREEN_ERR_SET,
+  payload: { data,token,client,uid }  //
+})
+
+
+export const ScreenErrCheck = (schema,data,index,field,params) => ({
+  type:  SCREEN_ERR_CHECK,
+  payload: {schema,data,index,field,params}  //
 })
 
 export const ScreenFailure = (errors) => ({
@@ -203,11 +220,13 @@ export const InputFieldProtect = (columns) => ({
   payload: { columns}
 })
 
-//export const FetchResult = (data) => ({
-//  type: FETCH_RESULT,
-//  payload: { data}
-//})
+export const FetchResult = (data,columns) => ({
+  type: FETCH_RESULT,
+  payload: { data,columns}
+})
 
-
-
+export const FetchFailure = (data,columns) => ({
+  type: FETCH_FAILURE,
+  payload: { data,columns}
+})
 

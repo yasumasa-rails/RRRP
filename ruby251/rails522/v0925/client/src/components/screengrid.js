@@ -2,11 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux'
 import ReactTable from 'react-table'
 import "react-table/react-table.css"
-import {ScreenParamsSet,ScreenRequest,FetchRequest,InputFieldProtect} from '../actions'
+import {ScreenParamsSet,ScreenRequest,FetchRequest,
+  //InputFieldProtect, ScreenErrSet,
+  ScreenErrCheck,} from '../actions'
 import ButtonList from './buttonlist'
 import   '../index.css' 
-import * as Yup from 'yup'
-
+import {yupschema} from '../yupschema'
+import Tooltip from 'react-tooltip-lite';
+//import * as Yup from 'yup'
 // LOGIN FORM
 // @NOTE For forms that can be reused for both create/update you would move this form to its own
 // file and import it with different initialValues depending on the use-case. An over-optimization
@@ -14,95 +17,132 @@ import * as Yup from 'yup'
 
 const renderEditable = (cellInfo )=> {
   return (
+   // <Tooltip content={cellInfo.row.gridmessage[cellInfo.column.id]?cellInfo.row.gridmessage[cellInfo.column.id]:""}
+    <Tooltip content={cellInfo.row.gridmessage===""?"":cellInfo.row.gridmessage?
+                      cellInfo.row.gridmessage[cellInfo.column.id]?cellInfo.row.gridmessage[cellInfo.column.id]:"":""}
+       tagName="span" arrowSize={5}>
     <div
+      className={cellInfo.column.className}
       contentEditable
       suppressContentEditableWarning      
       dangerouslySetInnerHTML={{ __html: cellInfo.value }}
     />
+    </Tooltip>
   );
 }
+
 
 const renderNonEditable = (cellInfo)=> {
   return (
     <div
-      dangerouslySetInnerHTML={{ __html: cellInfo.value  }}
+      className={cellInfo.column.className}
+      dangerouslySetInnerHTML={{ __html: cellInfo.value  }}      
     />
   );
 }
 
+const renderCheckbox = (cellInfo)=> {
+  return (    
+    <Tooltip content={cellInfo.row.gridmessage===""?"":cellInfo.row.gridmessage?
+                      cellInfo.row.gridmessage[cellInfo.column.id]?cellInfo.row.gridmessage[cellInfo.column.id]:"":""}
+       tagName="span" arrowSize={7}>
+          <input
+            type="checkbox"  className="checkbox"
+          />
+    </Tooltip>
+  );
+}
+
+
+
 function editableColumns(columns){
   let temp =[]
-  /* columns.map((val,index) =>{ 
-      if(val["Cell"] === 'renderEditable'){val["Cell"] = eval("renderEditable")}
-      else{val["Cell"] = eval("renderNonEditable")}
-       return   temp.push(val)
-  }) */
+  
   columns.map((val,index) =>{ 
-      if(val["classname"] === 'renderEditable'){val["Cell"] = renderEditable }
-      else{val["calssname"] = renderNonEditable}
-       return   temp.push(val)
-  })
-  return temp}   
+      if(val["className"])
+        {switch(true){
+                case /renderEditable/.test(val["className"]):
+                  val["Cell"] = renderEditable
+                  break
+                case /checkbox/.test(val["className"]):
+                    val["Cell"] = renderCheckbox
+                    break
+                default:    
+                    val["Cell"] = renderNonEditable
+                 }
+        }   
+      return   temp.push(val)
+  })    
+
+  return   temp   
+}   
 function noneditableColumns(columns){
   let temp =[]
   columns.map((val,index) =>{ 
-    val["Cell"] = renderNonEditable
+    if(val["className"].match(/renderEditable/)){val["Cell"] = renderNonEditable}
      return   temp.push(val)
     }) 
-  return temp}   
-
-
+  return temp}  
+ 
+  
+//  let errmsgs ={}
 
 class ScreenGrid extends React.Component {
 
   render() {
-    const {screenCode, pageSize,
-            page, filtered,  sorted,
-            handleScreenParamsSet,columns,data,pages,params,
-            handleScreenRequest,handleScreenLineEditRequest,
-            token,client,uid, screenName,handleFetchRequest,handleInputFieldProtect,
-            editableflg,
+    const {screenCode, pageSize,filterable,
+            page, loading,
+// sorted,handleScreenParamsSet,handleErrorMsg,handleErrorset,handleScreenLineEditRequest,handleInputFieldProtect,
+            columns,data,pages,params,  //params railsに渡すパラメータを兼ねている。
+            handleScreenRequest,handleValite,
+            uid, screenName,handleFetchRequest,
+            sizePerPageList,yup,
             } = this.props
     
-    let lineIndex = 99999999
-    let rowIndexCheck = true
-  
-      let schema = Yup.object().shape({
-        itm_expiredate:Yup.date().default(function() { return new Date(2099,12,31)}),
-        itm_code:Yup.string().required(), 
-        unit_code:Yup.string().required()
-       })
-       
- 
-      let onValite = (state) =>schema.validate({
-          itm_expiredate:state.data[lineIndex].itm_expiredate,
-          itm_code:state.data[lineIndex].itm_code,
-          unit_code:state.data[lineIndex].unit_code,
-          }).then(function(value){if(!state.data[lineIndex].itm_expiredate){ state.data[lineIndex].itm_expiredate = value.itm_expiredate}
-            handleScreenLineEditRequest(screenCode, pageSize,lineIndex,token,client,uid,screenName,state.data[lineIndex],pages)})
-           .catch(function(err){alert(err.name&&err.errors)})
-      let tcolumns=screenCode&&editableflg?editableColumns(columns):noneditableColumns(columns)           
+    //let rowIndexCheck = true
+    let Yup = require('yup')
 
-   //   let fetchSchema  = (params) =>handleFetchRequest(params)
+    let fieldSchema = field =>{
+      let tmp ={}
+      tmp[field] = yupschema[screenCode][field]
+      return(
+       Yup.object(
+         tmp
+      ))}
 
+  /*
+     */
+     let onLineValite = (data,index,field,params) =>
+     {
+      let screenSchema = Yup.object().shape(yupschema[screenCode])
+      handleValite(screenSchema,data,index,field,params)
+    }
+     
+     let onFieldValite = (data,index,field) =>
+          {let schema =  fieldSchema(field)
+           handleValite(schema,data,index,field,params)}
+     /*
+*/
+    let tcolumns=editableColumns(columns)   
+    let filtered =[]
     return(
     <div>
     {screenCode?
       <ReactTable
       page={page}
       pages={pages}  //
+      defaultPageSize={sizePerPageList[0]}
       pageSize={pageSize}  //
-      data={data?data:[]} // should default to [] / 
+      data={data}
+      loading={loading}
       columns={tcolumns}
+      pageSizeOptions={sizePerPageList}
       //filtered={filtered}
       //sorted={sorted}
       manual // informs React Table that you'll be handling sorting and pagination server-side
 
-      onFetchData={( state,instance) => {                 
-                    handleScreenParamsSet(state)  
-      }}  
        
-      filterable={true}
+      filterable={filterable}
       
       className="-striped -highlight" //-striped  奇数行、偶数行色分け　 -highlight：マウスがヒットした時の色の強調
        style={{
@@ -110,82 +150,74 @@ class ScreenGrid extends React.Component {
        }}
 
       getTrProps={(state, rowInfo, column, instance)  => {
-        return {
-          onClick: (e, handleOriginal) => {
-            params["req"]==="viewtablereq"&&(e.currentTarget.style.backgroundColor = 'green')
-                
-        }}
+        return {}
       }}
 
       getTdProps={(state, rowInfo, column, instance) => {
-        return {
-          onKeyPress:(e) =>
-             {e.currentTarget.style.backgroundColor = "#5F81f5" }  ,
-          onBlur:(e) =>
-             {if(state.resolvedData[rowInfo.index][column.id]===e.target.textContent)
-                {e.currentTarget.style.backgroundColor = "#7F81a5"} 
-              data[rowInfo.index][column.id] = e.target.textContent
-              lineIndex = rowInfo.index   
-              rowIndexCheck = false
-              if(state.resolvedData[rowInfo.index][column.id]!==e.target.textContent&&column.id==="unit_code"){// editableflg = false
-                                        handleInputFieldProtect(columns) 
+        return { 
+          onFocus:(e) =>
+            {  
+            e.target.className = "renderEditableInput"
+            if( data[rowInfo.index].confirm&&column.id==="confirm")
+                { params["uid"] = uid
+                  onLineValite(data,rowInfo.index,"confirm",params)  } 
+          } ,
+          onClick:(e) =>
+             { 
+             if(e.target.checked&&column.id==="confirm")
+                  { params["uid"] = uid
+                    onLineValite(data,rowInfo.index,"confirm",params) //
+                  }
+          }  ,
+          onBlur:(e) =>            
+             {if(state.data[rowInfo.index][column.id]===e.target.textContent && e.target.className !== "checkbox")
+                {e.target.className = "renderEditableNotChange"} 
+               else{if(e.target.className !== "renderEditableError" && e.target.className !== "checkbox"){e.target.className = "renderEditable"} }
+              
+              if(state.resolvedData[rowInfo.index][column.id]!==e.target.textContent&&yup.yupfetchcode[column.id]){// 
+                                        data[rowInfo.index][column.id]=e.target.textContent
+                                        //handleInputFieldProtect(columns) 
                                         let params = {}
                                          params["fetchcode"] = {[column.id]:e.target.textContent}
                                          params["screenCode"] = screenCode
-                                         params["rowInfo"] = rowInfo
-                                         handleFetchRequest(params,token,client,uid)}} ,
-          onFocus:(e) =>
-              {e.currentTarget.style.backgroundColor = "#aF81f5"
-                if( rowInfo.index!==lineIndex&&lineIndex!== 99999999&&
-                    state.resolvedData[lineIndex]!==data[lineIndex])
-                    { 
-                      onValite(state)      
-                    }
-                rowIndexCheck = true
-              } ,
+                                         params["resolvedData"] =  JSON.stringify(data[rowInfo.index])
+                                         params["index"] = rowInfo.index 
+                                         params["fetchview"] = yup.yupfetchcode[column.id]
+                                         params["uid"] =uid 
+                                         handleFetchRequest(params)
+                                         }
+              else{if(column.id!=="confirm"){　data[rowInfo.index][column.id] = e.target.textContent
+                                              onFieldValite(data,rowInfo.index,column.id,params)}}  ///screenCode,Name null                          
+             } ,
           }
         }
       }
       
       getProps={(state) => {      //  fillterの時もイベントが発生する。
           return {
-             onFocus:(e) =>
-                  {if( rowIndexCheck===false&&lineIndex!== 99999999&&state.resolvedData[lineIndex]!==data[lineIndex])
-                    { 
-                      onValite(state) 
-                      rowIndexCheck = true}} , 
-          //  onBlur:(e) =>
-           //       {handleScreenParamsSet(state) } ,
              onKeyPress:(e) =>{
                             if(e.key==="Enter"&& params["req"]==="viewtablereq"){
-                              handleScreenRequest(screenCode,page,pageSize,lineIndex,token,client,uid,screenName,filtered,)
+                              filtered = state.filtered
+                              handleScreenRequest(params,page,pageSize,state.filtered)
                             }}
                             }
                    }      
         }
-      
-      onPageChange={(pageIndex) => {     
-        handleScreenRequest(screenCode,pageIndex,pageSize,lineIndex,token,client,uid,screenName,filtered,)
-         } 
-        } 
-        
+      onPageChange={(pageIndex) => {      
+        handleScreenRequest(params,pageIndex,pageSize,filtered)
+           } }
       onPageSizeChange={(pageSize, pageIndex) => {      
-        handleScreenRequest(screenCode,pageIndex,pageSize,lineIndex,token,client,uid,screenName,filtered,)
+        handleScreenRequest(params,pageIndex,pageSize,filtered)
          } 
         } 
-    
-     >                       
+    >                       
 
       {(state, makeTable, instance) => {
         return (
-                <div
-                  style={{
-                  borderRadius: "5px",  overflow: "hidden", padding: "5px"
-                  }}
-                >     
-        {makeTable()}
-        <ButtonList/>
-        </div>
+          <div>     
+                {makeTable()}
+                <ButtonList/>
+          </div>
         );
       }}
       </ReactTable>
@@ -196,20 +228,20 @@ class ScreenGrid extends React.Component {
   }
 const  mapStateToProps = (state) => {
   return {  uid:state.login.auth?state.login.auth.uid:"",
-            token:state.login.auth?state.login.auth["access-token"]:"",
-            client:state.login.auth?state.login.auth.client:"",
             buttonflg:state.button?state.button.buttonflg:"",  
-            screenCode:state.screen.screenCode,
-            screenName:state.screen.screenName,
+            screenCode:state.screen.params?state.screen.params.screenCode:"",
+            screenName:state.screen.params?state.screen.params.screenName:"",
             columns:state.screen.columns?state.screen.columns:[],
             params:state.screen.params?state.screen.params:{},
-            data:state.screen.data,
+            data:state.screen.data?state.screen.data:[],
             pages:state.screen.pages,
             page:state.screen.page,
             pageSize:state.screen.pageSize,
             sorted:state.screen.sorted,
-            filtered:state.screen.filtered,
-            editableflg:state.screen.editableflg,
+            sizePerPageList:state.screen.sizePerPageList?state.screen.sizePerPageList:[25],
+            yup:state.screen.yup,
+            loading:state.screen.loading,
+            filterable:state.screen.filterable
             }
 }
    
@@ -217,21 +249,25 @@ const  mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch,ownProps ) => ({
     handleScreenParamsSet:  (state) =>{
                             dispatch(ScreenParamsSet(state))},                    
-    handleScreenLineEditRequest:  (screenCode, pageSize,lineIndex,token,client,uid,screenName,linedata,pages) =>{
-                            let  params= {screenCode:screenCode,lineIndex:lineIndex,uid:uid,linedata:linedata,
-                                          pageSize:pageSize,req:"updateGridLineData",pages:pages,}
-                           dispatch(ScreenRequest(params, token, client, uid,screenName))},
-    handleScreenRequest:  (screenCode,page, pageSize,lineIndex,token,client,uid,screenName,filtered) =>{
-                            let  params= {screenCode:screenCode,lineIndex:lineIndex,uid:uid,
-                                 page:page,pageSize:pageSize,req:"viewtablereq",filtered:filtered}
-                            dispatch(ScreenRequest(params, token, client, uid,screenName))},
-    handleFetchRequest:  (params,token,client,uid) =>{ params["req"] = "fetch_request"
-                                      dispatch(FetchRequest(params,token,client,uid))},
+    handleScreenLineEditRequest:  (screenCode, pageSize,index,uid,screenName,linedata,pages,sizePerPageList) =>{
+                            let  params= {screenCode:screenCode,screenName:screenName,
+                                          index:index,uid:uid,linedata:linedata,
+                                          pageSize:pageSize,req:"updateGridLineData",pages:pages,sizePerPageList:sizePerPageList}
+                           dispatch(ScreenRequest(params))},
+    handleScreenRequest:  (params,page,pageSize,filtered) =>{
+                            params = {...params,page:page,pageSize:pageSize,filtered:filtered}
+                            dispatch(ScreenRequest(params))},
+    handleFetchRequest:  (params) =>{ params["req"] = "fetch_request"
+                                      dispatch(FetchRequest(params))},
+    handleValite:  (schema,data,index,field,params) =>{ 
+                           dispatch(ScreenErrCheck(schema,data,index,field,params))},
+
     handleInputFieldProtect:  (columns) =>{
                               const temp =[]
                               columns.map((val,index) =>{ 
-                                     if(val["classneme"] === "renderEditable"){val["Cell"] = renderNonEditable}                                                   
+                                     if(val["className"].match(/renderEditable/)){val["Cell"] = renderNonEditable}
                                         return   temp.push(val)}) 
-                              dispatch(InputFieldProtect())},
+                            //  dispatch(InputFieldProtect())
+                            },
                       })   
 export default connect(mapStateToProps,mapDispatchToProps)(ScreenGrid)

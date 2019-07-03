@@ -7,7 +7,7 @@ import { Link,BrowserRouter,Route,} from 'react-router-dom'
 import { Tab, Tabs, TabList, TabPanel, } from 'react-tabs'
 import "react-tabs/style/react-tabs.css"
 import Button from '@material-ui/core/Button'
-import "./index.css"
+import "../index.css"
 
 import { Signup } from './signup'
 import { Login } from './login'
@@ -16,8 +16,8 @@ import ScreenGrid from './screengrid'
 
  class Menus extends React.Component {
   render() {
-    const { isAuthenticated ,menuListData,token,client,uid,getScreen, 
-            pageSize,page,sorted,filtered,} = this.props
+    const { isAuthenticated ,menuListData,uid,getScreen, 
+            pageSize,page,sorted,sizePerPageList} = this.props
     
     if (isAuthenticated) {
       if(menuListData){
@@ -47,8 +47,8 @@ import ScreenGrid from './screengrid'
                     <Tab key={index} >
                       <Button   type="submit"
                       onClick ={() => getScreen(val.screen_code,pageSize?pageSize:val.page_size,
-                                                page,sorted,filtered,val.scr_name,
-                                                token,client,uid)}>
+                                                page,sorted,val.scr_name,
+                                                uid,sizePerPageList)}>
                       {val.scr_name}       
                       </Button>             
                     </Tab>)}
@@ -62,7 +62,7 @@ import ScreenGrid from './screengrid'
                 </TabPanel> 
               )}
             </Tabs>
-            <ScreenGrid/>
+          <ScreenGrid/>
            </div>    
       )
     }
@@ -85,23 +85,23 @@ import ScreenGrid from './screengrid'
 const  mapStateToProps = (state,ownProps) =>({
   isAuthenticated:state.login.isAuthenticated ,
   menuListData:state.menu.menuListData ,
-  token:(state.login.auth?state.login.auth["access-token"]:"") ,
-  client:(state.login.auth?state.login.auth.client:""),
   uid:(state.login.auth?state.login.auth.uid:"") ,
 //画面移動前のpageSize,・・・を持ってくるようにする。  
   pageSize:state.screen?state.screen.pageSize:null,
   page:state.screen?state.screen.page:0,
+  data:state.screen?state.screen.data:[],
   sorted:state.screen?state.screen.sorted:null, 
-  filtered:state.screen?state.screen.filtered:null, 
+  sizePerPageList:state.screen.sizePerPageList?state.screen.sizePerPageList:[25],
+  params:state.screen.params,
   
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-      getScreen : (screenCode,pageSize, page,sorted,filtered,screenName,token, client, uid) =>{
-        let  params= {  page: page, pageSize : pageSize,
-                        sorted:sorted,  filtered:filtered,      
+      getScreen : (screenCode,pageSize, page,sorted,screenName, uid,sizePerPageList) =>{
+        let  params= {  page: page, pageSize : pageSize,sizePerPageList:sizePerPageList,
+                        sorted:sorted,   screenName:  screenName,   
                          screenCode:screenCode,uid:uid,req:"viewtablereq",} 
-        dispatch(ScreenRequest(params, token, client, uid,screenName))}
+        dispatch(ScreenRequest(params))}
           })    
 
 export default connect(mapStateToProps,mapDispatchToProps)(Menus)

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # RorBlk
 # 2099/12/31を修正する時は　2100/01/01の修正も
-module RorBlkctl
+module saveRorBlkctl
 	extend self
-	def system_person_id ## command_cで利用
+	def system_person_id
 		if @system_person_id
 			@system_person_id
 		else
@@ -145,8 +145,7 @@ module RorBlkctl
         tmp_key = {}
 				tblname = command_r[:sio_viewname].split("_")[1]
         if  command_r[:sio_message_contents].nil?
-						command_r = proc_set_src_tbl(command_r) ### @src_tblの項目作成
-						command_r["person_id_upd"] =  @sio_user_code
+						proc_set_src_tbl  command_r ### @src_tblの項目作成
 						if command_r[:sio_classname] =~ /_add_|_edit_|_delete_/ and tblname !~ /tblink/  ## rec = command_c = sio_xxxxx
 							proc_command_before_instance_variable(command_r)
 							proc_tblinks(command_r) do
@@ -202,8 +201,7 @@ module RorBlkctl
             ##crt_def_tb if  tblname == "blktbs"
       ensure
             proc_insert_sio_r( command_r) #### if @pare_class != "batch"    ## 結果のsio書き込み
-	  end ##begin
-	  return command_r
+      end ##begin
 	end
 	##def vproc_optiontabl tblname
 	##	if tblname =~ /rplies$|mksch|mkords|results$/ then true else false end  ###mkinsts,mkactsは使用してない　12/9
@@ -379,11 +377,8 @@ module RorBlkctl
     def proc_insert_sio_r  command_c ####レスポンス
         command_c[:sio_id] =  proc_get_nextval("sio.SIO_#{command_c[:sio_viewname]}_SEQ")
         command_c[:sio_command_response] = "R"
-		command_c[:sio_add_time] = Time.now
-		###画面専用項目
-		command_c.delete("gridmessage")
-		command_c.delete("confirm")
-		proc_tbl_add_arel  "SIO_#{command_c[:sio_viewname]}",command_c
+				command_c[:sio_add_time] = Time.now
+				proc_tbl_add_arel  "SIO_#{command_c[:sio_viewname]}",command_c
     end   ## 
     def char_to_number_data  command_c  ###excel からのデータ取り込み　根本解決を
 				##rubyXl マッキントッシュ excel windows excel not perfect
@@ -431,40 +426,34 @@ module RorBlkctl
 			end	
 			filtered.each  do |strjson|  ##xparams gridの生
 				ff = JSON.parse(strjson)
-	      		case where_info[ff["id"].to_sym]
+	      case where_info[ff["id"].to_sym]
 				when nil
 					next
-		 		when /number/
-					if ff["value"] =~ /^<=/  or ff["value"] =~ /^>=/ or ff["value"]=~ /^!=/
-						where_str << " #{ff["id"]} #{ff["value"][0..1]} #{ ff["value"][2..-1]}      AND "   
-					else
-						if ff["value"] =~ /^</   or  ff["value"] =~ /^>/	or  ff["value"] =~ /^=/
-							where_str << " #{ff["id"]}  #{ff["value"][0]}  #{ ff["value"][1..-1]}      AND "   
-						else	
-							where_str << " #{ff["id"]} = #{ff["value"]}     AND "
-						end	
-					end	
-	      		when /^date|^timestamp/
-		      		case  ff["value"].size
-			        when 4
+	      when /number/
+					where_str << " #{ff["id"]} = #{ff["value"]}     AND "
+					where_str << " #{ff["id"]}  #{ff["value"][0]}  #{ff["value"][1..-1]}      AND "   if ff["value"] =~ /^</   or  ff["value"] =~ /^>/
+					where_str << " #{ff["id"]} #{ff["value"][0..1]} #{ff["value"][2..-1]}      AND "    if ff["value"] =~ /^<=/  or ff["value"] =~ /^>=/ or j =~ /^!=/
+	      when /^date|^timestamp/
+		      case  ff["value"].size
+			          when 4
 									where_str << " to_char( #{ff["id"]},'yyyy') = '#{ff["value"]}'       AND "
-			        when 5
+			          when 5
 									where_str << " to_char( #{ff["id"]},'yyyy') #{ff["value"][0]} '#{ff["value"][1..-1]}'      AND "  if  ( ff["value"]=~ /^</   or ff["value"] =~ /^>/ )
-					when 6
+                when 6
 									where_str << " to_char( #{ff["id"]},'yyyy')  #{ff["value"][0..1]} '#{ff["value"][2..-1]}'      AND "  if   (ff["value"] =~ /^<=/  or ff["value"] =~ /^>=/ )
-			        when 7
+			          when 7
 									where_str <<" to_char( #{ff["id"]},'yyyy/mm') = '#{ff["value"]}'       AND "  if Date.valid_date?(ff["value"].split("/")[0].to_i,ff["value"].split("/")[1].to_i,01)
-			        when 8
+			          when 8
 									where_str << " to_char( #{ff["id"]},'yyyy/mm') #{ff["value"][0]} '#{ff["value"][1..-1]}'      AND "  if Date.valid_date?(ff["value"][1..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,01)  and ( ff["value"] =~ /^</   or  ff["value"] =~ /^>/ )
-                	when 9
+                when 9
 									where_str << " to_char( #{ff["id"]},'yyyy/mm')  #{ff["value"][0..1]} '#{ff["value"][2..-1]}'      AND "  if Date.valid_date?(ff["value"][1..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,01)   and (ff["value"] =~ /^<=/  or ff["value"]=~ /^>=/ )
-			        when 10
+			          when 10
 									where_str << " to_char( #{ff["id"]},'yyyy/mm/dd') = '#{ff["value"]}'       AND "  if Date.valid_date?(j.split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2].to_i)
-			        when 11
+			          when 11
 									where_str << " to_char( #{ff["id"]},'yyyy/mm/dd') #{ff["ivalue"][0]} '#{ff["value"][1..-1]}'      AND "  if Date.valid_date?(ff["value"][1..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2].to_i)  and ( ff["value"] =~ /^</   or  ff["value"] =~ /^>/ )
-                	when 12
+                when 12
 									where_str << " to_char( #{ff["id"]},'yyyy/mm/dd')  #{ff["value"][0..1]} '#{ff["value"][2..-1]}'      AND "  if Date.valid_date?(ff["value"][2..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2].to_i)   and (ff["value"] =~ /^<=/  or ff["value"]=~ /^>=/ )
-			        when 16
+			          when 16
 			            if Date.valid_date?(ff["value"].split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2][0..1].to_i)
 												hh = ff["value"].split(" ")[1][0..1]
 												mi = ff["value"].split(" ")[1][3..4]
@@ -473,7 +462,7 @@ module RorBlkctl
 													where_str << " to_char( #{ff["id"]},'yyyy/mm/dd hh24:mi') = '#{ff["value"]}'       AND "
 												end
 									end
-			        when 17
+			          when 17
 									if Date.valid_date?(ff["value"][1..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2][0..1].to_i)  and ( ff["value"] =~ /^</   or ff["value"] =~ /^>/ or  ff["value"] =~ /^=/ )
 										hh = ff["value"].split(" ")[1][0..1]
 										mi = ff["value"].split(" ")[1][3..4]
@@ -482,7 +471,7 @@ module RorBlkctl
 											where_str << " to_char( #{ff["id"]},'yyyy/mm/dd hh24:mi') #{ff["id"][0]} '#{ff["id"][1..-1]}'      AND "
 										end
 									end
-                	when 18
+                when 18
 			                if Date.valid_date?(j[2..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2][0..1].to_i)   and (ff["value"]=~ /^<=/  or ff["value"]=~ /^>=/ )
 												hh = ff["value"].split(" ")[1][0..1]
 												mi = ff["value"].split(" ")[1][3..4]
@@ -491,7 +480,7 @@ module RorBlkctl
 													where_str << " to_char( #{ff["id"]},'yyyy/mm/dd hh24:mi')  #{ff["id"][0..1]} '#{ff["id"][2..-1]}'      AND "
 												end
 											end
-                	end ## ff["value"].size
+                end ## ff["value"].size
 				when /char|text/
 					if  (ff["value"] =~ /^%/ or ff["value"] =~ /%$/ ) then 
 						where_str << " #{ff["id"]} like '#{ff["value"]}'     AND "
@@ -502,15 +491,15 @@ module RorBlkctl
 					else
 						where_str << " #{ff["id"]} = '#{ff["value"]}'         AND "
 					end
-	      		when "select"
+	      when "select"
 					where_str << " #{ff["id"]} = '#{ff["value"]}'         AND "
-        		end   ##show_data[:alltypes][i]
-        		tmpwhere = " #{ff["id"]} #{ff["value"]}    AND " if  ff["value"] =~/is\s*null/ or ff["value"]=~/is\s*not\s*null/
-	      		where_str << (tmpwhere||="")
+        end   ##show_data[:alltypes][i]
+        tmpwhere = " #{ff["id"]} #{ff["value"]}    AND " if  ff["value"] =~/is\s*null/ or ff["value"]=~/is\s*not\s*null/
+	      where_str << (tmpwhere||="")
 			end ### command_c.each  do |i,j|###
     	return where_str[0..-7]
 		end	
-		def fetch_data_blk id,select_fields,page_info,strwhere,sorting
+		def fetch_data id,select_fields,page_info,strwhere,sorting
 				strsorting = ""
 				if sorting
 				end
@@ -844,6 +833,160 @@ module RorBlkctl
 		else
 			Rails.logger.debug "logic err alloc = '#{alloc} "
 			raise
+		end
+	end
+	def proc_get_trngantt_cons_chil_stk(tblname,tblid)  ###子部品の消費　金型の返却　tblname 親のテーブル名  ###装置(facilities)、人員(makings)はテーブルが別
+		strsql = %Q& select calloc.qty alloc_qty,calloc.qty_stk alloc_qty_stk,
+						calloc.destblname alloc_destblname,calloc.destblid alloc_destblid,calloc.srctblid alloc_srctblid,
+						cgantt.trngantt_consumtype consumtype,cgantt.trngantt_processseq gantt_processseq,cgantt.trngantt_consumauto gantt_consumauto,
+            pgantt.trngantt_shelfno_id pare_shelfno_id,
+						pgantt.trngantt_key pkey,cgantt.trngantt_key ckey,calloc.id alloc_id,cgantt.id gantt_id,cgantt.trngantt_priority gantt_priority,palloc.id palloc_id
+						from r_trngantts cgantt,alloctbls calloc ,r_trngantts pgantt,alloctbls palloc
+						where palloc.srctblname = 'trngantts' and pgantt.trngantt_id = palloc.srctblid
+						and palloc.destblname = '#{tblname}' and palloc.destblid = #{tblid}
+						and pgantt.trngantt_orgtblname = cgantt.trngantt_orgtblname and pgantt.trngantt_orgtblid = cgantt.trngantt_orgtblid
+						and pgantt.trngantt_key =  case length(cgantt.trngantt_key)
+						                             when 3 then
+														to_char(cgantt.trngantt_key - 1,'000')
+													 else
+													     substr(cgantt.trngantt_key,1,length(cgantt.trngantt_key) -3 )
+													 end
+						and calloc.srctblname = 'trngantts' and calloc.srctblid = cgantt.trngantt_id
+						and (calloc.qty + calloc.qty_stk) > 0 and calloc.allocfree = 'alloc' and 	palloc.allocfree = 'alloc'
+						/*and  cgantt.trngantt_consumtype  in('BYP','con')   */
+						and  (cgantt.trngantt_consumauto != 'M' or cgantt.TRNGANTT_CONSUMAUTO is null) &
+		children = ActiveRecord::Base.connection.select_all(strsql)
+		children.each do |child|
+			 proc_get_trngantt_cons_chil_inout_fm_alloc_id child["palloc_id"]
+		end
+		children.each do |chil|
+			case chil["consumtype"]
+			when /BYP|con/
+				if chil["alloc_destblname"] == "lotstkhists"
+					rec = ActiveRecord::Base.connection.select_one(" select * from r_#{chil["alloc_destblname"]} where id = #{chil["alloc_destblid"]} ")
+					if chil["consumtype"] == "BYP"   ###副産物
+						rec["lotstkhist_qty_stk"] += chil["alloc_qty_stk"]
+						based_alloc = {}
+						based_alloc[:srctblid] = chil["alloc_srctblid"]
+						based_alloc[:destblid] = chil["alloc_destblid"]
+						proc_add_edit_lotstkhist_by_free(chil["alloc_qty_stk"]) do
+							based_alloc
+						end
+					else
+						rec["lotstkhist_qty_stk"] -= chil["alloc_qty_stk"]
+					end
+					packqty = rec["lotstkhist_qty_stk"]
+					proc_tbl_edit_arel("lotstkhists",{:qty_stk=>rec["lotstkhist_qty_stk"]},%Q& id = #{rec["id"]} &)
+					proc_tbl_edit_arel("alloctbls",{:qty_stk=>0,:packqty => packqty},%Q& id = #{chil["alloc_id"]} &)   ###変更削除に耐えれるよう修正
+					###when /picords|picinsts/
+					###完了の時子部品を残す残さない判定。
+				else
+					rec = ActiveRecord::Base.connection.select_one(" select * from r_#{chil["alloc_destblname"]} where id = #{chil["alloc_destblid"]} and opeitm_stktaking_f = '1' ")
+					prec = ActiveRecord::Base.connection.select_one(" select * from r_#{tblname} where id = #{tblid}")
+					next if rec.nil?
+					lot =  proc_decision_id_by_key("lotstkhists","  itms_id = #{rec["itm_id"]} and locas_id = #{prec["loca_id"]}
+																and lotno = '#{proc_flg_process_lotno_flg}' and shelfnos_id = #{chil["pare_shelfno_id"]} and prjnos_id  = #{rec["prjno_id"]}
+																and processseq = #{chil["gantt_processseq"]}
+																and packno =  'dummy'")
+					add_fields  = {}
+					add_fields[:id]  = lot["id"]
+					add_fields[:lotstkhist_qty_stk] =   (chil["alloc_qty"]) * -1  + (lot["qty_stk"]||=0)
+					if @lotstkhist_classname =~ /_add_/
+						add_fields[:lotstkhist_itm_id]  = rec["itm_id"]
+						add_fields[:lotstkhist_loca_id] =  prec["loca_id"]
+						add_fields[:lotstkhist_prjno_id] =  rec["prjno_id"]
+						add_fields[:lotstkhist_shelfno_id] = chil["pare_shelfno_id"]
+						add_fields[:lotstkhist_processseq] = chil["gantt_processseq"]
+						add_fields[:lotstkhist_lotno] = "dummy"
+						add_fields[:lotstkhist_packno] = "dummy"
+						__send__("proc_fld_r_alloctbls_lotstkhists_self50")   do
+							add_fields
+						end ##
+					else
+						proc_tbl_edit_arel("lotstkhists",{:qty_stk=>add_fields[:lotstkhist_qty_stk]},%Q& id = #{lot["id"]} &)
+					end
+					based_alloc = {}
+					based_alloc[:srctblid] = chil["gantt_id"]
+					based_alloc[:destblid] = lot["id"]
+					based_alloc[:qty_stk] = add_fields[:lotstkhist_qty_stk]
+					based_alloc[:packqty] = unless lot["lotno"].nil? and lot["lotno"] != "dummy" then add_fields[:lotstkhist_qty_stk] else 0 end
+					proc_add_edit_lotstkhist_by_free(add_fields[:lotstkhist_qty_stk]) do
+						based_alloc
+					end
+				end
+			when /MET/  ###金型の時 processseq = 999
+				if chil["alloc_destblname"] == "lotstkhists"
+					if chil["gantt_consumauto"] == "A"
+						strsql = "select shelfnos_id  from r_opeitms where itms_id = #{rec["itm_id"]} and locas_id = #{rec["loca_id"]} and processseq = #{chil["gantt_processseq"]} "
+						shelfno_id = ActiveRecord::Base.connection.select_value(strsql)
+						rec = ActiveRecord::Base.connection.select_one(" select * from r_lotstkhists where id = #{chil["alloc_destblid"]}  ")
+						rec["lotstkhist_qty_stk"] -= chil["alloc_qty_stk"]
+						proc_tbl_edit_arel("lotstkhists",{:qty_stk=>rec["lotstkhist_qty_stk"]},%Q& id = #{rec["id"]} &)
+						proc_tbl_edit_arel("alloctbls",{:qty_stk=>0},%Q& id = #{chil["alloc_id"]} &)
+						opeitm = proc_get_opeitms_rec rec["itm_id"],nil,999,chil["gantt_priority"]  ###金型の保管部署を求める。
+						rec =  proc_decision_id_by_key("lotstkhists","  itms_id = #{rec["itm_id"]} and locas_id = #{opeitm["locas_id"]}
+																and lotno = '#{rec["lotstkhist_lotno"]}' and shelfnos_id = #{shelfno_id}
+																and processseq = 999  and priority = #{chil["gantt_priority"]}
+																and packno =  'dummy'")
+						add_fields[:id]  = {}
+						add_fields[:id]  = rec["id"]
+						add_fields[:lotstkhist_qty_stk] =   (rec["qty_stk"]||=0) + 1
+						if @lotstkhist_classname =~ /_add_/
+							add_fields[:lotstkhist_itm_id]  = rec["itm_id"]
+							add_fields[:lotstkhist_loca_id] =  rec["loca_id"]
+							add_fields[:lotstkhist_prjno_id] =  rec["prjno_id"]
+							add_fields[:lotstkhist_shelfno_id] =  shelfno_id
+							add_fields[:lotstkhist_processseq] = chil["gantt_processseq"]
+							add_fields[:lotstkhist_packno] = "dummy"
+							__send__("proc_fld_r_alloctbls_lotstkhists_self50")   do
+								add_fields
+							end ##
+							based_alloc = {}
+							based_alloc[:srctblid] = chil["gantt_id"]
+							based_alloc[:destblid] = rec["id"]
+							based_alloc[:packqty] = 0
+							proc_add_edit_lotstkhist_by_free  add_fields[:lotstkhist_qty_stk] do
+								based_alloc
+							end
+						else
+							proc_tbl_edit_arel("lotstkhists",{:qty_stk=>rec["lotstkhist_qty_stk"]},%Q& id = #{rec["id"]} &)
+						end
+					end
+				else
+					rec = ActiveRecord::Base.connection.select_one(" select * from r_#{chil["alloc_destblname"]} where id = #{chil["alloc_destblid"]} and opeitm_stktaking_f = '1' ")
+					next if rec.nil?
+					strsql = "select shelfnos_id  from r_opeitms where itms_id = #{rec["itm_id"]} and locas_id = #{rec["loca_id"]} and processseq = #{chil["gantt_processseq"]} "
+					shelfno_id = ActiveRecord::Base.connection.select_value(strsql)
+					rec =  proc_decision_id_by_key("lotstkhists","  itms_id = #{rec["itm_id"]} and locas_id = #{rec["loca_id"]}
+																and lotno = '#{proc_flg_process_lotno_flg}' and shelfnos_id = #{shelfno_id}
+																and processseq = 999  and and processseq = #{chil["gantt_priority"]}
+																and packno =  'dummy'")
+					add_fields  = {}
+					add_fields[:id]  = rec["id"]
+					add_fields[:lotstkhist_qty_stk] =   (chil["alloc_qty"] + chil["alloc_qty_stk"]) * -1  + (rec["qty_stk"]||=0)
+					if @lotstkhist_classname =~ /_add_/
+						add_fields[:lotstkhist_itm_id]  = rec["itm_id"]
+						add_fields[:lotstkhist_loca_id] =  rec["loca_id"]
+						add_fields[:lotstkhist_prjno_id] =  rec["prjno_id"]
+						add_fields[:lotstkhist_processseq] = chil["gantt_processseq"]
+						add_fields[:lotstkhist_packno] = "dummy"
+						add_fields[:lotstkhist_shelfno_id] = shelfno_id
+						__send__("proc_fld_r_alloctbls_lotstkhists_self50")   do
+							add_fields
+						end ##
+						based_alloc = {}
+						based_alloc[:srctblid] = chil["gantt_id"]
+						based_alloc[:destblid] = rec["id"]
+						based_alloc[:packqty] = if proc_flg_process_lotno_flg == "dummy" then 0 else add_fields[:lotstkhist_qty_stk] end
+						proc_add_edit_lotstkhist_by_free  add_fields[:lotstkhist_qty_stk] do
+							based_alloc
+						end
+					else
+						packqty = if rec["packno"] != "dummy" then rec["lotstkhist_qty_stk"] else 0 end
+						proc_tbl_edit_arel("lotstkhists",{:qty_stk=>rec["lotstkhist_qty_stk"],:packqty => packqty},%Q& id = #{rec["id"]} &)
+					end
+				end
+			end
 		end
 	end
 	def proc_get_trngantt_pic_stk(shp,shp_id)  ### shp,dlv
@@ -1261,25 +1404,23 @@ module RorBlkctl
 			end
 	end
 	def proc_set_src_tbl rec  ##rec["xxxxx"]
-  		@src_tbl = {}   ###テーブル更新
-		tblnamechop = rec[:sio_viewname].split("_",2)[1].chop
+  		  @src_tbl = {}   ###テーブル更新
+				tblnamechop = rec[:sio_viewname].split("_",2)[1].chop
         rec.each do |j,k|
           j_to_stbl,j_to_sfld = j.to_s.split("_",2)
-			if   j_to_stbl == tblnamechop  and 
-					j_to_sfld != "code_upd" and  j_to_sfld != "name_upd"   and  j_to_sfld != "id_upd"##本体の更新
-			    if  k
-	              @src_tbl[j_to_sfld.sub("_id","s_id").to_sym] = k
+            if   j_to_stbl == tblnamechop   ##本体の更新
+			    			if  k
+	                @src_tbl[j_to_sfld.sub("_id","s_id").to_sym] = k
                   @src_tbl[j_to_sfld.to_sym] = nil  if k  == "\#{nil}"  ##
-				end
+								end
             end   ## if j_to_s.
         end ## rec.each
         @src_tbl[:persons_id_upd] = rec["#{tblnamechop}_person_id_upd"] = @sio_user_code
         @src_tbl[:updated_at] = rec["#{tblnamechop}_updated_at"] = Time.now
-		if rec[:sio_classname] =~ /_add_/
-			@src_tbl[:created_at] =  rec["#{tblnamechop}_created_at"] = Time.now
-			rec["id"] = @src_tbl[:id] = proc_get_nextval("#{tblnamechop}s_seq")
-		end	
-		return rec
+				if rec[:sio_classname] =~ /_add_/
+						@src_tbl[:created_at] =  rec["#{tblnamechop}_created_at"] = Time.now
+						@src_tbl[:id] =proc_get_nextval("#{tblnamechop}s_seq")
+				end	
 	end
 	def proc_save_rec_btch_sub rec
 		tmp = {}
@@ -1545,14 +1686,58 @@ module RorBlkctl
 			###  1 (params == String ,command_c=float or integer
     end
 	def init_from_screen current_user,params  ###
-		@sio_user_code = ActiveRecord::Base.connection.select_value("select id from persons where email = '#{params[:uid]}'")
+		@sio_user_code = ActiveRecord::Base.connection.select_value("select id from persons where email = '#{current_user[:email]}'")
 		command_c = {}
 		command_c[:sio_user_code] = @sio_user_code  ###########   LOGIN USER
 		command_c[:sio_email] = current_user[:email]
-	 	command_c[:sio_code]  = params[:screenCode]
+	  command_c[:sio_code]  = params[:screenCode]
 		command_c[:sio_params] = params.to_json.to_s[0..3999]
 		return command_c
 	end
+	##def get_screen_and_fields_prototype current_user
+	#	prototype = Rails.cache.fetch('screenfield'+RorBlkctl.grp_code(current_user[:email])+screen_code) do
+        	###  ダブルコーティション　「"」は使用できない。 
+  #      	sqlstr = "select pobject_code_sfd,screenfield_hideflg,screenfield_editable,screenfield_indisp ,
+	#				pobject_code_view,screen_strwhere,screen_rows_per_page,screen_rowlist,
+	#				screenfield_dataprecision,screenfield_datascale
+  #                  from r_screenfields
+  #                  where pobject_code_scr = '#{screen_code}' and screenfield_expiredate > current_date and screenfield_selection = 1
+  #                  order by screenfield_seqno"
+  #      	sqlrecstr = ""
+	#		screen_prop ={}  ###view screen_cod  ・・・
+	#		field_prop ={}   ###項目の属性
+	#		show_columns = []
+	#		ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
+	#			sqlrecstr << i["pobject_code_sfd"] + ","
+  # 		field_prop[i["pobject_code_sfd"]] ={:screenfield_editable=>i["screenfield_editable"],
+	#												:screenfield_indisp=>i["screenfield_indisp"],
+	#												:screenfield_dataprecision=>i["screenfield_dataprecision"],													
+	#												:screenfield_datascale=>i["screenfield_datascale"]}
+	#			
+	#				show_columns << {:dataField =>"#{i["pobject_code_sfd"]}",
+	#								:text=>"#{RorBlkctl.proc_blkgetpobj(i["pobject_code_sfd"],"view_field",current_user[:email])[0]}",
+	#								:hidden => if i["screenfield_hideflg"] == "1" then true else false end}
+	#		
+	#							###	#{if i["screenfield_hideflg"] == "0" then ",filtered: textFilter()" end }},%
+	#			
+  #          	if cnt == 0
+	#				screen_prop[:sid] = screen_code
+	#				screen_prop[:screen_name] = proc_blkgetpobj(screen_code,"screen",current_user[:email])[0]
+  #              	screen_prop[:viewname] = i["pobject_code_view"]
+  #              	screen_prop[:screen_strwhere] = i["screen_strwhere"]
+  #              	screen_prop[:sizePerPage] = i["screen_rows_per_page"].to_i
+	#				screen_prop[:sizePerPageList] = []
+	#				i["screen_rowlist"].split(",").each do |list|
+	#					##screen_prop[:sizePerPageList]  << {:text=> list.to_s,:value=> list.to_i}
+	#					screen_prop[:sizePerPageList]  <<  list.to_i
+	#				end
+  #          	end
+	#		end
+	#		##show_columns = show_columns.chop.gsub(/\n/,"") + "]"
+	#		screen_prop[:sqlrecstr] = sqlrecstr.chop
+	#		prototype = {:screen_prop=>screen_prop,:show_columns=>show_columns,:field_prop=>field_prop}
+	#	end
+	#end
 	
 	def create_grid_columns_info screen_code,email
 			grid_columns_info = Rails.cache.fetch('screenfield'+RorBlkctl.grp_code(email)+screen_code) do
@@ -1592,16 +1777,6 @@ module RorBlkctl
 			page_info = {}
 			where_info = {}
 			select_fields = ""
-			if (req==='editabletablereq' )
-
-				columns_info << {:Header=>"confirm",
-									:accessor=>"confirm",
-									:show=>true,
-									:filtered=>false,
-									:id=>"",
-									:className=>"checkbox"
-									}
-			end		
 			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
 				case  i["screenfield_type"] 
 					when  'numeric'
@@ -1614,17 +1789,20 @@ module RorBlkctl
 												:show=>if  i["screenfield_hideflg"] == "0" then true else false end,
 												:filtered=>true,
 												:id=>"#{i["screenfield_id"]}",
-												:className=>if ((req==="editabletablereq" or req==="inlineaddreq") and 
-																		  (i["screenfield_editable"] === "1" or i["screenfield_editable"] === "2"))
-																	if	(i["screenfield_indisp"] === "1" or i["screenfield_indisp"] === "2")
-																			"renderEditableRequired"
-																	else
+											##	:Cell=>if (req==='editabletablereq' or req==="inlineaddreq") and 
+											##							  (i["screenfield_editable"] === "1" or i["screenfield_editable"] === "2")
+											##						"renderEditable"
+											##					else	
+											##						"renderNonEditable"
+											##					end	
+											##				}
+												:classname=>if (req==='editabletablereq' or req==="inlineaddreq") and 
+																		  (i["screenfield_editable"] === "1" or i["screenfield_editable"] === "2")
 																			"renderEditable"
-																	end			  
-															else	
-																"renderNonEditable"
-															end	
-									}
+																		else	
+																			"renderNonEditable"
+																		end	
+																	}
 				where_info[i["pobject_code_sfd"].to_sym] = 	i["screenfield_type"]								
 				select_fields = 	select_fields + 	i["pobject_code_sfd"] + ','
 				if cnt == 0
@@ -1633,30 +1811,15 @@ module RorBlkctl
 								page_info[:pageNo] = 1
 								page_info[:sizePerPageList] = []
 								i["screen_rowlist"].split(",").each do |list|
+									##screen_prop[:sizePerPageList]  << {:text=> list.to_s,:value=> list.to_i}
 									page_info[:sizePerPageList]  <<  list.to_i
 								end
 				 end
 			end
 			if (req==='editabletablereq' or req==="inlineaddreq")
-
-				yup = YupSchema.create_yupfetchcode screen_code
-
-				columns_info << {:Header=>"gridmessage",
-									:accessor=>"gridmessage",
-									:show=>false,
-									:filtered=>false,
-									:className=>"renderNonEditable",
-									:id=>""
-									}
-			end		
-			if (req==="inlineaddreq")
-				columns_info << {:Header=>"confirm",
-									:accessor=>"confirm",
-									:show=>true,
-									:filtered=>false,
-									:id=>"",
-									:className=>"checkbox"
-									}
+				yup = YupSchema.create_schema screen_code
+			else
+				yup={}
 			end		
 			grid_columns_info = [columns_info,page_info,where_info,select_fields.chop,yup]
 		end
@@ -1672,32 +1835,64 @@ module RorBlkctl
 					if params["screenCode"].split("_")[1].chop != key.to_s.split("_")[0]
 						mainviewflg = false
 					end	 
-			end	
-			screendata = JSON.parse(params["resolvedData"])
+			end		
+			screendata = JSON.parse(params["rowInfo"])["original"]	
+			## ほかの項目にもkeyがないか確認
 			fetcfieldgetsql = "select pobject_code_sfd from r_screenfields
 								 where pobject_code_scr =  '#{params["screenCode"]}' 
-								 and screenfield_paragraph = '#{params["fetchview"]}'"	
-			delm = (params["fetchview"].split(":")[1]||="")
+								 and screenfield_paragraph = '#{fetchview}'"	
 			ActiveRecord::Base.connection.select_all(fetcfieldgetsql).each do |rec|
-				if delm == ""
-					strsql << "  #{rec["pobject_code_sfd"]} = '#{screendata[rec["pobject_code_sfd"]]}'    and"
-				else
-					strsql << "  #{rec["pobject_code_sfd"].split(delm)[0]} = '#{screendata[rec["pobject_code_sfd"]]}'    and"
-				end		
-				keys <<  "  #{rec["pobject_code_sfd"]} : '#{screendata[rec["pobject_code_sfd"]]}',"
+				strsql << "  #{rec["pobject_code_sfd"].split(":")[0]} = '#{screendata[rec["pobject_code_sfd"]]}'    and"
+				keys <<  "  #{rec["pobject_code_sfd"]} : '#{screendata[rec["pobject_code_sfd"]]}'"
             end
 			rec =  ActiveRecord::Base.connection.select_one(strsql[0..-4])	
 			fetch_data = {}
-			if rec
-				screendata.each do |key,val|  ###結果をセット
-						if rec[key] and key !="id" and key !~ /person.*upd/
-							 fetch_data[key+delm] =  rec[key]
+			delm = (params["fetchview"].split(":")[1]||="")
+			screendata.each do |key,val|  ###結果をセット
+				if rec
+						if rec[key+delm] and key !="id" and key !~ /person.*upd/
+							 fetch_data[key] =  rec[key]
 						end
-				end	
-				fetch_data[params["screenCode"].split("_")[1].chop+"_"+tblnamechop+"_id"+delm] =  rec["id"]
-			end			
+				end			
+			end	
 			return fetch_data,mainviewflg,keys
 	end	
+	def proc_save_alloc_id alloc
+		des_cmd = ActiveRecord::Base.connection.select_one("select * from r_#{alloc["destblname"]} where id = #{alloc["destblid"]}")
+		if des_cmd.nil?
+			Rails.logger.debug "error:not found  #{alloc["destblid"]} by alloctbls_id 'select * from r_#{alloc["destblname"]} where id = #{alloc["destblid"]} ' "
+			raise   ##logic error
+		end
+		return des_cmd
+	end
+	def proc_decide_alloc_inout(alloc)
+		des_cmd = proc_save_alloc_id(alloc)
+		if respond_to?(%Q&proc_tblink_alloctbls_#{alloc["destblname"]}_inouts_self10&)
+			des_cmd["sio_viewname"] = des_cmd["sio_code"] = "r_#{alloc["destblname"]}"
+			des_cmd["sio_classname"] = "_add_proc_decide_alloc_inout"
+			proc_command_instance_variable(des_cmd)
+			if block_given?
+					__send__(%Q&proc_tblink_alloctbls_#{alloc["destblname"]}_inouts_self10&,alloc) do
+						yield
+					end
+			else
+					__send__(%Q&proc_tblink_alloctbls_#{alloc["destblname"]}_inouts_self10&,alloc)
+			end
+		end
+	end
+	def proc_inouts_in_addfield_create alloc
+		add_fields = {}
+		add_fields[:inout_qty] =  alloc["qty"]
+		add_fields[:inout_qty_stk] =  alloc["qty_stk"]
+		add_fields[:inout_trngantt_id_inout] = alloc["srctblid"]   ### trngantts_id
+		add_fields[:inout_alloctbl_id_inout] = alloc["id"]
+		add_fields[:inout_inoutflg] = if block_given? then yield else nil end
+		add_fields[:id] = add_fields[:inout_id] = proc_get_nextval("inouts_seq")
+		add_fields.merge!( proc_get_pare_from_trn_id(alloc["srctblid"]))
+		__send__("proc_fld_alloctbls_#{alloc["destblname"]}_inouts_self10") do
+			add_fields
+		end
+	end
 
 	def proc_get_nextval tbl_seq
 		ActiveRecord::Base.uncached() do
@@ -2252,9 +2447,539 @@ module RorBlkctl
 				expiredate = command_c[(tblnamechop+"acpdate").to_sym].strftime("%Y/%m/%d")
 		end
 	end
+	def proc_create_trngantts_alloctbls_fm_trn trn  ##
+		strsql = "select * from alloctbls where
+					(srctblname = 'trngantts' and destblname = '#{trn[:tblname]}' and
+					destblid = #{trn[:id]} and allocfree in('alloc','free') and (qty_stk + qty) >0 ) or
+					(allocfree  = '#{trn[:tblname]}' and allocfreeid = #{trn[:id]}  and (qty_stk + qty) >0 ) "
+		crr_allocs = ActiveRecord::Base.connection.select_all(strsql)
+		i = 0
+		if crr_allocs.size > 0
+			allocs = []
+			##trn_qty = trn[:qty]
+			##trn_qty_stk = trn[:qty_stk]
+			crr_allocs.each do |crr_alloc|
+				trn[:qty] -= crr_alloc["qty"]
+				trn[:qty_stk] -= crr_alloc["qty_stk"]
+				if crr_alloc["allocfree"] =~ /alloc|free/
+					allocs << crr_alloc.with_indifferent_access
+					i += 1
+				end
+			end
+			##allocs[i]["qty"] += trn[:qty] if trn[:qty] >0
+			##allocs[i]["qty_stk"] += trn[:qty_stk] if trn[:qty_stk] >0
+		end
+		return allocs  if i > 0
+		tmp_gantt ={:id=>proc_get_nextval("trngantts_seq"),:key=>"000",
+				:orgtblname=>trn[:tblname] ,:orgtblid=>trn[:id],:mlevel=>0,
+				:prjnos_id=>trn[:prjnos_id],
+				:itms_id=>trn[:itms_id],:locas_id=>trn[:locas_id],:shelfnos_id=>trn[:shelfnos_id],
+				:prdpurshp=>trn[:prdpurshp],:processseq=>trn[:processseq],:priority=>trn[:priority],:shuffleflg=>trn[:shuffleflg],
+				:starttime=>(trn[:starttime]||=trn[:depdate]),:duedate=>trn[:duedate],
+				:parenum=>1,:chilnum=>1,:consumtype=>trn[:consumtype],:autoord_p=>"",
+				:consumauto=>"",:qty=>trn[:qty],:qty_stk=>trn[:qty_stk],
+				:qty_src=>trn[:qty],:depends=>"",:expiredate=>"2099/12/31".to_date,
+				:created_at=>Time.now,:updated_at=>Time.now,:remark=>"proc_create_trngantts_alloctbls_fm_trn gantt",
+				:persons_id_upd=>system_person_id}
+		proc_tbl_add_arel("trngantts",tmp_gantt)
+		### schからord ordから　・・・・を作成時には子部品のtrnganttsは作成しない。　二重手配になる。。
+		crr_alloc = {}
+		crr_alloc[:srctblname] = "trngantts"
+		crr_alloc[:destblname] = trn[:tblname]
+		crr_alloc[:srctblid] = tmp_gantt[:id]
+		crr_alloc[:destblid] = trn[:id]
+		crr_alloc[:qty] = tmp_gantt[:qty]
+		crr_alloc[:packqty] = 0
+		crr_alloc[:qty_stk] = tmp_gantt[:qty_stk]
+		crr_alloc[:allocfree] = "free"
+		crr_alloc[:allocfreeid] = 0
+		###  inouts ,
+		crr_alloc[:remark] = ""
+		proc_alloctbls_update("_add_",crr_alloc)
+		return [crr_alloc.with_indifferent_access ]
+	end
+	def proc_update_gantt_alloc_fm_trn trn,allocs,trn_id = nil    ### allocs:ord等の作成元　ordなら　sch;  instならord
+		trn_allocs = proc_create_trngantts_alloctbls_fm_trn(trn)
+		##logger.debug"error class trn_alloc:#{trn_allocs}"
+		allocs.each do |alloc|
+			trn_allocs.each do |trn_alloc|
+				case
+				when trn_alloc[:qty]  > 0
+					trn_alloc[:qty]  = proc_update_base_alloc trn,alloc.with_indifferent_access ,trn_alloc
+				when trn_alloc[:qty_stk]  > 0
+					trn_alloc[:qty_stk] = proc_update_stk_alloc(trn,alloc.with_indifferent_access ,trn_alloc)[0]  ###[0]:qty_stk [1]:alloc
+				end
+			end
+			##break if trn_alloc[:qty_stk] <= 0 and trn_alloc[:qty] <= 0
+		end
+	end
+	def proc_update_gantt_alloc_fm_acttrn lottrn,alloc,free_qty = nil    ### xxxactからlotstkhistsへ
+		##proc_tblink_r_lotstkhists_trngantts_self10 lottrn   ###在庫のtrngantts作成
+		proc_decision_id_by_key("trngantts","  orgtblname = 'lotstkhists' and orgtblid = #{lottrn[:id]} and key = '000' ")
+		proc_fld_r_lotstkhists_trngantts_self10
+		##based_alloc = proc_add_edit_lotstkhist_by_free  lottrn
+		based_alloc = proc_update_stk_alloc(lottrn,alloc,proc_add_edit_lotstkhist_by_free(free_qty||=lottrn[:qty_stk]))[1]   ###actからの引当て情報を在庫に引き継ぐ  [0]:trngantt_qty_stk
+  end
+	def proc_add_alloc_fm_schtrn trn,trngantt_id  ### allocs:ord等の作成元　ordなら　sch;  instならord
+	##proc_tblink_mksch_trnganttsから呼ばれる
+		str_alloctbl = {}
+		new_alloc = {}
+		new_alloc[:srctblname] = "trngantts"
+		new_alloc[:destblname] = "#{trn[:tblname] }"
+		new_alloc[:srctblid] = trngantt_id
+		new_alloc[:destblid] = trn[:id]
+		new_alloc[:allocfree] = "alloc"
+		new_alloc[:allocfreeid] = 0
+		new_alloc[:qty] = trn[:qty] ### allocs.nilで　trn[:qty] != trngantt_qtyはあり得ない
+		new_alloc[:qty_stk] = trn[:qty_stk]
+		new_alloc[:packqty] = (trn[:packqty]||=0)
+		new_alloc[:srctblid] = trngantt_id
+		new_alloc[:updated_at] = Time.now
+		alloc_id = proc_create_or_replace_alloc_by_same_tbl(trn,new_alloc)
+    end
+	def proc_alloc_copy_to_based_alloc(alloc)
+		{:id=>alloc["id"],:qty=>alloc["qty"],:srctblname=>alloc["srctblname"],:srctblid=>alloc["srctblid"],:allocfree=>alloc["allocfree"],
+						:destblname=>alloc["destblname"],:destblid=>alloc["destblid"],:qty_stk=>(alloc["qty_stk"]||=0),:packqty=>(alloc["packqty"]||=0)}  ###schs,ords,actsにはqty_stkはない。
+	end
+	def proc_update_base_alloc trn,alloc,new_alloc   ###trn:次のテーブル名　tblid  alloc:旧の引当て
+		based_alloc  = {}
+		based_alloc[:remark] = "proc_update_base_alloc edit"
+		based_alloc[:qty] = if  alloc["qty"] <= trn[:qty] then 0 else alloc["qty"] - trn[:qty] end
+		based_alloc[:qty_stk] = 0 ####  based_alloc[:qty] =  0 ###trn[:qty_stk] >0 なら　proc_update_stk_alloc
+	    ## 上位ステータスに変更
+		based_alloc[:id] =  alloc["id"]
+		proc_alloctbls_update("_edit_",based_alloc)
+		##
+		based_alloc = proc_alloc_copy_to_based_alloc(alloc)
+		based_alloc[:qty] = if  alloc["qty"] <= trn[:qty] then alloc["qty"] else trn[:qty] end
+		based_alloc[:allocfree] = trn[:tblname]
+		based_alloc[:allocfreeid] = trn[:id]
+		based_alloc[:remark] = "proc_update_base_alloc add"
+		proc_alloctbls_update("_add_",based_alloc)
+		if alloc["allocfree"] == "alloc"   ### free のallocはproc_update_gantt_alloc_fm_trnで作成済
+			new_alloc[:qty] = if  new_alloc[:qty] <= alloc["qty"] then 0 else  new_alloc[:qty] - alloc["qty"] end
+			##proc_tbl_edit_arel("alloctbls", {:qty=>new_alloc[:qty]}," id = #{new_alloc[:id]} ")
+			###based_alloc[:remark] = "proc_update_base_alloc alloc['allocfree'] == 'alloc'  edit"
+			proc_alloctbls_update("_edit_",{:qty=>new_alloc[:qty],:remark =>"proc_update_base_alloc alloc['allocfree'] == 'alloc'  edit",:id =>new_alloc[:id]} )
+			##
+			based_alloc[:srctblname] = alloc["srctblname"]  ###=trngantts
+			based_alloc[:srctblid] = alloc["srctblid"]
+			based_alloc[:destblname] = trn[:tblname]
+			based_alloc[:destblid] = trn[:id]
+			based_alloc[:allocfree] = "alloc"
+			based_alloc[:allocfreeid] = 0
+			based_alloc[:qty_stk] = 0
+			based_alloc[:packqty] = 0
+			based_alloc[:qty] = alloc["qty"]
+			based_alloc[:remark] = "proc_update_base_alloc alloc['allocfree'] == 'alloc'  add"
+			proc_alloctbls_update("_add_",based_alloc)
+			##based_alloc[:id] = proc_get_nextval "alloctbls_seq"
+			###新規引当て作成
+			###   ## 引当てを　schからord  又はordからinst
+		end
+		return new_alloc[:qty]
+		end
+	def proc_update_stk_alloc lottrn,alloc,new_alloc   ###trn:次のテーブル、tblid 　alloc:旧のalloc  alloc_qty >0 alloc_qty_stk =0
+		###在庫に引きあたることによって子部品の所要が不要になるが引当て変更はschsの時のみおこなう。、
+		based_alloc  = {}  ###allocの引当て数減
+		qty = based_alloc[:qty] = if lottrn[:qty_stk] >=alloc["qty"] then 0 else alloc["qty"] -  lottrn[:qty_stk] end
+		##else
+			##if alloc["qty_stk"] > 0
+		if alloc["packqty"] > 0
+			qty_stk = based_alloc[:qty_stk] = 0
+			proc_tbl_edit_arel(alloc["destblname"],{:qty_stk=>0}," id = #{alloc["destblid"]}")
+		else
+			if	lottrn[:qty_stk] >=alloc["qty_stk"]
+				based_alloc[:qty_stk] = 0
+				qty_stk = alloc["qty_stk"] + alloc["qty"]
+			else
+				based_alloc[:qty_stk] =	alloc["qty_stk"] -  lottrn[:qty_stk]
+				qty_stk = lottrn[:qty_stk]
+			end
+			rec = proc_get_rec_fm_tblname_yield(alloc["destblname"]) do
+			       " id = #{alloc["destblid"]} "
+			end
+			if alloc["qty"] !=0
+				proc_tbl_edit_arel(alloc["destblname"],{:qty=>rec["qty"] - qty_stk}," id = #{alloc["destblid"]} ")
+			else
+				if alloc["qty_stk"] != 0
+					proc_tbl_edit_arel(alloc["destblname"],{:qty_stk=>rec["qty_stk"] - qty_stk}," id = #{alloc["destblid"]} ")
+				else
+					Rails.logger.debug" error class #{self} #{Time.now}:  logic eror  line:#{__LINE__} alloc:#{alloc} lottrn:#{lottrn} new_alloc:#{new_alloc}  "
+					raise
+				end
+			end
+		end
+	    ## 上位ステータスに変更
+		based_alloc[:id] =  alloc["id"]
+		based_alloc[:remark] = "proc update_stk_alloc edit1 "
+		proc_alloctbls_update("_edit_",based_alloc)
+		##
+		gantt = ActiveRecord::Base.connection.select_one("select * from trngantts where id = #{alloc["srctblid"]}")
+		gantt["qty"] -= (alloc["qty"] - based_alloc[:qty])
+		##gantt["qty_stk"] -= (alloc["qty_stk"] - based_alloc[:qty_stk])
+		##gantt["packqty"] = 0
+		gantt["id"] = alloc["srctblid"]
+		proc_tbl_edit_arel("trngantts",gantt," id = #{alloc["srctblid"]} ")
+		##
+		based_alloc = proc_alloc_copy_to_based_alloc(alloc)
+		based_alloc[:allocfree] = lottrn[:tblname]
+		based_alloc[:allocfreeid] = lottrn[:id]
+		based_alloc[:qty] = lottrn[:qty]
+		based_alloc[:qty_stk] = lottrn[:qty_stk]
+		based_alloc[:remark] = "proc update_stk_alloc_2"
+		proc_alloctbls_update("_add_",based_alloc)
 
+		### free_lotstk  から　alloc_lotstkへ
+		if alloc["allocfree"] == "alloc" ##
+			##if lottrn[:packno] == "dummy"
+				new_alloc[:qty_stk] -= (alloc["qty"] +  alloc["qty_stk"])
+				proc_alloctbls_update("_edit_",{:qty_stk => new_alloc[:qty_stk],:remark => "proc update_stk_alloc alloc['allocfree'] == alloc add ",:id => new_alloc[:id]})
+			##else  ##packqty毎引当てると　戻った時freeができる。
+			##	proc_alloctbls_update("_edit_",{:qty_stk => 0,:remark => "proc update_stk_alloc alloc['allocfree'] == alloc add 1 ",:id => new_alloc[:id]})
+			##end
+			based_alloc = {}
+			based_alloc[:srctblname] = alloc["srctblname"]  ###=trngantts
+			based_alloc[:srctblid] = alloc["srctblid"]
+			based_alloc[:destblname] = lottrn[:tblname]
+			based_alloc[:destblid] = lottrn[:id]
+			based_alloc[:allocfree] = "alloc"
+			based_alloc[:allocfreeid] = 0
+			based_alloc[:qty] = 0
+			###新規引当て作成
+			###   ## 引当てを　schからord  又はordからinstへ　
+			based_alloc[:remark] = "proc update_stk_alloc alloc['allocfree'] == alloc nill "
+			based_alloc[:qty_stk] = (alloc["qty"] + alloc["qty_stk"])
+			based_alloc[:packqty] = if lottrn[:packno] == "dummy" then 0 else lottrn[:qty_stk] end
+			proc_alloctbls_update(nil,based_alloc)
+		end
+		return gantt["qty_stk"] ,based_alloc
+	end
+	def proc_update_alloc_chng_stk_to_pic lottrn,alloc   ### alloc:pu,prd schs,ords,insts alloc   new_alloc:picord_alloc
+		based_alloc  = {} ###将来の在庫予定
+		strsql = "select * from trngantts where id  = #{alloc["srctblid"]}  "
+		trn  = ActiveRecord::Base.connection.select_one(strsql)   ###在庫になる前の元のprdpurshpxxxsのtrngantts
+		if trn
+			tmp = proc_decision_id_by_key("trngantts"," key = '001' and orgtblname = 'lotstkhists' and  orgtblid= #{lottrn[:id]} ")
+				if tmp
+					tmp_gantt = {
+            ##:key=>"001",
+						##:orgtblname=>"lotstkhists" ,:orgtblid=>lottrn[:id],:mlevel=>1,
+						##:prjnos_id=>trn["prjnos_id"],
+						##:itms_id=>trn["itms_id"],:locas_id=>trn["locas_id"],
+						##:prdpurshp=>trn["prdpurshp"],:processseq=>trn["processseq"],:priority=>trn["priority"],:shuffleflg=>trn["shuffleflg"],
+						##:starttime=>trn["starttime"],:duedate=>trn["duedate"],
+						##:parenum=>1,:chilnum=>1,:consumtype=>trn["consumtype"],:autoord_p=>"",
+						##:consumauto=>"",:qty=>trn["qty"],:qty_stk=>trn["qty_stk"] + lottrn[:lotstkhist_qty_stk],
+						:qty_src=>trn["qty"] + lottrn[:lotstkhist_qty_stk],
+            ##:depends=>"",:expiredate=>"2099/12/31".to_date,
+						##:created_at=>Time.now,
+            :updated_at=>Time.now,:remark=>"pic dummy stk ",
+						:persons_id_upd=>system_person_id}						##proc_tbl_add_arel("trngantts",tmp_gantt)
+						proc_tbl_edit_arel("trngantts",tmp_gantt," id = #{tmp["id"]} ")
+				else
+					tmp_gantt = {:id=>proc_get_nextval("trngantts_seq"),:key=>"001",
+						:orgtblname=>"lotstkhists" ,:orgtblid=>lottrn[:id],:mlevel=>1,
+						:prjnos_id=>trn["prjnos_id"],:shelfnos_id=>trn["shelfnos_id"],
+						:itms_id=>trn["itms_id"],:locas_id=>trn["locas_id"],
+						:prdpurshp=>trn["prdpurshp"],:processseq=>trn["processseq"],:priority=>trn["priority"],:shuffleflg=>trn["shuffleflg"],
+						:starttime=>trn["starttime"],:duedate=>trn["duedate"],
+						:parenum=>1,:chilnum=>1,:consumtype=>trn["consumtype"],:autoord_p=>"",
+						:consumauto=>"",:qty=>trn["qty"],:qty_stk=>trn["qty_stk"],
+						:qty_src=>trn["qty"],:depends=>"",:expiredate=>"2099/12/31".to_date,
+						:updated_at=>Time.now,:remark=>"pic dummy stk ",
+						:persons_id_upd=>system_person_id}
+						proc_tbl_add_arel("trngantts",tmp_gantt)
+				end
+		else
+			Rails.logger.debug " error class line #{__LINE__} ,not found: table_name = 'trngantts' id = #{alloc["srctblid"]} "
+			raise
+		end
+		based_alloc[:remark] = " pic stk 4"
+		based_alloc[:qty] = 0
+		based_alloc[:qty_stk] = @picord_qty_stk
+		based_alloc[:packqty] = 0
+		based_alloc[:destblname] = "picords"
+		based_alloc[:destblid] = @picord_id
+		based_alloc[:srctblname] = "trngantts"
+		based_alloc[:srctblid] = alloc["srctblid"]
+		based_alloc[:allocfree] = "alloc"
+		based_alloc[:allocfreeid] = 0
+		proc_alloctbls_update("_add_",based_alloc)
+		based_alloc  = {} ###マイナス在庫の履歴作成  picordsが削除された時用
+		based_alloc[:remark] = " pic stk 5"
+		based_alloc[:qty] = 0
+		based_alloc[:qty_stk] = @picord_qty_stk
+		based_alloc[:packqty] = 0
+		based_alloc[:destblname] = "lotstkhists"
+		based_alloc[:destblid] = lottrn[:id]
+		based_alloc[:srctblname] = "trngantts"
+		based_alloc[:srctblid] = alloc["srctblid"]
+		based_alloc[:allocfree] = "picords"
+		based_alloc[:allocfreeid] = @picord_id
+		proc_alloctbls_update("_add_",based_alloc)
+	end
+	def proc_chng_sch_to_stk sch,alloc,lot_free   ###trn:次のテーブル、tblid 　alloc:旧のalloc
+		###在庫に引きあたることによって子部品の所要が不要になるが引当て変更はschsの時のみおこなう。、
+		based_alloc  = {}
+		based_alloc[:remark] = "proc_chng_sch_to_stk "
+		##based_alloc[:qty] = 0
+		qty = based_alloc[:qty] = if lot_free[:qty_stk] >=alloc["qty"] then 0 else  alloc["qty"] - lot_free[:qty_stk]  end
+	    ## 上位ステータスに変更
+		based_alloc[:id] = alloc["id"]
+		based_alloc[:remark] = "proc_chng_sch_to_stk edit"
+		proc_alloctbls_update("_edit_",based_alloc)
+		##
+		gantt = ActiveRecord::Base.connection.select_one("select * from trngantts where id = #{alloc["srctblid"]}")
+		gantt["qty"] -= alloc["qty"]
+		gantt["qty_stk"] += alloc["qty"]
+		proc_tbl_edit_arel("trngantts",gantt," id = #{alloc["srctblid"]} ")
+		##gantt["qty_stk"] += trn[:qty_stk]
+		##
+		##based_alloc[:persons_id_upd] = system_person_id
+		#	based_alloc = alloc.with_indifferent_access.dup
+		##based_alloc.with_indifferent_access
+		based_alloc = proc_alloc_copy_to_based_alloc(alloc)
+		based_alloc[:qty] -= qty
+		based_alloc[:allocfree] = sch[:tblname]
+		based_alloc[:allocfreeid] = sch[:id]
+		based_alloc[:remark] = " proc_chng_sch_to_stk add"
+		##proc_tbl_add_arel("alloctbls",based_alloc)
+		proc_alloctbls_update("_add_",based_alloc)
+		### free_lotstk  から　alloc_lotstkへ
+		if alloc["allocfree"] == "alloc"##
+			lot_free[:qty_stk] = if lot_free[:qty_stk] <= alloc["qty"] then 0 else   lot_free[:qty_stk] -  alloc["qty"] end
+			proc_alloctbls_update("_edit_",{:qty_stk => lot_free[:qty_stk],:remark =>" proc_chng_sch_to_stk  alloc['allocfree'] == 'allloc' edit",:id => lot_free[:id]} )
+			####
+			##based_alloc = {}
+			##based_alloc[:srctblname] = alloc["srctblname"]  ###=trngantts
+			##based_alloc[:srctblid] = alloc["srctblid"]
+			based_alloc[:destblname] = lot_free[:destblname]
+			based_alloc[:destblid] = lot_free[:destblid]
+			based_alloc[:allocfree] = "alloc"
+			based_alloc[:allocfreeid] = 0
+			based_alloc[:packqty] = lot_free[:packqty]
+			based_alloc[:remark] = " proc_chng_sch_to_stk  alloc['allocfree'] == 'alloc' nil"
+			based_alloc[:qty] = alloc["qty"]
+			###新規引当て作成
+			###   ## 引当てを　schからord  又はordからinstへ　
+			proc_alloctbls_update(nil,based_alloc) do
+			%Q%	based_alloc[:qty_stk] += based_alloc[:qty]
+				based_alloc[:qty] = 0%
+			end
+		end
+		return lot_free[:qty_stk]
+	end
+	def proc_reverse_alloc tblname,tblid,qty,qty_stk   ###trn:freeのtrn alloc:引当て要求元　freeを引き当てたいalloc  qty:戻す数
+		strsql = "select * from alloctbls where allocfree = '#{destblname}' and allocfreeid = #{destblid} order by id desc "
+		bases = ActiveRecord::Base.connection.select_all(strsql)
+		bases.each do|base|
+			reverse = ActiveRecord::Base.connection.select_one("select * from alloctbls where id = #{base["destblid"]}")
+			if qty > base["qty"]
+				##proc_tbl_edit_arel("alloctbls",{:qty=>reverse["qty"]+ base["qty"]}," id =  #{reverse["id"]} ")
+				##proc_tbl_edit_arel("alloctbls",{:qty=>0}," id =  #{base["id"]} ")
+				proc_alloctbls_update("_edit_",{:qty=>reverse["qty"]+ base["qty"],:id =>reverse["id"],:remark=>"proc_reverse_alloc1"} )
+				proc_alloctbls_update("_edit_",{:qty=>0,:id =>base["id"],:remark=>"proc_reverse_alloc2"} )
+				qty -= base["qty"]
+			else
+				if qty > 0
+					proc_alloctbls_update("_edit_",{:qty=>qty + base["qty"],:id =>reverse["id"],:remark=>"proc_reverse_alloc3"} )
+					proc_alloctbls_update("_edit_",{:qty=>base["qty"] - qty,:id =>base["id"],:remark=>"proc_reverse_alloc4"} )
+					qty = 0
+				end
+			end
+			if qty_stk > base["qty_stk"]
+				proc_alloctbls_update("_edit_",{:qty_stk=>reverse["qty_stk"]+ base["qty_stk"],:id =>reverse["id"],:remark=>"proc_reverse_alloc5"} )
+				proc_alloctbls_update("_edit_",{:qty_stk=>0,:id =>base["id"],:remark=>"proc_reverse_alloc6"} )
+				qty_stk -= base["qty_stk"]
+			else
+				if  qty_stk >0
+					proc_alloctbls_update("_edit_",{:qty_stk=>qty_stk + base["qty_stk"],:id =>reverse["id"],:remark=>"proc_reverse_alloc7"} )
+					proc_alloctbls_update("_edit_",{:qty_stk=>base["qty_stk"] - qty_stk,:id =>base["id"],:remark=>"proc_reverse_alloc8"} )
+					qty_stk = 0
+				end
+			end
+		end
+	end
+	def proc_add_trngantts	tblchop
+        @bgantts = {}
+		cnt = 0
+		if @opeitm_id
+			if @itm_id.nil?
+				@itm_id = @opeitm_itm_id
+			end
+			if @loca_id.nil?
+				@loca_id = @opeitm_loca_id
+			end
+		else
+			if @itm_id
+				@opeitm_id = proc_get_opeitms_rec(@itm_id,@loca_id,processseq = nil,priority = nil)["id"]
+			else
+				Rails.logger.debug " error class line #{__LINE__} ,@opeitm_id not found:#{rec} "
+				raise
+			end
+			if @loca_id.nil?
+				Rails.logger.debug " line #{__LINE__} ,@opeitm_id not found:#{rec} "
+			end
+		end
+		@bgantts["000"] = {:mlevel=>0,
+							:opeitms_id=>@opeitm_id,:duration=>0,
+							:itms_id=>@itm_id,
+							#####:itm_id=>@itm_id,:itm_code=>@itm_code,:itm_name=>@itm_name,
+							:locas_id=>@loca_id,:shelfnos_id=>0,
+							#####:loca_id=>@loca_id,:loca_code=>@loca_code,:loca_name=>@loca_name,
+							:processseq=>999,:priority=>eval("@#{tblchop}_priority||=999"),:prdpurshp=>"",
+							:duedate=>eval("@#{tblchop}_duedate"),:starttime=>eval("@#{tblchop}_starttime"),
+							:autocreate_ord=>@opeitm_autocreate_ord,:autocreate_inst=>"",:autoord_p=>"",
+							:autocreate_act=>"",:autoact_p=>"",
+							:qty=>eval("@#{tblchop}_qty"),:qty_src=>eval("@#{tblchop}_qty_src"),:qty_stk=>0,
+							:depends=>""}
+		@bgantts["000"][:duration] = (@bgantts["000"][:duedate].to_date - @bgantts["000"][:starttime].to_date).to_i
+		@bgantts["000"][:duration] = 1 if @bgantts["000"][:duration] < 1
+	    ngantts = []
+		r0 =  ActiveRecord::Base.connection.select_one("select * from  opeitms where id = #{@bgantts["000"][:opeitms_id]} ")
+		if @loca_id_to != r0["locas_id"]
+			cnt += 2
+			auto_cust = ActiveRecord::Base.connection.select_one("select * from  custrcvplcs where locas_id_custrcvplc = #{@loca_id_to} ")
+			if auto_cust.nil?
+				Rails.logger.debug " line #{__LINE__} ,loca_id_to:#{@loca_id_to}"
+				raise
+			end
+			@bgantts["001"] = {:seq=>"001",:mlevel=>1,
+						:itms_id=>@itm_id,
+						:locas_id=>@loca_id_to,:shelfnos_id=>r0["shelfnos_id"],
+						:processseq=>(r0["processseq"]+1),:priority=>r0["priority"],:prdpurshp=>"dlv",
+						:autocreate_ord=>auto_cust["autocreate_ord"],:autocreate_inst=>auto_cust["autocreate_inst"],
+						:autoord_p=>auto_cust["autoord_p"],
+						:duedate=>eval("@#{tblchop}_duedate"),:id=>"001",
+						:qty=>eval("@#{tblchop}_qty||=0"),:qty_src=>eval("@#{tblchop}_qty_src"),:qty_stk=>eval("@#{tblchop}_qty_stk||=0"),
+						:duration=>proc_get_duration_by_loca(eval("@#{tblchop}_loca_id_fm"),eval("@#{tblchop}_loca_id_to"),nil)[:duration],
+					:opeitms_id=>r0["id"]} ###,
+						###:subtblid=>"opeitms_"+r0["id"].to_s,:opeitms_id=>r0["id"]}
+			@bgantts["001"][:starttime] = proc_get_starttime(@bgantts["001"][:duedate],(@bgantts["001"][:duration]) ,"day",nil)
+			ngantts << {:seq=>"002",:mlevel=>2,
+					:itms_id=>r0["itms_id"],
+					:locas_id=>r0["locas_id"],:shelfnos_id=>r0["shelfnos_id"],
+					:processseq=>r0["processseq"],:priority=>r0["priority"],:prdpurshp=>"pic",
+					:autocreate_ord=>auto_cust["autocreate_ord"],:autocreate_inst=>auto_cust["autocreate_inst"],:shuffleflg=>r0["shuffleflg"],
+					:autoord_p=>auto_cust["autoord_p"],
+					:duedate=>@bgantts["001"][:starttime],:id=>"002",
+					:qty=>eval("@#{tblchop}_qty||=0"),:qty_src=>eval("@#{tblchop}_qty_src"),:qty_stk=>eval("@#{tblchop}_qty_stk||=0"),:duration=>(r0["duration"]||=1),
+					:opeitms_id=>r0["id"]} ###,
+					###:subtblid=>"opeitms_"+r0["id"].to_s,:opeitms_id=>r0["id"]}
+		else
+      cnt += 1
+			ngantts << {:seq=>"001",:mlevel=>1,
+					:itms_id=>@itm_id,
+					:locas_id=>@loca_id,:shelfnos_id=>r0["shelfnos_id"],:shuffleflg=>r0["shuffleflg"],
+					:processseq=>(r0["processseq"]),:priority=>(r0["priority"]),:prdpurshp=>r0["prdpurshp"],
+					:autocreate_ord=>r0["autocreate_ord"],:autoord_p=>r0["autoord_p"],:autocreate_inst=>r0["autocreate_inst"],
+					:duedate=>eval("@#{tblchop}_duedate"),:id=>"001",
+					:qty=>eval("@#{tblchop}_qty"),:qty_src=>eval("@#{tblchop}_qty_src"),:qty_stk=>eval("@#{tblchop}_qty_stk||=0"),
+					:duration=>proc_get_duration_by_loca(eval("@#{tblchop}_loca_id_fm"),eval("@#{tblchop}_loca_id_to"),nil)[:duration],
+					:opeitms_id=>r0["id"]} ###,
+					####:subtblid=>"opeitms_"+r0["id"].to_s,:opeitms_id=>r0["id"]}
+		end
+        until ngantts.size == 0
+            cnt += 1
+            ngantts = proc_get_tree_pare_itms_locas ngantts,"gantttrn"
+             break if cnt >= 10000
+        end
+        @bgantts["000"][:starttime] = if @min_time < Time.now then Time.now else @min_time end
+        prv_resch_trn  ####再計算
+        @bgantts["000"][:duedate] = @bgantts["001"][:duedate]
+        @bgantts["000"][:duration] = " #{(@bgantts["000"][:duedate]  - @bgantts["000"][:starttime] ).divmod(24*60*60)[0]}"
+	    tmp_gantt = {}
+		sio_classname = "trngantts_add_"
+        @bgantts.sort.each  do|key,value|   ###依頼されたオーダ等をopeitms,nditmsを使用してgantttableに展開
+			tmp_gantt = value.dup
+			tmp_gantt.merge!({:id=>proc_get_nextval("trngantts_seq"),:key=>key,
+								:orgtblname=>tblchop+"s",:orgtblid=>eval("@#{tblchop}_id"),
+								:prjnos_id=>eval("@#{tblchop}_prjno_id"),
+								:expiredate=>"2099/12/31".to_date,
+								:created_at=>Time.now,:updated_at=>Time.now,:remark=>"auto_created_by perform_mkbttables ",
+								:persons_id_upd=>system_person_id})
+		    #Trngantt.create tmp_gantt
+			tmp_gantt.delete(:seq)
+			tmp_gantt.delete(:opeitms_id)
+			tmp_gantt.delete(:starttime_est)
+			tmp_gantt.delete(:duedate_est)
+			proc_tbl_add_arel("trngantts",tmp_gantt)
+			proc_create_prdpurshp_alloc(tmp_gantt[:id],sio_classname)
+		end
+		proc_sch_chil_get(tblchop+"s",eval("@#{tblchop}_id"))
+	end
 	def proc_get_duration_by_loca(loca_id_fm,loca_id_to,priority)
 		{:duration=>1,:transport_id =>ActiveRecord::Base.connection.select_value("select id from transports where code = 'dummy' ")}
+	end
+	def proc_alloctbls_update(sio_classname,based_alloc)
+		if sio_classname.nil?
+			strsql = "select id,qty,qty_stk,destblname,	destblid
+							from alloctbls where srctblname = '#{based_alloc[:srctblname]}' and srctblid = #{based_alloc[:srctblid]} and
+							destblname = '#{based_alloc[:destblname]}' and destblid = #{based_alloc[:destblid]} and
+                            allocfree = '#{based_alloc[:allocfree]}'"
+			rec = ActiveRecord::Base.connection.select_one(strsql)
+			if  rec
+				based_alloc[:id] = rec["id"]
+				based_alloc[:qty] ||=  rec["qty"]
+				based_alloc[:qty_stk] ||= rec["qty_stk"]
+				based_alloc[:packqty] ||= rec["packqty"]
+				based_alloc[:destblname] ||= rec["destblname"]
+				based_alloc[:destblid] ||= rec["destblid"]
+				sio_classname = "_edit_"
+			else
+				sio_classname = "_add_"
+				based_alloc[:qty] ||=  0
+				based_alloc[:qty_stk] ||= 0
+				based_alloc[:packqty] ||= 0
+			end
+		end
+		eval(yield) if block_given?
+		based_alloc[:updated_at] = Time.now
+		case sio_classname
+			when /_add/
+				if based_alloc[:allocfree].nil?
+					Rails.logger.debug"error class #{Time.now}  based_alloc:#{based_alloc} "
+                 	raise
+				end
+				based_alloc[:persons_id_upd] = system_person_id
+				based_alloc[:expiredate] = "2099/12/31".to_date
+				based_alloc[:created_at] = Time.now
+				based_alloc[:id] = proc_get_nextval "alloctbls_seq"
+				proc_tbl_add_arel("alloctbls",based_alloc)
+				proc_decide_alloc_inout(based_alloc.with_indifferent_access)
+			when /_edit_|_delete/
+				if based_alloc[:id]
+					old_alloc = ActiveRecord::Base.connection.select_one("select * from alloctbls where id = #{based_alloc[:id]} order by updated_at desc")
+					old_alloc["qty"] = old_alloc["qty"] * -1
+					old_alloc["qty_stk"] = old_alloc["qty_stk"] * -1
+					if sio_classname =~ /_delete/
+						based_alloc[:qty] = based_alloc[:qty_stk] = 0
+					end
+					##based_alloc[:id] = old_alloc["id"]
+					based_alloc[:srctblname] = old_alloc["srctblname"]
+					based_alloc[:srctblid] = old_alloc["srctblid"]
+					based_alloc[:destblname] = old_alloc["destblname"]
+					based_alloc[:destblid] = old_alloc["destblid"]
+					based_alloc[:allocfree] = old_alloc["allocfree"]
+					based_alloc[:allocfreeid] = old_alloc["allocfreeid"]
+					based_alloc[:persons_id_upd] = system_person_id
+					proc_tbl_edit_arel("alloctbls",based_alloc," id = #{old_alloc["id"]}")
+					if  old_alloc["qty"] != 0 or  old_alloc["qty_stk"] != 0
+						proc_decide_alloc_inout(based_alloc.with_indifferent_access) do
+							"rty"
+						end
+					end
+					based_alloc[:qty] = old_alloc["qty"]
+					based_alloc[:qty_stk] = old_alloc["qty_stk"]
+					proc_decide_alloc_inout(based_alloc.with_indifferent_access)do
+					  "rvs"
+					end
+				else
+					Rails.logger.debug"error class #{Time.now}  based_alloc:#{based_alloc} "
+					raise
+				end
+		end
 	end
 	def proc_ord_inst_qty_chng tblname,tblid,qty
 		strsql = "select sum(qty) from alloctbls where srctblname = 'trngantts' and
@@ -2262,7 +2987,39 @@ module RorBlkctl
 							group by srctblname,destblname,destblid for update"
 
 	end
-
+	def proc_create_prdpurshp_alloc(trn_id,sio_classname)  ##
+		str_gantt_sch = ActiveRecord::Base.connection.select_one(" select * from r_trngantts where id = #{trn_id} ")
+		qty = str_gantt_sch["trngantt_qty"]
+		qty_stk = str_gantt_sch["trngantt_qty_stk"]
+		str_gantt_sch[:sio_viewname] = "r_trngantts"
+		str_gantt_sch[:sio_classname] = sio_classname
+		str_gantt_sch[:sio_code] = "r_trngantts"
+		proc_command_instance_variable(str_gantt_sch) ### trnganttsはproc_update_tableを使用してない。
+		if str_gantt_sch["trngantt_key"] ==  "000"
+			alloc= {}
+			alloc[:remark] = "proc_create_prdpurshp_alloc . key = '000'"
+			alloc[:qty] = @trngantt_qty
+			alloc[:qty_stk] = @trngantt_qty_stk
+			alloc[:packqty] = 0
+			alloc[:srctblname] = "trngantts"
+			alloc[:destblname] = @trngantt_orgtblname
+			alloc[:srctblid] = @trngantt_id
+			alloc[:destblid] = @trngantt_orgtblid
+			alloc[:allocfree] = "alloc"
+			alloc[:allocfreeid] = 0
+			proc_alloctbls_update(sio_classname,alloc)
+		else
+			### prdxxx,purxxx,shpxxxが直接画面、excelstr_gantt_schから入力された時 alloctblsとの紐つけを作成する。
+			strsql = %Q& select * from r_trngantts where trngantt_orgtblname = '#{@trngantt_orgtblname}'
+							and trngantt_orgtblid = #{@trngantt_orgtblid}
+							and trngantt_key = '#{if @trngantt_key.size == 3 then sprintf("%03d", @trngantt_key.to_i - 1) else @trngantt_key[0..-4]  end}'&
+			@pare_gantt = ActiveRecord::Base.connection.select_one(strsql).with_indifferent_access
+			##@pare_gantt = ActiveRecord::Base.connection.select_one(strsql)
+			##@pare_gantt = pare_gantt.with_indifferent_access
+			__send__("proc_tblink_mksch_trngantts_#{str_gantt_sch["trngantt_prdpurshp"]}schs_self10",str_gantt_sch)
+			##end
+		end
+	end
 	def proc_prj_allocprjcodes prj_code
 		prjcodes = []
 		prjcodes << prj_code
@@ -2283,8 +3040,249 @@ module RorBlkctl
 		end
 		prjcodes.join("','")
 	end
+	def proc_edit_chil_req_qty_from_trngantts c_alloc,qty ##trn   #proc update_stk_allocで対象のtrnganttのqty_stkは修正済
+		###在庫に引きあったとき、その子部品の引当てをなくす  c_alloc実際に在庫にあったalloctbls
+		###子部品の完成の前に親か完成すると、子部品のfreeが発生する。 完成とか受入時は子部品のfree移動はしない。(未実施)
+		strsql = %Q& select gantt.*,
+					alloc.id alloc_id,alloc.qty alloc_qty,alloc.qty_stk alloc_qty_stk,alloc.destblname alloc_destblname,alloc.destblid alloc_destblid,
+					trngantt_qty,trngantt_qty_stk,
+					case when alloc.destblname like '%schs' then 1
+					     when alloc.destblname like '%ords' then 2
+						 when alloc.destblname like '%insts' then 3
+						 when alloc.destblname like 'lot%' then 5 end tblsortkey   ---在庫は残す
+					from r_trngantts gantt inner join  alloctbls alloc
+					on alloc.srctblname = 'trngantts' and gantt.id = alloc.srctblid
+					where trngantt_orgtblname = '#{c_alloc["trngantt_orgtblname"]}' and trngantt_orgtblid = #{c_alloc["trngantt_orgtblid"]}
+					and trngantt_key like  '#{c_alloc["trngantt_key"]}%'
+					and (alloc.qty > 0 or alloc.qty_stk > 0)   and alloc.allocfree in('alloc')
+					---- and (alloc.destblname like '%schs' or  alloc.destblname like '%ords' or alloc.destblname like '%insts'  or alloc.destblname like 'lot%')
+					order by    trngantt_orgtblname, trngantt_orgtblid,trngantt_key,tblsortkey,alloc.destblid
+				&
+		### trngantt : alloctbl  = 1:n
+		gantt_allocs = ActiveRecord::Base.connection.select_all(strsql)
+		pre_gantt_id = gantt_allocs[0]["trngantt_id"]  if gantt_allocs[0]
+		##save_gantt_id = 0
+		##alloc ={}
+		newgantt = {}
+		pare_gantt ={}
+		gantt_allocs.each do |gantt_alloc|
+			if  pare_gantt[gantt_alloc["trngantt_key"]].nil?
+				pare_gantt[gantt_alloc["trngantt_key"]] = {}
+				pare_gantt[gantt_alloc["trngantt_key"]]["qty"] = gantt_alloc["trngantt_qty"]  ### 既に親の残りの必要数はproc_chng_sch_to_stkで計算されている。
+			end
+			pare_key = if gantt_alloc["trngantt_key"].size > 3 then	gantt_alloc["trngantt_key"][0..-4]	else sprintf("%03d",(gantt_alloc["trngantt_key"].to_i - 1)) end
+			if pare_gantt[pare_key]
+				new_qty = pare_gantt[pare_key]["qty"] * gantt_alloc["trngantt_chilnum"] / gantt_alloc["trngantt_parenum"]
+				if gantt_alloc["trngantt_qty_stk"] >= new_qty
+					trngantt_qty = 0
+					trngantt_qty_stk = new_qty
+				else
+					new_qty -= gantt_alloc["trngantt_qty_stk"]
+					trngantt_qty = new_qty
+					trngantt_qty_stk = gantt_alloc["trngantt_qty_stk"]
+				end
+				proc_tbl_edit_arel("trngantts",{:qty=>trngantt_qty ,:qty_stk=>trngantt_qty_stk}," id = #{gantt_alloc["trngantt_id"]} ")
+				case gantt_alloc["alloc_destblname"]
+					when  /schs$/
+						proc_alloctbls_update("_edit_",{:qty=>trngantt_qty,:remark=> "proc_edit_from_trngantts",:id =>gantt_alloc["alloc_id"]})
+						proc_tbl_edit_arel(gantt_alloc["alloc_destblname"],{:qty=>trngantt_qty}," id = #{gantt_alloc["alloc_destblid"]} ")
+					when  /ords$|insts$|lotstkhist/
+					proc_alloc_to_free(trngantt_qty,trngantt_qty_stk,gantt_alloc) ###alloc_qty まだ引当てされている数量　　　gantt_allc:freeになる前の引当て情報
+				end
+			end
+		end
+	end
 
+	def proc_edit_trngantts_by_prdpurshp_qty tblchop,tblid   #  例えばpurordsのqtyが変更された時callされる。  数量増は認めない。
+		strsql = %Q& select sum(qty) maxqty from  alloctbls alloc
+					where destblname = '#{tblchop}s'  and   destblid = #{tblid}
+					and alloc.qty > 0 and alloc.allocfree in('free','alloc')
+					group by destblname,destblid
+				&
+		max_qty = ActiveRecord::Base.connection.select_value(strsql)
+		if  eval("@#{tblchop}_qty") < max_qty
+			@err_msg = " 既に状態が変化しています。　現在の変更可能数量  #{max_qty}  "
+			return
+		end
+		proc_edit_gantt_alloc_by_trn tblchop,tblid
+		strsql = %Q& select gantt.*,
+					alloc.id alloc_id,alloc.qty alloc_qty,alloc.destblname alloc_destblname,alloc.destblid alloc_destblid
+					from r_trngantts gantt inner join  alloctbls alloc
+					on alloc.srctblname = 'trngantts' and gantt.id = alloc.srctblid
+					where destblname = '#{tblchop}s'  and   destblid = #{tblid}
+					and alloc.qty > 0  and alloc.allocfree in('free','alloc')
+					order by    gantt.id desc
+				&
+		### trngantt : alloctbl  = 1:n
+		gantt_allocs = ActiveRecord::Base.connection.select_all(strsql)
+		qty = ActiveRecord::Base.connection.select_value("select qty from #{tblchop}s where id = #{tblid}")
+		gantt_allocs.each do |gantt_alloc|   ###後から引き当てた物から引き離し
+			if qty >= gantt_alloc["alloc_qty"]
+				qty -= gantt_alloc["alloc_qty"]
+			else
+				save_qty = gantt_alloc["alloc_qty"]
+				gantt_alloc["alloc_qty"] = qty
+				proc_alloctbls_update("_edit_",{:qty=>gantt_alloc["alloc_qty"],:id =>gantt_alloc["alloc_id"],:remark=>"proc_edit_trngantts_by_prdpurshp_qty" })
+				proc_reverse_alloc(tblchop+"s",tblid,save_qty - qty,0)
+				qty = 0
+			end   ### prdpurshpの数量が減って前の状態のテーブルの引当て数を戻す。
+		end
+	end
 
+	def proc_edit_gantt_alloc_by_trn tblchop,tblid   ###deleteも含む	prdpurshpxxxsが変更された時
+		view =  ActiveRecord::Base.connection.select_one("select * from r_#{tblchop}s where id = #{tblid} ")
+		strsql = %Q& select *  from r_trngantts gantt
+					where trngantt_orgtblname = '#{tblchop}s'  and   trngantt_orgtblid = #{tblid}
+					order by    trngantt_orgtblname, trngantt_orgtblid,trngantt_key
+					&
+		### trngantt : alloctbl  = 1:n
+		gantts = ActiveRecord::Base.connection.select_all(strsql)
+		newgantt = {}
+		gantts.each do |gantt|
+			old_qty = gantt["trngantt_qty"]
+			if  gantt["trngantt_key"] == "000" 	  ###topレコード
+				newgantt[:qty] =  if gantt["trngantt_qty"] >= view[tblchop+"_qty"]
+										view[tblchop+"_qty"] ## trngantt_qty 下位に展開に必要な数
+									else
+										gantt["trngantt_qty"]
+									end
+				newgantt[:qty_src] = view[tblchop+"_qty"]
+				newgantt[:qty_stk] = 0
+				newgantt[:duedate] = view[tblchop+"_duedate"]
+				newgantt[:starttime] = proc_get_starttime(newgantt[:duedate],view["opeitm_duration"],"day",nil)
+				proc_tbl_edit_arel("trngantts",newgantt,"id = #{gantt["trngantt_id"]}") ##
+				###topの引当て変更はcall元ででやっている。
+			else  ###2階層以降　
+				key = 	if gantt["trngantt_key"].size == 3
+							 sprintf("%03d", gantt["trngantt_key"].to_i - 1)
+						else
+							gantt["trngantt_key"][0..-4]
+						end
+				strsql = %Q& select * from 	trngantts where orgtblname = '#{gantt["trngantt_orgtblname"]}'
+							and orgtblid = #{gantt["trngantt_orgtblid"]}
+							and key = '#{key}'&
+				pare_gantt = ActiveRecord::Base.connection.select_one(strsql)
+				newgantt[:qty] = if key == "000"
+									pare_gantt["qty_src"].to_f * gantt["trngantt_chilnum"] / gantt["trngantt_parenum"]
+								else
+									pare_gantt["qty"].to_f * gantt["trngantt_chilnum"] / gantt["trngantt_parenum"]
+								end
+				newgantt[:qty_stk] = 0
+				newgantt[:duedate] = proc_get_starttime(pare_gantt["starttime"],-1,"day",nil)  ### 構成を作成するときと合わすこと
+				newgantt[:starttime] = proc_get_starttime(newgantt[:duedate],gantt["duration"],"day",nil)
+				proc_tbl_edit_arel("trngantts",newgantt,"id = #{gantt["trngantt_id"]}") ##
+				strsql = %Q& select * from 	alloctbls  where srctblname = "trngantts" and srctblid = #{gantt["trngantt_id"]} and allocfree in('free','alloc')
+									 order by id desc&  ###最初に引き当ては物はなるべく残す
+				allocs = ActiveRecord::Base.connection.select_all(strsql)
+				qty = newgantt[:qty]
+				allocs.each do|alloc|
+					if qty >= alloc["qty"]
+						qty -= alloc["qty"]
+					else
+						proc_alloctbls_update("_edit_",{:qty=>qty,:id => alloc["id"],:remrk=>"proc_edit_gantt_alloc_by_trn"})
+						proc_reverse_alloc(gantt["trngantt_destblname"],gantt["trngantt_destblid"],alloc["qty"] - qty,0)
+						qty = 0
+					end
+				end
+			end
+		end
+	end
+	def proc_update_gantt_schs(gantt,newgantt)
+	raise ##使用してない　　使用しているときはqtyとqty_stkを再チェック
+	end
+	def proc_update_trangantts(id,newgantt,gantt_alloc)  ### id = trngantt_id
+		strsql = %Q& select * from opeitms where itms_id = #{gantt_alloc["trngantt_itm_id"]} and locas_id = #{gantt_alloc["trngantt_loca_id"]} and processseq = #{gantt_alloc["trngantt_processseq"]} &
+		opeitm = ActiveRecord::Base.connection.select_one(strsql)
+		newgantt[:starttime] =  proc_get_starttime(newgantt[:duedate], (opeitm["duration"]||=1),"day",nil)  ###稼働日考慮に  ###starttimeと合わすこと。
+		newgantt[:amt] = newgantt[:qty] * (gantt_alloc["trngantt_price"]||=0)
+		proc_tbl_edit_arel("trngantts",newgantt," id = #{id} ")
+		return
+	end
+	def proc_alloc_to_free(qty,qty_stk,gantt_alloc)  ###qty,qty_stk まだ引当てされている数量　　　gantt_allc:freeになる前の引当て情報
+		strsql = "select alloctbls.* from alloctbls ,trngantts where orgtblname = '#{gantt_alloc["alloc_destblname"]}' and orgtblid =  #{gantt_alloc["alloc_destblid"]}
+						 and key = '000' and trngantts.id = srctblid
+						and srctblname = 'trngantts' and destblname = '#{gantt_alloc["alloc_destblname"]}'"
+		free_alloc =  ActiveRecord::Base.connection.select_one(strsql)
+		based_alloc  = {}
+		based_alloc[:remark] = "alloc to free "
+		based_alloc[:qty_stk] = gantt_alloc["alloc_qty_stk"] - qty_stk   ###free　で残る数
+		based_alloc[:qty] = gantt_alloc["alloc_qty"] - qty  ###free　で残る数
+		based_alloc[:id] =  gantt_alloc["alloc_id"]
+		based_alloc[:remark] = "proc_alloc_to_free edit"
+		proc_alloctbls_update("_edit_",based_alloc)
+		qty_stk += free_alloc["qty_stk"]
+		qty += free_alloc["qty"]
+		proc_alloctbls_update("_edit_",{:qty =>qty,:qty_stk=>qty_stk,:id =>free_alloc["id"],:remark => "proc_alloc_to_free not lotstk"})
+	end
+	def proc_create_or_replace_alloc_by_same_tbl trn,alloc   ###xxxords,xxxinsts,lotstkhistsそのものが数量変更された時 alloc 新しい引当て
+		case trn[:sio_classname]
+			when /_add_/
+				alloc[:remark] = "proc_create_or_replace_alloc_by_same_tbl add"
+				proc_alloctbls_update("_add_",alloc)
+			when /_edit_|_delete_/
+				strsql = %Q& select * from alloctbls where srctblname = 'trngantts' and destblname = '#{alloc[:destblname]}'
+							and destblid = #{alloc[:destblid]} order by id desc &
+				c_allocs = ActiveRecord::Base.connection.select_all(strsql)
+				if c_allocs.size == 0 ##logic error
+				   Rails.logger.debug "strsql = #{strsql}"
+				end
+				qty = 0
+				qty_stk = 0
+				alloc[:qty] = 0 if @sio_classname =~ /_delete_/
+				alloc[:qty_stk] = 0 if @sio_classname =~ /_delete_/
+				c_allocs.each do |c_alloc|
+					if alloc[:qty] < qty + c_alloc["qty"]
+						c_alloc["qty"] = if (alloc[:qty] - qty) > 0 then alloc[:qty] - qty  else 0 end
+						proc_alloctbls_update("_edit_",{:qty=>c_alloc["qty"],:id => c_alloc["id"],:remark => "proc_create_or_replace_alloc_by_same_tbl 1 "})
+						##proc_tbl_edit_arel("alloctbl" ,{:qty=>c_alloc["qty"]}," id = #{c_alloc["id"]}")
+						proc_return_alloc c_alloc
+					end
+					if alloc[:qty_stk] < qty_stk + c_alloc["qty_stk"]
+						c_alloc["qty_stk"] = if (alloc[:qty_stk] - qty_stk) > 0 then alloc[:qty_stk] - qty_stk  else 0 end
+						proc_alloctbls_update("_edit_",{:qty=>c_alloc["qty_stk"],:id => c_alloc["id"],:remark => "proc_create_or_replace_alloc_by_same_tbl 2 "})
+						##proc_tbl_edit_arel("alloctbl" ,{:qty_stk=>c_alloc["qty_stk"]}," id = #{c_alloc["id"]}")
+						proc_return_alloc c_alloc
+					end
+					qty += c_alloc["qty"]
+					qty_stk += c_alloc["qty_stk"]
+				end
+				if alloc[:qty] > qty  ###数量増された時 在庫の増はない。
+					strsql = %Q& select alloctbls.id id,alloctbls.qty qty from trngantts,alloctbls where trngantts.orgtblname = '#{alloc[:destblname]}'
+									and trngantts.orgtblid = #{alloc[:destblid]} and trngantts.key = '001'
+									and alloctbls.srctblname = 'trngantts' and trngantts.id = alloctbls.srctblid
+									and alloctbls.destblname = '#{alloc[:destblname]}' and alloctbls.destblid = #{alloc[:destblid]}  &
+					free_alloc = ActiveRecord::Base.connection.select_one(strsql)
+					proc_alloctbls_update("_edit_",{:qty=>alloc[:qty] - qty + free_alloc["qty"],:id => free_alloc["id"],:remark => "proc_create_or_replace_alloc_by_same_tbl 3 "})
+					##proc_tbl_edit_arel("alloctbl" ,{:qty=>alloc[:qty] - qty + free_alloc["qty"]}," id = #{free_alloc["id"]}")
+				end
+		end
+		return alloc[:id]
+	end
+	def proc_return_alloc c_alloc   ### prdpurshpの数量が減って前の状態のテーブルの引当て数を戻す。
+		pre_destblname = case c_alloc["destblname"]
+							when /ords/
+								c_alloc["destblname"].sub("ords","schs")
+							when /insts/
+								c_alloc["destblname"].sub("insts","ords")
+							when /acts/
+								c_alloc["destblname"].sub("acts","insts")
+							when /lotstkhists/
+								c_alloc["destblname"].sub("acts","insts")
+							else
+								return  ###返品は前の状態に戻らない。
+						end
+		strsql = %Q&  select * from alloctbls where srctblname = '#{c_alloc["destblname"]}' and srctblid = #{c_alloc["destblid"]} and (qty > 0 or qty_stk > 0)
+												and destblname = 'alloctbls'　
+												and destblid in (select id from alloctbls where srctblname = 'trngantts' and srctblid = #{c_alloc["srctblid"]}
+																							and destblname ='#{pre_destblname}')&
+		rtn_alloc = ActiveRecord::Base.connection.select_one(strsql)
+		if rtn_alloc.nil?
+		   Rails.logger.debug " logic error"
+           Rails.logger.debug " strsql = #{strsql}"
+		end
+		proc_tbl_edit_arel("alloctbl" ,{:qty=>rtn_alloc["qty"] - c_alloc["qty"],:qty_stk=>rtn_alloc["qty_stk"] - c_alloc["qty_stk"]}," id = #{rtn_alloc["destblid"]} " )
+		proc_tbl_edit_arel("alloctbl" ,{:qty=>c_alloc["qty"],:qty_stk=>c_alloc["qty_stk"]}," id = #{rtn_alloc["id"]}" )
+	end
 	def proc_save_trn_of_opeitm trn  ##複数の品目の時、内容が変わってしまうのでsaveした。
 		yield
 		trn[:sio_classname] = @sio_classname
@@ -2391,6 +3389,255 @@ module RorBlkctl
 			false
 		end
 	end
+	def proc_chng_lot_to_pic(trn)  ###trn :shpxxxs or dlvxxxs
+		lot_qty_stk = []
+		prevs =  ActiveRecord::Base.connection.select_all(sql_proc_chng_lot_to_pic(trn,"( aprev.alloctbl_qty > 0 or aprev.alloctbl_qty_stk > 0 )"))
+		tmp_trn ={}
+		##realloc = {}
+		##ary = []
+		alloc = {}
+		prevs.each do |prev|
+			strsql = %Q& select * from  r_#{prev["destblname"]} where id = #{prev["destblid"]} &
+			proc_command_instance_variable(ActiveRecord::Base.connection.select_one(strsql))
+			###allocs = []
+			alloc = proc_alloc_copy_to_based_alloc(prev)
+      add_fields = {}
+			if  prev["destblname"] != "lotstkhists"   ###在庫がなかった時
+					rec =  proc_decision_id_by_key("lotstkhists","  itms_id = #{@itm_id} and locas_id = #{prev["shp_loca_id"]}
+																					and lotno = '#{proc_flg_process_lotno_flg}' and
+										 											processseq = #{prev["shp_trngantt_processseq"]}  and prjnos_id = #{@prjno_id} and packno =  'dummy'")
+					add_fields[:id]  = rec["id"]
+					add_fields[:lotstkhist_qty_stk] =   prev["qty"]*-1 + (rec["qty_stk"]||=0)
+					__send__("proc_fld_r_#{prev["destblname"]}_lotstkhists_self60")   do ###alloctbl_destblname
+							add_fields
+					end ##
+					proc_decision_id_by_key("picords"," orgtblname = '#{prev["shp_tblname"]}' and  orgtblid = #{prev["shp_tblid"]} and
+												lotno = '#{@lotstkhist_lotno}' and packno =  '#{@lotstkhist_packno}'   and shelfnos_id = #{@lotstkhist_shelfno_id} ")
+					__send__("proc_tblink_alloctbls_#{prev["destblname"]}_picords_self10",prev) do
+							{:picord_qty_stk=> prev[:qty] ,:picord_packqty=> 0}
+					end
+					proc_decision_id_by_key("trngantts","  orgtblname = 'lotstkhists' and orgtblid = #{@lotstkhist_id} and key = '000' ")
+					proc_fld_r_lotstkhists_trngantts_self10
+					proc_add_edit_lotstkhist_by_free(add_fields[:lotstkhist_qty_stk])
+					proc_update_alloc_chng_stk_to_pic(add_fields,prev)
+			else   ###在庫の時
+				  rec =  proc_decision_id_by_key("lotstkhists","  itms_id = #{@itm_id} and locas_id = #{prev["shp_loca_id"]}
+																							and lotno = '#{proc_flg_process_lotno_flg}' and
+											 											processseq = #{prev["shp_trngantt_processseq"]}  and prjnos_id = #{@prjno_id} and packno =  '#{@lotstkhist_packno}'")
+					proc_decision_id_by_key("picords"," orgtblname = '#{prev["shp_tblname"]}' and  orgtblid = #{prev["shp_tblid"]} and
+																						lotno = '#{@lotstkhist_lotno}' and packno =  '#{@lotstkhist_packno}'   and shelfnos_id = #{@lotstkhist_shelfno_id} ")
+					if  @lotstkhist_packno !~ /dummy/
+						if prev[:destblid] == @lotstkhist_id
+								__send__("proc_fld_alloctbls_lotstkhists_picords_self10") do
+									###{:picord_qty_stk=> @lotstkhist_qty_stk,:picord_packqty=> alloc[:packqty]} #
+									{:picord_qty_stk=> prev[:qty_stk],:picord_packqty=>  @lotstkhist_qty_stk} #
+								end
+      						add_fields[:id]  = rec["id"]
+      						add_fields[:lotstkhist_qty_stk] =  0
+      						__send__("proc_fld_r_#{prev["destblname"]}_lotstkhists_self60")   do ###alloctbl_destblname
+      							add_fields
+      						end ##
+                  proc_update_alloc_chng_stk_to_pic(add_fields,prev)
+						else  ###別の場は所に移動された
+								if proc_already_use_packno(prev,trn)
+									__send__("proc_fld_alloctbls_lotstkhists_picords_self10") do
+											{:picord_qty_stk=> prev[:qty_stk],:picord_packqty=>  @lotstkhist_qty_stk} #
+									end
+        					add_fields[:id]  = @lotstkhist_id
+        					add_fields[:lotstkhist_qty_stk] =  0
+        					__send__("proc_fld_r_#{prev["destblname"]}_lotstkhists_self60")   do ###alloctbl_destblname
+        						add_fields
+        					end ##
+                  proc_update_alloc_chng_stk_to_pic(add_fields,prev)
+								else
+									@lotstkhist_packno = "error "
+									__send__("proc_fld_alloctbls_lotstkhists_picords_self10") do
+											{:picord_qty_stk=> prev[:qty_stk],:picord_packqty=> 0,:remark=>"other packno useing "} #
+									end
+								end
+						end
+					else
+						add_fields[:id]  = rec["id"]
+						add_fields[:lotstkhist_qty_stk] =   prev["qty_stk"]*-1 + rec["qty_stk"]
+						__send__("proc_fld_r_#{prev["destblname"]}_lotstkhists_self60")   do ###alloctbl_destblname
+							add_fields
+						end ##
+						__send__("proc_fld_alloctbls_lotstkhists_picords_self10") do
+							{:picord_qty_stk=> prev["qty_stk"] ,:picord_packqty=> 0}
+						end
+            proc_update_alloc_chng_stk_to_pic(add_fields,prev)
+					end
+			end
+			proc_save_trn_of_opeitm(tmp_trn) do
+						tmp_trn[:tblname] = "picords"
+			end
+			proc_update_gantt_alloc_fm_trn tmp_trn,[alloc] ,nil
+			rec =  proc_decision_id_by_key("inouts","  alloctbls_id_inout = #{prev["id"]} and locas_id = #{@picord_loca_id} and
+												lotno = '#{@picord_lotno}' and　packno =  '#{@picord_packno}'   and  inoutflg = 'pic' ")
+			strsql = "select * from alloctbls where srctblname = 'trngantts' and destblname = 'picords' and destblid = #{@picord_id} and allocfree  in('alloc' ,'free') "
+			alloc = ActiveRecord::Base.connection.select_one(strsql)
+			proc_fld_r_picords_inouts_self10 do
+						{:id=>rec["id"],:inout_inoutflg=>"out",:inout_alloctbl_id_inout=>alloc["id"],:inout_trngantt_id_inout=>alloc["srctblid"]}
+			end
+				##proc_tblink_r_lotstkhists_trngantts_self10({:id=>add_fields[:id]})
+		end
+		return
+	end
+
+	def proc_shpact_to_lotstk_by_pic(tblname,tblid,pic_alloc)  ###tbl:shp dlv              trn :picact
+		allocs = proc_get_allrecs_fm_tblname_yield("alloctbls") do
+                   "allocfree = 'alloc' and srctblname = 'trngantts' and destblname = '#{tblname}' and destblid = #{tblid}"
+		end
+		qty_stk = 0
+		proc_command_instance_variable(proc_get_viewrec_from_id(pic_alloc["destblname"],pic_alloc["destblid"]))
+		##picact.with_indifferent_access
+		qty_stk  +=  @picact_qty_stk
+		add_fields  = {}
+		rec =  proc_decision_id_by_key("lotstkhists","  itms_id = #{@picact_itm_id} and locas_id = #{@picact_loca_id_to}
+	    						and lotno = '#{@picact_lotno}' and
+								processseq = #{@picact_processseq}  and prjnos_id = #{@picact_prjno_id} and packno =  '#{@picact_packno}'")
+		add_fields[:id]  = rec["id"]
+		add_fields[:lotstkhist_qty_stk] = (rec["qty_stk"]||=0) + @picact_qty_stk
+		proc_fld_r_picacts_lotstkhists_self10 do
+			add_fields
+		end
+		##proc_alloctbls_update("_edit_",{:id=>,:allocfree=>"done"})   ###alloctblsにはpicxxxはない。
+		trn = {}
+		proc_save_trn_of_opeitm(trn) do
+			trn[:tblname] = "lotstkhists"
+		end
+		trn[:qty_stk] = @picact_qty_stk
+		proc_update_gantt_alloc_fm_trn trn,allocs,nil
+	end
+	def proc_add_edit_lotstkhist_by_free qty_stk
+		if block_given?
+			based_alloc = yield.dup
+		else
+			based_alloc = {}
+			based_alloc[:srctblid] = @trngantt_id
+			based_alloc[:destblid] = @lotstkhist_id
+			based_alloc[:qty_stk] =  0
+			based_alloc[:packqty] = if @lotstkhist_packno != "dummy" then @lotstkhist_qty_stk  else 0 end
+		end
+		based_alloc[:srctblname] = "trngantts"
+		based_alloc[:destblname] = "lotstkhists"
+		based_alloc[:allocfree] = "free"
+		based_alloc[:allocfreeid] = 0
+		based_alloc[:remark] = "proc_add_edit_lotstkhist_by_free"
+		based_alloc[:qty_stk] += qty_stk
+		proc_alloctbls_update(nil,based_alloc)   ###nil--->登録削除の自動判定依頼
+		return based_alloc
+	end
+	def proc_act_to_lot trn,tblname
+		case trn[:sio_classname]
+			when/_add_/
+				@lotstkhist_classname = "lotstkhists_add_"
+				proc_command_instance_variable(ActiveRecord::Base.connection.select_one("select * from r_#{tblname} where id = #{trn[:id]} "))
+				strsql = "select *  from alloctbls where srctblname = 'trngantts' and destblname = '#{tblname}' and destblid = #{trn[:id]}  and qty >0
+							and allocfree in('alloc','free') order by allocfree"   ###order by allocfree 引当て分から在庫に充てる
+				### qty > 0 --->  自らのtrngantt は除く
+				allocs = ActiveRecord::Base.connection.select_all(strsql)
+				##qty = trn[:qty] ## @puract_qty 瓶の数又はリールの数
+				add_fields = {}
+				add_fields[:lotstkhist_lotno] = if eval("@#{tblname.chop}_lotno") then eval("@#{tblname.chop}_lotno") else proc_flg_process_lotno_flg end   ###lotno毎に入力する。lotno毎にpuractsができる。
+				add_fields[:lotstkhist_packno] = "dummy"
+				packqty = trn[:packqty]
+				rec = {}
+				lottrn = trn.dup
+				allocs.each do |alloc|
+					if trn[:packno_flg]  ==  "1"
+						until alloc["qty"] <= 0
+							if packqty == trn[:packqty]
+								add_fields[:lotstkhist_packno] = proc_flg_process_packno_flg(eval("@#{tblname.chop}_opeitm_id"),@lotstkhist_packno)
+								rec =  proc_decision_id_by_key("lotstkhists","  itms_id = #{trn[:itms_id]} and locas_id = #{trn[:locas_id_to]}
+																and lotno = '#{add_fields[:lotstkhist_lotno]}' and
+																processseq = #{trn[:processseq_pare]}  and prjnos_id = #{trn[:prjnos_id]} and packno =  '#{add_fields[:lotstkhist_packno]}'")
+								add_fields[:id]  = rec["id"]
+								add_fields[:lotstkhist_qty_stk] = packqty
+								###proc_crt_def_tblink("proc_tblink_r_#{tblname}_lotstkhists_self30")
+								__send__("proc_fld_r_#{tblname}_lotstkhists_self30")   do
+                                    add_fields
+								end ##
+								proc_save_trn_of_opeitm(lottrn) do
+									lottrn[:tblname] = "lotstkhists"
+								end
+								if packqty >= alloc["qty"]
+									packqty -= alloc["qty"]
+									proc_update_gantt_alloc_fm_acttrn lottrn,alloc.with_indifferent_access,nil
+									alloc["qty"] = 0
+								else
+									alloc_qty = alloc["qty"]
+									alloc["qty"] = packqty
+									packqty = trn[:packqty]
+									proc_update_gantt_alloc_fm_acttrn lottrn,alloc.with_indifferent_access,nil
+									alloc["qty"] = alloc_qty - trn[:packqty]
+								end
+							else  ###一つのリール又は一瓶の引当てが複数になった時
+								new_alloc =  proc_decision_id_by_key("alloctbls","srctblname = 'trngantts' and
+																	srctblid = (select id from trngantts where orgtblname = 'lotstkhists' and orgtblid = #{rec["id"]}  and key = '000') and
+																	destblname = 'lotstkhists' and destblid = #{rec["id"]} ")
+								if packqty >= alloc["qty"]
+									packqty -= alloc["qty"]
+									lottrn[:qty_stk] -= alloc["qty"]
+									proc_update_stk_alloc lottrn,alloc.with_indifferent_access,new_alloc.with_indifferent_access
+									alloc["qty"] = 0
+								else
+									sqty = alloc["qty"]
+									alloc["qty"] = packqty
+									lottrn[:qty_stk] -= alloc["qty"]
+									proc_update_stk_alloc lottrn,alloc.with_indifferent_access,new_alloc.with_indifferent_access
+									alloc["qty"] = sqty - packqty
+									packqty = trn[:packqty]
+								end
+							end
+						end
+					else
+						if trn[:qty] > 0
+							rec =  proc_decision_id_by_key("lotstkhists","  itms_id = #{trn[:itms_id]} and locas_id = #{trn[:locas_id_to]}
+												and lotno = '#{add_fields[:lotstkhist_lotno]}' and
+												processseq = #{trn[:processseq_pare]}  and prjnos_id = #{trn[:prjnos_id]} and packno =  'dummy'")
+							add_fields[:id]  = rec["id"]
+							add_fields[:lotstkhist_qty_stk] =   alloc["qty"] + (rec["qty_stk"]||=0)
+							__send__("proc_fld_r_#{tblname}_lotstkhists_self30")    do
+								add_fields
+							end ##
+							proc_save_trn_of_opeitm(lottrn) do
+								lottrn[:tblname] = "lotstkhists"
+							end
+						else
+							 Rails.logger.debug"error class #{self} : #{Time.now}:  line #{__LINE__}  trn:#{trn}  "
+							 raise
+						end
+						proc_update_gantt_alloc_fm_acttrn lottrn,alloc.with_indifferent_access,trn[:qty]  ###trn[:qty]　イッタンｆｒｅｅになる在庫
+						lottrn[:qty_stk] = 0   ###在庫の作成は完了
+						trn[:qty] -= alloc["qty"]
+					end
+				end
+			when /edit|delete/
+		end
+	end
+	def proc_alloc_to_sch alloc,qty,qty_stk  ###qty,qty_stk  allocとして残る数量
+		r_qty = alloc["qty"]
+		r_qty += alloc["qty_stk"]
+		new_qty = alloc["qty"] + alloc["qty_stk"] - qty - qty_stk
+		proc_alloctbls_update("_edit_",{:qty =>qty,:qty_stk=>qty_stk,:id =>alloc["id"],:remark => "proc_alloc_to_sch 1"})
+		strsql = "select * from alloctbls where srctblname = 'trngantts' and srctblid = #{alloc["srctblid"]} and destblname like '%schs' "
+		schs =  ActiveRecord::Base.connection.select_all(strsql)
+		schs.each do   |sch|
+			alloc["destblname"] = sch["destblname"]
+			if sch["allocfree"] == "alloc"
+				proc_alloctbls_update("_edit_",{:qty =>new_qty ,:id =>sch["id"],:remark => "proc_alloc_to_sch 0"})
+			else
+				if sch["qty"] >= r_qty
+					proc_alloctbls_update("_edit_",{:qty =>sch["qty"] -  r_qty,:id =>sch["id"],:remark => "proc_alloc_to_sch 2"})
+					r_qty = 0
+				else
+					proc_alloctbls_update("_edit_",{:qty =>0,:id =>sch["id"],:remark => "proc_alloc_to_sch 3"})
+					r_qty -= sch["qty"]
+				end
+			end
+		end
+	end
 	def proc_mkord_err rec,mag
 		proc_tbl_edit_arel(rec["alloctbl_destblname"],{:remark=>mag}," id = #{rec["alloctbl_destblid"]}")
 	end
@@ -2421,7 +3668,123 @@ module RorBlkctl
 			chil_items[item["chil_id"].to_s] = {:shp=>shp,:allocs=>allocs}
 		end
 	end
-
+	def proc_custord_chng_dlv_to_dlv(fmpps,fm_id)   ###custordsの引当ての変更
+		raise ###   使用してない。
+		case fmpps
+			when /custschs/
+			when /custords/  ###custordsの時　dlvはdlvinsts
+				strsql = "select * from dlvschs where tblname = '#{fmpps}' and tblid = #{fm_id} "
+				dlvsch = ActiveRecord::Base.connection.select_one(strsql)
+				strsql = "select * from custords where id = #{fm_id} "
+				custord = ActiveRecord::Base.connection.select_one(strsql)
+				strsql = "select * from alloctbls where srctblname = 'custords' and srctblid = #{fm_id}  and destblname = 'dlvschs' and destblid = #{dlvsch["id"]} "
+				alloctbl = ActiveRecord::Base.connection.select_one(strsql)
+				if alloctbl
+					strsql = "select sum(qty) qty from alloctbls where srctblname = 'custords' and srctblid = #{fm_id}  and destblname in('dlvords','dlvinsts','dlvacts')
+																			and allocfree like 'dlv%' group by srctblname,srctblid "
+					done_qty = ActiveRecord::Base.connection.select_value(strsql)
+					done_qty ||= 0
+					alloctbl["qty"] = custord["qty"] - done_qty
+					if alloctbl["qty"]  >= 0
+						###proc_tbl_edit_arel("alloctbls",alloctbl," id = #{alloctbl["id"]}")
+						proc_alloctbls_update("_edit_",alloctbl.with_indifferent_access)
+					else
+						Rails.logger.debug " logic error   オーダー済以下にはできない。"
+						Rails.logger.debug " 画面でチェック　していること。"
+						raise
+					end
+				else
+					alloctbl = {}
+						alloctbl[:qty] = custord["qty"]
+						alloctbl[:qty_stk] = 0
+						alloctbl[:packqty] = 0
+						alloctbl[:srctblname] = "custords"
+						alloctbl[:destblname] = "dlvschs"
+						alloctbl[:srctblid] = custord["id"]
+						alloctbl[:destblid] = dlvsch["id"]
+						alloctbl[:allocfree] = "alloc"
+						alloctbl[:allocfreeid] = 0
+						proc_alloctbls_update("_add_",alloctbl)
+				end
+			when /custinsts/   ##　custinstsの時　　　参考custords:custinsts= 1:n
+				strsql = "select * from dlvords where tblname = '#{fmpps}' and tblid = #{fm_id} "
+				dlvord = ActiveRecord::Base.connection.select_one(strsql)
+				strsql = "select * from custinsts where id = #{fm_id} "
+				custinst = ActiveRecord::Base.connection.select_one(strsql)
+				strsql = "select * from custords where custs_id = #{custinst["custs_id"]} and cno = '#{custinst["custinst_cno_ord"]}' "
+				custord = ActiveRecord::Base.connection.select_one(strsql)
+				strsql = "select * from alloctbls where srctblname = 'custords' and srctblid = #{custord["id"]}  and destblname = 'dlvords' and destblid = #{dlvord["id"]} "
+				alloctbl = ActiveRecord::Base.connection.select_one(strsql)
+				if alloctbl
+					strsql = "select sum(qty) qty from dlvinsts where sno_ord = '#{dlvord["sno"]}'  group by sno_ord "
+					dlvinst_qty = ActiveRecord::Base.connection.select_value(strsql)
+					dlvinst_qty ||= 0
+					alloctbl["qty"] = custinst["qty"] - dlvinst_qty   ###
+					if alloctbl["qty"]  >= 0
+						proc_alloctbls_update("_edit_",alloctbl)
+					else
+						Rails.logger.debug " logic error   出荷済数以下にはできない。"
+						Rails.logger.debug " 画面でチェック　していること。"
+						raise
+					end
+				else
+					alloctbl = {}
+					alloctbl[:qty] = custinst["qty"]
+					alloctbl[:qty_stk] = 0
+					alloctbl[:packqty] = 0
+					alloctbl[:srctblname] = "custords"   ###srctblname は常に　custords
+					alloctbl[:destblname] = "dlvords"
+					alloctbl[:srctblid] = custord["id"]
+					alloctbl[:destblid] = dlvord["id"]
+					alloctbl[:allocfree] = "alloc"
+					alloctbl[:allocfreeid] = 0
+					alloctbl[:remark] = "proc_custord_chng_dlv_to_dlv 3"
+					proc_alloctbls_update("_add_",alloctbl)
+				end
+					###cusords_dlvschs  のqty変更
+					strsql = "select * from alloctbls where srctblname = 'custords' and srctblid = #{custord["id"]} and destblname = 'dlvschs' and allocfree = 'dlv' "
+					alloctbl = ActiveRecord::Base.connection.select_one(strsql)
+					alloctbl["qty"] = custord["qty"] - custinst["qty"]
+					alloctbl["qty"] = 0 if alloctbl["qty"] < 0
+					proc_alloctbls_update("_edit_",alloctbl)
+			when /custacts/
+				strsql = "select * from dlvacts where tblname = '#{fmpps}' and tblid = #{fm_id} "
+				dlvact = ActiveRecord::Base.connection.select_one(strsql)  ###dlvinstsは現場(出荷場)からの回答
+				strsql = "select * from custacts where id = #{fm_id} "
+				custact = ActiveRecord::Base.connection.select_one(strsql)
+				strsql = "select * from custords where custs_id = #{custact["custs_id"]} and cno_ord  = '#{custact["cno_ord"]}' "
+				custord = ActiveRecord::Base.connection.select_one(strsql)
+				strsql = "select * from alloctbls where srctblname = 'custords' and srctblid = #{custord["id"]}  and destblname = 'dlvacts' and destblid = #{dlvact["id"]} "
+				alloctbl = ActiveRecord::Base.connection.select_one(strsql)
+				if alloctbl
+					alloctbl["qty"] = dlvact_qty
+					proc_alloctbls_update("_edit_",alloctbl)
+				else
+					alloctbl = {}
+					alloctbl [:qty] = custacts["qty"]
+					alloctbl[:qty_stk] = 0
+					alloctbl[:packqty] = 0
+					alloctbl[:srctblname] = "custords"   ###srctblname は常に　custords
+					alloctbl[:destblname] = "dlvords"
+					alloctbl[:srctblid] = custord["id"]
+					alloctbl[:destblid] = dlvact["id"]
+					alloctbl[:allocfree] = "alloc"
+					alloctbl[:allocfreeid] = 0
+					alloctbl[:remark] = "proc_custord_chng_dlv_to_dlv custacts add"
+					proc_alloctbls_update("_add_",alloctbl)
+				end
+				###alloctbl dlvinsts  のqty変更
+				strsql = "select * from dlvinsts where sno = '#{dlvacts["sno_inst"]}'  "
+				dlvinst = ActiveRecord::Base.connection.select_one(strsql)
+				strsql = "select * from alloctbls where srctblname = 'custords' and srctblid = #{custord["id"]} and destblname = 'dlvsinsts'  and destblid = #{dlvinst["id"]} and allocfree = 'dlv' "
+				alloctbl = ActiveRecord::Base.connection.select_one(strsql)
+				strsql = "select sum(qty) qty from dlvacts where sno_inst = '#{dlvinst["sno"]}' "
+				alldlvact_qty = ActiveRecord::Base.connection.select_value(strsql)  ###dlvinstsは現場(出荷場)からの回答
+					alloctbl["qty"] = dlvinst["qty"] - alldlvact_qty
+					alloctbl["qty"] = 0 if alloctbl["qty"] < 0
+					proc_alloctbls_update("_edit_",alloctbl)
+		end
+	end
 	def proc_blk_constrains tbl,colm,type,constraint_name   ###r_blktbsのテーブル　view作成ボタンでblkukysにレコードを追加してないとチェックはできない。
 		strsql = ""
 		ActiveRecord::Base.uncached() do
