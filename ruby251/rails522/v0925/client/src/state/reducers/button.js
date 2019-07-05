@@ -19,6 +19,7 @@ const buttonreducer =  (state= initialValues , actions) =>{
     case BUTTONFLG_REQUEST:
        return {...state,
         buttonflg:actions.payload.buttonflg,
+        loading : true,
      }
 
     case  LOGOUT_REQUEST:

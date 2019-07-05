@@ -213,6 +213,7 @@ button.outline {
 }
 
 .react-tooltip-lite {
+  min-width: 100px;
   background: #333;
   color: red;
 }

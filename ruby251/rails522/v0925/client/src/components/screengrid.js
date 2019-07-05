@@ -91,12 +91,12 @@ class ScreenGrid extends React.Component {
 
   render() {
     const {screenCode, pageSize,filterable,
-            page, loading,
-// sorted,handleScreenParamsSet,handleErrorMsg,handleErrorset,handleScreenLineEditRequest,handleInputFieldProtect,
+            page, loading,handleScreenParamsSet,
+// sorted,handleErrorMsg,handleErrorset,handleScreenLineEditRequest,
             columns,data,pages,params,  //params railsに渡すパラメータを兼ねている。
             handleScreenRequest,handleValite,
-            uid, screenName,handleFetchRequest,
-            sizePerPageList,yup,
+            uid, handleFetchRequest,
+            sizePerPageList,yup,buttonflg,
             } = this.props
     
     //let rowIndexCheck = true
@@ -123,8 +123,8 @@ class ScreenGrid extends React.Component {
            handleValite(schema,data,index,field,params)}
      /*
 */
-    let tcolumns=editableColumns(columns)   
-    let filtered =[]
+    let tcolumns=params.req!=="viewtablereq"?editableColumns(columns):columns   
+    //let filtered =[]
     return(
     <div>
     {screenCode?
@@ -141,13 +141,14 @@ class ScreenGrid extends React.Component {
       //sorted={sorted}
       manual // informs React Table that you'll be handling sorting and pagination server-side
 
-       
+      defaultFiltered={params?params["filtered"]?params["filtered"]:[]:[]}
       filterable={filterable}
       
       className="-striped -highlight" //-striped  奇数行、偶数行色分け　 -highlight：マウスがヒットした時の色の強調
-       style={{
-       height: "800px" // This will force the table body to overflow and scroll, since there is not enough room
-       }}
+       style={buttonflg!=="export"?{
+       height: "800px" 
+       // This will force the table body to overflow and scroll, since there is not enough room
+       }:{height:"200px"}}
 
       getTrProps={(state, rowInfo, column, instance)  => {
         return {}
@@ -176,7 +177,6 @@ class ScreenGrid extends React.Component {
               
               if(state.resolvedData[rowInfo.index][column.id]!==e.target.textContent&&yup.yupfetchcode[column.id]){// 
                                         data[rowInfo.index][column.id]=e.target.textContent
-                                        //handleInputFieldProtect(columns) 
                                         let params = {}
                                          params["fetchcode"] = {[column.id]:e.target.textContent}
                                          params["screenCode"] = screenCode
@@ -193,23 +193,28 @@ class ScreenGrid extends React.Component {
         }
       }
       
-      getProps={(state) => {      //  fillterの時もイベントが発生する。
+      getProps={(reacttablestate) => {      //  fillterの時もイベントが発生する。
           return {
              onKeyPress:(e) =>{
                             if(e.key==="Enter"&& params["req"]==="viewtablereq"){
-                              filtered = state.filtered
-                              handleScreenRequest(params,page,pageSize,state.filtered)
+                              params["filtered"] = reacttablestate.filtered
+                              handleScreenRequest(params,page,pageSize)
                             }}
+
+                            
                             }
                    }      
         }
       onPageChange={(pageIndex) => {      
-        handleScreenRequest(params,pageIndex,pageSize,filtered)
+        handleScreenRequest(params,pageIndex,pageSize,params["filtered"])
            } }
       onPageSizeChange={(pageSize, pageIndex) => {      
-        handleScreenRequest(params,pageIndex,pageSize,filtered)
+        handleScreenRequest(params,pageIndex,pageSize,params["filtered"])
          } 
         } 
+      onFilteredChange={(filtered, column) => {
+        params["filtered"] = filtered
+        handleScreenParamsSet(params)}} 
     >                       
 
       {(state, makeTable, instance) => {
@@ -247,27 +252,21 @@ const  mapStateToProps = (state) => {
    
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-    handleScreenParamsSet:  (state) =>{
-                            dispatch(ScreenParamsSet(state))},                    
+    handleScreenParamsSet:  (params) =>{
+                            dispatch(ScreenParamsSet(params))},                    
     handleScreenLineEditRequest:  (screenCode, pageSize,index,uid,screenName,linedata,pages,sizePerPageList) =>{
                             let  params= {screenCode:screenCode,screenName:screenName,
                                           index:index,uid:uid,linedata:linedata,
                                           pageSize:pageSize,req:"updateGridLineData",pages:pages,sizePerPageList:sizePerPageList}
                            dispatch(ScreenRequest(params))},
-    handleScreenRequest:  (params,page,pageSize,filtered) =>{
-                            params = {...params,page:page,pageSize:pageSize,filtered:filtered}
+    handleScreenRequest:  (params,page,pageSize) =>{
+                            params = {...params,page:page,pageSize:pageSize}
                             dispatch(ScreenRequest(params))},
     handleFetchRequest:  (params) =>{ params["req"] = "fetch_request"
                                       dispatch(FetchRequest(params))},
     handleValite:  (schema,data,index,field,params) =>{ 
                            dispatch(ScreenErrCheck(schema,data,index,field,params))},
 
-    handleInputFieldProtect:  (columns) =>{
-                              const temp =[]
-                              columns.map((val,index) =>{ 
-                                     if(val["className"].match(/renderEditable/)){val["Cell"] = renderNonEditable}
-                                        return   temp.push(val)}) 
-                            //  dispatch(InputFieldProtect())
-                            },
+
                       })   
 export default connect(mapStateToProps,mapDispatchToProps)(ScreenGrid)

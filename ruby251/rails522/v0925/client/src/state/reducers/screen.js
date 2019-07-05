@@ -23,10 +23,7 @@ const screenreducer =  (state= {} , action) =>{
 
       case SCREEN_PARAMS_SET:
         return {...state,
-          pageSize:action.payload.state.pageSize,
-          page:action.payload.state.page,
-          sorted:action.payload.state.sorted, 
-          filtered:action.payload.state.filtered, 
+          params:action.payload.params,
       }
 
 

@@ -3,7 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Tab, Tabs, TabList,TabPanel , } from 'react-tabs'
 import Upload from './upload'
-import Download from './download'
+import {Download} from './download'
 import "react-tabs/style/react-tabs.css"
 import Button from '@material-ui/core/Button'
 import "../index.css"
@@ -11,8 +11,7 @@ import {ScreenRequest,ButtonFlgRequest} from '../actions'
 
 
  const  ButtonList = ({buttonListData,setButtonFlg,buttonflg,
-                        screenCode,uid,screenName,
-                        page,sorted,params,
+                        screenCode,page,sorted,params,
                       //  editableflg,message
                       }) =>{
       let tmpbuttonlist = {}
@@ -70,7 +69,7 @@ const  mapStateToProps = (state,ownProps) =>({
   page:state.screen?state.screen.page:0,
   sorted:state.screen?state.screen.sorted:[], 
   //editableflg:state.screen.editableflg,
-  message:state.screen.message
+  message:state.screen.message,
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
@@ -83,17 +82,17 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
           { params= { ...params, page: page, 
             sorted:sorted,   req:"editabletablereq"}
           //editableflg = true
-              dispatch(ScreenRequest(params)) //menu
+              dispatch(ScreenRequest(params)) //filterの項目は画面に出ない。filter=falseが原因？
          }
          if(buttonCode==="inlineadd")
            { params= {...params,  page: page, pages:1,req:"inlineaddreq"}
           //  editableflg = true
-              dispatch(ScreenRequest(params)) //menu
+              dispatch(ScreenRequest(params)) //filterの項目は画面に出ない。filter=falseが原因？
           }
           if(buttonCode==="yup")
             { params= { ...params,req:"yup"}
            //  editableflg = false
-                dispatch(ScreenRequest(params)) //menu
+              dispatch(ScreenRequest(params)) //menu
            }
       } 
   })    

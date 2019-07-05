@@ -1,33 +1,61 @@
-// joemusacchia/ReactCarrierwaveImageUploadBlogPost.md
+// https://www.npmjs.com/package/react-export-excel
 
 import React from 'react'
 import { connect } from 'react-redux'
+import { Formik, ErrorMessage } from 'formik';
 import {DownloadRequest} from '../actions'
+import ReactExport from "react-data-export";
 
-const Download = ({uid,token,client,screenCode,screenName,readFile}) => (
+const ExcelFile = ReactExport.ExcelFile;
+const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
+const options = { year: 'numeric', month: 'long', day: 'numeric' ,hour:'numeric',minute:'numeric',second:'numeric'};
+const wtime = (new Date()).toLocaleDateString('ja-JA', options).replace(/:/g,"-")
+const DownloadForm = ({isSubmitting,screenCode,screenName,filtered,handleSubmit,
+                       excelData,excelColumns}) => (
     <div>
-       export Table {screenName}
-      <input type='file' onClick={(files)=>readFile(files,uid,token,client,screenCode)}/>
-    </div>
+       <p>export Table {screenName}</p>
+  <form  onSubmit={handleSubmit(screenCode,filtered)} >
+    <button type="submit" disabled={isSubmitting}>
+    export
+    </button>
+      </form>
+        {excelData&&
+             <ExcelFile filename={screenName+wtime}>
+                <ExcelSheet data={excelData} name="export">
+                   {excelColumns.map((val,index) =>{ 
+                     return (  <ExcelColumn label={val.label} value={val.vale} />)
+                    }) }
+                </ExcelSheet>
+            </ExcelFile>
+            }
+    </div>              
   )
 
 
+
+const initialValues = {
+  }
 const  mapStateToProps = (state) => ({
-              uid:state.login.auth?state.login.auth.uid:"",
-              token:state.login.auth?state.login.auth["access-token"]:"",
-              client:state.login.auth?state.login.auth.client:"",
               screenCode:state.screen.params.screenCode,
               screenName:state.screen.params.screenName,
-    
+              filtered:state.screen.parms.filtered, 
+              excelData:state.button.excelData,
+              excelColumns:state.button.excelColumns
   })
        
-  const mapDispatchToProps = (dispatch,ownProps ) => ({
-      readFile: (files,uid,token,client,screenCode) =>{
-                if(files && files[0]){
-                    let formPayLoad = new FormData();
-                    formPayLoad.append('downloaded_image', files[0]);
-                    dispatch(DownloadRequest(formPayLoad,uid,token,client,screenCode))
-                  }}
-    } )
+  const mapDispatchToProps = dispatch => ({
+    handleSubmit: (screenCode,filtered) => dispatch(DownloadRequest(screenCode,filtered))
+    })
 
-export default  connect(mapStateToProps,mapDispatchToProps)(Download)
+  const Container = ({onSubmit}) => (
+      <Formik 
+        initialValues={initialValues}
+        validateOnBlur={false}
+        validateOnChange={false}
+        onSubmit={onSubmit}
+        render={(props) => <DownloadForm {...props} />}
+      />
+)  
+
+export  const Download = connect(mapStateToProps,mapDispatchToProps)(Container)

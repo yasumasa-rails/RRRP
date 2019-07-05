@@ -100,9 +100,9 @@ export const ScreenRequest = (params) => ({
   payload: { params}  //
 })
 
-export const ScreenParamsSet = (state) => ({
+export const ScreenParamsSet = (params) => ({
   type:  SCREEN_PARAMS_SET,
-  payload: { state }  //
+  payload: { params}  //
 })
 
 export const ScreenErrSet = (data,token,client,uid) => ({

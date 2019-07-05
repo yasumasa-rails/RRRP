@@ -16,7 +16,7 @@ import ScreenGrid from './screengrid'
 
  class Menus extends React.Component {
   render() {
-    const { isAuthenticated ,menuListData,uid,getScreen, 
+    const { isAuthenticated ,menuListData,uid,getScreen, params,
             pageSize,page,sorted,sizePerPageList} = this.props
     
     if (isAuthenticated) {
@@ -47,8 +47,8 @@ import ScreenGrid from './screengrid'
                     <Tab key={index} >
                       <Button   type="submit"
                       onClick ={() => getScreen(val.screen_code,pageSize?pageSize:val.page_size,
-                                                page,sorted,val.scr_name,
-                                                uid,sizePerPageList)}>
+                                                page,sorted,val.scr_name,uid,sizePerPageList,params
+                                                )}>
                       {val.scr_name}       
                       </Button>             
                     </Tab>)}
@@ -93,14 +93,13 @@ const  mapStateToProps = (state,ownProps) =>({
   sorted:state.screen?state.screen.sorted:null, 
   sizePerPageList:state.screen.sizePerPageList?state.screen.sizePerPageList:[25],
   params:state.screen.params,
-  
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-      getScreen : (screenCode,pageSize, page,sorted,screenName, uid,sizePerPageList) =>{
-        let  params= {  page: page, pageSize : pageSize,sizePerPageList:sizePerPageList,
-                        sorted:sorted,   screenName:  screenName,   
-                         screenCode:screenCode,uid:uid,req:"viewtablereq",} 
+      getScreen : (screenCode,pageSize, page,sorted,screenName, uid,sizePerPageList,params) =>{
+        params= { ...params, page: page, pageSize : pageSize,sizePerPageList:sizePerPageList,
+                        sorted:sorted,   screenName:  screenName,
+                         screenCode:screenCode,uid:uid,req:"viewtablereq",filtered:params?params.filtered:[]} 
         dispatch(ScreenRequest(params))}
           })    
 
