@@ -526,6 +526,15 @@ module RorBlkctl
 				page_info[:totalPage] = (total_cnt.to_f/page_info[:sizePerPage].to_f).ceil
 				return  pagedata,	page_info
 		end	
+		def download_data_blk screenCode,select_fields,strwhere
+				strsql = "select #{select_fields} from  #{screenCode}
+							 #{if strwhere == '' then '' else strwhere   end }  limit 1000000	  "
+				pagedata = ActiveRecord::Base.connection.select_all(strsql)
+				strsql = "select count(*) from  #{screenCode}
+							 #{if strwhere == '' then '' else strwhere   end }  limit 1000000	  "
+				cnt = ActiveRecord::Base.connection.select_value(strsql)
+				return  pagedata,cnt
+		end	
 		def add_empty_data id,columns_info,page_info
 				num = page_info[:sizePerPage]
 				pagedata =[]
@@ -1292,7 +1301,7 @@ module RorBlkctl
 				else
 					delm = ""
 				end
-				if tblnamechop == screenchop  and tbl != "id" ###  and proc_chk_tble_exist(tbl+ "s")
+				if tblnamechop == screenchop  and tbl != "id" ###  a
 					if tbl == "person"
 						if @person_rec
 							if @person_rec["id"] = val
@@ -1661,6 +1670,33 @@ module RorBlkctl
 			grid_columns_info = [columns_info,page_info,where_info,select_fields.chop,yup]
 		end
 	end
+	
+	def create_download_columns_info screen_code,email
+		download_columns_info = Rails.cache.fetch('download'+RorBlkctl.grp_code(email)+screen_code) do
+				###  ダブルコーティション　「"」は使用できない。 
+			sqlstr = "select * from  func_get_screenfield_grpname('#{email}','#{screen_code}')"
+			columns_info = []
+			where_info = {}
+			select_fields = ""	
+			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
+				if cnt == 0
+								where_info[:filtered] = i["screen_strwhere"]
+				end
+				if i["screenfield_hideflg"] == "0"
+					case  i["screenfield_type"] 
+						when  'numeric'
+						when 'date'
+						when 'timestamp'
+						 ##renderer
+					end	
+					columns_info <<%Q%{"label":"#{i["screenfield_name"]}","value":"#{i["pobject_code_sfd"]}"}%
+					where_info[i["pobject_code_sfd"].to_sym] = 	i["screenfield_type"]								
+					select_fields = 	select_fields + 	i["pobject_code_sfd"] + ','
+				end	
+			end
+			download_columns_info = [columns_info,where_info,select_fields.chop]
+		end
+	end
 	def get_fetch_rec params
 			strsql = ""
 			mainviewflg = true  ##自分自身の登録か？
@@ -1709,14 +1745,7 @@ module RorBlkctl
 			end
 		end
 	end
-	def proc_chk_tble_exist tblname
-		case ActiveRecord::Base.configurations[Rails.env]['adapter']
-			when /post/
-				ActiveRecord::Base.connection.select_value("select relname as TABLE_NAME from pg_stat_user_tables where table_name = '#{tblname.doencase}'")  ##post
-			when /oracle/
-				ActiveRecord::Base.connection.select_value("select table_name from user_tables where table_name = '#{tblname.upcase}'")  ##oracle
-		end
-	end
+
 	def proc_blk_columns tblname
 		columns = {}
 		case ActiveRecord::Base.configurations[Rails.env]['adapter']

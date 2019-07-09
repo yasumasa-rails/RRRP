@@ -5,8 +5,12 @@ module Api
           end
           def create
             case params[:req] 
-              when 'menureq'  
-                strsql = "select * from func_get_screen_menu('#{current_api_user[:email]}')"
+              when 'menureq'
+                if Rails.env == "development" 
+                    strsql = "select * from func_get_screen_menu('#{current_api_user[:email]}')"
+                else
+                  strsql = "select * from func_get_screen_menu('#{current_api_user[:email]}') and pobject_code_sgrp <'S'"
+                end      
                 recs = ActiveRecord::Base.connection.select_all(strsql)
                 render json:  recs , status: :ok 
               when 'bottunlistreq'  
@@ -88,15 +92,18 @@ module Api
                     end  
                   end     
                   render json: {:params=>params}  
+                                
+              when 'download'
+                screenCode = params[:screenCode]
+                column_info,where_info,select_fields = RorBlkctl.create_download_columns_info screenCode,current_api_user[:email]  
+                if params[:filtered]
+                  where_str = RorBlkctl.create_filteredstr params[:filtered],where_info
+                else
+                   where_str = (where_info[:filtered]||"")
+                end    
+                pagedata,totalcnt = RorBlkctl.download_data_blk screenCode,select_fields,where_str  ### nil filtered sorting
+                render json:{:excelColumns=>column_info,:excelData=>pagedata,:totalcnt=>totalcnt}       
                   
-              when 'yup'
-                yup = YupSchema.create_schema 	
-                foo = File.open("#{Rails.root}/vendor/yup/yupschema.js", "w:UTF-8") # 書き込みモード
-                foo.puts yup[:yupschema]
-                params[:message] = " yup schema created " 
-                render json:{:params=>params}  
-              when 'yuponly'
-                render json:{:params=>params}     
             end   
           end
           def show

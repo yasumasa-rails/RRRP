@@ -36,7 +36,11 @@ const renderNonEditable = (cellInfo)=> {
   return (
     <div
       className={cellInfo.column.className}
-      dangerouslySetInnerHTML={{ __html: cellInfo.value  }}      
+      dangerouslySetInnerHTML={{ __html: cellInfo.value  }}   
+      style={{
+        //width: `${cellInfo.value?cellInfo.value.length*0.5:5}px`,
+        width: 'auto',
+      }}   
     />
   );
 }
@@ -45,7 +49,7 @@ const renderCheckbox = (cellInfo)=> {
   return (    
     <Tooltip content={cellInfo.row.gridmessage===""?"":cellInfo.row.gridmessage?
                       cellInfo.row.gridmessage[cellInfo.column.id]?cellInfo.row.gridmessage[cellInfo.column.id]:"":""}
-       tagName="span" arrowSize={7}>
+       tagName="span" arrowSize={2}>
           <input
             type="checkbox"  className="checkbox"
           />
@@ -76,6 +80,7 @@ function editableColumns(columns){
 
   return   temp   
 }   
+/*
 function noneditableColumns(columns){
   let temp =[]
   columns.map((val,index) =>{ 
@@ -83,7 +88,7 @@ function noneditableColumns(columns){
      return   temp.push(val)
     }) 
   return temp}  
- 
+ */
   
 //  let errmsgs ={}
 
@@ -123,7 +128,8 @@ class ScreenGrid extends React.Component {
            handleValite(schema,data,index,field,params)}
      /*
 */
-    let tcolumns=params.req!=="viewtablereq"?editableColumns(columns):columns   
+    //let tcolumns=params.req!=="viewtablereq"?editableColumns(columns):columns   
+    let tcolumns=editableColumns(columns)   
     //let filtered =[]
     return(
     <div>
@@ -145,11 +151,10 @@ class ScreenGrid extends React.Component {
       filterable={filterable}
       
       className="-striped -highlight" //-striped  奇数行、偶数行色分け　 -highlight：マウスがヒットした時の色の強調
-       style={buttonflg!=="export"?{
-       height: "800px" 
+      
+      style={buttonflg!=="export"?{ height: "800px" ,width:"2380px" }:{height:"200px"}}
        // This will force the table body to overflow and scroll, since there is not enough room
-       }:{height:"200px"}}
-
+      
       getTrProps={(state, rowInfo, column, instance)  => {
         return {}
       }}
@@ -250,7 +255,6 @@ const  mapStateToProps = (state) => {
             }
 }
    
-
 const mapDispatchToProps = (dispatch,ownProps ) => ({
     handleScreenParamsSet:  (params) =>{
                             dispatch(ScreenParamsSet(params))},                    

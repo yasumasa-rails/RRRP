@@ -3,15 +3,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Tab, Tabs, TabList,TabPanel , } from 'react-tabs'
 import Upload from './upload'
-import {Download} from './download'
+import Download from './download'
 import "react-tabs/style/react-tabs.css"
 import Button from '@material-ui/core/Button'
 import "../index.css"
-import {ScreenRequest,ButtonFlgRequest} from '../actions'
+import {ScreenRequest,ButtonFlgRequest,DownloadRequest,
+        YupRequest,TblfieldRequest} from '../actions'
 
 
  const  ButtonList = ({buttonListData,setButtonFlg,buttonflg,
-                        screenCode,page,sorted,params,
+                        screenCode,page,sorted,params,downloadloading,
                       //  editableflg,message
                       }) =>{
       let tmpbuttonlist = {}
@@ -33,7 +34,7 @@ import {ScreenRequest,ButtonFlgRequest} from '../actions'
                     <Tab key={index} >
                       <Button  
                       type={val[1]==='inlineedit'||'inlineadd'||'yup'?"submit":"button"}
-                      onClick ={() =>{ setButtonFlg(val[1],  // buttonCode
+                      onClick ={() =>{ setButtonFlg(val[1],  // buttonflg
                                                     //screenCode,uid,screenName,
                                                     page,sorted,params
                                                     //editableflg,
@@ -53,7 +54,11 @@ import {ScreenRequest,ButtonFlgRequest} from '../actions'
             </Tabs>
         }
         {buttonflg==='import'&&<Upload/>}
-        {buttonflg==='export'&&<Download/>}
+        {downloadloading==="done"?<Download/>:downloadloading==="doing"?<p>please wait </p>:""}
+        {params.req==="createTblViewScreen"&&params.messages.map((msg,index) =>{
+                                                return  <p key ={index}>{msg}</p>
+                                                  }
+                                               )}
         <React.Fragment> </React.Fragment>
         </div>    
       )
@@ -70,30 +75,43 @@ const  mapStateToProps = (state,ownProps) =>({
   sorted:state.screen?state.screen.sorted:[], 
   //editableflg:state.screen.editableflg,
   message:state.screen.message,
+  downloadloading:state.button.downloadloading,
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-  setButtonFlg : (buttonCode,
+  setButtonFlg : (buttonflg,
                   //editableflg,screenCode,uid,screenName,
                     page,sorted,params) =>{
-        let buttonflg = buttonCode;
-        dispatch(ButtonFlgRequest(buttonflg)) // import export 画面用
-        if(buttonCode==="inlineedit")
-          { params= { ...params, page: page, 
+        dispatch(ButtonFlgRequest(buttonflg,params)) // import export 画面用
+        switch (buttonflg) {
+          case "inlineedit":
+            params= { ...params, page: page, 
             sorted:sorted,   req:"editabletablereq"}
           //editableflg = true
-              dispatch(ScreenRequest(params)) //filterの項目は画面に出ない。filter=falseが原因？
-         }
-         if(buttonCode==="inlineadd")
-           { params= {...params,  page: page, pages:1,req:"inlineaddreq"}
+            return dispatch(ScreenRequest(params)) //
+        
+          case "inlineadd":
+            params= {...params,  page: page, pages:1,req:"inlineaddreq"}
           //  editableflg = true
-              dispatch(ScreenRequest(params)) //filterの項目は画面に出ない。filter=falseが原因？
-          }
-          if(buttonCode==="yup")
-            { params= { ...params,req:"yup"}
+             return  dispatch(ScreenRequest(params)) //
+          
+          case "export":
+              params= {...params,  req:"download"}
+            //  editableflg = true
+               return  dispatch(DownloadRequest(params)) //
+               
+          case "yup":
+             params= { ...params,req:"yup"}
            //  editableflg = false
-              dispatch(ScreenRequest(params)) //menu
-           }
+            return  dispatch(YupRequest(params)) //
+
+            case "crt_tbl_view_screen":
+               params= { ...params,req:"createTblViewScreen"}
+             //  editableflg = false
+              return  dispatch(TblfieldRequest(params)) //
+          default:
+            return 
+        }   
       } 
   })    
 

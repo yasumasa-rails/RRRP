@@ -2,8 +2,8 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Formik, ErrorMessage } from 'formik';
-import {DownloadRequest} from '../actions'
+import { Form, withFormik} from 'formik';
+import {DownloadReset} from '../actions'
 import ReactExport from "react-data-export";
 
 const ExcelFile = ReactExport.ExcelFile;
@@ -11,51 +11,52 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
 const options = { year: 'numeric', month: 'long', day: 'numeric' ,hour:'numeric',minute:'numeric',second:'numeric'};
 const wtime = (new Date()).toLocaleDateString('ja-JA', options).replace(/:/g,"-")
-const DownloadForm = ({isSubmitting,screenCode,screenName,filtered,handleSubmit,
-                       excelData,excelColumns}) => (
-    <div>
-       <p>export Table {screenName}</p>
-  <form  onSubmit={handleSubmit(screenCode,filtered)} >
-    <button type="submit" disabled={isSubmitting}>
-    export
-    </button>
-      </form>
-        {excelData&&
-             <ExcelFile filename={screenName+wtime}>
-                <ExcelSheet data={excelData} name="export">
-                   {excelColumns.map((val,index) =>{ 
-                     return (  <ExcelColumn label={val.label} value={val.vale} />)
+const formikForm = ({isSubmitting,handleSubmit,status, values}) => {
+        const {screenName,filtered,excelData,excelColumns,totalcnt} = status
+        return(                 
+        <div>
+          <Form {...values} onSubmit={handleSubmit}>
+           <p>export Table       --->{screenName}</p>
+           <p>select condition </p>
+           {filtered.length===0?<p>all data selected </p>: filtered.map((val,index) =>{
+                                                    return <p key={index}>{val.id} : {val.value}</p>
+           })}
+           <p>total record count --->{totalcnt}</p>
+               <ExcelFile filename={screenName+wtime} element={<button disabled={isSubmitting}> Data Download </button>} >
+                  <ExcelSheet data={excelData} name="export">
+                     {excelColumns.map((val,index) =>{ 
+                       let obj = JSON.parse(val)
+                      return (  <ExcelColumn label={obj.label} value={obj.value} key ={index}/>)
                     }) }
-                </ExcelSheet>
-            </ExcelFile>
-            }
-    </div>              
-  )
+                  </ExcelSheet>
+               </ExcelFile>
+          </Form>
+        </div> 
+        )             
+}
 
-
-
-const initialValues = {
-  }
-const  mapStateToProps = (state) => ({
-              screenCode:state.screen.params.screenCode,
-              screenName:state.screen.params.screenName,
-              filtered:state.screen.parms.filtered, 
-              excelData:state.button.excelData,
-              excelColumns:state.button.excelColumns
-  })
-       
-  const mapDispatchToProps = dispatch => ({
-    handleSubmit: (screenCode,filtered) => dispatch(DownloadRequest(screenCode,filtered))
+    const formikEnhancer = withFormik({
+      mapPropsToValues : (props) =>({
+        }),
+      mapPropsToStatus : (props) =>({
+        screenCode:props.button.screenCode,
+        screenName:props.button.screenName,
+        filtered:props.button.filtered?props.button.filtered:[], 
+        excelData:props.button.excelData,
+        excelColumns:props.button.excelColumns,
+        totalcnt:props.button.totalcnt,
+        }),
+      handleSubmit : (values,{props}) =>{ /*
+        let params={screenCode:values.screencode,filtered:values.filtered,req:"download"}
+        props.dispatch(DownloadRequest(params)) */
+        props.dispatch(DownloadReset()) 
+            }, 
+          }, 
+    )(formikForm)
+    
+    const mapStateToProps = (state,ownProps)  =>({  
+      button:state.button,
     })
 
-  const Container = ({onSubmit}) => (
-      <Formik 
-        initialValues={initialValues}
-        validateOnBlur={false}
-        validateOnChange={false}
-        onSubmit={onSubmit}
-        render={(props) => <DownloadForm {...props} />}
-      />
-)  
-
-export  const Download = connect(mapStateToProps,mapDispatchToProps)(Container)
+const  Download =  connect(mapStateToProps,null)(formikEnhancer)
+export  default  Download;

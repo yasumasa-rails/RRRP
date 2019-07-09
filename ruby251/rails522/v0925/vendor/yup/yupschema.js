@@ -1309,7 +1309,6 @@ export const yupschema = {
                   pobject_code_scr:Yup.string().required(),
                   pobject_code_view:Yup.string().required(),
                   screen_expiredate:Yup.date().required(),
-                  screen_grpcodename:Yup.string().required(),
                   screen_height:Yup.number(),
                   screen_rows_per_page:Yup.number(),
                   scrlv_code:Yup.string().required(),
@@ -1526,8 +1525,7 @@ export const yupschema = {
                   trngantt_amt:Yup.number(),
                   trngantt_autoord_p:Yup.number(),
                   trngantt_chilnum:Yup.number(),
-                  trngantt_co
-sumauto:Yup.string().required(),
+                  trngantt_consumauto:Yup.string().required(),
                   trngantt_duedate:Yup.date(),
                   trngantt_duration:Yup.number(),
                   trngantt_expiredate:Yup.date(),

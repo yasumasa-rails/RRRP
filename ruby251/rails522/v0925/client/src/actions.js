@@ -48,6 +48,9 @@ export const EDITUPLOAD_REQUEST = 'EDITUPLOAD_REQUEST'
 export const EDITUPLOAD_RESULT = 'EDITUPLOAD_RESULT'
 
 export const DOWNLOAD_REQUEST = 'DOWNLOAD_REQUEST'
+export const DOWNLOAD_SUCCESS = 'DOWNLOAD_SUCCESS'
+export const DOWNLOAD_FAILURE = 'DOWNLOAD_FAILURE'
+export const DOWNLOAD_RESET = 'DOWNLOAD_RESET'
 
 export const SCREEN_LINEEDIT = 'SCREEN_LINEEDIT'
 
@@ -58,6 +61,11 @@ export const FETCH_FAILURE = 'FETCH_FAILURE'
 export const INPUTFIELDPROTECT_REQUEST = ' INPUTFIELDPROTECT_REQUEST'
 
 export const YUP_RESULT = 'YUP_RESULT'
+export const YUP_REQUEST = 'YUP_REQUEST'
+export const TBLFIELD_REQUEST = 'TBLFIELD_REQUEST'
+export const TBLFIELD_SUCCESS = 'TBLFIELD_SUCCESS'
+export const TBLFIELD_FAILURE = 'TBLFIELD_FAILFURE'
+
 
 // LOGIN
 // Attach our Formik actions as meta-data to our action.
@@ -121,11 +129,23 @@ export const ScreenFailure = (errors) => ({
   errors: { errors }  //
 })
 
-export const DownloadRequest = (formPayLoad) => ({
+export const DownloadRequest = (params) => ({
   type: DOWNLOAD_REQUEST,
-  payload: { formPayLoad}
+  payload: { params}
 })
 
+export const DownloadReset = () => ({
+  type: DOWNLOAD_RESET,
+  payload: { }
+})
+
+
+/*
+export const DownloadSuccess = (response) => ({
+  type: DOWNLOAD_SUCCESS,
+  payload: {response}
+})
+*/
 
 export const ButtonListRequest = (token,client,uid) => ({
   type:  BUTTONLIST_REQUEST,
@@ -141,9 +161,9 @@ export const ButtonListFailure = (error) => ({
 })
 
 
-export const ButtonFlgRequest = (buttonflg) => ({
+export const ButtonFlgRequest = (buttonflg,params) => ({
   type: BUTTONFLG_REQUEST,
-  payload: { buttonflg}
+  payload: { buttonflg,params}
 })
 
 export const ChangeUploadableRequest = (isUpload) => ({
@@ -230,3 +250,13 @@ export const FetchFailure = (data,columns) => ({
   payload: { data,columns}
 })
 
+
+export const YupRequest = (params) => ({
+  type:  YUP_REQUEST,
+  payload: { params}  //
+})
+
+export const TblfieldRequest = (params) => ({
+  type:  TBLFIELD_REQUEST,
+  payload: { params}  //
+})

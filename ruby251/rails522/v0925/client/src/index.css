@@ -148,7 +148,7 @@ label {
 }
 
 button {
-  max-width: 80px;
+  max-width: 800px;
   max-height: 30px;
   margin: 5px 0;
   padding: 12px 10px;
@@ -216,4 +216,18 @@ button.outline {
   min-width: 100px;
   background: #333;
   color: red;
+}
+
+/* 表の縦線がfilterと表の明細とで異なることへの対応*/
+.rt-thead{
+  width:3000px;
+}
+
+.rt-tbody{
+  width:3020px;
+}
+
+/* 下記のwidth以外では prev nectボタンがコントロールできない。*/
+.-pagination{
+  width:750px
 }

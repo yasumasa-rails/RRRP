@@ -12,7 +12,7 @@ export function * ScreenErrCheckSaga ({payload: {schema,data,index,field,params}
   let dataIndex =   data[index]
   if(dataIndex.gridmessage===""||dataIndex.gridmessage===null||dataIndex.gridmessage===undefined)
     {dataIndex.gridmessage={}} 
-  const { response, err } = yield call( validateApi,{schema,data,index})
+  const { err } = yield call( validateApi,{schema,data,index})
   switch(field) {
     case "confirm"  :  //1行すべてのチェック
       if(err){
