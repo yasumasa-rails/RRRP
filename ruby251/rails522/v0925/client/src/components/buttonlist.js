@@ -12,8 +12,8 @@ import {ScreenRequest,ButtonFlgRequest,DownloadRequest,
 
 
  const  ButtonList = ({buttonListData,setButtonFlg,buttonflg,
-                        screenCode,page,sorted,params,downloadloading,
-                      //  editableflg,message
+                        screenCode,page,sorted,params,downloadloading,disabled,
+                        message,messages //  editableflg,message
                       }) =>{
       let tmpbuttonlist = {}
       if(buttonListData){
@@ -33,6 +33,7 @@ import {ScreenRequest,ButtonFlgRequest,DownloadRequest,
                   {tmpbuttonlist[screenCode].map((val,index) => 
                     <Tab key={index} >
                       <Button  
+                      disabled={disabled}
                       type={val[1]==='inlineedit'||'inlineadd'||'yup'?"submit":"button"}
                       onClick ={() =>{ setButtonFlg(val[1],  // buttonflg
                                                     //screenCode,uid,screenName,
@@ -59,6 +60,10 @@ import {ScreenRequest,ButtonFlgRequest,DownloadRequest,
                                                 return  <p key ={index}>{msg}</p>
                                                   }
                                                )}
+        <p>{message}</p>
+        {messages&&messages.map((val,index) => 
+                     <p key={index} > {val}</p>
+                    )}
         <React.Fragment> </React.Fragment>
         </div>    
       )
@@ -74,8 +79,10 @@ const  mapStateToProps = (state,ownProps) =>({
   page:state.screen?state.screen.page:0,
   sorted:state.screen?state.screen.sorted:[], 
   //editableflg:state.screen.editableflg,
-  message:state.screen.message,
+  message:state.button.messages,
+  messages:state.button.message,
   downloadloading:state.button.downloadloading,
+  disabled:state.button.disabled?true:false,
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
@@ -106,7 +113,7 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
             return  dispatch(YupRequest(params)) //
 
             case "crt_tbl_view_screen":
-               params= { ...params,req:"createTblViewScreen"}
+               params= {req:"createTblViewScreen",screenCode:params.screenCode}
              //  editableflg = false
               return  dispatch(TblfieldRequest(params)) //
           default:

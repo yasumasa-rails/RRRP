@@ -260,3 +260,9 @@ export const TblfieldRequest = (params) => ({
   type:  TBLFIELD_REQUEST,
   payload: { params}  //
 })
+
+
+export const TblfielSuccess = (messages) => ({
+  type:  TBLFIELD_SUCCESS,
+  payload: { messages}  //
+})

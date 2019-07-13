@@ -12,12 +12,14 @@ module Api
                 params[:message] = " yup schema created " 
                 render json:{:params=>params} 
               when 'createTblViewScreen'  ### blktbs tblfields 
-	            	@messages =[]
-		            @modifysql = ""
-                TblField.blktbs params	
-                foo = File.open("#{Rails.root}/vendor/postgesql/tblviewupdate#{(Time.now).strftime("%Y/%m/%d%H%M")}.sql", "w:UTF-8") # 書き込みモード
-                foo.puts @modifysql
-                params[:messages] = 	@messages 
+                messages,modifysql = TblField.blktbs params,current_api_user
+                foo = File.open("#{Rails.root}/vendor/postgresql/tblviewupdate#{(Time.now).strftime("%Y%m%d%H%M%S")}.sql", "w:UTF-8") # 書き込みモード
+                foo.puts modifysql
+                foo.close
+                foo = File.open("#{Rails.root}/vendor/postgresql/messages#{(Time.now).strftime("%Y%m%d%H%M%S")}.sql", "w:UTF-8") # 書き込みモード
+                foo.puts messages
+                foo.close
+                params[:messages] = 	messages 
                 render json:{:params=>params}  
             end 
           end

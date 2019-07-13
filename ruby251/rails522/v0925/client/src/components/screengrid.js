@@ -20,6 +20,9 @@ const renderEditable = (cellInfo )=> {
    // <Tooltip content={cellInfo.row.gridmessage[cellInfo.column.id]?cellInfo.row.gridmessage[cellInfo.column.id]:""}
     <Tooltip content={cellInfo.row.gridmessage===""?"":cellInfo.row.gridmessage?
                       cellInfo.row.gridmessage[cellInfo.column.id]?cellInfo.row.gridmessage[cellInfo.column.id]:"":""}
+                      type={cellInfo.row.gridmessage===""?"":cellInfo.row.gridmessage?
+                      cellInfo.row.gridmessage[cellInfo.column.id]?"error":"":""}
+                      border={true} 
        tagName="span" arrowSize={5}>
     <div
       className={cellInfo.column.className}

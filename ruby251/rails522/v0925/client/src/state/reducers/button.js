@@ -1,5 +1,6 @@
 import {  BUTTONLIST_REQUEST, BUTTONLIST_SUCCESS, BUTTONFLG_REQUEST,
           DOWNLOAD_REQUEST,DOWNLOAD_SUCCESS,DOWNLOAD_RESET,
+          TBLFIELD_SUCCESS,SCREEN_SUCCESS,
           LOGOUT_REQUEST} from 'actions'
 const initialValues = {
   errors:[],
@@ -14,15 +15,22 @@ const buttonreducer =  (state= initialValues , actions) =>{
         buttonflg:actions.payload.buttonflg, 
         screenCode:actions.payload.params.screenCode,
         screenName:actions.payload.params.screenName,
-        filtered:actions.payload.params.filtered,     
+        filtered:actions.payload.params.filtered,  
+        disabled:true,  
+        messages:null,
+        message:null, 
       }
     
     case BUTTONLIST_REQUEST:
-      return {...state}
+      return {...state,
+        disabled:true,
+        messages:null,
+        message:null,}
 
     case BUTTONLIST_SUCCESS:
       return {...state,
       buttonListData:actions.payload,
+      disabled:false,
      }
 
     case DOWNLOAD_REQUEST:
@@ -32,6 +40,9 @@ const buttonreducer =  (state= initialValues , actions) =>{
         totalcnt:null,
         params:actions.payload.params,
         downloadloading:"doing",
+        disabled:true,
+        messages:null,
+        message:null,
      }
     case DOWNLOAD_SUCCESS:
      return {...state,
@@ -39,6 +50,7 @@ const buttonreducer =  (state= initialValues , actions) =>{
       excelColumns:actions.payload.data.excelColumns,
       totalcnt:actions.payload.data.totalcnt,
       downloadloading:"done",
+      disabled:false,
    }
    case DOWNLOAD_RESET:
     return {...state,
@@ -47,7 +59,21 @@ const buttonreducer =  (state= initialValues , actions) =>{
       totalcnt:null,
       buttonflg:null,
       downloadloading:"",
+      disabled:false,
   }
+  case TBLFIELD_SUCCESS:
+   return {...state,
+    messages:actions.payload.messages,
+    message:actions.payload.message,
+    disabled:false,
+ }
+
+ case SCREEN_SUCCESS:
+  return {...state,
+   disabled:false,
+   messages:null,
+   message:null,
+}
 
     case  LOGOUT_REQUEST:
     return {}  

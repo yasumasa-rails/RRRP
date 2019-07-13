@@ -1,0 +1,47 @@
+Arguments: 
+  /usr/bin/node /home/ky/.yarn/bin/yarn.js add es_lint
+
+PATH: 
+  /home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/ky/.rbenv/shims:/home/ky/.rbenv/bin:/home/ky/bin:/home/ky/.local/bin:/home/ky/.yarn/bin:/home/ky/.config/yarn/global/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/mnt/c/Program Files/WindowsApps/CanonicalGroupLimited.UbuntuonWindows_1804.2019.521.0_x64__79rhkp1fndgsc:/mnt/c/oraclexe/app/oracle/product/11.2.0/server/bin:/mnt/c/Windows/System32:/mnt/c/Windows:/mnt/c/Windows/System32/wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0:/mnt/c/Program Files/Git/cmd:/mnt/c/PostgreSQL/pg96/bin:/mnt/c/Program Files/Microsoft VS Code/bin:/mnt/c/Windows/System32/OpenSSH:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Users/yasum/AppData/Local/Microsoft/WindowsApps:/snap/bin
+
+Yarn version: 
+  1.16.0
+
+Node version: 
+  10.15.0
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/es_lint: Not found
+      at Request.params.callback [as _callback] (/home/ky/.yarn/lib/cli.js:66091:18)
+      at Request.self.callback (/home/ky/.yarn/lib/cli.js:129590:22)
+      at Request.emit (events.js:182:13)
+      at Request.<anonymous> (/home/ky/.yarn/lib/cli.js:130562:10)
+      at Request.emit (events.js:182:13)
+      at IncomingMessage.<anonymous> (/home/ky/.yarn/lib/cli.js:130484:12)
+      at Object.onceWrapper (events.js:273:13)
+      at IncomingMessage.emit (events.js:187:15)
+      at endReadableNT (_stream_readable.js:1094:12)
+      at process._tickCallback (internal/process/next_tick.js:63:19)
+
+npm manifest: 
+  {
+    "name": "create-repack-app",
+    "version": "1.0.0",
+    "scripts": {
+      "build": "cd client && npm install --only=dev && npm install && npm run build && cd ..",
+      "deploy": "cp -a client/build/. public/",
+      "heroku-postbuild": "npm run build && npm run deploy && echo 'Client Built'"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

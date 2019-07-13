@@ -851,7 +851,7 @@ CREATE TABLE TBLFIELDS
    )
   ;
 
-CREATE  SEQUENCE   TBLFIELDS_seq INCREMENT BY 1 START WITH 10000 
+CREATE  SEQUENCE   TBLFIELDS_seq INCREMENT BY 1 START WITH 100000 
 ;
 
   CREATE
@@ -1595,10 +1595,8 @@ OR REPLACE  VIEW R_USEBUTTONS (
   , SCREEN_CDRFLAYOUT_UB
   , SCREEN_YMLCODE_UB
   , SCREEN_ID_UB
-  , SCREEN_POBJECT_ID_SCR_UB
   , POBJECT_CODE_SCR_UB
   , POBJECT_OBJECTTYPE_SCR_UB
-  , POBJECT_ID_SCR_UB
   , POBJECT_CONTENTS_SCR_UB
   , SCREEN_CONTENTS_UB
   , SCREEN_SCRLV_ID_UB
@@ -1646,10 +1644,8 @@ select
   , screen_ub.screen_cdrflayout screen_cdrflayout_ub
   , screen_ub.screen_ymlcode screen_ymlcode_ub
   , screen_ub.screen_id screen_id_ub
-  , screen_ub.screen_pobject_id_scr screen_pobject_id_scr_ub
   , screen_ub.pobject_code_scr pobject_code_scr_ub
   , screen_ub.pobject_objecttype_scr pobject_objecttype_scr_ub
-  , screen_ub.pobject_id_scr pobject_id_scr_ub
   , screen_ub.pobject_contents_scr pobject_contents_scr_ub
   , screen_ub.screen_contents screen_contents_ub
   , screen_ub.screen_scrlv_id screen_scrlv_id_ub

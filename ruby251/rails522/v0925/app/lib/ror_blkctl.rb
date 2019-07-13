@@ -141,69 +141,69 @@ module RorBlkctl
         return proc_get_nextval(parescreen_cnt_usercode)
     end
   def proc_update_table command_r,r_cnt0  ##rec = command_c command_rとの混乱を避けるためrecにした。
-      begin
-        tmp_key = {}
-				tblname = command_r[:sio_viewname].split("_")[1]
-        if  command_r[:sio_message_contents].nil?
-						command_r = proc_set_src_tbl(command_r) ### @src_tblの項目作成
-						command_r["person_id_upd"] =  @sio_user_code
-						if command_r[:sio_classname] =~ /_add_|_edit_|_delete_/ and tblname !~ /tblink/  ## rec = command_c = sio_xxxxx
-							proc_command_before_instance_variable(command_r)
-							proc_tblinks(command_r) do
-								"before"
-							end
-						end
-						command_r[:sio_recordcount] = r_cnt0
-						if tblname =~ /^mk/ and @screen_code !~ /#{tblname}/  ###mkxxxxは追加のみ
-							proc_tbl_add_arel(tblname,@src_tbl)
-						else
-							case command_r[:sio_classname]
-							when /_add_/
-								proc_tbl_add_arel(tblname,@src_tbl)
-							when /_edit_/
-								##@src_tbl[:where] = {:id => @src_tbl[:id]}             ##変更分のみ更新
-								proc_tbl_edit_arel(tblname,@src_tbl," id = #{@src_tbl[:id]}")
-							when  /_delete_/
-								if tblname =~ /schs$|ords$|insts$|acts$/  ##alloctblにかかわるtrnは削除なし
-									@src_tbl[:qty] = 0 if @src_tbl[:qty]
-									@src_tbl[:qty_stk] = 0 if @src_tbl[:qty_stk]
-									@src_tbl[:amt] = 0 if @src_tbl[:amt]
-									@src_tbl[:tax] = 0 if @src_tbl[:tax]      ##変更分のみ更新
-									proc_tbl_edit_arel(tblname,@src_tbl," id = #{@src_tbl[:id]}")
-								else
-									proc_tbl_delete_arel(tblname," id = #{@src_tbl[:id]}")
-								end
-							end ### blkukyの時は　constrainも削除
-						end
-				else
-					Rails.logger.debug "command_r = '#{command_r}'"
-					raise
-				end   ## case iud
+      	begin
+         	tmp_key = {}
+			tblname = command_r[:sio_viewname].split("_")[1]
+        	if  command_r[:sio_message_contents].nil?
+				command_r = proc_set_src_tbl(command_r) ### @src_tblの項目作成
+				command_r["person_id_upd"] =  @sio_user_code
 				if command_r[:sio_classname] =~ /_add_|_edit_|_delete_/ and tblname !~ /tblink/  ## rec = command_c = sio_xxxxx
-					proc_command_after_instance_variable(command_r)
+					proc_command_before_instance_variable(command_r)
 					proc_tblinks(command_r) do
-						"after"
-					end
+						"before"
 				end
-      rescue
-          ActiveRecord::Base.connection.rollback_db_transaction()
-          @sio_result_f = command_r[:sio_result_f] =   "9"  ##9:error
-          command_r[:sio_message_contents] =  "class #{self} : LINE #{__LINE__} $!: #{$!} "    ###evar not defined
-          command_r[:sio_errline] =  "class #{self} : LINE #{__LINE__} $@: #{$@} "[0..3999]
-          Rails.logger.debug"error class #{self} : #{Time.now}: #{$@} "
-          Rails.logger.debug"error class #{self} : $!: #{$!} "
-          Rails.logger.debug"  command_r: #{command_r} "
-      else
-          @sio_result_f = command_r[:sio_result_f] =  "1"   ## 1 normal end
-          command_r[:sio_message_contents] = nil
-          command_r[(tblname.chop + "_id")] =  command_r["id"] = @src_tbl[:id]
+			end
+			command_r[:sio_recordcount] = r_cnt0
+			if tblname =~ /^mk/ and @screen_code !~ /#{tblname}/  ###mkxxxxは追加のみ
+				proc_tbl_add_arel(tblname,@src_tbl)
+			else
+				case command_r[:sio_classname]
+				when /_add_/
+					proc_tbl_add_arel(tblname,@src_tbl)
+				when /_edit_/
+					##@src_tbl[:where] = {:id => @src_tbl[:id]}             ##変更分のみ更新
+					proc_tbl_edit_arel(tblname,@src_tbl," id = #{@src_tbl[:id]}")
+				when  /_delete_/
+					if tblname =~ /schs$|ords$|insts$|acts$/  ##alloctblにかかわるtrnは削除なし
+						@src_tbl[:qty] = 0 if @src_tbl[:qty]
+						@src_tbl[:qty_stk] = 0 if @src_tbl[:qty_stk]
+						@src_tbl[:amt] = 0 if @src_tbl[:amt]
+						@src_tbl[:tax] = 0 if @src_tbl[:tax]      ##変更分のみ更新
+						proc_tbl_edit_arel(tblname,@src_tbl," id = #{@src_tbl[:id]}")
+					else
+						proc_tbl_delete_arel(tblname," id = #{@src_tbl[:id]}")
+					end
+				end ### blkukyの時は　constrainも削除
+			end
+		else
+			Rails.logger.debug "command_r = '#{command_r}'"
+			raise
+		end   ## case iud
+		if command_r[:sio_classname] =~ /_add_|_edit_|_delete_/ and tblname !~ /tblink/  ## rec = command_c = sio_xxxxx
+			proc_command_after_instance_variable(command_r)
+			proc_tblinks(command_r) do
+						"after"
+			end
+		end
+      	rescue
+        	ActiveRecord::Base.connection.rollback_db_transaction()
+            @sio_result_f = command_r[:sio_result_f] =   "9"  ##9:error
+            command_r[:sio_message_contents] =  "class #{self} : LINE #{__LINE__} $!: #{$!} "    ###evar not defined
+            command_r[:sio_errline] =  "class #{self} : LINE #{__LINE__} $@: #{$@} "[0..3999]
+            Rails.logger.debug"error class #{self} : #{Time.now}: #{$@} "
+          	Rails.logger.debug"error class #{self} : $!: #{$!} "
+          	Rails.logger.debug"  command_r: #{command_r} "
+      	else
+        	@sio_result_f = command_r[:sio_result_f] =  "1"   ## 1 normal end
+          	command_r[:sio_message_contents] = nil
+          	command_r[(tblname.chop + "_id")] =  command_r["id"] = @src_tbl[:id]
 					proc_delayjob_or_optiontbl(tblname,command_r["id"]) ###  if vproc_optiontabl(tblname)
 					##crt_def_all if tblname =~ /rubycodings|tblink/
             ##crt_def_tb if  tblname == "blktbs"
-      ensure
+      	ensure
             proc_insert_sio_r( command_r) #### if @pare_class != "batch"    ## 結果のsio書き込み
-	  end ##begin
-	  return command_r
+	  	end ##begin
+	  	return command_r
 	end
 	##def vproc_optiontabl tblname
 	##	if tblname =~ /rplies$|mksch|mkords|results$/ then true else false end  ###mkinsts,mkactsは使用してない　12/9
@@ -1554,12 +1554,12 @@ module RorBlkctl
 			###  1 (params == String ,command_c=float or integer
     end
 	def init_from_screen current_user,params  ###
-		@sio_user_code = ActiveRecord::Base.connection.select_value("select id from persons where email = '#{params[:uid]}'")
+		@sio_user_code = ActiveRecord::Base.connection.select_value("select id from persons where email = '#{current_user[:email]}'")
 		command_c = {}
-		command_c[:sio_user_code] = @sio_user_code  ###########   LOGIN USER
-		command_c[:sio_email] = current_user[:email]
-	 	command_c[:sio_code]  = params[:screenCode]
-		command_c[:sio_params] = params.to_json.to_s[0..3999]
+		#command_c[:sio_user_code] = @sio_user_code  ###########   LOGIN USER
+		#command_c[:sio_email] = current_user[:email]
+	 	#command_c[:sio_code]  = params[:screenCode]
+		#command_c[:sio_params] = params.to_json.to_s[0..3999]
 		return command_c
 	end
 	
@@ -1928,7 +1928,6 @@ module RorBlkctl
 						when "Hash"
 							"'#{val.to_query}',"
 						else
-							debugger
 							Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
 						end
 		end

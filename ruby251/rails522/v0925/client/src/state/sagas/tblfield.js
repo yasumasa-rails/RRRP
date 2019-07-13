@@ -29,14 +29,17 @@ export function* TblfieldSaga({ payload: {params}  }) {
   let client = loginState.auth.client         
   let uid = loginState.auth.uid    
   const screenState = yield select(getScreenState) //
-  params["data"] = screenState.data
+  let data =[]
+  screenState.data.map((val,index) =>{ 
+    return data.push({pobject_code_tbl:val.pobject_code_tbl})})
+  params["data"] = data
   let response  = yield call(screenApi,{params ,token,client,uid} )
   if(response){
       switch(params.req) {
         case "yup":  // create yup schema
               return yield put({ type: TBLFIELD_SUCCESS, payload: {message:response.data.params.message} })   
         case "createTblViewScreen":  // create  or add field table and create or replacr view  and create screen
-              return yield put({ type: TBLFIELD_SUCCESS, payload: {message:response.data.params.message} })     
+              return yield put({ type: TBLFIELD_SUCCESS, payload: {messages:response.data.params.messages} })     
         default:
           return {}
       }
