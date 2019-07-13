@@ -9256,7 +9256,7 @@ redux-form@7.4.2:
     invariant "^2.2.4"
     is-promise "^2.1.0"
     lodash "^4.17.10"
-    lodash-es "^4.17.10"
+    lodash-es "^4.17.14"
     prop-types "^15.6.1"
     react-lifecycles-compat "^3.0.4"
 
@@ -9267,7 +9267,7 @@ redux-persist@^4.6.0:
   dependencies:
     json-stringify-safe "^5.0.1"
     lodash "^4.17.4"
-    lodash-es "^4.17.4"
+    lodash-es "^4.17.14"
 
 redux@^3.4.0, redux@^3.6.0:
   version "3.7.2"
@@ -9275,7 +9275,7 @@ redux@^3.4.0, redux@^3.6.0:
   integrity sha512-pNqnf9q1hI5HHZRBkj3bAngGZW/JMCmexDlOxw4XagXY2o1327nHH54LoTjiPJ0gizoqPDRqWyX/00g0hD6w+A==
   dependencies:
     lodash "^4.2.1"
-    lodash-es "^4.2.1"
+    lodash-es "^4.17.14"
     loose-envify "^1.1.0"
     symbol-observable "^1.0.3"
 
