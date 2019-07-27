@@ -16,14 +16,11 @@ extend self
             str = "Yup."
             case rec["screenfield_type"] 
             when "timestamp", "timestamp(6)","date"
-                str<< %Q%date()%
+                str<< %Q%date().min('1900/01/01').max('2100/01/01')%
             when "varchar", "textarea","char"
                 str<< %Q%string()%
-                if rec["screenfield_minvalue"].to_i > 0
-                    tr<< %Q%.min(#{rec["screenfield_minvalue"].to_i})%
-                end    
                 if rec["screenfield_maxvalue"].to_i > 0
-                    str<< %Q%.max(#{rec["screenfield_maxvalue"].to_i})%
+                    str<< %Q%.max(#{rec["screenfield_edoptmaxlength"].to_i})%
                 end   
             when "select"
                 str<< %Q%string()%
@@ -47,7 +44,7 @@ extend self
     end 
     def create_yupfetchcode screencode       
         yupfetchcode ={}
-        ActiveRecord::Base.connection.select_all(strsql(screencode)).each do |rec|   
+        ActiveRecord::Base.connection.select_all(fetchcodesql(screencode)).each do |rec|   
             if rec["screenfield_paragraph"]  
                 yupfetchcode[rec["pobject_code_sfd"]] = rec["screenfield_paragraph"]
             end    
@@ -68,4 +65,10 @@ extend self
                     screenfield_minvalue,screenfield_formatter,screenfield_paragraph,pobject_code_scr
                     order by 	pobject_code_scr,pobject_code_sfd%
     end    
+    def fetchcodesql screencode
+         %Q%select pobject_code_sfd,screenfield_paragraph
+                    from r_screenfields
+                    where trim(screenfield_paragraph) is not null
+                    #{if screencode then " and pobject_code_scr = '#{screencode}' " else "" end }%
+    end  
 end

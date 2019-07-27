@@ -97,6 +97,13 @@ const  mapStateToProps = (state,ownProps) =>({
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
       getScreen : (screenCode,pageSize, page,sorted,screenName, uid,sizePerPageList,params) =>{
+        if(params){}else{params={}}
+        params["filtered"]=[] 
+        if(params["dropdownselect"]){}else{params["dropdownselect"]={}}
+        Object.keys(params["dropdownselect"]).map((sel)=>{
+              params["filtered"].push({id:sel,value:params["dropdownselect"][sel]})
+              return params["filtered"] }
+             ) 
         params= { ...params, page: page, pageSize : pageSize,sizePerPageList:sizePerPageList,
                         sorted:sorted,   screenName:  screenName,
                          screenCode:screenCode,uid:uid,req:"viewtablereq",filtered:params?params.filtered:[]} 

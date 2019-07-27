@@ -1,3 +1,4 @@
+/*
 body {
   margin: 0;
   padding: 0;
@@ -12,10 +13,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
-
+*/
 
 .app {
-  margin: 2rem;
+  margin: 1rem;
 }
 
 a {
@@ -23,28 +24,26 @@ a {
 }
 
 .renderEditable {
-  padding: 1px 1px;
+  padding: 0.5px 0.5px;
   font-size: 16px;
-  width:auto;
   display: block;
   border-radius: 0.5px;
-  border: 0.5px solid #ccc;
   background-color:  rgb(200, 220, 245);
 }
+
 
 .renderEditableRequired {
   padding: 1px 1px;
   font-size: 16px;
-  width:auto;
   display: block;
   border-radius: 0.5px;
-  border: 0.5px solid rgb(89, 139, 245);
+  border: 0.5px solid rgb(120, 160, 247);
   background-color:  rgb(125, 177, 245);
 }
 
 
 .renderEditableError {
-  border: px solid #ccc;
+  border: 0.5px solid #ccc;
   background-color:  rgb(243, 24, 35);
 }
 
@@ -63,52 +62,68 @@ a {
   background-color:  rgb(107, 245, 148);
 }
 
-
-.renderNonEditableSelect {
-  padding: 1px 1px;
+/* 表示の時のcss*/
+.renderNonEditable {
+  padding: 0.5px 0.5px;
   font-size: 16px;
-  width:auto;
   display: block;
   border-radius: 0.5px;
-  border: 0.5px solid #ccc;
-  background-color:  rgb(107, 245, 148);
+  color:  rgb(0, 0, 0);
 }
 
-
-
+.renderNonEditableSelect {
+  padding: 0.1px 0.1px;
+  font-size: 12px;
+  display: block;
+  border-radius: 0.1px;
+  border: 0.1px solid rgb(238, 248, 239);
+  background-color:  rgb(107, 245, 148);
+}
 
 .oddclass {
   background-color:  rgb(211, 224, 240);
 }
-
 
 .evenclass {
   background-color:  rgb(240, 217, 175);
 }
 
 .setInputMarkClass {
-  width: 100%;
   border: 3px solid #0def;
   background-color: #5F81f5;
 }
 
 
-.ReactTable .rt-th, .ReactTable .rt-td {
-  width: 80%;
-  padding: 1px 1px;
-  border-radius: 1px;
-  border: 1px solid #ccc;
+.ReactTable .rt-th,  .rt-td {
+  padding: 0.5px 0.5px;
+  border-radius: 0.5px;
+  border: 1.1px solid #ccc;
+  overflow:hidden;
+  color:  rgb(0, 0, 0);
 }
+.rt-td {
+  height: 33px;  /*テーブルの文字の表示の高さ */
+}
+.rt-th {
+  overflow:hidden; 
+}
+
+/* 表の縦線がfilterと表の明細とで異なることへの対応*/
+/*
+.rt-thead{
+  width:3000px;
+}
+.rt-tbody{
+  width:3020px;
+}
+*/
+
 
 .-header{
   height: 30px;
   background-color: rgb(189, 189, 189);
 }
 
-.rt-td {
-  width: auto;
-  height: 30px;  /*テーブルの文字の表示の高さ */
-}
 
 input.checkbox {
 	-webkit-appearance: checkbox;
@@ -117,12 +132,39 @@ input.checkbox {
 
 input {
   padding: .5rem;
-  font-size: 10px;
-  width: 30%;
+  font-size: 16px;
   display: block;
   border-radius: 4px;
   border: 1px solid #ccc;
   background-color: "#0fffff";  
+}
+
+
+/*
+.renderSelect {
+  background-color:  rgb(200, 220, 245);
+}
+*/
+/* 表示の時のcss*/
+.renderSelectNonEditable { 
+	height: 2em;
+  font-size: 16px;
+	padding: 0.1rem;
+	border-top: 0.1px solid #666666;
+}
+.renderSelectEditable{
+	height: 2em;
+  font-size: 16px;
+	padding: 0.1rem;
+	border-top: 0.1px solid #666666;
+  background-color:  rgb(160, 199, 247);
+}
+
+select{
+	height: 1.8em;
+  font-size: 16px;
+	padding: 0.1rem;
+	border-top: 0.1px solid #666666;
 }
 
 input:focus {
@@ -205,7 +247,7 @@ button.outline {
 .react-tabs--selected_custom_footer {
   min-width: 64px;
   line-height: 32px;
-  border-radius: 4px;
+  border-radius: 1px;
   border: none;
   padding: 0 8px;
   color: #fff;
@@ -218,14 +260,6 @@ button.outline {
   color: red;
 }
 
-/* 表の縦線がfilterと表の明細とで異なることへの対応*/
-.rt-thead{
-  width:3000px;
-}
-
-.rt-tbody{
-  width:3020px;
-}
 
 /* 下記のwidth以外では prev nectボタンがコントロールできない。*/
 .-pagination{

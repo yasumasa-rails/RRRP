@@ -42,30 +42,29 @@ export function* ScreenSaga({ payload: {params}  }) {
             response.data["params"] = params
             return yield put({ type: SCREEN_SUCCESS, action: response })    
         case "updateGridLineData":
-          screenState.data[params.index]["id"] = response.data.params.addId
-          screenState.data[params.index]["gridmessage"] = response.data.params.addId
+          //screenState.data[params.index]["id"] = response.data.params.addId
+          //screenState.data[params.index]["gridmessage"] = response.data.params.railsUpdateResult
+          screenState.data[params.index] = response.data.params
           return yield put({ type: SCREEN_LINEEDIT, payload:{data:screenState.data} })    
         case "fetch_request":
+            let tmp =  response.data.params.fetchdata
             if(screenState.data[params.index].gridmessage===""||screenState.data[params.index].gridmessage===null||screenState.data[params.index].gridmessage===undefined)
                     {screenState.data[params.index].gridmessage={}}
             if(response.data.params.err){
-              response.data.params.keys.map((key)=>{
-                 Object.keys(screenState.data[params.index]).map((idx)=>
-                    {if(idx.split("_")[0] === key.split("_")[0]){
-                          screenState.data[params.index][key]= ""
-                          screenState.data[params.index]["gridmessage"][key] = response.data.params.err}
-                          return screenState.data})
-                 if(key.match(/_code/)&&params.screenCode.split("_")[1].slice(0,-1)!==key.split("_")[0]){
-                   screenState.data[params.index][params.screenCode.split("_")[1].slice(0,-1)+"_"+key.replace("code","id")]= ""}
-               return screenState.data
-               })
+                Object.keys(tmp).map((idx)=>{
+                  screenState.data[params.index][idx]= tmp[idx]
+                return screenState.data
+                })
+                response.data.params.keys.map((idx)=>{
+                  screenState.data[params.index].gridmessage[idx] = response.data.params.err
+                return screenState.data
+                })
               return yield put({ type: FETCH_FAILURE, payload: {data:screenState.data} })   
             }
             else{
-              let tmp =  response.data.params.fetchdata
-               Object.keys(tmp).map((key)=>{
-                  screenState.data[params.index][key]= response.data.params.fetchdata[key]
-                  screenState.data[params.index].gridmessage[key] = ""
+               Object.keys(tmp).map((idx)=>{
+                  screenState.data[params.index][idx]= tmp[idx]
+                  screenState.data[params.index].gridmessage[idx] = ""
                 return screenState.data
                 })
                return yield put({ type: FETCH_RESULT, payload: {data:screenState.data} })   

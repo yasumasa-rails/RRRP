@@ -997,7 +997,6 @@ OR REPLACE  VIEW R_SCREENFIELDS (
   SCREENFIELD_POBJECT_ID_SFD
   , POBJECT_CODE_SFD
   , POBJECT_OBJECTTYPE_SFD
-  , POBJECT_ID_SFD
   , POBJECT_CONTENTS_SFD
   , SCREENFIELD_EXPIREDATE
   , SCREENFIELD_UPDATED_AT
@@ -1030,7 +1029,6 @@ OR REPLACE  VIEW R_SCREENFIELDS (
   , SCREENFIELD_ID
   , SCREENFIELD_FORMATTER
   , SCREENFIELD_PERSON_ID_UPD
-  , PERSON_ID_UPD
   , PERSON_CODE_UPD
   , PERSON_NAME_UPD
   , SCREENFIELD_CONTENTS
@@ -1039,25 +1037,18 @@ OR REPLACE  VIEW R_SCREENFIELDS (
   , SCREEN_ROWS_PER_PAGE
   , SCREEN_ROWLIST
   , SCREEN_HEIGHT
-  , SCREEN_POBJECT_ID_VIEW
   , POBJECT_CODE_VIEW
   , POBJECT_OBJECTTYPE_VIEW
-  , POBJECT_ID_VIEW
   , POBJECT_CONTENTS_VIEW
   , SCREEN_FORM_PS
   , SCREEN_STRSELECT
   , SCREEN_CDRFLAYOUT
   , SCREEN_YMLCODE
-  , SCREEN_ID
-  , SCREEN_POBJECT_ID_SCR
   , POBJECT_CODE_SCR
   , POBJECT_OBJECTTYPE_SCR
-  , POBJECT_ID_SCR
   , POBJECT_CONTENTS_SCR
   , SCREEN_CONTENTS
-  , SCREEN_SCRLV_ID
   , SCRLV_LEVEL1
-  , SCRLV_ID
   , SCRLV_CODE
   , SCREENFIELD_TBLFIELD_ID
   , TBLFIELD_CONTENTS
@@ -1067,7 +1058,6 @@ select
   screenfield.pobjects_id_sfd screenfield_pobject_id_sfd
   , pobject_sfd.pobject_code pobject_code_sfd
   , pobject_sfd.pobject_objecttype pobject_objecttype_sfd
-  , pobject_sfd.pobject_id pobject_id_sfd
   , pobject_sfd.pobject_contents pobject_contents_sfd
   , screenfield.expiredate screenfield_expiredate
   , screenfield.updated_at screenfield_updated_at
@@ -1100,7 +1090,6 @@ select
   , screenfield.id screenfield_id
   , screenfield.formatter screenfield_formatter
   , screenfield.persons_id_upd screenfield_person_id_upd
-  , person_upd.person_id_upd person_id_upd
   , person_upd.person_code_upd person_code_upd
   , person_upd.person_name_upd person_name_upd
   , screenfield.contents screenfield_contents
@@ -1109,25 +1098,18 @@ select
   , screen.screen_rows_per_page screen_rows_per_page
   , screen.screen_rowlist screen_rowlist
   , screen.screen_height screen_height
-  , screen.screen_pobject_id_view screen_pobject_id_view
   , screen.pobject_code_view pobject_code_view
   , screen.pobject_objecttype_view pobject_objecttype_view
-  , screen.pobject_id_view pobject_id_view
   , screen.pobject_contents_view pobject_contents_view
   , screen.screen_form_ps screen_form_ps
   , screen.screen_strselect screen_strselect
   , screen.screen_cdrflayout screen_cdrflayout
   , screen.screen_ymlcode screen_ymlcode
-  , screen.screen_id screen_id
-  , screen.screen_pobject_id_scr screen_pobject_id_scr
   , screen.pobject_code_scr pobject_code_scr
   , screen.pobject_objecttype_scr pobject_objecttype_scr
-  , screen.pobject_id_scr pobject_id_scr
   , screen.pobject_contents_scr pobject_contents_scr
   , screen.screen_contents screen_contents
-  , screen.screen_scrlv_id screen_scrlv_id
   , screen.scrlv_level1 scrlv_level1
-  , screen.scrlv_id scrlv_id
   , screen.scrlv_code scrlv_code
   , screenfield.TBLFIELDS_id
   , TBLFIELD.TBLFIELD_contents
@@ -1856,18 +1838,14 @@ OR REPLACE  VIEW R_TBLINKS (
   , TBLINK_CREATED_AT
   , TBLINK_UPDATED_AT
   , TBLINK_PERSON_ID_UPD
-  , PERSON_ID_UPD
   , PERSON_CODE_UPD
   , PERSON_NAME_UPD
   , TBLINK_CODEL
   , TBLINK_SEQNO
   , TBLINK_BLKTB_ID_DEST
   , BLKTB_CONTENTS_DEST
-  , BLKTB_ID_DEST
-  , BLKTB_POBJECT_ID_TBL_DEST
   , POBJECT_CODE_TBL_DEST
   , POBJECT_OBJECTTYPE_TBL_DEST
-  , POBJECT_ID_TBL_DEST
   , POBJECT_CONTENTS_TBL_DEST
   , BLKTB_SELTBLS_DEST
   , TBLINK_BEFOREAFTER
@@ -1877,25 +1855,18 @@ OR REPLACE  VIEW R_TBLINKS (
   , SCREEN_ROWS_PER_PAGE_SRC
   , SCREEN_ROWLIST_SRC
   , SCREEN_HEIGHT_SRC
-  , SCREEN_POBJECT_ID_VIEW_SRC
   , POBJECT_CODE_VIEW_SRC
   , POBJECT_OBJECTTYPE_VIEW_SRC
-  , POBJECT_ID_VIEW_SRC
   , POBJECT_CONTENTS_VIEW_SRC
   , SCREEN_FORM_PS_SRC
   , SCREEN_STRSELECT_SRC
   , SCREEN_CDRFLAYOUT_SRC
   , SCREEN_YMLCODE_SRC
-  , SCREEN_ID_SRC
-  , SCREEN_POBJECT_ID_SCR_SRC
   , POBJECT_CODE_SCR_SRC
   , POBJECT_OBJECTTYPE_SCR_SRC
-  , POBJECT_ID_SCR_SRC
   , POBJECT_CONTENTS_SCR_SRC
   , SCREEN_CONTENTS_SRC
-  , SCREEN_SCRLV_ID_SRC
   , SCRLV_LEVEL1_SRC
-  , SCRLV_ID_SRC
   , SCRLV_CODE_SRC
 ) AS
 select
@@ -1908,18 +1879,14 @@ select
   , tblink.created_at tblink_created_at
   , tblink.updated_at tblink_updated_at
   , tblink.persons_id_upd tblink_person_id_upd
-  , person_upd.person_id_upd person_id_upd
   , person_upd.person_code_upd person_code_upd
   , person_upd.person_name_upd person_name_upd
   , tblink.codel tblink_codel
   , tblink.seqno tblink_seqno
   , tblink.blktbs_id_dest tblink_blktb_id_dest
   , blktb_dest.blktb_contents blktb_contents_dest
-  , blktb_dest.blktb_id blktb_id_dest
-  , blktb_dest.blktb_pobject_id_tbl blktb_pobject_id_tbl_dest
   , blktb_dest.pobject_code_tbl pobject_code_tbl_dest
   , blktb_dest.pobject_objecttype_tbl pobject_objecttype_tbl_dest
-  , blktb_dest.pobject_id_tbl pobject_id_tbl_dest
   , blktb_dest.pobject_contents_tbl pobject_contents_tbl_dest
   , blktb_dest.blktb_seltbls blktb_seltbls_dest
   , tblink.beforeafter tblink_beforeafter
@@ -1929,25 +1896,18 @@ select
   , screen_src.screen_rows_per_page screen_rows_per_page_src
   , screen_src.screen_rowlist screen_rowlist_src
   , screen_src.screen_height screen_height_src
-  , screen_src.screen_pobject_id_view screen_pobject_id_view_src
   , screen_src.pobject_code_view pobject_code_view_src
   , screen_src.pobject_objecttype_view pobject_objecttype_view_src
-  , screen_src.pobject_id_view pobject_id_view_src
   , screen_src.pobject_contents_view pobject_contents_view_src
   , screen_src.screen_form_ps screen_form_ps_src
   , screen_src.screen_strselect screen_strselect_src
   , screen_src.screen_cdrflayout screen_cdrflayout_src
   , screen_src.screen_ymlcode screen_ymlcode_src
-  , screen_src.screen_id screen_id_src
-  , screen_src.screen_pobject_id_scr screen_pobject_id_scr_src
   , screen_src.pobject_code_scr pobject_code_scr_src
   , screen_src.pobject_objecttype_scr pobject_objecttype_scr_src
-  , screen_src.pobject_id_scr pobject_id_scr_src
   , screen_src.pobject_contents_scr pobject_contents_scr_src
   , screen_src.screen_contents screen_contents_src
-  , screen_src.screen_scrlv_id screen_scrlv_id_src
   , screen_src.scrlv_level1 scrlv_level1_src
-  , screen_src.scrlv_id scrlv_id_src
   , screen_src.scrlv_code scrlv_code_src
 from
   tblinks tblink

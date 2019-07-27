@@ -9,21 +9,21 @@ module Api
                 if Rails.env == "development" 
                     strsql = "select * from func_get_screen_menu('#{current_api_user[:email]}')"
                 else
-                  strsql = "select * from func_get_screen_menu('#{current_api_user[:email]}') and pobject_code_sgrp <'S'"
+                    strsql = "select * from func_get_screen_menu('#{current_api_user[:email]}') and pobject_code_sgrp <'S'"
                 end      
                 recs = ActiveRecord::Base.connection.select_all(strsql)
                 render json:  recs , status: :ok 
               when 'bottunlistreq'  
                 strsql = "select pobject_code_scr_ub screen_code,button_title,button_code,button_contents
-                          from r_usebuttons
-                          inner join persons p on screen_scrlv_id_ub = scrlvs_id and p.email = '#{current_api_user[:email]}' 
+                          from r_usebuttons u
+                          inner join r_persons p on u.scrlv_code_ub = p.scrlv_code and p.person_email = '#{current_api_user[:email]}' 
                           where usebutton_expiredate > current_date
                           order by pobject_code_scr_ub,button_seqno"
                 recs = ActiveRecord::Base.connection.select_all(strsql)
                 render json:  recs , status: :ok
               when 'viewtablereq','editabletablereq'
                 screenCode = params[:screenCode]
-                column_info,page_info,where_info,select_fields,yup = RorBlkctl.create_grid_editable_columns_info screenCode,current_api_user[:email],params[:req]   
+                column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info= RorBlkctl.create_grid_editable_columns_info screenCode,current_api_user[:email],params[:req]   
                 if params[:filtered]
                   where_str = RorBlkctl.create_filteredstr params[:filtered],where_info
                 else
@@ -32,16 +32,16 @@ module Api
                 page_info[:pageNo] = (params[:page]||=0).to_f 
                 page_info[:pageNo] += 1.0 
                 page_info[:sizePerPage] =params[:pageSize].to_f
-                pagedata,page_info = RorBlkctl.fetch_data_blk screenCode,select_fields,page_info,where_str,nil   ### nil filtered sorting
-                render json:{:columns=>column_info,:data=>pagedata,:pageInfo=>page_info,:yup=>yup}       
+                pagedata,page_info = RorBlkctl.fetch_data_blk screenCode,select_fields,page_info,where_str,sort_info
+                render json:{:columns=>column_info,:data=>pagedata,:pageInfo=>page_info,:yup=>yup,:dropdownlist=>dropdownlist}       
               
               when 'inlineaddreq'
                 screenCode = params[:screenCode]
-                column_info,page_info,where_info,select_fields,yup= RorBlkctl.create_grid_editable_columns_info screenCode,current_api_user[:email] ,params[:req]  
+                column_info,page_info,where_info,select_fields,yup,dropdownlist= RorBlkctl.create_grid_editable_columns_info screenCode,current_api_user[:email] ,params[:req]  
                 page_info[:pageNo] = 1
                 page_info[:sizePerPage] = params[:pageSize].to_f
                 pagedata,page_info = RorBlkctl.add_empty_data screenCode,column_info,page_info  ### nil filtered sorting
-                render json:{:columns=>column_info,:data=>pagedata,:pageInfo=>page_info,:yup=>yup}      
+                render json:{:columns=>column_info,:data=>pagedata,:pageInfo=>page_info,:yup=>yup,:dropdownlist=>dropdownlist}      
                 
               when "updateGridLineData"
                 commad_r =  RorBlkctl.init_from_screen current_api_user,params
@@ -56,25 +56,28 @@ module Api
                     command_r[:sio_classname] = "_edit_update_grid_line_data"
                 end       
                 command_r = RorBlkctl.proc_update_table(command_r,1)
-                if @sio_result_f ==   "9"
-                    params[:status]= "error"
-                    render json: {:params=>params}
+                rparams={}
+                (JSON.parse params[:linedata]).each do |key,val|
+                  rparams[key] = command_r[key] if  command_r[key]
+                end  
+                if command_r[:sio_result_f] ==   "9"
+                    rparams[:gridmessage] = {:status=>'error'}
+                    rparams[:err] = command_r[:sio_message_contents][0..100]
+                    render json: {:params=>rparams}
                 else  
-                    params[:status]= "OK"
-                    if command_r[:sio_classname] == "_add_update_grid_line_data"
-                      params[:addId] = command_r["id"]
-                    end  
-                    render json: {:params=>params}
+                    rparams[:gridmessage] =  {:status=>'ok'}
+                    render json: {:params=>rparams}
                 end  
               when "fetch_request"   
-                  fetch_data,mainviewflg,keys = RorBlkctl.get_fetch_rec params
-                  if fetch_data.size > 0
+                  fetch_data,mainviewflg,keys,findstatus = RorBlkctl.get_fetch_rec params
+                  if findstatus
                       if mainviewflg
                         params[:err] = "error duplicate code #{keys} "
                         params[:keys] = []
-                         keys.split(",").each do |key| 
+                        keys.split(",").each do |key| 
                           params[:keys] =  [key.split(":")[0].gsub(" ","")] 
-                         end  
+                        end  
+                        params[:fetchdata] = {} 
                       else
                         params[:fetchdata] = fetch_data 
                         params[:err] = ""
@@ -85,10 +88,11 @@ module Api
                       params[:err] = ""
                     else
                       params[:err] =  "error   --->not find #{keys} "
-                      params[:fetchdata] = {}
-                       keys.split(",").each do |key| 
-                        params[:keys] =  [key.split(":")[0].gsub(" ","")] 
-                       end  
+                      params[:fetchdata] = fetch_data
+                      params[:keys] =[]
+                      keys.split(",").each do |key| 
+                          params[:keys] << key.split(":")[0].gsub(" ","")
+                      end  
                     end  
                   end     
                   render json: {:params=>params}  

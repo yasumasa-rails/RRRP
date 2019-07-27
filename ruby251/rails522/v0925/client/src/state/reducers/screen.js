@@ -2,7 +2,7 @@ import { SCREEN_REQUEST,SCREEN_SUCCESS,SCREEN_FAILURE,
           LOGOUT_REQUEST,SCREEN_PARAMS_SET,
           SCREEN_LINEEDIT,SCREEN_ERR_CHECK,SCREEN_ERR_CHECK_RESULT,
           FETCH_REQUEST,FETCH_RESULT,FETCH_FAILURE,
-          YUP_RESULT,
+          YUP_RESULT,DROPDOWNVALUE_SET,
         //  INPUTFIELDPROTECT_REQUEST
         } 
           from '../../actions'
@@ -54,6 +54,7 @@ const screenreducer =  (state= {} , action) =>{
         pages: action.action.data.pageInfo.totalPage,
         sizePerPageList: action.action.data.pageInfo.sizePerPageList,
         yup:action.action.data.yup,
+        dropDownList:action.action.data.dropdownlist,
         status: action.action.data.status,
         loading:false,
         filterable:action.action.data.params.req==="viewtablereq"?true:false,
@@ -66,6 +67,14 @@ const screenreducer =  (state= {} , action) =>{
           loading:false,
           filterable:false,  
         }  
+
+      case  DROPDOWNVALUE_SET:
+           let {index,field,val} = {...action.payload.dropDownValue}
+           state.data[index][field] = val
+          return {...state,
+            data:state.data
+          }  
+    
 
     // Append the error returned from our api
     // set the success and requesting flags to false

@@ -65,6 +65,7 @@ export const YUP_REQUEST = 'YUP_REQUEST'
 export const TBLFIELD_REQUEST = 'TBLFIELD_REQUEST'
 export const TBLFIELD_SUCCESS = 'TBLFIELD_SUCCESS'
 export const TBLFIELD_FAILURE = 'TBLFIELD_FAILFURE'
+export const DROPDOWNVALUE_SET = 'DROPDOWNVALUE_SET'
 
 
 // LOGIN
@@ -123,6 +124,12 @@ export const ScreenErrCheck = (schema,data,index,field,params) => ({
   type:  SCREEN_ERR_CHECK,
   payload: {schema,data,index,field,params}  //
 })
+
+export const DropDownValueSet = (dropDownValue) => ({
+  type:  DROPDOWNVALUE_SET,
+  payload: {dropDownValue}  //
+})
+
 
 export const ScreenFailure = (errors) => ({
   type: SCREEN_FAILURE,
