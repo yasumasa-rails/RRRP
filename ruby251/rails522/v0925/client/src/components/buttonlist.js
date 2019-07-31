@@ -4,10 +4,11 @@ import { connect } from 'react-redux'
 import { Tab, Tabs, TabList,TabPanel , } from 'react-tabs'
 import Upload from './upload'
 import Download from './download'
+import GanttChart from './ganttchart'
 import "react-tabs/style/react-tabs.css"
 import Button from '@material-ui/core/Button'
 import "../index.css"
-import {ScreenRequest,ButtonFlgRequest,DownloadRequest,
+import {ScreenRequest,ButtonFlgRequest,DownloadRequest,GanttChartRequest,GanttReset,
         YupRequest,TblfieldRequest} from '../actions'
 
 
@@ -34,7 +35,7 @@ import {ScreenRequest,ButtonFlgRequest,DownloadRequest,
                     <Tab key={index} >
                       <Button  
                       disabled={disabled}
-                      type={val[1]==='inlineedit'||'inlineadd'||'yup'?"submit":"button"}
+                      type={val[1]==='inlineedit'||'inlineadd'||'yup'||'ganttchart'?"submit":"button"}
                       onClick ={() =>{ setButtonFlg(val[1],  // buttonflg
                                                     //screenCode,uid,screenName,
                                                     page,sorted,params
@@ -54,8 +55,10 @@ import {ScreenRequest,ButtonFlgRequest,DownloadRequest,
                     )} 
             </Tabs>
         }
+        
+        {buttonflg==="ganttchart"?params["onClickSelect"]?params["onClickSelect"]["index"]?<GanttChart/>:" select item":"select item":""}
         {buttonflg==='import'&&<Upload/>}
-        {downloadloading==="done"?<Download/>:downloadloading==="doing"?<p>please wait </p>:""}
+        {buttonflg==="export"&&downloadloading==="done"?<Download/>:downloadloading==="doing"?<p>please wait </p>:""}
         {params.req==="createTblViewScreen"&&params.messages.map((msg,index) =>{
                                                 return  <p key ={index}>{msg}</p>
                                                   }
@@ -111,6 +114,14 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
              params= { ...params,req:"yup"}
            //  editableflg = false
             return  dispatch(YupRequest(params)) //
+
+          case "ganttchart":
+            if(params["onClickSelect"]["index"]){
+               params= { ...params,req:"ganttchart"}
+             //  editableflg = false
+              return  dispatch(GanttChartRequest(params)) }//
+            else{dispatch(GanttReset())}  
+            break
 
             case "crt_tbl_view_screen":
                params= {req:"createTblViewScreen",screenCode:params.screenCode}

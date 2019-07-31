@@ -507,7 +507,7 @@ module GanttChart
 			end
 		else
 			if @itm_id
-				@opeitm_id = proc_get_opeitms_rec(@itm_id,@loca_id,processseq = nil,priority = nil)["id"]
+				@opeitm_id = get_opeitms_id_from_itm(@itm_id)
 			else
 				Rails.logger.debug " error class line #{__LINE__} ,@opeitm_id not found:#{rec} "
 				raise
@@ -609,7 +609,7 @@ module GanttChart
 				case gantt_reverse
 				when /gantt/
 					starttime,duedate = proc_get_item_loca_contents(n0,gantt_reverse)
-					tmp = vproc_get_chil_itms(n0,starttime)
+					tmp = get_ganttchart_data(opeitms_id)
 					ngantts.concat(tmp) if tmp[0].size > 0
 					tmpx = vproc_get_prev_process(n0,starttime)
 					if tmpx[0].size > 0
@@ -681,19 +681,24 @@ module GanttChart
     def proc_get_duration_by_loca(loca_id_fm,loca_id_to,priority)
         {:duration=>1,:transport_id =>ActiveRecord::Base.connection.select_value("select id from transports where code = 'dummy' ")}
     end
-    def proc_get_opeitms_rec itms_id,locas_id,processseq = nil,priority = nil  ###
-		strsql = %Q& select * from opeitms where itms_id = #{itms_id} #{if locas_id then " and locas_id = " + locas_id.to_s else "" end}
-		           and processseq = #{processseq ||= 999}
-				   #{if priority then " and priority = " + priority.to_s else "" end}
-				   and expiredate > current_date &
-		rec = ActiveRecord::Base.connection.select_one(strsql)
-        if rec
-	        rec
-		  else
-            Rails.logger.debug "error class logic err proc_get_opeitms_rec itms_id = #{itms_id} ,locas_id = #{locas_id}, processseq = #{processseq ||= 999} ,
-					priority = = #{priority ||= 999} ,expiredate > #{Date.today}"
-            raise
-        end
+    def get_opeitms_id_from_itm itms_id ###
+		strsql = %Q& select max(processseq) from opeitms where itms_id = #{itms_id}  and expiredate > current_date group by itms_id &
+		max_processseq = ActiveRecord::Base.connection.select_value(strsql)
+		if max_processseq 
+			strsql = %Q& select max(priority) from opeitms where itms_id = #{itms_id} 
+					 and processseq =#{max_processseq} and expiredate > current_date group by itms_id &
+			max_priority = ActiveRecord::Base.connection.select_value(strsql)
+			if max_priority
+				strsql = %Q& select id from opeitms where itms_id = #{itms_id} 
+						 and processseq =#{max_processseq} and processseq =#{max_priority} and expiredate > current_date &
+				opeitms_id = ActiveRecord::Base.connection.select_value(strsql)
+			else 
+				opeitms_id = nil	
+			end		
+		else
+			opeitms_id = nil
+		end		
+		return opeitms_id
     end
 	def proc_sch_chil_get orgtblname,orgtblid	##
 		strsql = "select alloctbl.id alloctbl_id from trngantts trn ,alloctbls alloctbl where trn.orgtblname = '#{orgtblname}' and trn.orgtblid = #{orgtblid}
@@ -744,43 +749,51 @@ module GanttChart
 		@max_time = cgantt[:duedate] if (@max_time||=Time.now)  < cgantt[:duedate]
         return cgantt[:starttime],cgantt[:duedate]
     end
-    def vproc_get_chil_itms(n0,duedate)  ###工程の始まり=前工程の終わり
-          rnditms = ActiveRecord::Base.connection.select_all("select * from nditms where opeitms_id = #{n0[:opeitms_id]} and Expiredate > current_date  ")
-          if rnditms.size > 0 then
-              ngantts = []  ###viewの内容なので　itm_id  loca_id
-              mlevel = n0[:mlevel] + 1
-              rnditms.each.with_index(1)  do |i,cnt|
-                  chil_ope = proc_get_opeitms_rec(i["itms_id_nditm"], i["locas_id_nditm"],i["processseq_nditm"])
-                  if chil_ope.nil?
-                      chil_ope = proc_get_opeitms_rec(i["itms_id_nditm"],nil,i["processseq_nditm"],999)
-                  end
-                  ##if chil_ope and i["consumtype"]
-                  if chil_ope
-                        opeitm = proc_get_opeitms_rec(i["itms_id_nditm"], i["locas_id_nditm"],i["processseq_nditm"])
-                          i["consumtype"] = "con"  if  i["consumtype"] =~ /con/
-                          ngantts << {:seq=>n0[:seq] + sprintf("%03d", cnt),:mlevel=>mlevel,:itms_id=>i["itms_id_nditm"],
-                                  ##:prdpurshp=>"shp",
-                                  :prdpurshp=>opeitm["prdpurshp"],
-                                  :processseq=>i["processseq_nditm"],
-                                  :locas_id=> i["locas_id_nditm"],
-                                  :locas_id_to=>n0[:locas_id],:opeitms_id =>chil_ope["id"],
-                                  :priority=>chil_ope["priority"],
-                                  :duedate=>duedate,:duration=>(n0[:duration]||=1),:shelfnos_id=>chil_ope["shelfnos_id"],:shuffleflg=>chil_ope["shuffleflg"],
-                                  :consumtype=>i["consumtype"],:consumauto=>i["consumauto"],
-                                  :autocreate_ord=>chil_ope["autocreate_ord"],:autoord_p=>chil_ope["autoord"],
-                                  :autocreate_inst=>chil_ope["autocreate_inst"],:autocreate_act=>chil_ope["autocreate_act"],
-                                  :parenum=>i["parenum"],:chilnum=>i["chilnum"],:id=>"nditms_"+i["id"].to_s}  ###
-                  else
-                      item_code  = ActiveRecord::Base.connection.select_value("select code from itms where id = #{i["itms_id_nditm"]} ")
-                      @errmsg = "missng opeitms ... item_code = #{item_code} processseq =  #{i["processseq_nditm"]}"
-                      raise
-                  end
-              end
-          else
-                  ngantts  = [{}]
-          end
-          return ngantts
-    end
+	def get_ganttchart_data(level,opeitms_id)  ###工程の始まり=前工程の終わり
+		if level.nil?
+			level = "0"
+			@ganttchartData ={}
+			start = Time.now - 1* 24 * 60 * 60 
+			rec = ActiveRecord::Base.connection.select_one("select  * from r_opeitms where id = #{opeitms_id}")
+			@ganttchartData[level] = {"opeitm_id"=>opeitms_id,"duration"=>1,
+									##	"start"=>"#{start.year},#{start.month},#{start.day}",
+									##	"end"=>"#{Time.now.year},#{Time.now.month},#{Time.now.day}",
+										"start"=>start,
+										"end"=>Time.now,
+										"parenum"=>1,"chilnum"=>1,"itms_id"=>nil,"itm_code"=>rec["itm_code"],"itm_name"=>rec["itm_name"]}
+			@stacklevel =[]
+		end	
+		depend = []
+		##new_end = Time.parse(@ganttchartData[level]["end"]) - ((@ganttchartData[level]["duration"]).to_i + 1) * 24 * 60 * 60 
+		new_end = @ganttchartData[level]["start"] -  24 * 60 * 60 
+		rnditms = ActiveRecord::Base.connection.select_all("select * from r_nditms where nditm_opeitm_id = #{@ganttchartData[level]["opeitm_id"]} 
+															and nditm_Expiredate > current_date order by itm_code_nditm  ")
+		rnditms.each_with_index  do |rec,index|
+			nopeitms_id =get_opeitms_id_from_itm(rec["nditm_itm_id_nditm"])
+			duration= 	rec["nditm_duration"].to_i
+			new_start = new_end - (rec["nditm_duration"].to_i) * 24 * 60 * 60 
+			contents ={"opeitm_id"=>nopeitms_id,
+						"start"=>new_start,
+						"end"=>new_end,
+						"parenum"=>rec["nditm_parenum"],"chilnum"=>rec["nditm_chilnum"],
+						"itms_id"=>rec["itm_id_nditm"],"itm_code"=>rec["itm_code_nditm"],"itm_name"=>rec["itm_name_nditm"]}
+			nlevel = level + "_" + format('%04d', index)
+			@ganttchartData[nlevel] = contents
+			@stacklevel << nlevel  if nopeitms_id
+			depend << nlevel
+		end
+		@ganttchartData[level]["depend"] = depend.join(",")
+		until @stacklevel == []
+			 vget_ganttchart_data @stacklevel.shift
+		end	 
+
+		return @ganttchartData
+	end
+	def vget_ganttchart_data level
+		if @ganttchartData[level]["opeitm_id"]
+			get_ganttchart_data(level,@ganttchartData[level]["opeitm_id"])
+		end	
+	end	
     def vproc_get_prev_process(n0,starttime)  ###工程の始まり=前程の終わり
         rec = ActiveRecord::Base.connection.select_one("select * from opeitms where itms_id = #{n0[:itms_id]} and Expiredate > current_date
                                                                               and Priority = #{n0[:priority]} and processseq < #{n0[:processseq]}  order by   processseq desc")

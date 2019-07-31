@@ -68,7 +68,7 @@ import ScreenGrid from './screengrid'
     }
      return(
      <div>
-      <p>seq error </p>
+      <p> please wait </p>
     </div>)}
     return (
       <BrowserRouter>

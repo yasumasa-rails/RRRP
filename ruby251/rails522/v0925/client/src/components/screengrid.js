@@ -238,13 +238,13 @@ const  renderFilter = ({column,onChange,filter})=> {
       }
        getTdProps={(state, rowInfo, column, instance) => {
         return { 
-          onFocus:(e) =>
+       /*   onFocus:(e) =>
             {  
       //      e.target.className = "renderEditableInput"  // カーソルの動きが遅くなる。
             if( data[rowInfo.index].confirm&&column.id==="confirm")
               { params["uid"] = uid
                  onLineValite(data,rowInfo.index,"confirm",params)  } 
-          } ,
+          } , */
           onClick:(e) =>
              { 
              if(e.target.checked&&column.id==="confirm")
@@ -328,7 +328,7 @@ const  renderFilter = ({column,onChange,filter})=> {
         );
       }}
       </ReactTable>
-        :"please select"}
+        :<h2>please select</h2>}
         </div>
        )
     }

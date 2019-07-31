@@ -33,6 +33,8 @@ export const BUTTONLIST_SUCCESS = 'BUTTONLIST_SUCCESS'
 export const BUTTONLIST_FAILFURE = 'BUTTONLIST_FAILURE'
 
 export const BUTTONFLG_REQUEST = 'BUTTONFLG_REQUEST'
+export const BUTTON_RESET = 'BUTTON_RESET'
+export const GANTT_RESET = 'GANTT_RESET'
 
 export const UPLOAD_REQUEST = 'UPLOAD_REQUEST'
 export const UPLOADLIST_REQUEST = 'UPLOADLIST_REQUEST'
@@ -67,10 +69,13 @@ export const TBLFIELD_SUCCESS = 'TBLFIELD_SUCCESS'
 export const TBLFIELD_FAILURE = 'TBLFIELD_FAILFURE'
 export const DROPDOWNVALUE_SET = 'DROPDOWNVALUE_SET'
 
+export const GANTTCHART_REQUEST = 'GANTTCHART_REQUEST'
+export const GANTTCHART_FAILURE = 'GANTTCHART_FAILURE'
+export const GANTTCHART_SUCCESS = 'GANTTCHART_SUCCESS'
+
 
 // LOGIN
 // Attach our Formik actions as meta-data to our action.
-
 
 export const SignupRequest = createAction(
   SIGNUP_REQUEST,
@@ -272,4 +277,19 @@ export const TblfieldRequest = (params) => ({
 export const TblfielSuccess = (messages) => ({
   type:  TBLFIELD_SUCCESS,
   payload: { messages}  //
+})
+
+export const GanttChartRequest = (params) => ({
+  type:  GANTTCHART_REQUEST,
+  payload: { params}  //
+})
+
+
+export const ButtonReset = () => ({
+  type:  BUTTON_RESET,
+   //
+})
+
+export const GanttReset = () => ({
+  type:  GANTT_RESET,
 })

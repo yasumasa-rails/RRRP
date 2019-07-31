@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   namespace :api do
     resources :menus 
     resources :uploads 
+    resources :ganttcharts 
     resources :tblfields  if Rails.env == "development" ##テスト環境の時のみ
   end  
   post '/rails/active_storage/direct_uploads' => 'active_storage/direct_uploads#create'

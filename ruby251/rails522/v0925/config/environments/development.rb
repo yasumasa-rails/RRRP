@@ -62,7 +62,6 @@ Rails.application.configure do
   }
   config.action_mailer.logger = Logger.new(config.paths['log'].first)
   config.action_mailer.logger.level = Logger::INFO
-  config.action_mailer.default_url_options = { host: 'localhost', port: 3001 }
 
   config.action_controller.asset_host = 'http://localhost:3001'
   

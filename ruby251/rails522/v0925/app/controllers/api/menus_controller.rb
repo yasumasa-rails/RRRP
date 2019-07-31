@@ -71,7 +71,7 @@ module Api
               when "fetch_request"   
                   fetch_data,mainviewflg,keys,findstatus = RorBlkctl.get_fetch_rec params
                   if findstatus
-                      if mainviewflg
+                      if mainviewflg  ##mainviewflg = true 自分自身の登録
                         params[:err] = "error duplicate code #{keys} "
                         params[:keys] = []
                         keys.split(",").each do |key| 
@@ -81,6 +81,11 @@ module Api
                       else
                         params[:fetchdata] = fetch_data 
                         params[:err] = ""
+                        keys.split(",").each do |key| ###コードが変更されたとき既に使用されている？
+                            if key =~/_code/
+                              ###作成中
+                            end  
+                        end  
                       end  
                   else
                     if mainviewflg

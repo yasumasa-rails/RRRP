@@ -4,7 +4,7 @@ import {takeLatest} from 'redux-saga/effects'
 import {LOGIN_REQUEST,SIGNUP_REQUEST,MENU_REQUEST,
         LOGOUT_REQUEST,SCREEN_REQUEST,BUTTONLIST_REQUEST,
         EDITUPLOAD_REQUEST,UPLOADLIST_REQUEST,EDITUPLOADTITLE_REQUEST,
-        FETCH_REQUEST,SCREEN_ERR_CHECK,
+        FETCH_REQUEST,SCREEN_ERR_CHECK,GANTTCHART_REQUEST,
         DOWNLOAD_REQUEST,
         YUP_REQUEST,TBLFIELD_REQUEST,
       //  UPLOAD_REQUEST,
@@ -21,6 +21,7 @@ import {DownloadSaga} from './download'
 import {ScreenSaga} from './screen'//
 import {ScreenErrCheckSaga} from './screenerrcheck'
 import {ButtonListSaga} from './buttonlist'
+import {GanttChartSaga} from './ganttchart'
 import {TblfieldSaga} from './tblfield'
 import {LogoutSaga} from './logout'
 
@@ -40,5 +41,6 @@ export function * sagas () {
   yield takeLatest(DOWNLOAD_REQUEST,DownloadSaga)
   yield takeLatest(YUP_REQUEST,TblfieldSaga)
   yield takeLatest(TBLFIELD_REQUEST,TblfieldSaga)
+  yield takeLatest(GANTTCHART_REQUEST,GanttChartSaga)
   yield takeLatest(LOGOUT_REQUEST,LogoutSaga)
 }

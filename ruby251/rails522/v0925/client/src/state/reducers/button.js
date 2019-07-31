@@ -1,6 +1,6 @@
 import {  BUTTONLIST_REQUEST, BUTTONLIST_SUCCESS, BUTTONFLG_REQUEST,
-          DOWNLOAD_REQUEST,DOWNLOAD_SUCCESS,DOWNLOAD_RESET,
-          TBLFIELD_SUCCESS,SCREEN_SUCCESS,
+          DOWNLOAD_REQUEST,DOWNLOAD_SUCCESS,DOWNLOAD_RESET,GANTT_RESET,
+          TBLFIELD_SUCCESS,SCREEN_SUCCESS,GANTTCHART_SUCCESS,
           LOGOUT_REQUEST} from 'actions'
 const initialValues = {
   errors:[],
@@ -26,6 +26,11 @@ const buttonreducer =  (state= initialValues , actions) =>{
         disabled:true,
         messages:null,
         message:null,}
+
+    case GANTT_RESET:
+          return {...state,
+            disabled:false,}
+    
 
     case BUTTONLIST_SUCCESS:
       return {...state,
@@ -74,6 +79,14 @@ const buttonreducer =  (state= initialValues , actions) =>{
    messages:null,
    message:null,
 }
+
+case GANTTCHART_SUCCESS:
+  return {...state,
+   disabled:false,
+   messages:null,
+   message:null,
+}
+
 
     case  LOGOUT_REQUEST:
     return {}  
