@@ -7,7 +7,7 @@
     "axios": "^0.18.0",
     "babel-preset-react": "^6.24.1",
     "bootstrap": "3.3.7",
-    "bootstrap-sass": "^3.3.7",
+    "bootstrap-sass": "^3.4.1",
     "caniuse-lite": "^1.0.30000849",
     "classnames": "^2.2.5",
     "jquery": "^3.3.1",
