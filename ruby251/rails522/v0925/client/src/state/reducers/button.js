@@ -41,7 +41,6 @@ const buttonreducer =  (state= initialValues , actions) =>{
     case DOWNLOAD_REQUEST:
        return {...state,
         excelData:null,
-        excelColumns:null,
         totalcnt:null,
         params:actions.payload.params,
         downloadloading:"doing",
@@ -52,7 +51,6 @@ const buttonreducer =  (state= initialValues , actions) =>{
     case DOWNLOAD_SUCCESS:
      return {...state,
       excelData:actions.payload.data.excelData,
-      excelColumns:actions.payload.data.excelColumns,
       totalcnt:actions.payload.data.totalcnt,
       downloadloading:"done",
       disabled:false,
@@ -60,7 +58,6 @@ const buttonreducer =  (state= initialValues , actions) =>{
    case DOWNLOAD_RESET:
     return {...state,
       excelData:null,
-      excelColumns:null,
       totalcnt:null,
       buttonflg:null,
       downloadloading:"",

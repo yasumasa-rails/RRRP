@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { Link,BrowserRouter,Route,} from 'react-router-dom'
 import { Tab, Tabs, TabList, TabPanel, } from 'react-tabs'
 import "react-tabs/style/react-tabs.css"
-import Button from '@material-ui/core/Button'
+import {Button} from '../styles/button'
 import "../index.css"
 
 import { Signup } from './signup'
@@ -93,6 +93,7 @@ const  mapStateToProps = (state,ownProps) =>({
   sorted:state.screen?state.screen.sorted:null, 
   sizePerPageList:state.screen.sizePerPageList?state.screen.sizePerPageList:[25],
   params:state.screen.params,
+  originalreq:state.screen.originalreq,
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({

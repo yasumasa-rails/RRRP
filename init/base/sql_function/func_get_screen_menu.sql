@@ -6,13 +6,13 @@ select case  when q.pobjgrp_name is null then s.pobject_code_sgrp else q.pobjgrp
 	s.pobject_code_scr screen_code,to_number(split_part(s.screen_rowlist,',',1),'9999') page_size,x.pobjgrp_contents as contents,
         s.pobject_code_sgrp
 from r_screens s
-      inner join persons on screen_scrlv_id = persons.scrlvs_id and  persons.email ='system@rrrp.com'
+      inner join persons on screen_scrlv_id = persons.scrlvs_id and  persons.email = $1
       left join  ( select t.pobject_code,t.pobjgrp_name  from r_pobjgrps t 
-			inner join  persons  p on p.usrgrps_id = t.pobjgrp_usrgrp_id and email= 'system@rrrp.com') q
+			inner join  persons  p on p.usrgrps_id = t.pobjgrp_usrgrp_id and email= $1 and  pobject_objecttype ='screen_group') q
         on q.pobject_code = s.pobject_code_sgrp 
       left join  ( select t.pobject_code,t.pobjgrp_name ,t.pobjgrp_contents  from r_pobjgrps t 
-			inner join  persons  p on p.usrgrps_id = t.pobjgrp_usrgrp_id and email= 'system@rrrp.com') x
+			inner join  persons  p on p.usrgrps_id = t.pobjgrp_usrgrp_id and email= $1 and  pobject_objecttype ='screen' ) x
         on x.pobject_code = s.pobject_code_scr
-where s.pobject_code_sgrp !='#' order by  s.pobject_code_sgrp,s.screen_seqno
+where s.pobject_code_sgrp !='#' and s.screen_expiredate > current_date order by  s.pobject_code_sgrp,s.screen_seqno
 $$
 language sql

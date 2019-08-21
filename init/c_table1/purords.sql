@@ -1,283 +1,299 @@
-﻿CREATE TABLE PURORDS 
-   (	ID NUMERIC(38,0), 
-	SNO VARCHAR(40), 
-	QTY NUMERIC(18,4), 
-	DUEDATE TIMESTAMP (6), 
-	ISUDATE TIMESTAMP (6), 
-	REMARK VARCHAR(4000), 
-	UPDATE_IP VARCHAR(40), 
-	CREATED_AT TIMESTAMP (6), 
-	UPDATED_AT TIMESTAMP (6), 
-	AMT NUMERIC(18,4), 
-	TODUEDATE TIMESTAMP (6), 
-	PERSONS_ID_UPD NUMERIC, 
-	EXPIREDATE DATE, 
-	PRICE NUMERIC(38,4), 
-	QTY_CASE NUMERIC(38,0), 
-	CONFIRM CHAR(1), 
-	OPEITMS_ID NUMERIC, 
-	OPT_FIXOTERM NUMERIC(5,2), 
-	LOCAS_ID_TO NUMERIC, 
-	PROCESSSEQ_PARE NUMERIC(38,0), 
-	PRJNOS_ID NUMERIC, 
-	CONTRACT_PRICE CHAR(1), 
-	CHRGS_ID NUMERIC(38,0), 
-	TAX NUMERIC(38,4), 
-	GNO VARCHAR(40), 
-	ITM_CODE_CLIENT VARCHAR(50), 
-	STARTTIME TIMESTAMP (6), 
-	 CONSTRAINT PURORDS_ID_PK PRIMARY KEY (ID),
-	 CONSTRAINT PURORD_CHRGS_ID FOREIGN KEY (CHRGS_ID)
-	  REFERENCES CHRGS (ID) , 
-	 CONSTRAINT PURORD_OPEITMS_ID FOREIGN KEY (OPEITMS_ID)
-	  REFERENCES OPEITMS (ID) , 
-	 CONSTRAINT PURORD_LOCAS_ID_TO FOREIGN KEY (LOCAS_ID_TO)
-	  REFERENCES LOCAS (ID) , 
-	 CONSTRAINT PURORD_PERSONS_ID_UPD FOREIGN KEY (PERSONS_ID_UPD)
-	  REFERENCES PERSONS (ID) , 
-	 CONSTRAINT PURORD_PRJNOS_ID FOREIGN KEY (PRJNOS_ID)
-	  REFERENCES PRJNOS (ID) 
-   ) 
+﻿
+ --- drop view r_purords cascade  
+ create or replace view r_purords as select  
+purord.created_at  purord_created_at,
+purord.update_ip  purord_update_ip,
+purord.toduedate  purord_toduedate,
+purord.isudate  purord_isudate,
+purord.expiredate  purord_expiredate,
+purord.updated_at  purord_updated_at,
+purord.id id,
+purord.id  purord_id,
+purord.persons_id_upd   purord_person_id_upd,
+purord.locas_id_to   purord_loca_id_to,
+purord.starttime  purord_starttime,
+purord.prjnos_id   purord_prjno_id,
+purord.opeitms_id   purord_opeitm_id,
+purord.opt_fixoterm  purord_opt_fixoterm,
+purord.processseq_pare  purord_processseq_pare,
+purord.qty_case  purord_qty_case,
+purord.contract_price  purord_contract_price,
+purord.chrgs_id   purord_chrg_id,
+purord.itm_code_client  purord_itm_code_client,
+  loca_to.loca_country  loca_country_to ,
+  loca_to.loca_abbr  loca_abbr_to ,
+purord.duedate  purord_duedate,
+purord.sno  purord_sno,
+purord.remark  purord_remark,
+purord.price  purord_price,
+purord.qty  purord_qty,
+purord.confirm  purord_confirm,
+purord.amt  purord_amt,
+purord.tax  purord_tax,
+purord.gno  purord_gno,
+  opeitm.opeitm_prjalloc_flg  opeitm_prjalloc_flg ,
+  opeitm.opeitm_processseq  opeitm_processseq ,
+  prjno.prjno_code  prjno_code ,
+  loca_to.loca_prfct  loca_prfct_to ,
+  loca_to.loca_tel  loca_tel_to ,
+  loca_to.loca_mail  loca_mail_to ,
+  loca_to.loca_addr1  loca_addr1_to ,
+  loca_to.loca_zip  loca_zip_to ,
+  loca_to.loca_fax  loca_fax_to ,
+  loca_to.loca_addr2  loca_addr2_to ,
+  opeitm.loca_mail_shelfno  loca_mail_shelfno ,
+  opeitm.loca_zip_shelfno  loca_zip_shelfno ,
+  opeitm.opeitm_shelfno_id  opeitm_shelfno_id ,
+  opeitm.loca_id_shelfno  loca_id_shelfno ,
+  prjno.prjno_name  prjno_name ,
+  loca_to.loca_name  loca_name_to ,
+  opeitm.loca_name_shelfno  loca_name_shelfno ,
+  prjno.prjno_code_chil  prjno_code_chil ,
+  opeitm.opeitm_priority  opeitm_priority ,
+  opeitm.opeitm_units_lttime  opeitm_units_lttime ,
+  opeitm.opeitm_boxe_id  opeitm_boxe_id ,
+  opeitm.opeitm_unit_id_case  opeitm_unit_id_case ,
+  opeitm.unit_name_case  unit_name_case ,
+  opeitm.unit_code_prdpurshp  unit_code_prdpurshp ,
+  opeitm.unit_code  unit_code ,
+  opeitm.unit_name  unit_name ,
+  opeitm.opeitm_chkord  opeitm_chkord ,
+  opeitm.opeitm_chkinst  opeitm_chkinst ,
+  opeitm.opeitm_mold  opeitm_mold ,
+  opeitm.opeitm_packno_flg  opeitm_packno_flg ,
+  opeitm.opeitm_opt_fix_flg  opeitm_opt_fix_flg ,
+  opeitm.unit_code_case  unit_code_case ,
+  opeitm.unit_name_box  unit_name_box ,
+  opeitm.unit_code_box  unit_code_box ,
+  opeitm.opeitm_minqty  opeitm_minqty ,
+  opeitm.opeitm_packqty  opeitm_packqty ,
+  opeitm.opeitm_maxqty  opeitm_maxqty ,
+  opeitm.opeitm_unit_id_prdpurshp  opeitm_unit_id_prdpurshp ,
+  opeitm.itm_deth  itm_deth ,
+  opeitm.shelfno_loca_id_shelfno  shelfno_loca_id_shelfno ,
+  opeitm.opeitm_chkord_prc  opeitm_chkord_prc ,
+  opeitm.itm_weight  itm_weight ,
+  opeitm.itm_length  itm_length ,
+  opeitm.itm_wide  itm_wide ,
+  opeitm.unit_code_outbox  unit_code_outbox ,
+  opeitm.unit_name_prdpurshp  unit_name_prdpurshp ,
+  opeitm.unit_name_outbox  unit_name_outbox ,
+  opeitm.opeitm_operation  opeitm_operation ,
+  opeitm.opeitm_prdpurshp  opeitm_prdpurshp ,
+  opeitm.opeitm_autoord_p  opeitm_autoord_p ,
+  opeitm.opeitm_duration  opeitm_duration ,
+  opeitm.opeitm_esttosch  opeitm_esttosch ,
+  opeitm.itm_model  itm_model ,
+  opeitm.itm_design  itm_design ,
+  opeitm.loca_prfct  loca_prfct ,
+  opeitm.loca_addr1  loca_addr1 ,
+  opeitm.loca_addr2  loca_addr2 ,
+  opeitm.loca_zip  loca_zip ,
+  opeitm.boxe_boxtype  boxe_boxtype ,
+  opeitm.loca_abbr  loca_abbr ,
+  opeitm.loca_addr1_shelfno  loca_addr1_shelfno ,
+  opeitm.boxe_name  boxe_name ,
+  opeitm.boxe_code  boxe_code ,
+  opeitm.loca_name  loca_name ,
+  opeitm.opeitm_autoact_p  opeitm_autoact_p ,
+  opeitm.shelfno_code  shelfno_code ,
+  opeitm.shelfno_name  shelfno_name ,
+  opeitm.loca_code_shelfno  loca_code_shelfno ,
+  opeitm.opeitm_safestkqty  opeitm_safestkqty ,
+  opeitm.opeitm_contents  opeitm_contents ,
+  opeitm.itm_material  itm_material ,
+  opeitm.itm_std  itm_std ,
+  opeitm.itm_name  itm_name ,
+  opeitm.loca_code  loca_code ,
+  opeitm.loca_prfct_shelfno  loca_prfct_shelfno ,
+  opeitm.loca_country_shelfno  loca_country_shelfno ,
+  opeitm.loca_addr2_shelfno  loca_addr2_shelfno ,
+  opeitm.loca_abbr_shelfno  loca_abbr_shelfno ,
+  opeitm.loca_fax_shelfno  loca_fax_shelfno ,
+  opeitm.loca_tel_shelfno  loca_tel_shelfno ,
+  chrg.chrg_person_id  chrg_person_id ,
+  chrg.loca_id_sect  loca_id_sect ,
+  chrg.usrgrp_code_chrg  usrgrp_code_chrg ,
+  chrg.loca_code_sect  loca_code_sect ,
+  chrg.loca_name_sect  loca_name_sect ,
+  chrg.usrgrp_name_chrg  usrgrp_name_chrg ,
+  chrg.person_name_chrg  person_name_chrg ,
+  chrg.person_code_chrg  person_code_chrg ,
+  opeitm.itm_code  itm_code ,
+  loca_to.loca_code  loca_code_to ,
+  opeitm.opeitm_itm_id  opeitm_itm_id ,
+  opeitm.opeitm_loca_id  opeitm_loca_id ,
+  opeitm.opeitm_opt_fixoterm  opeitm_opt_fixoterm ,
+  opeitm.opeitm_autocreate_ord  opeitm_autocreate_ord ,
+  opeitm.opeitm_autocreate_inst  opeitm_autocreate_inst ,
+  opeitm.opeitm_shuffle_flg  opeitm_shuffle_flg ,
+  opeitm.opeitm_shuffle_loca  opeitm_shuffle_loca ,
+  opeitm.opeitm_autocreate_act  opeitm_autocreate_act ,
+  opeitm.opeitm_rule_price  opeitm_rule_price ,
+  opeitm.opeitm_stktaking_f  opeitm_stktaking_f 
+ from purords   purord,
+  r_persons  person_upd ,  r_locas  loca_to ,  r_prjnos  prjno ,  r_opeitms  opeitm ,  r_chrgs  chrg 
+  where       purord.persons_id_upd = person_upd.id      and purord.locas_id_to = loca_to.id      and purord.prjnos_id = prjno.id      and purord.opeitms_id = opeitm.id      and purord.chrgs_id = chrg.id     ;
+ DROP TABLE IF EXISTS sio.sio_r_purords;
+ CREATE TABLE sio.sio_r_purords (
+          sio_id numeric(38,0)  CONSTRAINT SIO_r_purords_id_pk PRIMARY KEY           ,sio_user_code numeric(38,0)
+          ,sio_Term_id varchar(30)
+          ,sio_session_id numeric(38,0)
+          ,sio_Command_Response char(1)
+          ,sio_session_counter numeric(38,0)
+          ,sio_classname varchar(50)
+          ,sio_viewname varchar(30)
+          ,sio_code varchar(30)
+          ,sio_strsql varchar(4000)
+          ,sio_totalcount numeric(38,0)
+          ,sio_recordcount numeric(38,0)
+          ,sio_start_record numeric(38,0)
+          ,sio_end_record numeric(38,0)
+          ,sio_sord varchar(256)
+          ,sio_search varchar(10)
+          ,sio_sidx varchar(256)
+,purord_confirm  varchar (1) 
+,purord_sno  varchar (40) 
+,itm_name  varchar (100) 
+,itm_code  varchar (50) 
+,loca_code  varchar (50) 
+,purord_qty  numeric (18,4)
+,loca_name  varchar (100) 
+,purord_duedate   timestamp(6) 
+,purord_amt  numeric (18,4)
+,purord_price  numeric (38,4)
+,purord_tax  numeric (38,4)
+,purord_gno  varchar (40) 
+,itm_std  varchar (50) 
+,opeitm_autoact_p  numeric (3,0)
+,itm_material  varchar (50) 
+,opeitm_operation  varchar (40) 
+,opeitm_prdpurshp  varchar (5) 
+,opeitm_autoord_p  numeric (3,0)
+,opeitm_duration  numeric (38,2)
+,opeitm_safestkqty  numeric (38,0)
+,opeitm_contents  varchar (4000) 
+,purord_contract_price  varchar (1) 
+,purord_starttime   timestamp(6) 
+,purord_opt_fixoterm  numeric (5,2)
+,purord_processseq_pare  numeric (38,0)
+,purord_qty_case  numeric (38,0)
+,purord_itm_code_client  varchar (50) 
+,purord_remark  varchar (4000) 
+,opeitm_processseq  numeric (3,0)
+,purord_toduedate   timestamp(6) 
+,purord_isudate   timestamp(6) 
+,purord_expiredate   date 
+,opeitm_priority  numeric (3,0)
+,opeitm_chkord  varchar (1) 
+,opeitm_chkinst  varchar (1) 
+,opeitm_mold  varchar (1) 
+,opeitm_packno_flg  varchar (1) 
+,loca_code_to  varchar (50) 
+,loca_name_to  varchar (100) 
+,opeitm_opt_fix_flg  varchar (1) 
+,opeitm_esttosch  numeric (22,0)
+,opeitm_autocreate_ord  varchar (1) 
+,opeitm_autocreate_inst  varchar (1) 
+,opeitm_chkord_prc  numeric (3,0)
+,opeitm_shuffle_flg  varchar (1) 
+,itm_deth  numeric (22,0)
+,opeitm_shuffle_loca  varchar (1) 
+,opeitm_autocreate_act  varchar (1) 
+,opeitm_rule_price  varchar (1) 
+,itm_wide  numeric (22,0)
+,boxe_boxtype  varchar (20) 
+,itm_design  varchar (50) 
+,itm_model  varchar (50) 
+,itm_length  numeric (22,0)
+,itm_weight  numeric (22,0)
+,opeitm_minqty  numeric (38,6)
+,loca_abbr_to  varchar (50) 
+,loca_country_to  varchar (20) 
+,opeitm_stktaking_f  varchar (1) 
+,opeitm_maxqty  numeric (22,0)
+,opeitm_packqty  numeric (38,0)
+,loca_prfct_to  varchar (20) 
+,loca_tel_to  varchar (20) 
+,loca_mail_to  varchar (20) 
+,loca_addr1_to  varchar (50) 
+,loca_zip_to  varchar (10) 
+,loca_fax_to  varchar (20) 
+,loca_addr2_to  varchar (50) 
+,opeitm_opt_fixoterm  numeric (5,2)
+,loca_code_sect  varchar (50) 
+,opeitm_prjalloc_flg  numeric (22,0)
+,prjno_code  varchar (50) 
+,prjno_name  varchar (100) 
+,prjno_code_chil  varchar (50) 
+,usrgrp_code_chrg  varchar (50) 
+,loca_name_sect  varchar (100) 
+,person_name_chrg  varchar (100) 
+,person_code_chrg  varchar (50) 
+,usrgrp_name_chrg  varchar (100) 
+,opeitm_units_lttime  varchar (4) 
+,unit_name  varchar (100) 
+,unit_code  varchar (50) 
+,unit_code_prdpurshp  varchar (50) 
+,unit_code_box  varchar (50) 
+,unit_name_box  varchar (100) 
+,unit_code_case  varchar (50) 
+,unit_name_outbox  varchar (100) 
+,boxe_name  varchar (100) 
+,boxe_code  varchar (50) 
+,unit_name_case  varchar (100) 
+,unit_code_outbox  varchar (50) 
+,unit_name_prdpurshp  varchar (100) 
+,shelfno_name  varchar (100) 
+,loca_code_shelfno  varchar (50) 
+,loca_name_shelfno  varchar (100) 
+,shelfno_code  varchar (50) 
+,purord_id  numeric (38,0)
+,id  numeric (38,0)
+,purord_updated_at   timestamp(6) 
+,purord_created_at   timestamp(6) 
+,purord_update_ip  varchar (40) 
+,purord_chrg_id  numeric (38,0)
+,purord_opeitm_id  numeric (38,0)
+,purord_prjno_id  numeric (38,0)
+,purord_loca_id_to  numeric (38,0)
+,purord_person_id_upd  numeric (38,0)
+,loca_addr2_shelfno  varchar (50) 
+,loca_abbr_shelfno  varchar (50) 
+,loca_fax_shelfno  varchar (20) 
+,loca_tel_shelfno  varchar (20) 
+,chrg_person_id  numeric (22,0)
+,loca_id_sect  numeric (22,0)
+,loca_addr1_shelfno  varchar (50) 
+,loca_abbr  varchar (50) 
+,loca_addr2  varchar (50) 
+,loca_prfct  varchar (20) 
+,opeitm_unit_id_prdpurshp  numeric (38,0)
+,shelfno_loca_id_shelfno  numeric (38,0)
+,loca_mail_shelfno  varchar (20) 
+,loca_zip  varchar (10) 
+,opeitm_itm_id  numeric (38,0)
+,opeitm_loca_id  numeric (38,0)
+,opeitm_boxe_id  numeric (22,0)
+,loca_addr1  varchar (50) 
+,opeitm_unit_id_case  numeric (38,0)
+,loca_id_shelfno  numeric (22,0)
+,opeitm_shelfno_id  numeric (22,0)
+,loca_zip_shelfno  varchar (10) 
+,loca_prfct_shelfno  varchar (20) 
+,loca_country_shelfno  varchar (20) 
+          ,sio_errline varchar(4000)
+          ,sio_org_tblname varchar(30)
+          ,sio_org_tblid numeric(38,0)
+          ,sio_add_time date
+          ,sio_replay_time date
+          ,sio_result_f char(1)
+          ,sio_message_code char(10)
+          ,sio_message_contents varchar(4000)
+          ,sio_chk_done char(1)
+);
+ CREATE INDEX sio_r_purords_uk1 
+  ON sio.sio_r_purords(sio_user_code,sio_session_counter,sio_session_id,sio_Command_Response); 
 
-;
-
-CREATE SEQUENCE  PURORDS_SEQ INCREMENT BY 1 START WITH 1 
-;
-
-CREATE OR REPLACE VIEW R_PURORDS (PURORD_ISUDATE, PURORD_PRJNO_ID, PRJNO_ID, PRJNO_EXPIREDATE, PRJNO_CODE, PRJNO_NAME, PRJNO_CODE_CHIL, PURORD_OPEITM_ID, OPEITM_MINQTY, OPEITM_PRIORITY, OPEITM_PARENUM, OPEITM_CHILNUM, OPEITM_EXPIREDATE, OPEITM_CONSUMTYPE, OPEITM_PROCESSSEQ, OPEITM_SAFESTKQTY, OPEITM_DURATION, OPEITM_PACKQTY, OPEITM_ITM_ID, ITM_CODE, ITM_STD, ITM_EXPIREDATE, ITM_MODEL, ITM_WIDE, ITM_NAME, ITM_DETH, ITM_LENGTH, ITM_WEIGHT, ITM_DESIGN, ITM_DATASCALE, ITM_MATERIAL, ITM_ID, ITM_UNIT_ID, UNIT_CONTENTS, UNIT_ID, UNIT_CODE, UNIT_NAME, OPEITM_PRDPURSHP, OPEITM_ID, OPEITM_CONTENTS, OPEITM_LOCA_ID, LOCA_ID, LOCA_EXPIREDATE, LOCA_CODE, LOCA_NAME, LOCA_ABBR, LOCA_ZIP, LOCA_COUNTRY, LOCA_PRFCT, LOCA_ADDR1, LOCA_ADDR2, LOCA_TEL, LOCA_FAX, LOCA_MAIL, OPEITM_AUTOCREATE_ORD, OPEITM_AUTOCREATE_INST, OPEITM_OPT_FIXOTERM, OPEITM_MAXQTY, OPEITM_OPERATION, OPEITM_UNIT_ID_CASE_PUR, UNIT_ID_CASE_PUR, UNIT_EXPIREDATE_CASE_PUR, UNIT_CODE_CASE_PUR, UNIT_NAME_CASE_PUR, UNIT_CONTENTS_CASE_PUR, OPEITM_UNIT_ID_CASE, UNIT_ID_CASE, UNIT_EXPIREDATE_CASE, UNIT_CODE_CASE, UNIT_NAME_CASE, UNIT_CONTENTS_CASE, OPEITM_AUTOCREATE_ACT, OPEITM_SHUFFLE_FLG, OPEITM_SHUFFLE_LOCA, OPEITM_CHKORD, OPEITM_CHKORD_PRC, OPEITM_RULE_PRICE, OPEITM_STKTAKING_F, OPEITM_ESTTOSCH, OPEITM_CHKINST, OPEITM_MOLD, OPEITM_CONSUMAUTO, OPEITM_BOXE_ID, BOXE_HEIGHT, BOXE_CONTENTS, BOXE_ID, BOXE_EXPIREDATE, BOXE_CODE, BOXE_NAME, BOXE_WIDE, BOXE_BOXTYPE, BOXE_DEPTH, BOXE_OUTDEPTH, BOXE_OUTWIDE, BOXE_OUTHEIGHT, BOXE_UNIT_ID_BOX, UNIT_ID_BOX, UNIT_EXPIREDATE_BOX, UNIT_CODE_BOX, UNIT_NAME_BOX, UNIT_CONTENTS_BOX, BOXE_UNIT_ID_OUTBOX, UNIT_ID_OUTBOX, UNIT_EXPIREDATE_OUTBOX, UNIT_CODE_OUTBOX, UNIT_NAME_OUTBOX, UNIT_CONTENTS_OUTBOX, OPEITM_OPT_FIX_FLG, OPEITM_AUTOORD_P, OPEITM_PACKNO_FLG, OPEITM_PRJALLOC_FLG, OPEITM_AUTOACT_P, OPEITM_UNITS_LTTIME, OPEITM_QTY_PUR, OPEITM_SHELFNO_ID, SHELFNO_CODE, SHELFNO_EXPIREDATE, SHELFNO_NAME, SHELFNO_ID, SHELFNO_CONTENTS, SHELFNO_LOCA_ID_SHELFNO, LOCA_ID_SHELFNO, LOCA_EXPIREDATE_SHELFNO, LOCA_CODE_SHELFNO, LOCA_NAME_SHELFNO, LOCA_ABBR_SHELFNO, LOCA_ZIP_SHELFNO, LOCA_COUNTRY_SHELFNO, LOCA_PRFCT_SHELFNO, LOCA_ADDR1_SHELFNO, LOCA_ADDR2_SHELFNO, LOCA_TEL_SHELFNO, LOCA_FAX_SHELFNO, LOCA_MAIL_SHELFNO, PURORD_EXPIREDATE, PURORD_UPDATED_AT, PURORD_QTY, PURORD_SNO, PURORD_LOCA_ID_TO, LOCA_ID_TO, LOCA_EXPIREDATE_TO, LOCA_CODE_TO, LOCA_NAME_TO, LOCA_ABBR_TO, LOCA_ZIP_TO, LOCA_COUNTRY_TO, LOCA_PRFCT_TO, LOCA_ADDR1_TO, LOCA_ADDR2_TO, LOCA_TEL_TO, LOCA_FAX_TO, LOCA_MAIL_TO, PURORD_PRICE, PURORD_REMARK, PURORD_CREATED_AT, PURORD_UPDATE_IP, PURORD_DUEDATE, PURORD_AMT, PURORD_TODUEDATE, ID, PURORD_ID, PURORD_TAX, PURORD_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, PURORD_STARTTIME, PURORD_PROCESSSEQ_PARE, PURORD_OPT_FIXOTERM, PURORD_QTY_CASE, PURORD_CONFIRM, PURORD_CONTRACT_PRICE, PURORD_CHRG_ID, CHRG_ID, CHRG_EXPIREDATE, CHRG_PERSON_ID, PERSON_CODE_CHRG, PERSON_EXPIREDATE_CHRG, PERSON_NAME_CHRG, USRGRP_NAME_CHRG, USRGRP_CODE_CHRG, PERSON_EMAIL_CHRG, PERSON_ID_CHRG, PERSON_SECT_ID, SECT_ID, LOCA_ID_SECT, LOCA_CODE_SECT, LOCA_NAME_SECT, LOCA_ABBR_SECT, LOCA_ZIP_SECT, LOCA_COUNTRY_SECT, LOCA_PRFCT_SECT, LOCA_ADDR1_SECT, LOCA_ADDR2_SECT, PURORD_GNO, PURORD_ITM_CODE_CLIENT) AS 
-  select purord.isudate purord_isudate ,purord.prjnos_id purord_prjno_id , prjno.prjno_id prjno_id, prjno.prjno_expiredate prjno_expiredate, prjno.prjno_code prjno_code, prjno.prjno_name prjno_name, prjno.prjno_code_chil prjno_code_chil,purord.opeitms_id purord_opeitm_id , opeitm.opeitm_minqty opeitm_minqty, opeitm.opeitm_priority opeitm_priority, opeitm.opeitm_parenum opeitm_parenum, opeitm.opeitm_chilnum opeitm_chilnum, opeitm.opeitm_expiredate opeitm_expiredate, opeitm.opeitm_consumtype opeitm_consumtype, opeitm.opeitm_processseq opeitm_processseq, opeitm.opeitm_safestkqty opeitm_safestkqty, opeitm.opeitm_duration opeitm_duration, opeitm.opeitm_packqty opeitm_packqty, opeitm.opeitm_itm_id opeitm_itm_id, opeitm.itm_code itm_code, opeitm.itm_std itm_std, opeitm.itm_expiredate itm_expiredate, opeitm.itm_model itm_model, opeitm.itm_wide itm_wide, opeitm.itm_name itm_name, opeitm.itm_deth itm_deth, opeitm.itm_length itm_length, opeitm.itm_weight itm_weight, opeitm.itm_design itm_design, opeitm.itm_datascale itm_datascale, opeitm.itm_material itm_material, opeitm.itm_id itm_id, opeitm.itm_unit_id itm_unit_id, opeitm.unit_contents unit_contents, opeitm.unit_id unit_id, opeitm.unit_code unit_code, opeitm.unit_name unit_name, opeitm.opeitm_prdpurshp opeitm_prdpurshp, opeitm.opeitm_id opeitm_id, opeitm.opeitm_contents opeitm_contents, opeitm.opeitm_loca_id opeitm_loca_id, opeitm.loca_id loca_id, opeitm.loca_expiredate loca_expiredate, opeitm.loca_code loca_code, opeitm.loca_name loca_name, opeitm.loca_abbr loca_abbr, opeitm.loca_zip loca_zip, opeitm.loca_country loca_country, opeitm.loca_prfct loca_prfct, opeitm.loca_addr1 loca_addr1, opeitm.loca_addr2 loca_addr2, opeitm.loca_tel loca_tel, opeitm.loca_fax loca_fax, opeitm.loca_mail loca_mail, opeitm.opeitm_autocreate_ord opeitm_autocreate_ord, opeitm.opeitm_autocreate_inst opeitm_autocreate_inst, opeitm.opeitm_opt_fixoterm opeitm_opt_fixoterm, opeitm.opeitm_maxqty opeitm_maxqty, opeitm.opeitm_operation opeitm_operation, opeitm.opeitm_unit_id_case_pur opeitm_unit_id_case_pur, opeitm.unit_id_case_pur unit_id_case_pur, opeitm.unit_expiredate_case_pur unit_expiredate_case_pur, opeitm.unit_code_case_pur unit_code_case_pur, opeitm.unit_name_case_pur unit_name_case_pur, opeitm.unit_contents_case_pur unit_contents_case_pur, opeitm.opeitm_unit_id_case opeitm_unit_id_case, opeitm.unit_id_case unit_id_case, opeitm.unit_expiredate_case unit_expiredate_case, opeitm.unit_code_case unit_code_case, opeitm.unit_name_case unit_name_case, opeitm.unit_contents_case unit_contents_case, opeitm.opeitm_autocreate_act opeitm_autocreate_act, opeitm.opeitm_shuffle_flg opeitm_shuffle_flg, opeitm.opeitm_shuffle_loca opeitm_shuffle_loca, opeitm.opeitm_chkord opeitm_chkord, opeitm.opeitm_chkord_prc opeitm_chkord_prc, opeitm.opeitm_rule_price opeitm_rule_price, opeitm.opeitm_stktaking_f opeitm_stktaking_f, opeitm.opeitm_esttosch opeitm_esttosch, opeitm.opeitm_chkinst opeitm_chkinst, opeitm.opeitm_mold opeitm_mold, opeitm.opeitm_consumauto opeitm_consumauto, opeitm.opeitm_boxe_id opeitm_boxe_id, opeitm.boxe_height boxe_height, opeitm.boxe_contents boxe_contents, opeitm.boxe_id boxe_id, opeitm.boxe_expiredate boxe_expiredate, opeitm.boxe_code boxe_code, opeitm.boxe_name boxe_name, opeitm.boxe_wide boxe_wide, opeitm.boxe_boxtype boxe_boxtype, opeitm.boxe_depth boxe_depth, opeitm.boxe_outdepth boxe_outdepth, opeitm.boxe_outwide boxe_outwide, opeitm.boxe_outheight boxe_outheight, opeitm.boxe_unit_id_box boxe_unit_id_box, opeitm.unit_id_box unit_id_box, opeitm.unit_expiredate_box unit_expiredate_box, opeitm.unit_code_box unit_code_box, opeitm.unit_name_box unit_name_box, opeitm.unit_contents_box unit_contents_box, opeitm.boxe_unit_id_outbox boxe_unit_id_outbox, opeitm.unit_id_outbox unit_id_outbox, opeitm.unit_expiredate_outbox unit_expiredate_outbox, opeitm.unit_code_outbox unit_code_outbox, opeitm.unit_name_outbox unit_name_outbox, opeitm.unit_contents_outbox unit_contents_outbox, opeitm.opeitm_opt_fix_flg opeitm_opt_fix_flg, opeitm.opeitm_autoord_p opeitm_autoord_p, opeitm.opeitm_packno_flg opeitm_packno_flg, opeitm.opeitm_prjalloc_flg opeitm_prjalloc_flg, opeitm.opeitm_autoact_p opeitm_autoact_p, opeitm.opeitm_units_lttime opeitm_units_lttime, opeitm.opeitm_qty_pur opeitm_qty_pur, opeitm.opeitm_shelfno_id opeitm_shelfno_id, opeitm.shelfno_code shelfno_code, opeitm.shelfno_expiredate shelfno_expiredate, opeitm.shelfno_name shelfno_name, opeitm.shelfno_id shelfno_id, opeitm.shelfno_contents shelfno_contents, opeitm.shelfno_loca_id_shelfno shelfno_loca_id_shelfno, opeitm.loca_id_shelfno loca_id_shelfno, opeitm.loca_expiredate_shelfno loca_expiredate_shelfno, opeitm.loca_code_shelfno loca_code_shelfno, opeitm.loca_name_shelfno loca_name_shelfno, opeitm.loca_abbr_shelfno loca_abbr_shelfno, opeitm.loca_zip_shelfno loca_zip_shelfno, opeitm.loca_country_shelfno loca_country_shelfno, opeitm.loca_prfct_shelfno loca_prfct_shelfno, opeitm.loca_addr1_shelfno loca_addr1_shelfno, opeitm.loca_addr2_shelfno loca_addr2_shelfno, opeitm.loca_tel_shelfno loca_tel_shelfno, opeitm.loca_fax_shelfno loca_fax_shelfno, opeitm.loca_mail_shelfno loca_mail_shelfno,purord.expiredate purord_expiredate ,purord.updated_at purord_updated_at ,purord.qty purord_qty ,purord.sno purord_sno ,purord.locas_id_to purord_loca_id_to , loca_to.loca_id loca_id_to, loca_to.loca_expiredate loca_expiredate_to, loca_to.loca_code loca_code_to, loca_to.loca_name loca_name_to, loca_to.loca_abbr loca_abbr_to, loca_to.loca_zip loca_zip_to, loca_to.loca_country loca_country_to, loca_to.loca_prfct loca_prfct_to, loca_to.loca_addr1 loca_addr1_to, loca_to.loca_addr2 loca_addr2_to, loca_to.loca_tel loca_tel_to, loca_to.loca_fax loca_fax_to, loca_to.loca_mail loca_mail_to,purord.price purord_price ,purord.remark purord_remark ,purord.created_at purord_created_at ,purord.update_ip purord_update_ip ,purord.duedate purord_duedate ,purord.amt purord_amt ,purord.toduedate purord_toduedate ,purord.id id,purord.id purord_id ,purord.tax purord_tax ,purord.persons_id_upd purord_person_id_upd , person_upd.person_id_upd person_id_upd, person_upd.person_code_upd person_code_upd, person_upd.person_name_upd person_name_upd,purord.starttime purord_starttime ,purord.processseq_pare purord_processseq_pare ,purord.opt_fixoterm purord_opt_fixoterm ,purord.qty_case purord_qty_case ,purord.confirm purord_confirm ,purord.contract_price purord_contract_price ,purord.chrgs_id purord_chrg_id , chrg.chrg_id chrg_id, chrg.chrg_expiredate chrg_expiredate, chrg.chrg_person_id chrg_person_id, chrg.person_code_chrg person_code_chrg, chrg.person_expiredate_chrg person_expiredate_chrg, chrg.person_name_chrg person_name_chrg, chrg.usrgrp_name_chrg usrgrp_name_chrg, chrg.usrgrp_code_chrg usrgrp_code_chrg, chrg.person_email_chrg person_email_chrg, chrg.person_id_chrg person_id_chrg, chrg.person_sect_id person_sect_id, chrg.sect_id sect_id, chrg.loca_id_sect loca_id_sect, chrg.loca_code_sect loca_code_sect, chrg.loca_name_sect loca_name_sect, chrg.loca_abbr_sect loca_abbr_sect, chrg.loca_zip_sect loca_zip_sect, chrg.loca_country_sect loca_country_sect, chrg.loca_prfct_sect loca_prfct_sect, chrg.loca_addr1_sect loca_addr1_sect, chrg.loca_addr2_sect loca_addr2_sect,purord.gno purord_gno ,purord.itm_code_client purord_itm_code_client 
- from purords purord ,r_prjnos  prjno,r_opeitms  opeitm,r_locas  loca_to,upd_persons  person_upd,r_chrgs  chrg
- where  prjno.id = purord.prjnos_id and  opeitm.id = purord.opeitms_id and  loca_to.id = purord.locas_id_to and  person_upd.id = purord.persons_id_upd and  chrg.id = purord.chrgs_id
-;
-
-CREATE TABLE sio.SIO_R_PURORDS 
-   (	SIO_ID NUMERIC(38,0), 
-	SIO_USER_CODE NUMERIC(38,0), 
-	SIO_TERM_ID VARCHAR(30), 
-	SIO_SESSION_ID NUMERIC, 
-	SIO_COMMAND_RESPONSE CHAR(1), 
-	SIO_SESSION_COUNTER NUMERIC(38,0), 
-	SIO_CLASSNAME VARCHAR(50), 
-	SIO_VIEWNAME VARCHAR(30), 
-	SIO_CODE VARCHAR(30), 
-	SIO_STRSQL VARCHAR(4000), 
-	SIO_TOTALCOUNT NUMERIC(38,0), 
-	SIO_RECORDCOUNT NUMERIC(38,0), 
-	SIO_START_RECORD NUMERIC(38,0), 
-	SIO_END_RECORD NUMERIC(38,0), 
-	SIO_SORD VARCHAR(256), 
-	SIO_SEARCH VARCHAR(10), 
-	SIO_SIDX VARCHAR(256), 
-	PURORD_ISUDATE TIMESTAMP (6), 
-	PURORD_PRJNO_ID NUMERIC(22,0), 
-	PRJNO_ID NUMERIC(22,0), 
-	PRJNO_EXPIREDATE DATE, 
-	PRJNO_CODE VARCHAR(50), 
-	PRJNO_NAME VARCHAR(100), 
-	PRJNO_CODE_CHIL VARCHAR(50), 
-	PURORD_OPEITM_ID NUMERIC(22,0), 
-	OPEITM_MINQTY NUMERIC(22,6), 
-	OPEITM_PRIORITY NUMERIC(22,0), 
-	OPEITM_PARENUM NUMERIC(22,0), 
-	OPEITM_CHILNUM NUMERIC(22,0), 
-	OPEITM_EXPIREDATE DATE, 
-	OPEITM_CONSUMTYPE CHAR(3), 
-	OPEITM_PROCESSSEQ NUMERIC(22,0), 
-	OPEITM_SAFESTKQTY NUMERIC(22,0), 
-	OPEITM_DURATION NUMERIC(22,2), 
-	OPEITM_PACKQTY NUMERIC(18,2), 
-	OPEITM_ITM_ID NUMERIC(22,0), 
-	ITM_CODE VARCHAR(50), 
-	ITM_STD VARCHAR(50), 
-	ITM_EXPIREDATE DATE, 
-	ITM_MODEL VARCHAR(50), 
-	ITM_WIDE NUMERIC(7,2), 
-	ITM_NAME VARCHAR(100), 
-	ITM_DETH NUMERIC(22,6), 
-	ITM_LENGTH NUMERIC(22,6), 
-	ITM_WEIGHT NUMERIC(7,2), 
-	ITM_DESIGN VARCHAR(50), 
-	ITM_DATASCALE NUMERIC(22,0), 
-	ITM_MATERIAL VARCHAR(50), 
-	ITM_ID NUMERIC(22,0), 
-	ITM_UNIT_ID NUMERIC(22,0), 
-	UNIT_CONTENTS VARCHAR(4000), 
-	UNIT_ID NUMERIC(22,0), 
-	UNIT_CODE VARCHAR(50), 
-	UNIT_NAME VARCHAR(100), 
-	OPEITM_PRDPURSHP VARCHAR(5), 
-	OPEITM_ID NUMERIC(22,0), 
-	OPEITM_CONTENTS VARCHAR(4000), 
-	OPEITM_LOCA_ID NUMERIC(22,0), 
-	LOCA_ID NUMERIC(22,0), 
-	LOCA_EXPIREDATE DATE, 
-	LOCA_CODE VARCHAR(50), 
-	LOCA_NAME VARCHAR(100), 
-	LOCA_ABBR VARCHAR(50), 
-	LOCA_ZIP VARCHAR(10), 
-	LOCA_COUNTRY VARCHAR(20), 
-	LOCA_PRFCT VARCHAR(20), 
-	LOCA_ADDR1 VARCHAR(50), 
-	LOCA_ADDR2 VARCHAR(50), 
-	LOCA_TEL VARCHAR(20), 
-	LOCA_FAX VARCHAR(20), 
-	LOCA_MAIL VARCHAR(20), 
-	OPEITM_AUTOCREATE_ORD CHAR(1), 
-	OPEITM_AUTOCREATE_INST CHAR(1), 
-	OPEITM_OPT_FIXOTERM NUMERIC(5,2), 
-	OPEITM_MAXQTY NUMERIC(22,4), 
-	OPEITM_OPERATION VARCHAR(40), 
-	OPEITM_UNIT_ID_CASE_PUR NUMERIC(22,0), 
-	UNIT_ID_CASE_PUR NUMERIC(22,0), 
-	UNIT_EXPIREDATE_CASE_PUR DATE, 
-	UNIT_CODE_CASE_PUR VARCHAR(50), 
-	UNIT_NAME_CASE_PUR VARCHAR(100), 
-	UNIT_CONTENTS_CASE_PUR VARCHAR(4000), 
-	OPEITM_UNIT_ID_CASE NUMERIC(22,0), 
-	UNIT_ID_CASE NUMERIC(22,0), 
-	UNIT_EXPIREDATE_CASE DATE, 
-	UNIT_CODE_CASE VARCHAR(50), 
-	UNIT_NAME_CASE VARCHAR(100), 
-	UNIT_CONTENTS_CASE VARCHAR(4000), 
-	OPEITM_AUTOCREATE_ACT CHAR(1), 
-	OPEITM_SHUFFLE_FLG CHAR(1), 
-	OPEITM_SHUFFLE_LOCA CHAR(1), 
-	OPEITM_CHKORD CHAR(1), 
-	OPEITM_CHKORD_PRC NUMERIC(3,0), 
-	OPEITM_RULE_PRICE CHAR(1), 
-	OPEITM_STKTAKING_F CHAR(1), 
-	OPEITM_ESTTOSCH NUMERIC(22,0), 
-	OPEITM_CHKINST CHAR(1), 
-	OPEITM_MOLD CHAR(1), 
-	OPEITM_CONSUMAUTO CHAR(1), 
-	OPEITM_BOXE_ID NUMERIC(22,0), 
-	BOXE_HEIGHT NUMERIC(7,2), 
-	BOXE_CONTENTS VARCHAR(4000), 
-	BOXE_ID NUMERIC(22,0), 
-	BOXE_EXPIREDATE DATE, 
-	BOXE_CODE VARCHAR(50), 
-	BOXE_NAME VARCHAR(100), 
-	BOXE_WIDE NUMERIC(7,2), 
-	BOXE_BOXTYPE VARCHAR(20), 
-	BOXE_DEPTH NUMERIC(7,2), 
-	BOXE_OUTDEPTH NUMERIC(7,2), 
-	BOXE_OUTWIDE NUMERIC(7,2), 
-	BOXE_OUTHEIGHT NUMERIC(7,2), 
-	BOXE_UNIT_ID_BOX NUMERIC(22,0), 
-	UNIT_ID_BOX NUMERIC(22,0), 
-	UNIT_EXPIREDATE_BOX DATE, 
-	UNIT_CODE_BOX VARCHAR(50), 
-	UNIT_NAME_BOX VARCHAR(100), 
-	UNIT_CONTENTS_BOX VARCHAR(4000), 
-	BOXE_UNIT_ID_OUTBOX NUMERIC(22,0), 
-	UNIT_ID_OUTBOX NUMERIC(22,0), 
-	UNIT_EXPIREDATE_OUTBOX DATE, 
-	UNIT_CODE_OUTBOX VARCHAR(50), 
-	UNIT_NAME_OUTBOX VARCHAR(100), 
-	UNIT_CONTENTS_OUTBOX VARCHAR(4000), 
-	OPEITM_OPT_FIX_FLG CHAR(1), 
-	OPEITM_AUTOORD_P NUMERIC(3,0), 
-	OPEITM_PACKNO_FLG CHAR(1), 
-	OPEITM_PRJALLOC_FLG NUMERIC(22,0), 
-	OPEITM_AUTOACT_P NUMERIC(3,0), 
-	OPEITM_UNITS_LTTIME CHAR(4), 
-	OPEITM_QTY_PUR NUMERIC(22,0), 
-	OPEITM_SHELFNO_ID NUMERIC(22,0), 
-	SHELFNO_CODE VARCHAR(50), 
-	SHELFNO_EXPIREDATE DATE, 
-	SHELFNO_NAME VARCHAR(100), 
-	SHELFNO_ID NUMERIC(22,0), 
-	SHELFNO_CONTENTS VARCHAR(4000), 
-	SHELFNO_LOCA_ID_SHELFNO NUMERIC(22,0), 
-	LOCA_ID_SHELFNO NUMERIC(22,0), 
-	LOCA_EXPIREDATE_SHELFNO DATE, 
-	LOCA_CODE_SHELFNO VARCHAR(50), 
-	LOCA_NAME_SHELFNO VARCHAR(100), 
-	LOCA_ABBR_SHELFNO VARCHAR(50), 
-	LOCA_ZIP_SHELFNO VARCHAR(10), 
-	LOCA_COUNTRY_SHELFNO VARCHAR(20), 
-	LOCA_PRFCT_SHELFNO VARCHAR(20), 
-	LOCA_ADDR1_SHELFNO VARCHAR(50), 
-	LOCA_ADDR2_SHELFNO VARCHAR(50), 
-	LOCA_TEL_SHELFNO VARCHAR(20), 
-	LOCA_FAX_SHELFNO VARCHAR(20), 
-	LOCA_MAIL_SHELFNO VARCHAR(20), 
-	PURORD_EXPIREDATE DATE, 
-	PURORD_UPDATED_AT TIMESTAMP (6), 
-	PURORD_QTY NUMERIC(18,4), 
-	PURORD_SNO VARCHAR(40), 
-	PURORD_LOCA_ID_TO NUMERIC(22,0), 
-	LOCA_ID_TO NUMERIC(22,0), 
-	LOCA_EXPIREDATE_TO DATE, 
-	LOCA_CODE_TO VARCHAR(50), 
-	LOCA_NAME_TO VARCHAR(100), 
-	LOCA_ABBR_TO VARCHAR(50), 
-	LOCA_ZIP_TO VARCHAR(10), 
-	LOCA_COUNTRY_TO VARCHAR(20), 
-	LOCA_PRFCT_TO VARCHAR(20), 
-	LOCA_ADDR1_TO VARCHAR(50), 
-	LOCA_ADDR2_TO VARCHAR(50), 
-	LOCA_TEL_TO VARCHAR(20), 
-	LOCA_FAX_TO VARCHAR(20), 
-	LOCA_MAIL_TO VARCHAR(20), 
-	PURORD_PRICE NUMERIC(22,4), 
-	PURORD_REMARK VARCHAR(4000), 
-	PURORD_CREATED_AT TIMESTAMP (6), 
-	PURORD_UPDATE_IP VARCHAR(40), 
-	PURORD_DUEDATE TIMESTAMP (6), 
-	PURORD_AMT NUMERIC(18,4), 
-	PURORD_TODUEDATE TIMESTAMP (6), 
-	ID NUMERIC(22,0), 
-	PURORD_ID NUMERIC(22,0), 
-	PURORD_TAX NUMERIC(22,4), 
-	PURORD_PERSON_ID_UPD NUMERIC(22,0), 
-	PERSON_ID_UPD NUMERIC(22,0), 
-	PERSON_CODE_UPD VARCHAR(50), 
-	PERSON_NAME_UPD VARCHAR(100), 
-	PURORD_STARTTIME TIMESTAMP (6), 
-	PURORD_PROCESSSEQ_PARE NUMERIC(22,0), 
-	PURORD_OPT_FIXOTERM NUMERIC(5,2), 
-	PURORD_QTY_CASE NUMERIC(22,0), 
-	PURORD_CONFIRM CHAR(1), 
-	PURORD_CONTRACT_PRICE CHAR(1), 
-	PURORD_CHRG_ID NUMERIC(22,0), 
-	CHRG_ID NUMERIC(22,0), 
-	CHRG_EXPIREDATE DATE, 
-	CHRG_PERSON_ID NUMERIC(22,0), 
-	PERSON_CODE_CHRG VARCHAR(50), 
-	PERSON_EXPIREDATE_CHRG DATE, 
-	PERSON_NAME_CHRG VARCHAR(100), 
-	USRGRP_NAME_CHRG VARCHAR(100), 
-	USRGRP_CODE_CHRG VARCHAR(50), 
-	PERSON_EMAIL_CHRG VARCHAR(50), 
-	PERSON_ID_CHRG NUMERIC(22,0), 
-	PERSON_SECT_ID NUMERIC(22,0), 
-	SECT_ID NUMERIC(22,0), 
-	LOCA_ID_SECT NUMERIC(22,0), 
-	LOCA_CODE_SECT VARCHAR(50), 
-	LOCA_NAME_SECT VARCHAR(100), 
-	LOCA_ABBR_SECT VARCHAR(50), 
-	LOCA_ZIP_SECT VARCHAR(10), 
-	LOCA_COUNTRY_SECT VARCHAR(20), 
-	LOCA_PRFCT_SECT VARCHAR(20), 
-	LOCA_ADDR1_SECT VARCHAR(50), 
-	LOCA_ADDR2_SECT VARCHAR(50), 
-	PURORD_GNO VARCHAR(40), 
-	PURORD_ITM_CODE_CLIENT VARCHAR(50), 
-	SIO_ERRLINE VARCHAR(4000), 
-	SIO_ORG_TBLNAME VARCHAR(30), 
-	SIO_ORG_TBLID NUMERIC(38,0), 
-	SIO_ADD_TIME DATE, 
-	SIO_REPLAY_TIME DATE, 
-	SIO_RESULT_F CHAR(1), 
-	SIO_MESSAGE_CODE CHAR(10), 
-	SIO_MESSAGE_CONTENTS VARCHAR(4000), 
-	SIO_CHK_DONE CHAR(1), 
-	 CONSTRAINT SIO_R_PURORDS_ID_PK PRIMARY KEY (SIO_ID)) 
-;
-
-
-commit
-
-;
-
+ drop sequence  if exists sio.sio_r_purords_seq ;
+ create sequence sio.sio_r_purords_seq ;

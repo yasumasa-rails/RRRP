@@ -369,13 +369,13 @@ extend self
 			end
 		else 
 			### テーブルscreendsに登録されてない
-			@messages << " add screen  to　screens   --> '#{screen}'"
+			@messages << " <p>add screen  to　screens   --> '#{screen}' </p>"
 			strsql = "select * from pobjects where code ='#{screen}' and objecttype = 'screen'"
 			pobject_id_scr = ActiveRecord::Base.connection.select_one(strsql)
 			if pobject_id_scr
 				###ok
-			else　
-				@messages << " add screen code to pobjects --> '#{screen}'"
+			else
+				@messages << " <p> add screen code to pobjects --> '#{screen}' </p>"
 			end	
 		end
 		return 	screens_id
@@ -419,12 +419,25 @@ extend self
 		command_r["id"] = ""
 		command_r[:sio_classname] = "_add_screenfield_record"
 		command_r["screenfield_id"] = ""
-		command_r["screenfield_remark"] = "auto add to screenfield ===> #{field["pobject_code_tbl"].chop}_#{field["pobject_code_fld"]}"
+		command_r["screenfield_remark"] =	if field["pobject_code_fld"] =~ /s_id/ and field["pobject_code_fld"] != "persons_id_upd"
+												" 検索項目の入力を忘れずに"
+											else	
+												"auto add to screenfield "
+											end
 		command_r["screenfield_expiredate"] = '2099/12/31'
 		command_r["screenfield_screen_id"] = screens_id
 		command_r["screenfield_selection"] = "1"
-		command_r["screenfield_hideflg"] = if field["pobject_code_fld"] =~ /_id/ then "1" else "0" end
-		command_r["screenfield_seqno"]= "0"
+		command_r["screenfield_hideflg"] = if field["pobject_code_fld"] =~ /_id/  or field["pobject_code_fld"] == "id" then "1" else "0" end
+		command_r["screenfield_seqno"] =	if ["persons_id_upd","created_at","updated_at","update_ip"].include?(field["pobject_code_fld"]) or
+												field["pobject_code_fld"] =~ /_id/  or field["pobject_code_fld"] == "id"
+	  												 "9990"
+											 else
+												if ["code","name","sno","gno","cno"].include?(field["pobject_code_fld"] ) 
+													  "100"
+												else
+													  "200"	
+												end 		  
+   											end
 		command_r["screenfield_rowpos"]="0"
 		command_r["screenfield_colpos"]="0"
 		command_r["screenfield_width"]="100"
@@ -433,7 +446,8 @@ extend self
 		command_r["screenfield_datascale"] = field["fieldcode_datascale"]
 		command_r["screenfield_indisp"] = "0"
 		command_r["screenfield_subindisp"] ="0"
-		command_r["screenfield_editable"] =	if ["persons_id_upd","created_at","updated_at","update_ip"].include?(field["pobject_code_fld"]) 
+		command_r["screenfield_editable"] =	if ["created_at","updated_at","update_ip"].include?(field["pobject_code_fld"]) or
+													 field["pobject_code_fld"] =~ /_id/  or field["pobject_code_fld"] == "id"
 												"0"
 											else
 												"1"
@@ -470,8 +484,17 @@ extend self
 		command_r["screenfield_expiredate"] = rec["screenfield_expiredate"]
 		command_r["screenfield_screen_id"] = screens_id
 		command_r["screenfield_selection"] = if rec["pobject_code_sfd"] =~ /_id/ or rec["screenfield_selection"] == '0' then '0' else '1' end
-		command_r["screenfield_hideflg"] = if rec["pobject_code_sfd"] =~ /_id/ or rec["screenfield_hideflg"] != '0' then "1" else "0" end
-		command_r["screenfield_seqno"]= "0"
+		command_r["screenfield_hideflg"] = if rec["pobject_code_sfd"] =~ /_id/ or rec["screenfield_hideflg"] != '0' or 
+												rec["pobject_code_sfd"] =~ /_remark/ then "1" else "0" end
+		command_r["screenfield_seqno"]   =	if rec["pobject_code_sfd"] =~ /_code/ or rec["pobject_code_sfd"] =~ /_name/ 
+												  "150"
+											else
+												if rec["pobject_code_sfd"] == "id"  or rec["screenfield_hideflg"] != '0' or rec["pobject_code_sfd"] =~ /_remark/
+													"9992"
+												else	
+													  "300"	
+												end	  
+											end 	
 		command_r["screenfield_rowpos"]="0"
 		command_r["screenfield_colpos"]="0"
 		command_r["screenfield_width"]=rec["screenfield_width"]
@@ -622,10 +645,11 @@ extend self
 			  
 			@modifysql <<  "\n drop sequence  if exists sio.sio_#{viewname}_seq ;"##logger.debug @modifysql
 			@modifysql <<  "\n create sequence sio.sio_#{viewname}_seq ;"##logger.debug @modifysql
-	  end #
-	  def sio_fields viewname
+	end #
+	def sio_fields viewname
 			sio_field_strsql = ""
-			strsql = "select screenfield_type,screenfield_dataprecision,screenfield_datascale,pobject_code_sfd,screenfield_edoptmaxlength
+			strsql = "select screenfield_type,screenfield_dataprecision,screenfield_datascale,pobject_code_sfd,
+						screenfield_edoptmaxlength,fieldcode_fieldlength
 						from r_screenfields a
 						where pobject_code_scr = '#{viewname}' 
 						order by screenfield_seqno"
@@ -634,7 +658,7 @@ extend self
 			  sio_field_strsql << "," + sr["pobject_code_sfd"] + " " 
 			  case  sr["screenfield_type"]
 				  when /char|text|select/
-					  sio_field_strsql << " varchar (" +  sr["screenfield_edoptmaxlength"].to_s + ") \n"
+					  sio_field_strsql << " varchar (" +  sr["fieldcode_fieldlength"].to_s + ") \n"
 				  when /number|numeric/
 					sio_field_strsql << " numeric "
 					sio_field_strsql << if sr["screenfield_dataprecision"] == "0" or sr["screenfield_dataprecision"].nil?
@@ -647,7 +671,7 @@ extend self
 			  end
 		  end
 		  return sio_field_strsql
-	  end 
+	end 
 	def proc_set_search_code_of_screen   pobject_code_scr
 		### 以下　blkukysに変更して　全面コーディングし直した　2014/12/26
 		strsql = "select * from r_screenfields where pobject_code_scr = '#{pobject_code_scr}' and  screenfield_selection = 1 "
@@ -696,89 +720,6 @@ extend self
 			@modifysql << " ALTER TABLE #{tblname} drop CONSTRAINT #{key}"
 		end
 	end
-
- 	def create_or_replace_viewxxxx  tblid,tblname,screen_id
-		strsql = "select * from r_tblfields where tblfield_blktb_id = #{tblid} and tblfield_expiredate >  current_date"
-   		subfields = ActiveRecord::Base.connection.select_all(strsql)
-		tmp_union_tbl = ActiveRecord::Base.connection.select_one("select * from blktbs  where id  = #{tblid} ")
-		union_tbls =  if tmp_union_tbl["seltbls"] and tmp_union_tbl["seltbls"] != "undefined" then eval(tmp_union_tbl["seltbls"])  else [""] end ##tblname対応
-			### tmp_union_tbl[:seltbls]はarrayであること。　　checkが必要
-			selectstr = ""
-			fromstr = ""
-			wherestr = ""
-			@sfd_code_id = {}
-			union_tbls.each_with_index do |utbl,idx|   ###うまくセットできてない。　2016/4/24
-        		selectstr <<  if idx == 0 then  " select " else "\n union \n select " end
-       			wherestr << if utbl == "" then "\n where "  else  "\n where #{tblname.chop}.tblid = #{utbl.to_s.split("_")[1].chop}.id  and
-		                                 #{tblname.chop}.tblname = '#{utbl.to_s}' and " end ##join条件
-       			fromstr << "\n from " + tblname + " " + tblname.chop + " ,"   ## 最後のSはとる。
-				fromstr << if utbl == "" then "" else  utbl.to_s + " " + utbl.to_s.split("_")[1].chop + " ," end
-        		subfields.each do |rec|
-        			js = rec["pobject_code_fld"]
-         			if  js =~ /_id/
-           				case  js
-          				when /persons_id_upd/   ##person は特殊
-              					join_rtbl = "upd_persons"
-            			else
-             					join_rtbl = "r_" + js.split(/_id/)[0]  ##JOINするテーブル名
-           				end
-           				rtblname =  js.sub(/s_id/,"")
-          				fromstr << join_rtbl + "  " + rtblname + ','    ### from r_xxxxs xxxxx
-           				wherestr << " #{rtblname}.id = "  ##相手側のテーブルのid
-	         			wherestr << tblname.chop + "." + js  + " and "   ## 自分のテーブル内の相手がわを示すid
-			    		delm = js.split("_")[-1]   ###idにdelm識別子を付けたとき
-			    		if delm == tblname.chop and js !~ /_id/
-				    		new_js = js.sub("_#{tblname.chop}","")    ###ヘッダーと同じものは除く
-				    		selectstr << tblname.chop + "." +  js + " " + tblname.chop + "_" +  new_js.sub("s_id","_id") + " ,"
-							@sfd_code_id[tblname.chop + "_" +  new_js.sub("s_id","_id")] = rec["id"]
-			    		else
-				    		selectstr << tblname.chop + "." +  js + " " + tblname.chop + "_" +  js.sub("s_id","_id") + " ,"
-							@sfd_code_id[tblname.chop + "_" +  js.sub("s_id","_id")] = rec["id"]
-			    		end
-            			subtblcrt  join_rtbl,rtblname do |k|   ###相手側の項目セット
-              				selectstr << k
-          				end
-					  else ##not _id
-						if js == 'id'
-						 	selectstr << tblname.chop + "." +  js  + " id,"
-						 	@sfd_code_id["id"] = rec["id"]
-					 	end
-			   			case rec["tblfield_viewflmk"]
-				 		when nil
-							strsql = "select id from r_screens where pobject_code_scr = '#{join_rtbl}'    and  screen_expiredate > current_date "
-							screen_id = ActiveRecord::Base.connection.select_value(strsql)
-							if screen_id and join_rtbl != "upd_persons"
-								strsql = %Q%select pobject_code_sfd from r_screenfields where screenfield_selection = 1
-																												and screenfield_screen_id = #{screen_id}
-																												and pobject_code_sfd = '#{tblname.chop + "_" +  js }' %
-								fld = ActiveRecord::Base.connection.select_value(strsql)
-								if fld
-									selectstr << tblname.chop + "." +  js + " " + fld + " ,"
-								else
-									next
-								end
-							else
-			      				selectstr << tblname.chop + "." +  js + " " + tblname.chop + "_" +  js + " ,"
-							end
-							@sfd_code_id[tblname.chop + "_" +  js] = rec["id"]
-				 		when /^tblnamefields/  ##vfield対応　union
-				    		tblnamefields = eval(rec["tblfield_viewflmk"])
-					 		selectstr << utbl.to_s.split("_")[1].chop + "." +  tblnamefields[utbl] + "  vf" + tblname.chop + "_" +  js + " ,"
-				 			####@sfd_code_to   未対応
-        				end
-			 		end      ##if  js =~ /_id/
-  			end   ##subfields
-			selectstr = selectstr.chop +  fromstr.chop + wherestr[0..-5]
-			#fromstr = ""
-			#wherestr = ""
-		end
-   		#sub_rtbl = "r_" + tblname   ##create view name  tbl:view=1:1  自動作成されるviewはr_xxxxで固定
-   		#@strsql1 = "create or replace view  " + sub_rtbl + " as "
-   		#@strsql1 << selectstr.chop
-    	#ActiveRecord::Base.connection.execute(@strsql1)
-		### sql実行時のエラー表示　がまだできてない。
- 	end  #end create_or_replace_view
-
 
 	def  subtblcrt  join_rtbl ,rtblname   ## rtblname:join_rtbl(view名) + safix
    		k = ""
@@ -875,5 +816,59 @@ extend self
 				@messages << "<p> view r_#{tbl} not exists</p>"
 			end		
 		end
-	end 	
+	end 
+	def createUniqueIndex params
+		@messages = ""   
+		@sql = ""
+		ukey = {}
+		params["data"].each do |tmp|
+			val = JSON.parse(tmp)
+			next if val["blkuky_expiredate"] == ""
+			next if val["blkuky_expiredate"].to_date < Time.now
+			next if val["pobject_code_tbl"] == ""
+			next if val["blkuky_grp"] == ""
+			if ukey[val["pobject_code_tbl"]].nil?
+				ukey[val["pobject_code_tbl"]] = {}
+			end	
+			if ukey[val["pobject_code_tbl"]][val["blkuky_grp"]].nil?
+				ukey[val["pobject_code_tbl"]][val["blkuky_grp"]] = {}
+			end	
+			ukey[val["pobject_code_tbl"]][val["blkuky_grp"]][val["blkuky_seqno"]] = val["pobject_code_fld"]
+		end	
+		ukey.each do |tbl,val|
+			tblname = tbl.to_s
+			val.each do |grp,valseq|  
+				grpname = grp.to_s
+				rslt = chk_constraint tblname,grpname
+				if rslt == "ok"
+					codes = []
+					valseq.sort.each do |valseq,code|
+						codes << code
+					end	
+					creat_uniq_constraint tblname,grpname,codes
+				end	
+			end	
+		end	
+		return @messages,@sql
+	end
+	def chk_constraint tblname,grpname
+		strsql = %Q%SELECT table_name,constraint_name
+					FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+					WHERE TABLE_SCHEMA = 'public' and table_name = '#{tblname}'
+					and constraint_name = '#{tblname}_uky#{grpname}'
+					ORDER BY CONSTRAINT_CATALOG, CONSTRAINT_SCHEMA, CONSTRAINT_NAME%
+		chkrecs = ActiveRecord::Base.connection.select_one(strsql)
+		if chkrecs.nil?
+			rslt = "ok"
+			@messages << " create TABLE_CONSTRAINTS :#{tblname}_uky#{grpname} "
+		else
+			rslt = nil
+			@messages << " table:#{tblname} already use :#{tblname}_uky#{grpname} "
+		end
+		return rslt		
+	end	
+	def	creat_uniq_constraint tblname,grpname,codes
+		 @sql << %Q%ALTER TABLE public.#{tblname}
+				ADD CONSTRAINT #{tblname}_uky#{grpname} UNIQUE(#{codes.join(",")});\n%
+	end	 
 end

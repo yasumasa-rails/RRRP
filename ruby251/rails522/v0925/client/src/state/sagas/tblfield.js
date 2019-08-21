@@ -4,6 +4,7 @@ import {TBLFIELD_SUCCESS, TBLFIELD_FAILURE,
         }     from '../../actions'
 import {getLoginState} from '../reducers/login'
 import {getScreenState} from '../reducers/screen'
+//import { isValidElement } from 'react';
 //import { ReactReduxContext } from 'react-redux';
 
 
@@ -31,7 +32,12 @@ export function* TblfieldSaga({ payload: {params}  }) {
   const screenState = yield select(getScreenState) //
   let data =[]
   screenState.data.map((val,index) =>{ 
-    return data.push({pobject_code_tbl:val.pobject_code_tbl})})
+    return data.push({pobject_code_tbl:val.pobject_code_tbl,                      
+                      pobject_code_fld:val.pobject_code_fld,  // blkuky用
+                      blkuky_grp:val.blkuky_grp,
+                      blkuky_seqno:val.blkuky_seqno,
+                      blkuky_expiredate:val.blkuky_expiredate,})
+  })
   params["data"] = data
   let response  = yield call(screenApi,{params ,token,client,uid} )
   if(response){
@@ -39,7 +45,9 @@ export function* TblfieldSaga({ payload: {params}  }) {
         case "yup":  // create yup schema
               return yield put({ type: TBLFIELD_SUCCESS, payload: {message:response.data.params.message} })   
         case "createTblViewScreen":  // create  or add field table and create or replacr view  and create screen
-              return yield put({ type: TBLFIELD_SUCCESS, payload: {messages:response.data.params.messages} })     
+              return yield put({ type: TBLFIELD_SUCCESS, payload: {messages:response.data.params.messages} })  
+        case "createUniqueIndex":  // create  or add field table and create or replacr view  and create screen
+              return yield put({ type: TBLFIELD_SUCCESS, payload: {messages:response.data.params.messages} })        
         default:
           return {}
       }

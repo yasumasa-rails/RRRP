@@ -37,7 +37,7 @@ export function * ScreenErrCheckSaga ({payload: {schema,linedata,field,params}})
               linedata.gridmessage[field] = ""
               linedata.gridmessage["confirm"] = ""
               return yield put({ type:SCREEN_ERR_CHECK_RESULT, payload:{data:screenState.data} }) 
-          }
+                    }
                      
   }
  }

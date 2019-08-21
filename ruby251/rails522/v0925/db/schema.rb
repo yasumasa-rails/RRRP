@@ -440,39 +440,6 @@ ActiveRecord::Schema.define(version: 2019_04_28_055925) do
     t.index ["blktbs_id", "fieldcodes_id"], name: "tblfields_ukys10", unique: true
   end
 
-  create_table "tblinkflds", id: :decimal, precision: 38, force: :cascade do |t|
-    t.string "remark", limit: 4000
-    t.date "expiredate"
-    t.decimal "persons_id_upd", precision: 38
-    t.string "update_ip", limit: 40
-    t.datetime "created_at", precision: 6
-    t.datetime "updated_at", precision: 6
-    t.string "command_c", limit: 4000
-    t.decimal "tblinks_id", precision: 38
-    t.decimal "tblfields_id", precision: 38
-    t.decimal "seqno", precision: 38
-    t.string "contents", limit: 4000
-    t.string "rubycode", limit: 4000
-    t.index ["tblinks_id", "tblfields_id"], name: "tblinkflds_ukys10", unique: true
-  end
-
-  create_table "tblinks", id: :decimal, precision: 38, force: :cascade do |t|
-    t.string "remark", limit: 4000
-    t.date "expiredate"
-    t.decimal "persons_id_upd", precision: 38
-    t.string "update_ip", limit: 40
-    t.datetime "created_at", precision: 6
-    t.datetime "updated_at", precision: 6
-    t.decimal "blktbs_id_dest", precision: 38
-    t.decimal "screens_id_src", precision: 38
-    t.decimal "seqno", precision: 38
-    t.string "beforeafter", limit: 15
-    t.string "contents", limit: 4000
-    t.string "hikisu", limit: 400
-    t.string "codel", limit: 50
-    t.index ["screens_id_src", "blktbs_id_dest", "beforeafter", "seqno"], name: "tblinks_ukys1", unique: true
-  end
-
   create_table "units", id: :decimal, precision: 38, force: :cascade do |t|
     t.string "code", limit: 50
     t.string "name", limit: 100
@@ -594,11 +561,6 @@ ActiveRecord::Schema.define(version: 2019_04_28_055925) do
   add_foreign_key "tblfields", "blktbs", column: "blktbs_id", name: "tblfield_blktbs_id"
   add_foreign_key "tblfields", "fieldcodes", column: "fieldcodes_id", name: "tblfield_fieldcodes_id"
   add_foreign_key "tblfields", "persons", column: "persons_id_upd", name: "tblfield_persons_id_upd"
-  add_foreign_key "tblinkflds", "persons", column: "persons_id_upd", name: "tblinkfld_persons_id_upd"
-  add_foreign_key "tblinkflds", "tblfields", column: "tblfields_id", name: "tblinkfld_tblfields_id"
-  add_foreign_key "tblinkflds", "tblinks", column: "tblinks_id", name: "tblinkfld_tblinks_id"
-  add_foreign_key "tblinks", "blktbs", column: "blktbs_id_dest", name: "tblink_blktbs_id_dest"
-  add_foreign_key "tblinks", "persons", column: "persons_id_upd", name: "tblink_persons_id_upd"
   add_foreign_key "usebuttons", "buttons", column: "buttons_id", name: "usebutton_buttons_id"
   add_foreign_key "usebuttons", "persons", column: "persons_id_upd", name: "usebutton_persons_id_upd"
   add_foreign_key "userprocs", "persons", column: "persons_id_upd", name: "userprocs_persons_id_upd"

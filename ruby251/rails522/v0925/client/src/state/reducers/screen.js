@@ -2,7 +2,7 @@ import { SCREEN_REQUEST,SCREEN_SUCCESS,SCREEN_FAILURE,
           LOGOUT_REQUEST,SCREEN_PARAMS_SET,
           SCREEN_LINEEDIT,SCREEN_ERR_CHECK,SCREEN_ERR_CHECK_RESULT,
           FETCH_REQUEST,FETCH_RESULT,FETCH_FAILURE,
-          YUP_RESULT,DROPDOWNVALUE_SET,
+          YUP_ERR_SET,YUP_RESULT,DROPDOWNVALUE_SET,
         //  INPUTFIELDPROTECT_REQUEST
         } 
           from '../../actions'
@@ -30,12 +30,18 @@ const screenreducer =  (state= {} , action) =>{
       case SCREEN_ERR_CHECK:
           return {...state,
             schema:action.payload.schema,
-            data:action.payload.data,
-            index:action.payload.index,
+            linedata:action.payload.linedata,
             field:action.payload.field,
             params:action.payload.params,
             loading : true
         }
+        
+      case YUP_ERR_SET:
+          return {...state,
+            data:action.payload.data,
+            loading : false
+        }
+          
         
       case SCREEN_ERR_CHECK_RESULT:
         return {...state,
@@ -53,11 +59,13 @@ const screenreducer =  (state= {} , action) =>{
         params: action.action.data.params,
         pages: action.action.data.pageInfo.totalPage,
         sizePerPageList: action.action.data.pageInfo.sizePerPageList,
+        screenwidth: action.action.data.pageInfo.screenwidth,
         yup:action.action.data.yup,
         dropDownList:action.action.data.dropdownlist,
         status: action.action.data.status,
         loading:false,
         filterable:action.action.data.params.req==="viewtablereq"?true:false,
+        originalreq: action.action.data.params.req,
       }
     
     

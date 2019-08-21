@@ -1795,213 +1795,6 @@ where
 ;
 
 
-CREATE TABLE TBLINKS
-   (	ID numeric(38,0),
-	REMARK varchar(4000),
-	EXPIREDATE DATE,
-	PERSONS_ID_UPD numeric(38,0),
-	UPDATE_IP varchar(40),
-	CREATED_AT TIMESTAMP (6),
-	UPDATED_AT TIMESTAMP (6),
-	BLKTBS_ID_DEST numeric(38,0),
-	SCREENS_ID_SRC numeric(38,0),
-	SEQNO numeric(38,0),
-	BEFOREAFTER varchar(15),
-	CONTENTS varchar(4000),
-	HIKISU varchar(400),
-	CODEL varchar(50),
-	 CONSTRAINT TBLINKS_ID_PK PRIMARY KEY (ID)
-  ,
-	 CONSTRAINT TBLINKS_UKYS1 UNIQUE (SCREENS_ID_SRC, BLKTBS_ID_DEST, BEFOREAFTER, SEQNO)
-  ,
-	 CONSTRAINT TBLINK_PERSONS_ID_UPD FOREIGN KEY (PERSONS_ID_UPD)
-	  REFERENCES PERSONS (ID) ,
-	 CONSTRAINT TBLINK_BLKTBS_ID_DEST FOREIGN KEY (BLKTBS_ID_DEST)
-	  REFERENCES BLKTBS (ID) ,
-	 CONSTRAINT TBLINK_SCREENS_ID_SRC FOREIGN KEY (SCREENS_ID_SRC)
-	  REFERENCES SCREENS (ID)
-   )
-  ;
-
-CREATE   SEQUENCE   TBLINKS_seq  INCREMENT BY 1 START WITH 10000    
-;
-  
-  
-CREATE
-OR REPLACE  VIEW R_TBLINKS (
-  TBLINK_CONTENTS
-  , ID
-  , TBLINK_ID
-  , TBLINK_REMARK
-  , TBLINK_EXPIREDATE
-  , TBLINK_UPDATE_IP
-  , TBLINK_CREATED_AT
-  , TBLINK_UPDATED_AT
-  , TBLINK_PERSON_ID_UPD
-  , PERSON_CODE_UPD
-  , PERSON_NAME_UPD
-  , TBLINK_CODEL
-  , TBLINK_SEQNO
-  , TBLINK_BLKTB_ID_DEST
-  , BLKTB_CONTENTS_DEST
-  , POBJECT_CODE_TBL_DEST
-  , POBJECT_OBJECTTYPE_TBL_DEST
-  , POBJECT_CONTENTS_TBL_DEST
-  , BLKTB_SELTBLS_DEST
-  , TBLINK_BEFOREAFTER
-  , TBLINK_HIKISU
-  , TBLINK_SCREEN_ID_SRC
-  , SCREEN_STRWHERE_SRC
-  , SCREEN_ROWS_PER_PAGE_SRC
-  , SCREEN_ROWLIST_SRC
-  , SCREEN_HEIGHT_SRC
-  , POBJECT_CODE_VIEW_SRC
-  , POBJECT_OBJECTTYPE_VIEW_SRC
-  , POBJECT_CONTENTS_VIEW_SRC
-  , SCREEN_FORM_PS_SRC
-  , SCREEN_STRSELECT_SRC
-  , SCREEN_CDRFLAYOUT_SRC
-  , SCREEN_YMLCODE_SRC
-  , POBJECT_CODE_SCR_SRC
-  , POBJECT_OBJECTTYPE_SCR_SRC
-  , POBJECT_CONTENTS_SCR_SRC
-  , SCREEN_CONTENTS_SRC
-  , SCRLV_LEVEL1_SRC
-  , SCRLV_CODE_SRC
-) AS
-select
-  tblink.contents tblink_contents
-  , tblink.id id
-  , tblink.id tblink_id
-  , tblink.remark tblink_remark
-  , tblink.expiredate tblink_expiredate
-  , tblink.update_ip tblink_update_ip
-  , tblink.created_at tblink_created_at
-  , tblink.updated_at tblink_updated_at
-  , tblink.persons_id_upd tblink_person_id_upd
-  , person_upd.person_code_upd person_code_upd
-  , person_upd.person_name_upd person_name_upd
-  , tblink.codel tblink_codel
-  , tblink.seqno tblink_seqno
-  , tblink.blktbs_id_dest tblink_blktb_id_dest
-  , blktb_dest.blktb_contents blktb_contents_dest
-  , blktb_dest.pobject_code_tbl pobject_code_tbl_dest
-  , blktb_dest.pobject_objecttype_tbl pobject_objecttype_tbl_dest
-  , blktb_dest.pobject_contents_tbl pobject_contents_tbl_dest
-  , blktb_dest.blktb_seltbls blktb_seltbls_dest
-  , tblink.beforeafter tblink_beforeafter
-  , tblink.hikisu tblink_hikisu
-  , tblink.screens_id_src tblink_screen_id_src
-  , screen_src.screen_strwhere screen_strwhere_src
-  , screen_src.screen_rows_per_page screen_rows_per_page_src
-  , screen_src.screen_rowlist screen_rowlist_src
-  , screen_src.screen_height screen_height_src
-  , screen_src.pobject_code_view pobject_code_view_src
-  , screen_src.pobject_objecttype_view pobject_objecttype_view_src
-  , screen_src.pobject_contents_view pobject_contents_view_src
-  , screen_src.screen_form_ps screen_form_ps_src
-  , screen_src.screen_strselect screen_strselect_src
-  , screen_src.screen_cdrflayout screen_cdrflayout_src
-  , screen_src.screen_ymlcode screen_ymlcode_src
-  , screen_src.pobject_code_scr pobject_code_scr_src
-  , screen_src.pobject_objecttype_scr pobject_objecttype_scr_src
-  , screen_src.pobject_contents_scr pobject_contents_scr_src
-  , screen_src.screen_contents screen_contents_src
-  , screen_src.scrlv_level1 scrlv_level1_src
-  , screen_src.scrlv_code scrlv_code_src
-from
-  tblinks tblink
-  , upd_persons person_upd
-  , r_blktbs blktb_dest
-  , r_screens screen_src
-where
-  person_upd.id = tblink.persons_id_upd
-  and blktb_dest.id = tblink.blktbs_id_dest
-  and screen_src.id = tblink.screens_id_src
-  ;
-
-
-CREATE TABLE TBLINKFLDS
-   (	ID numeric(38,0),
-	REMARK varchar(4000),
-	EXPIREDATE DATE,
-	PERSONS_ID_UPD numeric(38,0),
-	UPDATE_IP varchar(40),
-	CREATED_AT TIMESTAMP (6),
-	UPDATED_AT TIMESTAMP (6),
-	COMMAND_C varchar(4000),
-	TBLINKS_ID numeric(38,0),
-	TBLFIELDS_ID numeric(38,0),
-	SEQNO numeric(38,0),
-	CONTENTS varchar(4000),
-	RUBYCODE varchar(4000),
-	 CONSTRAINT TBLINKFLDS_ID_PK PRIMARY KEY (ID)
-  ,
-	 CONSTRAINT TBLINKFLDS_UKYS10 UNIQUE (TBLINKS_ID, TBLFIELDS_ID)
-  ,
-	 CONSTRAINT TBLINKFLD_PERSONS_ID_UPD FOREIGN KEY (PERSONS_ID_UPD)
-	  REFERENCES PERSONS (ID) ,
-	 CONSTRAINT TBLINKFLD_TBLINKS_ID FOREIGN KEY (TBLINKS_ID)
-	  REFERENCES TBLINKS (ID) ,
-	 CONSTRAINT TBLINKFLD_TBLFIELDS_ID FOREIGN KEY (TBLFIELDS_ID)
-	  REFERENCES TBLFIELDS (ID)
-   )
-  ;
-
-
-CREATE   SEQUENCE   TBLINKS_seq  INCREMENT BY 1 START WITH 10000 
-;
-  
-  CREATE OR REPLACE  VIEW R_TBLINKFLDS (TBLINKFLD_EXPIREDATE, TBLINKFLD_UPDATED_AT, TBLINKFLD_SEQNO,
-  TBLINKFLD_REMARK, TBLINKFLD_CREATED_AT, TBLINKFLD_UPDATE_IP, TBLINKFLD_RUBYCODE, ID, TBLINKFLD_ID, TBLINKFLD_TBLFIELD_ID,
-  TBLFIELD_CONTENTS, TBLFIELD_BLKTB_ID, BLKTB_CONTENTS, BLKTB_ID, BLKTB_POBJECT_ID_TBL, POBJECT_CODE_TBL, POBJECT_OBJECTTYPE_TBL,
-  POBJECT_ID_TBL, POBJECT_CONTENTS_TBL, BLKTB_SELTBLS, TBLFIELD_FIELDCODE_ID, FIELDCODE_SEQNO,
-  FIELDCODE_FTYPE, FIELDCODE_DATASCALE, FIELDCODE_DATAPRECISION, FIELDCODE_FIELDLENGTH, FIELDCODE_ID, FIELDCODE_CONTENTS,
-  FIELDCODE_POBJECT_ID_FLD, 
-  TBLFIELD_ID, TBLFIELD_EXPIREDATE, TBLFIELD_SEQNO, TBLFIELD_VIEWFLMK, TBLINKFLD_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD,
-  PERSON_NAME_UPD, TBLINKFLD_CONTENTS, TBLINKFLD_TBLINK_ID, TBLINK_CONTENTS, TBLINK_ID, TBLINK_EXPIREDATE,
-  TBLINK_SEQNO, TBLINK_BLKTB_ID_DEST, BLKTB_CONTENTS_DEST, BLKTB_ID_DEST, BLKTB_POBJECT_ID_TBL_DEST, POBJECT_CODE_TBL_DEST,
-  POBJECT_OBJECTTYPE_TBL_DEST, POBJECT_ID_TBL_DEST, POBJECT_CONTENTS_TBL_DEST, BLKTB_SELTBLS_DEST,
-  TBLINK_BEFOREAFTER, TBLINK_HIKISU, TBLINK_SCREEN_ID_SRC, SCREEN_STRWHERE_SRC, SCREEN_ROWS_PER_PAGE_SRC, SCREEN_ROWLIST_SRC,
-  SCREEN_HEIGHT_SRC, SCREEN_POBJECT_ID_VIEW_SRC, POBJECT_CODE_VIEW_SRC, POBJECT_OBJECTTYPE_VIEW_SRC,
-  POBJECT_ID_VIEW_SRC, POBJECT_CONTENTS_VIEW_SRC, SCREEN_FORM_PS_SRC,  SCREEN_STRSELECT_SRC,
-  SCREEN_CDRFLAYOUT_SRC, SCREEN_YMLCODE_SRC, SCREEN_ID_SRC,  SCREEN_POBJECT_ID_SCR_SRC, POBJECT_CODE_SCR_SRC,
-  POBJECT_OBJECTTYPE_SCR_SRC,  POBJECT_ID_SCR_SRC, POBJECT_CONTENTS_SCR_SRC, SCREEN_CONTENTS_SRC,
-  SCREEN_SCRLV_ID_SRC, SCRLV_LEVEL1_SRC, SCRLV_ID_SRC, SCRLV_CODE_SRC, TBLINK_CODEL, TBLINKFLD_COMMAND_C) AS
-  select tblinkfld.expiredate tblinkfld_expiredate ,tblinkfld.updated_at tblinkfld_updated_at ,tblinkfld.seqno tblinkfld_seqno ,
-  tblinkfld.remark tblinkfld_remark ,tblinkfld.created_at tblinkfld_created_at ,tblinkfld.update_ip tblinkfld_update_ip ,
-  tblinkfld.rubycode tblinkfld_rubycode ,tblinkfld.id id,tblinkfld.id tblinkfld_id ,tblinkfld.tblfields_id tblinkfld_tblfield_id ,
-  tblfield.tblfield_contents tblfield_contents, tblfield.tblfield_blktb_id tblfield_blktb_id, tblfield.blktb_contents blktb_contents,
-  tblfield.blktb_id blktb_id, tblfield.blktb_pobject_id_tbl blktb_pobject_id_tbl, tblfield.pobject_code_tbl pobject_code_tbl,
-  tblfield.pobject_objecttype_tbl pobject_objecttype_tbl, tblfield.pobject_id_tbl pobject_id_tbl,
-  tblfield.pobject_contents_tbl pobject_contents_tbl, tblfield.blktb_seltbls blktb_seltbls, tblfield.tblfield_fieldcode_id tblfield_fieldcode_id,
-  tblfield.fieldcode_seqno fieldcode_seqno, tblfield.fieldcode_ftype fieldcode_ftype, tblfield.fieldcode_datascale fieldcode_datascale,
-  tblfield.fieldcode_dataprecision fieldcode_dataprecision, tblfield.fieldcode_fieldlength fieldcode_fieldlength, tblfield.fieldcode_id fieldcode_id,
-  tblfield.fieldcode_contents fieldcode_contents, tblfield.fieldcode_pobject_id_fld fieldcode_pobject_id_fld, 
- tblfield.tblfield_id tblfield_id, tblfield.tblfield_expiredate tblfield_expiredate,
-  tblfield.tblfield_seqno tblfield_seqno, tblfield.tblfield_viewflmk tblfield_viewflmk,tblinkfld.persons_id_upd tblinkfld_person_id_upd ,
-  person_upd.person_id_upd person_id_upd, person_upd.person_code_upd person_code_upd, person_upd.person_name_upd person_name_upd,
-  tblinkfld.contents tblinkfld_contents ,tblinkfld.tblinks_id tblinkfld_tblink_id , tblink.tblink_contents tblink_contents, tblink.tblink_id tblink_id,
-  tblink.tblink_expiredate tblink_expiredate, tblink.tblink_seqno tblink_seqno,
-  tblink.tblink_blktb_id_dest tblink_blktb_id_dest, tblink.blktb_contents_dest blktb_contents_dest, tblink.blktb_id_dest blktb_id_dest,
-  tblink.blktb_pobject_id_tbl_dest blktb_pobject_id_tbl_dest, tblink.pobject_code_tbl_dest pobject_code_tbl_dest,
-  tblink.pobject_objecttype_tbl_dest pobject_objecttype_tbl_dest,
-  tblink.pobject_id_tbl_dest pobject_id_tbl_dest, tblink.pobject_contents_tbl_dest pobject_contents_tbl_dest, tblink.blktb_seltbls_dest blktb_seltbls_dest,
-  tblink.tblink_beforeafter tblink_beforeafter, tblink.tblink_hikisu tblink_hikisu, tblink.tblink_screen_id_src tblink_screen_id_src,
-  tblink.screen_strwhere_src screen_strwhere_src, tblink.screen_rows_per_page_src screen_rows_per_page_src, tblink.screen_rowlist_src screen_rowlist_src,
-  tblink.screen_height_src screen_height_src, tblink.screen_pobject_id_view_src screen_pobject_id_view_src, tblink.pobject_code_view_src pobject_code_view_src,
-  tblink.pobject_objecttype_view_src pobject_objecttype_view_src, tblink.pobject_id_view_src pobject_id_view_src,
-  tblink.pobject_contents_view_src pobject_contents_view_src, tblink.screen_form_ps_src screen_form_ps_src,
-  tblink.screen_strselect_src screen_strselect_src, tblink.screen_cdrflayout_src screen_cdrflayout_src, tblink.screen_ymlcode_src screen_ymlcode_src,
-  tblink.screen_id_src screen_id_src,  tblink.screen_pobject_id_scr_src screen_pobject_id_scr_src,
-  tblink.pobject_code_scr_src pobject_code_scr_src, tblink.pobject_objecttype_scr_src pobject_objecttype_scr_src,
-  tblink.pobject_id_scr_src pobject_id_scr_src, tblink.pobject_contents_scr_src pobject_contents_scr_src, tblink.screen_contents_src screen_contents_src,
-  tblink.screen_scrlv_id_src screen_scrlv_id_src, tblink.scrlv_level1_src scrlv_level1_src, tblink.scrlv_id_src scrlv_id_src, tblink.scrlv_code_src scrlv_code_src,
-  tblink.tblink_codel tblink_codel,tblinkfld.command_c tblinkfld_command_c
- from tblinkflds tblinkfld ,r_tblfields  tblfield,upd_persons  person_upd,r_tblinks  tblink
- where  tblfield.id = tblinkfld.tblfields_id and  person_upd.id = tblinkfld.persons_id_upd and  tblink.id = tblinkfld.tblinks_id
- ;
-
    CREATE OR REPLACE  VIEW SCR_POBJECTS
  (POBJECT_CODE,  POBJECT_EXPIREDATE, POBJECT_UPDATED_AT,
   POBJECT_REMARK, POBJECT_CONTENTS,POBJECT_CREATED_AT, POBJECT_UPDATE_IP, ID, POBJECT_ID,
@@ -2065,10 +1858,11 @@ CREATE   SEQUENCE   TBLINKS_seq  INCREMENT BY 1 START WITH 10000
    person_upd.id = pobject.persons_id_upd
    and pobject.objecttype = 'view';
 
-
+drop view TBL_POBJECTS cascade ;
    CREATE OR REPLACE  VIEW TBL_POBJECTS
  (POBJECT_CODE,  POBJECT_EXPIREDATE, POBJECT_UPDATED_AT,
   POBJECT_REMARK, POBJECT_CREATED_AT, POBJECT_UPDATE_IP, ID, POBJECT_ID, POBJECT_PERSON_ID_UPD,
+pobject_contents,
  PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD) AS
  select
    pobject.code pobject_code
@@ -2080,6 +1874,7 @@ CREATE   SEQUENCE   TBLINKS_seq  INCREMENT BY 1 START WITH 10000
    , pobject.id id
    , pobject.id pobject_id
    , pobject.persons_id_upd pobject_person_id_upd
+ 	,pobject.contents pobject_contents
    , person_upd.id updperson_id_upd
    , person_upd.code updperson_code_upd
    , person_upd.name updperson_name_upd
@@ -2251,9 +2046,13 @@ CREATE TABLE CRRS
 CREATE  SEQUENCE  CRRS_seq  INCREMENT BY 1 START WITH 10000   
 ;
 
+--- drop view r_crrs cascade;
 
-CREATE OR REPLACE VIEW R_CRRS (ID, CRR_ID, CRR_REMARK, CRR_EXPIREDATE, CRR_UPDATE_IP, CRR_CREATED_AT, CRR_UPDATED_AT, CRR_PERSON_ID_UPD, PERSON_ID_UPD_UPD, PERSON_CODE_UPD_UPD, PERSON_NAME_UPD_UPD, CRR_CODE, CRR_NAME, CRR_CONTENTS, CRR_PRICEDECIMAL, CRR_AMTDECIMAL) AS 
-  select crr.id id,crr.id crr_id ,crr.remark crr_remark ,crr.expiredate crr_expiredate ,crr.update_ip crr_update_ip ,crr.created_at crr_created_at ,crr.updated_at crr_updated_at ,crr.persons_id_upd crr_person_id_upd , person_upd.person_id_upd person_id_upd_upd, person_upd.person_code_upd person_code_upd_upd, person_upd.person_name_upd person_name_upd_upd,crr.code crr_code ,crr.name crr_name ,crr.contents crr_contents ,crr.pricedecimal crr_pricedecimal ,crr.amtdecimal crr_amtdecimal 
+CREATE OR REPLACE VIEW R_CRRS (ID, CRR_ID, CRR_REMARK, CRR_EXPIREDATE, CRR_UPDATE_IP, CRR_CREATED_AT, CRR_UPDATED_AT,
+ CRR_PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD,
+ CRR_CODE, CRR_NAME, CRR_CONTENTS, CRR_PRICEDECIMAL, CRR_AMTDECIMAL) AS 
+  select crr.id id,crr.id crr_id ,crr.remark crr_remark ,crr.expiredate crr_expiredate ,crr.update_ip crr_update_ip ,crr.created_at crr_created_at ,crr.updated_at crr_updated_at ,
+crr.persons_id_upd crr_person_id_upd , person_upd.person_code_upd person_code_upd, person_upd.person_name_upd person_name_upd,crr.code crr_code ,crr.name crr_name ,crr.contents crr_contents ,crr.pricedecimal crr_pricedecimal ,crr.amtdecimal crr_amtdecimal 
  from crrs crr ,upd_persons  person_upd
  where  person_upd.id = crr.persons_id_upd
 ;

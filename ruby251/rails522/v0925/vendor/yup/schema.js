@@ -858,19 +858,6 @@
             shpsch_tblid:Yup.number(),      // 2017-08-11 09:22:29
             tblfield_expiredate:Yup.date(),      // 2015-11-23 00:20:26
             tblfield_seqno:Yup.number(),      // 2015-11-22 21:22:45
-            tblink_beforeafter:Yup.string(),      // 2014-12-07 06:59:32.234
-            tblink_beforeafter:Yup.string().required(),      // 2014-12-01 21:04:17.932
-            tblink_codel:Yup.string().required(),      // 2015-11-22 11:04:19
-            tblink_expiredate:Yup.date(),      // 2016-06-12 23:12:10
-            tblink_expiredate:Yup.date().required(),      // 2014-11-19 19:54:01.673
-            tblink_hikisu:Yup.string().required(),      // 2017-01-14 00:52:43
-            tblink_seqno:Yup.number(),      // 2014-12-07 06:59:14.194
-            tblink_seqno:Yup.number().required(),      // 2014-08-24 18:32:16.836
-            tblink_updated_at:Yup.date(),      // 2017-08-19 23:45:09
-            tblinkfld_expiredate:Yup.date(),      // 2016-06-12 23:10:40
-            tblinkfld_seqno:Yup.number().required(),      // 2014-09-29 21:50:40.768
-            tblinkky_command_c:Yup.string().required(),      // 2014-07-27 02:36:29.962
-            tblinkky_expiredate:Yup.date(),      // 2014-07-13 09:25:46.477
             transport_code:Yup.string().required(),      // 2016-12-25 12:31:07
             transport_expiredate:Yup.date(),      // 2016-07-30 23:24:19
             transport_name:Yup.string().required(),      // 2017-08-11 09:28:56

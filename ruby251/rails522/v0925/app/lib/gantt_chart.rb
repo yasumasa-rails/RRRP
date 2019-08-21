@@ -682,7 +682,8 @@ module GanttChart
         {:duration=>1,:transport_id =>ActiveRecord::Base.connection.select_value("select id from transports where code = 'dummy' ")}
     end
     def get_opeitms_id_from_itm itms_id ###
-		strsql = %Q& select max(processseq) from opeitms where itms_id = #{itms_id}  and expiredate > current_date group by itms_id &
+		strsql = %Q& select max(processseq) from opeitms where itms_id = #{itms_id} 
+					 and expiredate > current_date group by itms_id &
 		max_processseq = ActiveRecord::Base.connection.select_value(strsql)
 		if max_processseq 
 			strsql = %Q& select max(priority) from opeitms where itms_id = #{itms_id} 
@@ -690,7 +691,7 @@ module GanttChart
 			max_priority = ActiveRecord::Base.connection.select_value(strsql)
 			if max_priority
 				strsql = %Q& select id from opeitms where itms_id = #{itms_id} 
-						 and processseq =#{max_processseq} and processseq =#{max_priority} and expiredate > current_date &
+						 and processseq =#{max_processseq} and priority =#{max_priority} and expiredate > current_date &
 				opeitms_id = ActiveRecord::Base.connection.select_value(strsql)
 			else 
 				opeitms_id = nil	
@@ -698,6 +699,20 @@ module GanttChart
 		else
 			opeitms_id = nil
 		end		
+		return opeitms_id
+	end
+	
+    def get_opeitms_id_from_itm_by_processseq itms_id,processseq  ###
+			strsql = %Q& select max(priority) from opeitms where itms_id = #{itms_id} 
+					 and processseq =#{processseq} and expiredate > current_date group by itms_id &
+			max_priority = ActiveRecord::Base.connection.select_value(strsql)
+			if max_priority
+				strsql = %Q& select id from opeitms where itms_id = #{itms_id} 
+						 and processseq =#{processseq} and priority =#{max_priority} and expiredate > current_date &
+				opeitms_id = ActiveRecord::Base.connection.select_value(strsql)
+			else 
+				opeitms_id = nil	
+			end		
 		return opeitms_id
     end
 	def proc_sch_chil_get orgtblname,orgtblid	##
@@ -769,7 +784,7 @@ module GanttChart
 		rnditms = ActiveRecord::Base.connection.select_all("select * from r_nditms where nditm_opeitm_id = #{@ganttchartData[level]["opeitm_id"]} 
 															and nditm_Expiredate > current_date order by itm_code_nditm  ")
 		rnditms.each_with_index  do |rec,index|
-			nopeitms_id =get_opeitms_id_from_itm(rec["nditm_itm_id_nditm"])
+			nopeitms_id =get_opeitms_id_from_itm_by_processseq(rec["nditm_itm_id_nditm"],rec["nditm_processseq_nditm"])
 			duration= 	rec["nditm_duration"].to_i
 			new_start = new_end - (rec["nditm_duration"].to_i) * 24 * 60 * 60 
 			contents ={"opeitm_id"=>nopeitms_id,

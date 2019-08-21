@@ -6,7 +6,7 @@ import Upload from './upload'
 import Download from './download'
 import GanttChart from './ganttchart'
 import "react-tabs/style/react-tabs.css"
-import {Button} from '../styles/button'
+import Button from '@material-ui/core/Button'
 import "../index.css"
 import {ScreenRequest,ButtonFlgRequest,DownloadRequest,GanttChartRequest,GanttReset,
         YupRequest,TblfieldRequest} from '../actions'
@@ -81,11 +81,11 @@ const  mapStateToProps = (state,ownProps) =>({
   uid:state.login.auth?state.login.auth.uid:"" ,
   page:state.screen?state.screen.page:0,
   sorted:state.screen?state.screen.sorted:[], 
-  message:state.button.message,
-  messages:state.button.messages,
+  //editableflg:state.screen.editableflg,
+  message:state.button.messages,
+  messages:state.button.message,
   downloadloading:state.button.downloadloading,
   disabled:state.button.disabled?true:false,
-  originalreq:state.screen.originalreq,
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
@@ -95,7 +95,8 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
         dispatch(ButtonFlgRequest(buttonflg,params)) // import export 画面用
         switch (buttonflg) {
           case "inlineedit":
-            params= { ...params, page: page,sorted:sorted,   req:"editabletablereq"}
+            params= { ...params, page: page, 
+            sorted:sorted,   req:"editabletablereq"}
           //editableflg = true
             return dispatch(ScreenRequest(params)) //
         
@@ -126,10 +127,6 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
                params= {req:"createTblViewScreen",screenCode:params.screenCode}
              //  editableflg = false
               return  dispatch(TblfieldRequest(params)) //
-            case "unique_index":
-                    params= {req:"createUniqueIndex",screenCode:params.screenCode}
-                     //  editableflg = false
-                    return  dispatch(TblfieldRequest(params)) 
           default:
             return 
         }   

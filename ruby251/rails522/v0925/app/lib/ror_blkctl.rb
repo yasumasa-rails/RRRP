@@ -30,62 +30,12 @@ module RorBlkctl
 			end
 		end
 	end
-    def user_seq_nextval
-      ses_cnt_usercode = "userproc_ses_cnt" + @sio_user_code.to_s ###user_code 15char 以下
-      unless proc_sequences_exist(ses_cnt_usercode)
-             ActiveRecord::Base.connection.execute("CREATE SEQUENCE #{ses_cnt_usercode}")
-             ActiveRecord::Base.connection.execute("CREATE SEQUENCE userproc#{@sio_user_code.to_s}s_seq")
-             userprocs = "CREATE TABLE userproc#{@sio_user_code.to_s}s
-                   ( id numeric(38)
-				     ,session_counter numeric(38)
-                     ,tblname VARCHAR(30)
-                     ,status VARCHAR(20)
-                     ,cnt numeric(38)
-                     ,cnt_out numeric(38)
-                     ,Persons_id_Upd numeric(38)
-                     ,Update_IP varchar(40)
-                     ,created_at timestamp(6)
-                     ,Expiredate date
-                     ,Updated_at timestamp(6)
-                     ,CONSTRAINT userproc#{@sio_user_code.to_s}s_id_pk PRIMARY KEY (id)
-					 ,CONSTRAINT userproc#{@sio_user_code.to_s}s_uk1 UNIQUE(session_counter,tblname)
-                      )"
-              ActiveRecord::Base.connection.execute(userprocs)
-      end
-      return proc_get_nextval(ses_cnt_usercode)
-    end
-    def user_parescreen_nextval
-        parescreen_cnt_usercode = "parescreen_a" + @sio_user_code.to_s
-        unless proc_sequences_exist(parescreen_cnt_usercode)
-            ActiveRecord::Base.connection.execute("CREATE SEQUENCE #{parescreen_cnt_usercode}")
-            parescreens = "CREATE TABLE parescreen#{@sio_user_code.to_s}s
-                   ( id numeric(38)
-                    ,rcdkey VARCHAR(200)
-                     ,strsql VARCHAR(4000)
-                     ,ctltbl VARCHAR(4000)
-                     ,Persons_id_Upd numeric(38)
-                     ,Update_IP varchar(40)
-                     ,created_at timestamp(6)
-                     ,Expiredate date
-                     ,Updated_at timestamp(6)
-                     , CONSTRAINT parescreen#{@sio_user_code.to_s}s_id_pk PRIMARY KEY (id)
-                      )"
-              ActiveRecord::Base.connection.execute(parescreens)
-        end
-        return proc_get_nextval(parescreen_cnt_usercode)
-    end
-  def proc_update_table command_r,r_cnt0  ##rec = command_c command_rとの混乱を避けるためrecにした。
+  	def proc_update_table command_r,r_cnt0  ##rec = command_c command_rとの混乱を避けるためrecにした。
       	begin
          	tmp_key = {}
 			tblname = command_r[:sio_viewname].split("_")[1]
         	if  command_r[:sio_message_contents].nil?
 				command_r = proc_set_src_tbl(command_r) ### @src_tblの項目作成
-				command_r["person_id_upd"] =  @sio_user_code
-				if command_r[:sio_classname] =~ /_add_|_edit_|_delete_/ and tblname !~ /tblink/  ## rec = command_c = sio_xxxxx
-					proc_command_before_instance_variable(command_r)
-					proc_tblinks(command_r) do
-						"before"
-				end
 			end
 			command_r[:sio_recordcount] = r_cnt0
 			if tblname =~ /^mk/ and @screen_code !~ /#{tblname}/  ###mkxxxxは追加のみ
@@ -95,7 +45,6 @@ module RorBlkctl
 				when /_add_/
 					proc_tbl_add_arel(tblname,@src_tbl)
 				when /_edit_/
-					##@src_tbl[:where] = {:id => @src_tbl[:id]}             ##変更分のみ更新
 					proc_tbl_edit_arel(tblname,@src_tbl," id = #{@src_tbl[:id]}")
 				when  /_delete_/
 					if tblname =~ /schs$|ords$|insts$|acts$/  ##alloctblにかかわるtrnは削除なし
@@ -107,18 +56,9 @@ module RorBlkctl
 					else
 						proc_tbl_delete_arel(tblname," id = #{@src_tbl[:id]}")
 					end
-				end ### blkukyの時は　constrainも削除
-			end
-		else
-			Rails.logger.debug "command_r = '#{command_r}'"
-			raise
-		end   ## case iud
-		if command_r[:sio_classname] =~ /_add_|_edit_|_delete_/ and tblname !~ /tblink/  ## rec = command_c = sio_xxxxx
-			proc_command_after_instance_variable(command_r)
-			proc_tblinks(command_r) do
-						"after"
-			end
-		end
+				end ##
+				processreqs_id = proc_processreqs_add tblname,@src_tbl[:id]
+			end ##se iud
       	rescue
         	ActiveRecord::Base.connection.rollback_db_transaction()
             command_r[:sio_result_f] =   "9"  ##9:error
@@ -131,10 +71,8 @@ module RorBlkctl
         	command_r[:sio_result_f] =  "1"   ## 1 normal end
           	command_r[:sio_message_contents] = nil
           	command_r[(tblname.chop + "_id")] =  command_r["id"] = @src_tbl[:id]
-					proc_delayjob_or_optiontbl(tblname,command_r["id"]) ###  if vproc_optiontabl(tblname)
-					##crt_def_all if tblname =~ /rubycodings|tblink/
-            ##crt_def_tb if  tblname == "blktbs"
-            proc_insert_sio_r( command_r) #### if @pare_class != "batch"    ## 結果のsio書き込み
+			proc_insert_sio_r( command_r) #### if @pare_class != "batch"    ## 結果のsio書き込み
+			CreateOtherTableRecordJob.perform_later processreqs_id
       	ensure
 	  	end ##begin
 	  	return command_r
@@ -142,42 +80,6 @@ module RorBlkctl
 	##def vproc_optiontabl tblname
 	##	if tblname =~ /rplies$|mksch|mkords|results$/ then true else false end  ###mkinsts,mkactsは使用してない　12/9
 	##end
-	def proc_delayjob_or_optiontbl tblname,id
-		###ActionController::Base::DbCud.new
-      case tblname
-			#when   /mkschs/   ###mkinsts,mkactsは使用してない　12/9
-			#			if @tbl_mkschs
-			#			else
-			#				 @tbl_mkschs = []
-			#			end
-			#			@tbl_mkschs << [tblname,id]
-			#							 		####when   /schs$|ords$|insts$|acts$/
-			when   /mkords/   ###mkinsts,mkactsは使用してない　12/9
-						if @tbl_mkords
-						else
-						 	@tbl_mkords = []
-						end
-						@tbl_mkords << [tblname,id]
- 			when   /mkbttables/   ###mkinsts,mkactsは使用してない　12/9
- 						if @tbl_mktbls
- 						else
- 						 	@tbl_mktbls = []
- 						end
- 						@tbl_mktbls << [tblname,id]
- 			when    /rplies$/  ###mkinsts,mkactsは使用してない　12/9
- 						if @tbl_rpls
- 						else
- 						 	@tbl_rpls = []
- 						end
- 						@tbl_rpls << [tblname,id]
- 			when    /results$/  ###mkinsts,mkactsは使用してない　12/9
- 						if @tbl_results
- 						else
- 						 	@tbl_results = []
- 						end
- 						@tbl_results << [tblname,id]
-      end
-	end
 	def vproc_tbl_mk_sub tbls
 		begin
 			 tbls.each do |tbl|
@@ -269,35 +171,6 @@ module RorBlkctl
 		end
 		return command_r
 	end
-	def proc_userproc_insert command_c
-    ##def sub_userproc_insert command_c
-        userproc = {}
-        userproc[:id] = proc_get_nextval("userproc#{@sio_user_code.to_s}s_seq")
-				userproc[:session_counter] = command_c[:sio_session_counter]
-        userproc[:tblname] = "sio_"+ command_c[:sio_viewname]
-        userproc[:cnt] = command_c[:sio_recordcount]
-        userproc[:cnt_out] = 0
-        userproc[:status] = "request"
-        userproc[:created_at] = Time.now
-        userproc[:updated_at] = Time.now
-        userproc[:persons_id_upd] = system_person_id
-        userproc[:expiredate] = DateTime.parse("2099/12/31")
-        proc_tbl_add_arel("userproc#{@sio_user_code.to_s}s",userproc)
-    ##end
-	##	sub_userproc_chk_set command_c
-	end
-    def proc_userproc_chk_set command_c
-		strwhere = "select * from userproc#{@sio_user_code.to_s}s where tblname = 'sio_#{command_c[:sio_viewname]}' and "
-		strwhere << " session_counter = #{command_c[:sio_session_counter]} "
-        chkuserproc = ActiveRecord::Base.connection.select_one(strwhere)
-		if chkuserproc
-		    chkuserproc["cnt"] += 1
-            ### chkuserproc["where"] = {:id=>chkuserproc["id"]}
-            proc_tbl_edit_arel("userproc#{@sio_user_code.to_s}s",chkuserproc," id = #{chkuserproc["id"]}" )
-		else
-		    proc_userproc_insert command_c
-		end
-    end
     def sub_parescreen_insert hash_rcd
         parescreen = {}
         parescreen[:id] = @ss_id.to_i
@@ -310,16 +183,19 @@ module RorBlkctl
         parescreen[:expiredate] = Date.today + 1
         proc_tbl_add_arel("parescreen#{@sio_user_code.to_s}s",parescreen)
     end
-    def proc_insert_sio_r  command_c ####レスポンス
-        command_c[:sio_id] =  proc_get_nextval("sio.SIO_#{command_c[:sio_viewname]}_SEQ")
-        command_c[:sio_command_response] = "R"
-		command_c[:sio_add_time] = Time.now
+	def proc_insert_sio_r  command_c ####レスポンス
+		rec = {}
+        rec[:sio_id] =  proc_get_nextval("sio.SIO_#{command_c[:sio_viewname]}_SEQ")
+        rec[:sio_command_response] = "R"
+		rec[:sio_add_time] = Time.now
 		###画面専用項目
-		command_c.delete("gridmessage")
-		command_c.delete("confirm")
-		command_c.delete("err")
-		command_c.delete("person_id_upd")
-		proc_tbl_add_arel  "SIO_#{command_c[:sio_viewname]}",command_c
+		command_c.each do |key,val|
+			next if key.to_s =~ /gridmessage/
+			next if key.to_s =~ /^_/
+			next if key.to_s == "confirm"
+			rec[key] = val
+		end	
+		proc_tbl_add_arel  "SIO_#{command_c[:sio_viewname]}",rec
     end   ## 
     def char_to_number_data  command_c  ###excel からのデータ取り込み　根本解決を
 				##rubyXl マッキントッシュ excel windows excel not perfect
@@ -384,7 +260,8 @@ module RorBlkctl
 							where_str << " #{ff["id"]} = #{ff["value"]}     AND "
 						end	
 					end	
-	      		when /^date|^timestamp/
+				  when /^date|^timestamp/
+					ff["value"] = ff["value"].gsub("-","/")
 		      		case  ff["value"].size
 			        when 4
 									where_str << " to_char( #{ff["id"]},'yyyy') = '#{ff["value"]}'       AND "
@@ -454,10 +331,10 @@ module RorBlkctl
 		end	
 		def fetch_data_blk id,select_fields,page_info,strwhere,sort_info
 				strsorting = ""
-				if sort_info[:option]
+				if sort_info[:option] and  sort_info[:option] != ""
 					strsorting << "order by #{sort_info[:option]}"
 				else
-					if sort_info[:default]	
+					if sort_info[:default]	and  sort_info[:default] != ""
 						strsorting << "order by #{sort_info[:default]}"
 					end	
 				end
@@ -471,15 +348,22 @@ module RorBlkctl
 				strsql = "SELECT count(*) FROM #{id} #{if strwhere == '' then '' else strwhere end } "
 				total_cnt = ActiveRecord::Base.connection.select_value(strsql)
 				page_info[:totalPage] = (total_cnt.to_f/page_info[:sizePerPage].to_f).ceil
-				return  pagedata,	page_info
+				return  pagedata,page_info
 		end	
-		def download_data_blk screenCode,select_fields,strwhere
+		def download_data_blk screenCode,select_fields,strwhere,columns_color
 				strsql = "select #{select_fields} from  #{screenCode}
 							 #{if strwhere == '' then '' else strwhere   end }  limit 1000000	  "
-				pagedata = ActiveRecord::Base.connection.select_all(strsql)
-				strsql = "select count(*) from  #{screenCode}
-							 #{if strwhere == '' then '' else strwhere   end }  limit 1000000	  "
-				cnt = ActiveRecord::Base.connection.select_value(strsql)
+				recs = ActiveRecord::Base.connection.select_all(strsql)
+				cnt = 0
+				pagedata = "[["
+				recs.each do |rec|
+					rec.each do |key,val|
+						pagedata << %Q%{"value":"#{val}","style":{"fill":{"patternType": "solid", "fgColor": {"rgb": "#{columns_color[key.to_sym]}"}}}}\n,%
+					end
+					pagedata = pagedata.chop +  "],["
+					cnt += 1	
+				end	
+				pagedata = pagedata[0..-3] + "]"
 				return  pagedata,cnt
 		end	
 		def add_empty_data id,columns_info,page_info
@@ -545,27 +429,6 @@ module RorBlkctl
       end
     end
 
-
-
-	def proc_auto_add_pobject_code(pobject_code,objecttype)
-        strsql = "select code from pobjects where code = '#{pobject_code}' and objecttype = '#{objecttype}'  and expiredate > current_date"
-        if   ActiveRecord::Base.connection.select_one(strsql).nil?
-	        command_c = {}.with_indifferent_access
-            command_c[:pobject_code] = pobject_code
-            command_c[:pobject_expiredate] = "2099/12/31".to_date
-            command_c[:pobject_objecttype] = objecttype
-            command_c[:sio_viewname] = "r_pobjects"
-            command_c[:sio_session_counter] =   user_seq_nextval   ##
-            command_c[:sio_classname] = "_auto_add_by_screencodes"
-            command_c[:id] = command_c[:pobject_id] = proc_get_nextval("pobjects_seq")
-            command_c[:sio_user_code] = (@sio_user_code ||=0)
-            proc_simple_sio_insert command_c
-			id = command_c[:id]
-		else
-			id = nil
-        end
-	end
-
   def sub_get_sects_id_fm_locas_id  locas_id
 	    sect_id = ActiveRecord::Base.connection.select_value("select id from sects where locas_id_sect = #{locas_id||=0} ")
 		if sect_id.nil?
@@ -623,22 +486,6 @@ module RorBlkctl
 	    end
 	    return chrgperson_id
   	end
-
-  	def proc_tblinks command_c
-			if command_c[:sio_code] !~ /blktbs/ and command_c[:sio_code] !~ /tblink/
-				strsql = " select * from r_tblinks where pobject_code_scr_src = '#{command_c[:sio_code]}' and tblink_expiredate > current_date "
-				strsql << " and tblink_beforeafter = '#{yield}' order by tblink_seqno "
-				do_all = ActiveRecord::Base.connection.select_all(strsql)
-				do_all.each do |dorec|
-					if respond_to?(dorec["tblink_codel"])
-						__send__(dorec["tblink_codel"],eval(dorec["tblink_hikisu"]))
-					else
-						proc_crt_def_rubycode({"codel"=> dorec["tblink_codel"],"hikisu"=>dorec["tblink_hikisu"],"rubycode"=>dorec["tblink_rubycode"]})
-						__send__(dorec["tblink_codel"],eval(dorec["tblink_hikisu"]))
-					end
-				end
-			end
-	end
 	def proc_set_src_tbl rec  ##rec["xxxxx"]
   		@src_tbl = {}   ###テーブル更新
 		tblnamechop = rec[:sio_viewname].split("_",2)[1].chop
@@ -662,74 +509,6 @@ module RorBlkctl
 		end	
 		return rec
 	end
-	def proc_save_rec_btch_sub rec
-		tmp = {}
-		tblnamechop = rec[:sio_viewname].split("_")[1].chop
-		rec.each do |key,val|
-			if  key.to_s =~ /_id/ and val
-				screenchop,tbl,filler = key.to_s.split("_",3)
-				if filler
-					delm = "_" + key.to_s.split("_id",2)[1]
-				else
-					delm = ""
-				end
-				if tblnamechop == screenchop  and tbl != "id" ###  a
-					if tbl == "person"
-						if @person_rec
-							if @person_rec["id"] = val
-								trec = @person_rec
-							else
-								@person_rec = trec = ActiveRecord::Base.connection.select_one("select * from #{"r_" + tbl + "s"} where id = #{val}")
-							end
-						else
-							@person_rec = trec = ActiveRecord::Base.connection.select_one("select * from #{"r_" + tbl + "s"} where id = #{val}")
-						end
-					else
-						trec = ActiveRecord::Base.connection.select_one("select * from #{"r_" + tbl + "s"} where id = #{val}")
-					end
-					if trec.nil?  ###logic error
-						Rails.logger.debug " logic error rec = #{rec} "
-						Rails.logger.debug " key = '#{key}' val = #{val} "
-						raise
-					end
-					trec.each do |reckey,recval|
-						tmp[reckey+delm] = recval if recval and reckey != "id"
-					end
-				end
-			end
-		end
-		show_data = get_show_data(rec[:sio_code]||=rec["sio_code"])
-		show_data[:allfields].each  do |fld|  ###必要項目のみセット
-			rec[fld.to_s] = tmp[fld]  if tmp[fld]
-		end
-		return rec
-	end
-	def proc_save_rec_btch rec
-			if @rec_save
-				if @rec_save["sio_code"] == rec["sio_code"] and @rec_save["id"] == rec["id"]
-					return @rec_save
-				else
-					@rec_save = proc_save_rec_btch_sub rec
-				end
-			else
-				@rec_save = proc_save_rec_btch_sub rec
-			end
-			return @rec_save
-	end
-  def proc_command_before_instance_variable rec
-	    if @pare_class == "batch"  ###delayjobからだと必要データが来ない。
-				proc_command_instance_variable(proc_save_rec_btch(rec))
-			else
-				proc_command_instance_variable rec
-	    end
-  end
-  def proc_command_after_instance_variable rec
-	    if @pare_class == "batch"  ###delayjobからだと必要データが来ない。
-				proc_command_instance_variable(proc_save_rec_btch(rec))
-			else
-				proc_command_instance_variable rec
-			end
-  end
 	def proc_command_instance_variable rec ###@xxxxの作成
 	    str = ""
         rec.each do |key,val|
@@ -766,57 +545,6 @@ module RorBlkctl
 		end
 		return screen_code
     end
-    def crt_def_all
-        eval("def dummy_def \n end")
-		begin
-			crt_defs = ActiveRecord::Base.connection.select_all("select * from rubycodings where expiredate > current_date")
-			crt_defs.each do |src_tbl|
-				vproc_crt_def_rubycode src_tbl
-			end
-			proc_create_tblinkfld_def
-			crt_defs = ActiveRecord::Base.connection.select_all("select * from tblinks where expiredate > current_date")
-			crt_defs.each do |src_tbl|
-				vproc_crt_def_rubycode src_tbl
-			end
-		rescue
-			if self.to_s != "main"
-				Rails.logger.debug" error class #{self} #{Time.now}:  $@: #{$@} "
-				Rails.logger.debug"  error class #{self} :  $!: #{$!} "
-			else
-				p " error class #{self} #{Time.now}:  $@: #{$@} "
-				p "  error class #{self} :  $!: #{$!} "
-			end
-		end
-	end
-    def vproc_crt_def_rubycode src_tbl
-		strdef = "def #{src_tbl["codel"]}  #{src_tbl["hikisu"]} \n"
-		strdef << src_tbl["rubycode"]
-	    strdef <<"\n end"
-		if self.to_s != "main"
-			Rails.logger.debug strdef
-		else
-			p strdef[0..50]
-		end
-	    eval(strdef)
-    end
-	def proc_crt_def_tblink codel
-		src_tbl  = ActiveRecord::Base.connection.select_one("select * from tblinks where codel = '#{codel}' and expiredate > current_date")
-		proc_crt_def_rubycode(src_tbl)
-	end
-    def proc_crt_def_rubycode(src_tbl)
-		strdef = "def #{src_tbl["codel"]}  #{src_tbl["hikisu"]} \n"
-		strdef << src_tbl["rubycode"]
-		strdef <<"\n end"
-		if self.to_s != "main"
-			Rails.logger.debug strdef
-		else
-			p strdef[0..50]
-		end
-		eval(strdef)
-		proc_create_tblinkfld_def do
-		 " and tblink_codel = '#{src_tbl["codel"]}' "
-		end
-    end
 	def str_init_command_c tbl_dest
 	    %Q%
 		command_c = {}.with_indifferent_access
@@ -839,99 +567,15 @@ module RorBlkctl
 	    end
 		%
 	end
-    def proc_create_tblinkfld_def
-		strsql = " select * from r_tblinkflds where tblinkfld_expiredate > current_date "
-		if block_given?
-			strsql << yield
-		end
-		strsql << " order by pobject_code_scr_src,pobject_code_tbl_dest,tblink_beforeafter,tblink_seqno,tblinkfld_seqno "
-	    recs = ActiveRecord::Base.connection.select_all(strsql)
-		streval = nil
-		tblchop = ""
-		src_screen = ""
-		beforeafter = ""
-		seqno = ""
-	    recs.each do |rec|
-			if src_screen != rec["pobject_code_scr_src"] or 	tblchop != rec["pobject_code_tbl_dest"].chop or
-					beforeafter != rec["tblink_beforeafter"] or seqno != rec["tblink_seqno"]
-					if streval
-						streval << str_sio_set(tblchop)
-						if self.to_s != "main"
-							Rails.logger.debug streval
-						else
-							p streval[0..50]
-						end
-						eval(streval)
-					end
-					src_screen = rec["pobject_code_scr_src"]
-					tblchop = rec["pobject_code_tbl_dest"].chop
-					beforeafter = rec["tblink_beforeafter"]
-					seqno = rec["tblink_seqno"]
-					streval = "def proc_fld_#{src_screen}_#{tblchop}s_#{beforeafter+seqno.to_s}\n"
-					p streval
-					streval << str_init_command_c("r_#{rec["pobject_code_tbl_dest"]}")
-			end
-			if  rec["pobject_code_fld"] =~ /s_id/   ###tblchop==delm ###ヘッダーと同じものは除く crttblviewscreen
-				fld = tblchop + "_" + rec["pobject_code_fld"].sub("s_id","_id")
-			else
-				fld = tblchop+"_"+rec["pobject_code_fld"]
-			end
-			if rec["tblinkfld_rubycode"] and rec["tblinkfld_rubycode"] != "undefined"
-					streval << %Q&\n	command_c[:#{fld}] = #{rec["tblinkfld_rubycode"]} 	&
-			else
-				str = vproc_tblinkfld_dflt_set_fm_rubycoding(fld)
-				if str
-					streval << %Q&\n command_c[:#{fld}] = #{str} 	&
-				end
-			end
-			if  rec["pobject_code_fld"] =~ /s_id/
-				streval << %Q&\n 	command_c[:#{fld}] = "missing id #{fld}"  if command_c[:#{fld}].nil?  &  	###_id項目は必須
-			end
-	    end ##
-		if recs.size > 0
-		    streval << %Q&\n command_c[(command_c[:sio_viewname].split("_")[1].chop+"_id").to_sym] = command_c[:id] &
-			streval << str_sio_set(tblchop)
-			if self.to_s != "main"
-				Rails.logger.debug streval
-			else
-				p streval[0..50]
-			end
-			eval(streval)
-		end
-    end
-	def vproc_tblinkfld_dflt_set_fm_rubycoding fld
-		dflt_rubycode = nil
-		strsql = %Q& select * from r_rubycodings where pobject_objecttype = 'view_field' 	and  pobject_code = '#{fld}'
-							and rubycoding_codel like '%dflt_for_tbl_set' &
-		rubycode_view = ActiveRecord::Base.connection.select_one(strsql)
-		if rubycode_view
-			dflt_rubycode = rubycode_view["rubycoding_codel"] + " " +(rubycode_view["rubycoding_hikisu"]||="" )
-		else
-			fld_tbl = fld.split("_",2)[1]
-			strsql = %Q& select * from r_rubycodings where pobject_objecttype = 'tbl_field' 	and  pobject_code = '#{fld_tbl}'
-					and rubycoding_codel like '%dflt_for_tbl_set' &
-			rubycode_tbl = ActiveRecord::Base.connection.select_one(strsql)
-			if rubycode_tbl
-				dflt_rubycode = rubycode_tbl["rubycoding_codel"] + " " + (rubycode_tbl["rubycoding_hikisu"]||="")
-			end
-		end
-		return dflt_rubycode
-	end
-    def proc_set_fields_from_allfields params ## value ###画面の内容をcommand_rへ ###typeの変換を
-        command_c = params.dup
-	    command_c[:sio_code]  = screen_code
-		char_to_number_data command_c
-	        ## nilは params[j] にセットされない。
-			### 下記の変換が未実施
-			###  1 (params == String ,command_c=float or integer
-    end
-	def init_from_screen current_user,params  ###
+
+	def init_from_screen current_user,params  ### current_user = current_api_user
 		@sio_user_code = ActiveRecord::Base.connection.select_value("select id from persons where email = '#{current_user[:email]}'")
 		command_c = {}
-		#command_c[:sio_user_code] = @sio_user_code  ###########   LOGIN USER
-		#command_c[:sio_email] = current_user[:email]
-	 	#command_c[:sio_code]  = params[:screenCode]
-		#command_c[:sio_params] = params.to_json.to_s[0..3999]
+		command_c[:sio_viewname] =  params[:screenCode]
+		command_c[:sio_code] =  params[:screenCode]
+		command_c[:sio_message_contents] = nil
+		command_c[:sio_recordcount] = 1
+		command_c[:sio_result_f] =   "0"  
 		return command_c
 	end
 	
@@ -950,16 +594,16 @@ module RorBlkctl
 												##	:filterable=>i["screenfield_hideflg"] 
 													}
 					select_fields = 	select_fields + 		i["pobject_code_sfd"] + ','
-          if cnt == 0
-                	where_info[:filtered] = i["screen_strwhere"]
-                	page_info[:sizePerPage] = i["screen_rows_per_page"].to_i
-                	page_info[:pageNo] = 1
-									page_info[:sizePerPageList] = []
+          			if cnt == 0
+                		where_info[:filtered] = i["screen_strwhere"]
+                		page_info[:sizePerPage] = i["screen_rows_per_page"].to_i
+                		page_info[:pageNo] = 1
+						page_info[:sizePerPageList] = []
 									i["screen_rowlist"].split(",").each do |list|
 										##screen_prop[:sizePerPageList]  << {:text=> list.to_s,:value=> list.to_i}
 										page_info[:sizePerPageList]  <<  list.to_i
-									end
-       		end
+						end
+       				end
 				end
 				grid_columns_info = [columns_info,page_info,where_info,select_fields.chop]
 			end
@@ -973,8 +617,10 @@ module RorBlkctl
 			page_info = {}
 			where_info = {}
 			select_fields = ""
+			gridmessages_fields = ""  ### error messages
 			dropdownlist = {}
 			sort_info = {}
+			screenwidth = 0
 			if (req==='editabletablereq' )
 
 				columns_info << {:Header=>"confirm",
@@ -985,14 +631,24 @@ module RorBlkctl
 									:className=>"checkbox",
 									:width=>50
 									}
+				columns_info << {:Header=>"confirm_gridmessage",
+														:accessor=>"confirm_gridmessage",
+														:show=>false,
+														:filtered=>false,
+														:id=>"",
+														:className=>"gridmessage",
+														}
 			end		
-			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
+			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|							
+				select_fields = 	select_fields + 	i["pobject_code_sfd"] + ','
 				columns_info << {:Header=>"#{i["screenfield_name"]}",
 												:accessor=>"#{i["pobject_code_sfd"]}",
 												:show=>if  i["screenfield_hideflg"] == "0" then true else false end,
 												:filtered=>true,
 												:width => i["screenfield_width"].to_i,
 												:id=>"#{i["screenfield_id"]}",
+												##:style=>%Q%{"textAlign":#{if i["screenfield_type"] == "numeric" then "right" else "left" end}%, 
+												:style=>{:textAlign=>if i["screenfield_type"] == "numeric" then "right" else "left" end}, 
 												:className=>if ((req==="editabletablereq" or req==="inlineaddreq") and 
 																		  (i["screenfield_editable"] === "1" or i["screenfield_editable"] === "2"))
 																if  i["screenfield_type"] == "select" 
@@ -1011,9 +667,19 @@ module RorBlkctl
 																	"renderNonEditable"
 																end	
 															end	
-									}							
-				where_info[i["pobject_code_sfd"].to_sym] = 	i["screenfield_type"]								
-				select_fields = 	select_fields + 	i["pobject_code_sfd"] + ','
+									}
+				if (req==="editabletablereq" or req==="inlineaddreq") and  (i["screenfield_editable"] === "1" or i["screenfield_editable"] === "2")
+					columns_info << {:Header=>"#{i["screenfield_name"]}_gridmessage",
+																	:accessor=>"#{i["pobject_code_sfd"]}_gridmessage",
+																	:show=>false,
+																	:filtered=>false,
+																	:width => 10,
+																	:id=>"#{i["screenfield_id"]}_gridmessage",
+																	:className=>"gridmessages"
+									}
+					gridmessages_fields << %Q% '' #{i["pobject_code_sfd"]}_gridmessage,%	
+				end																
+				where_info[i["pobject_code_sfd"].to_sym] = 	i["screenfield_type"]	
 				if cnt == 0
 								where_info[:filtered] = i["screen_strwhere"]
 								page_info[:sizePerPage] = i["screen_rows_per_page"].to_i
@@ -1029,21 +695,10 @@ module RorBlkctl
 				if  i["screenfield_edoptvalue"]
 					dropdownlist[i["pobject_code_sfd"]] = i["screenfield_edoptvalue"]
 				end	
-			end
-			if (req==='editabletablereq' or req==="inlineaddreq")
-
-				yup = YupSchema.create_yupfetchcode screen_code
-
-				columns_info << {:Header=>"gridmessage",
-									:accessor=>"gridmessage",
-									:show=>false,
-									:filtered=>false,
-									:className=>"renderNonEditable",
-									:id=>""
-									}
-				
-								
-			end		
+				if   i["screenfield_hideflg"] == "0" 
+					screenwidth = screenwidth +  i["screenfield_width"].to_i
+				end 	
+			end	
 			if (req==="inlineaddreq")
 				columns_info << {:Header=>"confirm",
 									:accessor=>"confirm",
@@ -1053,6 +708,11 @@ module RorBlkctl
 									:className=>"checkbox",
 									:width=>50
 									}
+			end	
+			if (req==='editabletablereq' or req==="inlineaddreq")
+				yup = YupSchema.create_yupfetchcode screen_code   
+			else
+				yup={}
 			end		
 			dropdownlist.each do |key,val|
 				tmpval="["
@@ -1079,7 +739,11 @@ module RorBlkctl
 					end	
 					break if sort_info[:default].nil?
 				end	
-			end	 	
+			end	 
+			page_info[:screenwidth] = screenwidth	
+			if gridmessages_fields.size > 1
+				select_fields << gridmessages_fields
+			end
 			grid_columns_info = [columns_info,page_info,where_info,select_fields.chop,yup,dropdownlist,sort_info ]
 		end
 	end
@@ -1088,7 +752,8 @@ module RorBlkctl
 		download_columns_info = Rails.cache.fetch('download'+RorBlkctl.grp_code(email)+screen_code) do
 				###  ダブルコーティション　「"」は使用できない。 
 			sqlstr = "select * from  func_get_screenfield_grpname('#{email}','#{screen_code}')"
-			columns_info = []
+			columns_info = "["
+			columns_color = {}
 			where_info = {}
 			select_fields = ""	
 			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
@@ -1102,12 +767,24 @@ module RorBlkctl
 						when 'timestamp'
 						 ##renderer
 					end	
-					columns_info <<%Q%{"label":"#{i["screenfield_name"]}","value":"#{i["pobject_code_sfd"]}"}%
-					where_info[i["pobject_code_sfd"].to_sym] = 	i["screenfield_type"]								
+					if i["screenfield_indisp"] == "1"
+						color = "00bfff"  ##rgb(125, 177, 245)
+					else
+						if i["screenfield_editable"] == "1"	
+							color = "87ceeb"  ## rgb(200, 220, 245);
+						else
+							color = "ffffff"
+						end
+					end			##value: "Blue",  style: {fill: {patternType: "solid", fgColor: {rgb: "FF0000FF"}}}
+					columns_info << %Q%{"title":"#{i["screenfield_name"]}"},%
+					where_info[i["pobject_code_sfd"].to_sym] = 	i["screenfield_type"]	
+					columns_color[i["pobject_code_sfd"].to_sym] = color							
 					select_fields = 	select_fields + 	i["pobject_code_sfd"] + ','
 				end	
 			end
-			download_columns_info = [columns_info,where_info,select_fields.chop]
+			columns_info = columns_info.chop 
+			columns_info = columns_info + "]"
+			download_columns_info = [columns_info,where_info,select_fields.chop,columns_color]
 		end
 	end
 	def get_fetch_rec params
@@ -1118,15 +795,17 @@ module RorBlkctl
 			tblnamechop = fetchview.split("_")[1].chop
 			strsql = " select * from #{fetchview} where "
 			JSON.parse(params["fetchcode"]).each do |key,val|
+			##params["fetchcode"].each do |key,val|
 					if params["screenCode"].split("_")[1].chop != key.to_s.split("_")[0]
 						mainviewflg = false
 					end	 
 			end	
-			screendata = JSON.parse(params["data"])
+			screendata = JSON.parse(params["linedata"])
 			fetcfieldgetsql = "select pobject_code_sfd from r_screenfields
 								 where pobject_code_scr =  '#{params["screenCode"]}' 
 								 and screenfield_paragraph = '#{params["fetchview"]}'"	
 			delm = (params["fetchview"].split(":")[1]||="")
+			missing = false
 			ActiveRecord::Base.connection.select_all(fetcfieldgetsql).each do |rec|
 				if delm == ""
 					strsql << "  #{rec["pobject_code_sfd"]} = '#{screendata[rec["pobject_code_sfd"]]}'    and"
@@ -1134,16 +813,30 @@ module RorBlkctl
 					strsql << "  #{rec["pobject_code_sfd"].split(delm)[0]} = '#{screendata[rec["pobject_code_sfd"]]}'    and"
 				end		
 				keys <<  "  #{rec["pobject_code_sfd"]} : '#{screendata[rec["pobject_code_sfd"]].gsub(",","_")}',"  ###入力項目に「,」が入っていた時
-            end
-			rec =  ActiveRecord::Base.connection.select_one(strsql[0..-4])	
+				if screendata[rec["pobject_code_sfd"]] == "" or screendata[rec["pobject_code_sfd"]].nil?   ###未入力
+					missing = true
+					rec = nil
+				end		
+			end
+			if missing == false
+				rec =  ActiveRecord::Base.connection.select_one(strsql[0..-4])
+			end
 			fetch_data = {}
 			if rec
 				screendata.each do |key,val|  ###結果をセット
-						if rec[key] and key !="id" and key !~ /person.*upd/ and key !~ /_id/ 
+						key = key.sub(delm,"")
+						if rec[key] and key !="id" and key !~ /person.*upd/ 
 							 fetch_data[key+delm] =  rec[key]
 						end
 				end	
-				fetch_data[params["screenCode"].split("_")[1].chop+"_"+tblnamechop+"_id"+delm] =  rec["id"]
+				field = params["screenCode"].split("_")[1].chop+"_"+tblnamechop+"_id"+delm
+				if JSON.parse(params["linedata"])[field]
+					fetch_data[field] =  rec["id"]
+				end
+				field = tblnamechop+"_id"+delm
+				if JSON.parse(params["linedata"])[field]
+					fetch_data[field] =  rec["id"]
+				end	
 				findstatus = true
 			else
 				fetch_data[params["screenCode"].split("_")[1].chop+"_"+tblnamechop+"_id"+delm] =  ""  ##再入力時のNgに対応
@@ -1184,7 +877,6 @@ module RorBlkctl
 		else
 			rec = ActiveRecord::Base.connection.select_one("select * from r_#{tblname} where #{tblname.chop}_tblname = '#{srctblname}' and #{tblname.chop}_tblid = #{srctblid}")
 		end
-		####id = proc_get_nextval "#{tblname}_seq" if id.nil?
 		proc_command_instance_variable(rec)
 		return rec.with_indifferent_access if rec
 	end
@@ -1223,74 +915,10 @@ module RorBlkctl
 			nil
 		end
 	end
-	def proc_get_allrecs_fm_tblname_yield tblname  ##proc_fld_xxxxの中の項目を求める。　 ##レコードが見つからなかったときの処理は親ですること。
-		 ActiveRecord::Base.connection.select_all("select * from #{tblname} where expiredate > current_date and  #{yield}")
-		##### recs.with_indifferent_access
-	end
-	def proc_get_viewrec_from_id tblname,id  ##  ##レコードが見つからなかったときの処理は親ですること。
-		rec = ActiveRecord::Base.connection.select_one("select * from r_#{tblname} where id = #{id}")
-		return rec.with_indifferent_access if rec
-	end
 	def proc_get_tblrec_from_id tblname,id  ##  ##レコードが見つからなかったときの処理は親ですること。
 		rec = ActiveRecord::Base.connection.select_one("select * from #{tblname} where id = #{id}")
 		return rec.with_indifferent_access if rec
 	end
-	def proc_get_pare_from_trn_id trn_id  ## inoutsのprocessseq　itms_id_pare  品目違いの親を求める。
-		inout = {}
-		for ii in 1..5 do
-			strsql = " select case when pare.itm_id = trn.itm_id then pare.trngantt_processseq else 999 end processseq,
-					pare.itm_id itms_id_pare,trn.itm_id itms_id,pare.trngantt_key key,pare.trngantt_id pare_trn_id, pare.trngantt_processseq  processseq_pare
-					from r_trngantts trn,r_trngantts pare
-					where trn.trngantt_orgtblname = pare.trngantt_orgtblname and trn.trngantt_orgtblid = pare.trngantt_orgtblid
-					and pare.trngantt_key =  case length(trn.trngantt_key)      when 3 then  to_char(trn.trngantt_key  - 1,'000')   else   substr(trn.trngantt_key,1,length(trn.trngantt_key) -3)   end
-					and trn.id = #{trn_id} "
-			rec = ActiveRecord::Base.connection.select_one(strsql)
-			if rec
-				inout[:inout_itm_id_pare] = rec["itms_id_pare"]
-				inout[:inout_processseq_pare] = rec["processseq_pare"]
-				break if rec["itms_id_pare"] != rec["itms_id"]
-				break if  rec["key"].size < 4
-			else
-				rec1 = ActiveRecord::Base.connection.select_one("select itms_id,processseq from trngantts where id = #{trn_id}")
-				inout[:inout_itm_id_pare] = rec1["itms_id"]
-				inout[:inout_processseq_pare] = rec1["processseq"]
-				break
-			end
-			ii += 1
-			trn_id = rec["pare_trn_id"]
-		end
-		return inout
-	end
-	def proc_decision_id_by_key(tblname,where)
-		strsql = %Q& select * from #{tblname} where #{where} for update &
-		rec = ActiveRecord::Base.connection.select_one(strsql)
-		eval(%Q& if  rec.nil?
-					rec = {}
-					rec["id"] =  proc_get_nextval("#{tblname}_seq")
-					@#{tblname.chop}_classname = "#{tblname}_add_#{where}"[0..49]
-					rec["expiredate"] = "2099/12/31".to_date
-					rec["created_at"] = Time.now
-				else
-					### tbllinksでユニークkey チェックをセットする。　複数レコードはエラー
-					@#{tblname.chop}_classname  = "#{tblname}_edit_#{where}"[0..49]
-				end &)
-		eval(%Q& @#{tblname.chop}_id = rec["id"] &)
-		rec["updated_at"] = Time.now
-		rec["persons_id_upd"] = (@sio_user_code ||=0)
-		return rec
-	end
-	def proc_decision_all_ids_by_key(tblname,where)
-		strsql = %Q& select * from #{tblname} where #{where} for update &
-		recs = ActiveRecord::Base.connection.select_all(strsql)
-		eval(%Q& if  recs.size == 0
-					rec[0] = {"id" =>  proc_get_nextval("#{tblname}_seq")}
-					@#{tblname.chop}_classname = "#{tblname}_add_#{where}"[0..49]
-				else
-					@#{tblname.chop}_classname  = "#{tblname}_edit_#{where}"[0..49]
-				end &)
-		return recs
-	end
-
 	def proc_tbl_add_arel  tblname,tblarel ##
 		fields = ""
 		values = ""
@@ -1306,21 +934,23 @@ module RorBlkctl
 						when "Time"
 							case key.to_s
 							when "created_at","updated_at"
-									%Q& to_date('#{val.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),&
+									%Q& to_timestamp('#{val.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),&
 							else
-									%Q& to_date('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
+									%Q& to_timestamp('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
 							end
 						when "DateTime"
 							case key.to_s
 							when "expiredate"
 									%Q& to_date('#{val.strftime("%Y/%m/%d")}','yyyy/mm/dd'),&
 							else
-								%Q& to_date('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
+								%Q& to_timestamp('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
 							end
 						when "NilClass"
 							"null,"
 						when "Hash"
 							"'#{val.to_query}',"
+						when "TrueClass"
+							if val == true then "1," else "0," end	
 						else
 							Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
 						end
@@ -1334,87 +964,6 @@ module RorBlkctl
 			ActiveRecord::Base.connection.insert("insert into #{tblname.downcase}(#{fields.chop}) values(#{values.chop})")
 		end
 	end
-	def proc_tbl_rec_to_screen_field hash ##
-		strset = "{"
-		hash.each do |key,val|
-			strset << case val.class.to_s 
-				when "String"
-					%Q& #{key.to_s}: "#{val}",&
-				when "Fixnum","Bignum","BigDecimal","Float"
-					" #{key.to_s}: #{val.to_s},"
-				when "Date"
-					%Q&  #{key.to_s}: '#{val.strftime("%Y/%m/%d")}',&
-				when "Time"
-					case key.to_s
-						when /created_at|updated_at/
-							%Q&  #{key.to_s}:  '#{val.strftime("%Y/%m/%d %H:%M:%S")}',&
-						when /expiredate/
-							%Q&  #{key.to_s}: '#{val.strftime("%Y/%m/%d")}',&
-						else
-							%Q&  #{key.to_s}: '#{val.strftime("%Y/%m/%d %H:%M")}',&
-					end
-				when "NilClass"
-					"  #{key.to_s}: '',"
-				else
-					Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
-					raise
-		   end
-		end
-		return strset.chop + "},"
-	end
-	def proc_tbl_field_to_screen_field key,val,prop ##
-		strset = ""
-		strset << case val.class.to_s 
-				when "String"
-					%Q& #{key.to_s}: "#{val}"&
-				when "Fixnum","Bignum","BigDecimal","Float"
-					" #{key.to_s}: #{val.to_s}"
-					### 小数点編集等
-				when "Date"
-					%Q&  #{key.to_s}: '#{val.strftime("%Y/%m/%d")}'&
-				when "Time"
-					case key.to_s
-						when /created_at|updated_at/
-							%Q&  #{key.to_s}:  '#{val.strftime("%Y/%m/%d %H:%M:%S")}'&
-						when /expiredate/
-							%Q&  #{key.to_s}: '#{val.strftime("%Y/%m/%d")}'&
-						else
-							%Q&  #{key.to_s}: '#{val.strftime("%Y/%m/%d %H:%M")}'&
-					end
-				when "NilClass"
-					"  #{key.to_s}: ''"
-				else
-					Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
-					raise
-		   		end
-		return strset
-	end
-	def proc_tbl_field_to_screen_field_hash key,val,prop,phach##
-		case val.class.to_s 
-			when "String"
-					phach[key]= val
-			when "Fixnum	","Bignum","BigDecimal","Float"
-					phach[key]=  val.to_s
-					### 小数点編集等
-			when "Date"
-					phach[key.to_s]= val.strftime("%Y/%m/%d")
-			when "Time"
-				case key.to_s
-					when /created_at|updated_at/
-							phach[key]= val.strftime("%Y/%m/%d %H:%M:%S")
-					when /expiredate/
-							phach[key]= val.strftime("%Y/%m/%d")
-					else
-							phach[key]= val.strftime("%Y/%m/%d %H:%M")
-				end
-			when "NilClass"
-					phach[key.to_s]= ""
-			else
-					Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
-					raise
-		   	end
-		return
-	end
 	def proc_tbl_edit_arel  tblname,hash,strwhere ##
 		strset = ""
 		hash.each do |key,val|
@@ -1425,13 +974,13 @@ module RorBlkctl
 				when "Fixnum","Bignum","BigDecimal","Float","Integer"
 					"#{val},"
 				when "Date"
-					%Q& to_date('#{val.strftime("%Y/%m/%d")}','yyyy/mm/dd'),&
+					%Q& to_timestamp('#{val.strftime("%Y/%m/%d")}','yyyy/mm/dd'),&
 				when "Time"
 					case key.to_s
 						when "created_at","updated_at"
-							%Q& to_date('#{val.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),&
+							%Q&to_timestamp('#{val.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),&
 						else
-							%Q& to_date('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
+							%Q& to_timestamp('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
 					end
 				when "NilClass"
 					"null,"
@@ -1445,74 +994,21 @@ module RorBlkctl
 	def proc_tbl_delete_arel  tblname,strwhere ##
 		ActiveRecord::Base.connection.delete("delete from  #{tblname}  where #{strwhere} ")
 	end
-	def proc_ord_inst_qty_chng tblname,tblid,qty
-		strsql = "select sum(qty) from alloctbls where srctblname = 'trngantts' and
-							destblname = '(#{tblname}' and destblid = #{tblid}
-							group by srctblname,destblname,destblid for update"
-
-	end
-
-	def proc_mkord_err rec,mag
-		proc_tbl_edit_arel(rec["alloctbl_destblname"],{:remark=>mag}," id = #{rec["alloctbl_destblid"]}")
-	end
-
-	def proc_blk_constrains tbl,colm,type,constraint_name   ###r_blktbsのテーブル　view作成ボタンでblkukysにレコードを追加してないとチェックはできない。
-		strsql = ""
-		ActiveRecord::Base.uncached() do
-			case ActiveRecord::Base.configurations[Rails.env]['adapter']
-				when /post/
-					##post
-				when /oracle/
-					strsql = "select  c.table_name, c.constraint_name, c.constraint_type, cc.position, cc.column_name from user_constraints c, user_cons_columns cc
-								where c.table_name      = cc.table_name  and c.constraint_name = cc.constraint_name "
-					strsql << if tbl then " and c.table_name = '#{tbl.upcase}' " else "" end
-					strsql << if colm
-								if colm =~ /%$|^%/ then " and  cc.column_name like  '#{colm.upcase}' " else " and  cc.column_name = '#{colm.upcase}'" end
-								else
-									""
-								end
-					strsql << if type then " and c.constraint_type = '#{type.upcase}' " else "" end
-					strsql << if constraint_name then " and c.constraint_name = '#{constraint_name.upcase}' " else "" end
-					strsql << " order by c.constraint_name ,cc.position "
-			end
-			ActiveRecord::Base.connection.select_all(strsql)
-		end
-	end
-	def proc_blk_get_constrains tbl,type
-		strsql = ""
-		ActiveRecord::Base.uncached() do
-			case ActiveRecord::Base.configurations[Rails.env]['adapter']
-				when /post/
-					strsql = "SELECT  constraint_name FROM information_schema.table_constraints WHERE table_name = '#{tbl.downcase}'
-										and constraint_type = #{case type.upcase when /^U/ then 'UNIQUE' when /^F/ then 'FOREIGN KEY' else '' end } "
-				when /oracle/
-					strsql = "select constraint_name 	from all_constraints 	where  table_name = '#{tbl.upcase}'  and constraint_type = '#{type[0].upcase}'"
-			end
-			ActiveRecord::Base.connection.select_values(strsql)
-		end
-	end
-	def proc_sequences_exist seq_name
-		case ActiveRecord::Base.configurations[Rails.env]['adapter']
-			when /oracle/
-				sql = "SELECT 1	FROM user_sequences WHERE sequence_name = '#{seq_name.upcase}' "
-			when /post/
-				sql = "SELECT 1 FROM pg_class where relname = '#{seq_name.downcase}'"
-		end
-		ActiveRecord::Base.connection.select_one(sql)
-	end
-	def proc_no_set code,key
-		rec =  proc_decision_id_by_key("notbls","  code = '#{code}' and key = '#{key}'" )
-		if @notbl_classname =~ /_add_/
-			rec["code"] = code
-			rec["key"] = key
-			rec["seqno"] = 1
-			proc_tbl_add_arel("notbls",rec)
-			return 1
-		else
-			rec["seqno"] += 1
-			proc_tbl_edit_arel("notbls",rec," id = #{rec["id"]}")
-			return rec["seqno"]
-		end
+	def proc_processreqs_add tblname,id
+		processreqs_id = proc_get_nextval("#{tblname}_seq")
+		strsql = %Q%
+		insert into processreqs(tblname,tblid,contents,remark,
+								created_at,updated_at,
+								update_ip,persons_id_upd,
+								id,result_f)
+								values('#{tblname}',#{id},'','',
+								to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
+								to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
+								'',#{@sio_user_code},
+								#{processreqs_id},'0')
+		%
+		ActiveRecord::Base.connection.insert(strsql)
+		return processreqs_id
 	end
 	# Float()で変換できれば数値、例外発生したら違う
 	def float_string?(str)

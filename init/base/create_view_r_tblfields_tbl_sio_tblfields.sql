@@ -1,30 +1,41 @@
 ﻿
  --- drop view r_tblfields cascade  
  create or replace view r_tblfields as select  
-tblfield.id id,
   blktb.pobject_code_tbl  pobject_code_tbl ,
+  blktb.pobject_objecttype_tbl  pobject_objecttype_tbl ,
+tblfield.id  tblfield_id,
   fieldcode.fieldcode_fieldlength  fieldcode_fieldlength ,
   fieldcode.fieldcode_datascale  fieldcode_datascale ,
+  blktb.blktb_pobject_id_tbl  blktb_pobject_id_tbl ,
+  blktb.pobject_id_tbl  pobject_id_tbl ,
+  blktb.blktb_id  blktb_id ,
 tblfield.blktbs_id   tblfield_blktb_id,
 tblfield.fieldcodes_id   tblfield_fieldcode_id,
-  blktb.pobject_id_tbl  pobject_id_tbl ,
-tblfield.created_at  tblfield_created_at,
-tblfield.updated_at  tblfield_updated_at,
-tblfield.id  tblfield_id,
+  fieldcode.fieldcode_id  fieldcode_id ,
   fieldcode.pobject_id_fld  pobject_id_fld ,
-  fieldcode.fieldcode_dataprecision  fieldcode_dataprecision ,
-tblfield.seqno  tblfield_seqno,
 tblfield.persons_id_upd   tblfield_person_id_upd,
+  fieldcode.fieldcode_dataprecision  fieldcode_dataprecision ,
+  fieldcode.fieldcode_pobject_id_fld  fieldcode_pobject_id_fld ,
+  blktb.blktb_contents  blktb_contents ,
+  blktb.pobject_contents_tbl  pobject_contents_tbl ,
+  fieldcode.pobject_contents_fld  pobject_contents_fld ,
+tblfield.seqno  tblfield_seqno,
   person_upd.person_name  person_name_upd ,
   person_upd.person_code  person_code_upd ,
-tblfield.update_ip  tblfield_update_ip,
+  blktb.blktb_seltbls  blktb_seltbls ,
   fieldcode.fieldcode_contents  fieldcode_contents ,
 tblfield.viewflmk  tblfield_viewflmk,
-  fieldcode.pobject_code_fld  pobject_code_fld ,
   fieldcode.fieldcode_ftype  fieldcode_ftype ,
-tblfield.contents  tblfield_contents,
+  fieldcode.pobject_code_fld  pobject_code_fld ,
+  fieldcode.pobject_objecttype_fld  pobject_objecttype_fld ,
 tblfield.remark  tblfield_remark,
-tblfield.expiredate  tblfield_expiredate
+tblfield.expiredate  tblfield_expiredate,
+tblfield.contents  tblfield_contents,
+  fieldcode.fieldcode_seqno  fieldcode_seqno ,
+tblfield.id id,
+tblfield.created_at  tblfield_created_at,
+tblfield.updated_at  tblfield_updated_at,
+tblfield.update_ip  tblfield_update_ip
  from tblfields   tblfield,
   r_blktbs  blktb ,  r_fieldcodes  fieldcode ,  r_persons  person_upd 
   where       tblfield.blktbs_id = blktb.id      and tblfield.fieldcodes_id = fieldcode.id      and tblfield.persons_id_upd = person_upd.id     ;
@@ -46,44 +57,44 @@ tblfield.expiredate  tblfield_expiredate
           ,sio_sord varchar(256)
           ,sio_search varchar(10)
           ,sio_sidx varchar(256)
-,tblfield_seqno  numeric (22,0)
 ,pobject_code_tbl  varchar (50) 
 ,pobject_code_fld  varchar (50) 
+,tblfield_seqno  numeric (22,0)
+,tblfield_expiredate   date 
+,tblfield_contents  varchar (4000) 
 ,fieldcode_ftype  varchar (15) 
 ,fieldcode_fieldlength  numeric (22,0)
 ,fieldcode_dataprecision  numeric (38,0)
 ,fieldcode_datascale  numeric (22,0)
-,tblfield_contents  varchar (4000) 
 ,fieldcode_contents  varchar (4000) 
 ,tblfield_remark  varchar (4000) 
-,tblfield_expiredate   date 
 ,tblfield_viewflmk  varchar (4000) 
-,pobject_id_fld  numeric (22,0)
+,fieldcode_pobject_id_fld  numeric (22,0)
 ,blktb_contents  varchar (4000) 
 ,pobject_contents_tbl  varchar (4000) 
 ,pobject_rubycode_fld  varchar (4000) 
 ,pobject_contents_fld  varchar (4000) 
-,tblfield_person_id_upd  numeric (22,0)
-,person_id_upd  numeric (22,0)
 ,person_name_upd  varchar (100) 
 ,person_code_upd  varchar (50) 
-,tblfield_update_ip  varchar (40) 
 ,blktb_seltbls  varchar (4000) 
-,pobject_objecttype_fld  varchar (20) 
+,pobject_objecttype_fld  varchar (19) 
 ,pobject_rubycode_tbl  varchar (4000) 
-,id  numeric (38,0)
 ,fieldcode_seqno  numeric (22,0)
-,pobject_objecttype_tbl  varchar (20) 
-,tblfield_blktb_id  numeric (22,0)
-,tblfield_fieldcode_id  numeric (22,0)
+,id  numeric (38,0)
+,tblfield_created_at   timestamp(6) 
+,tblfield_updated_at   timestamp(6) 
+,tblfield_update_ip  varchar (40) 
+,pobject_objecttype_tbl  varchar (19) 
+,tblfield_id  numeric (22,0)
 ,blktb_pobject_id_tbl  numeric (22,0)
 ,pobject_id_tbl  numeric (22,0)
 ,blktb_id  numeric (22,0)
-,tblfield_created_at   timestamp(6) 
-,tblfield_updated_at   timestamp(6) 
-,tblfield_id  numeric (22,0)
-,fieldcode_pobject_id_fld  numeric (22,0)
+,tblfield_blktb_id  numeric (22,0)
+,tblfield_fieldcode_id  numeric (22,0)
 ,fieldcode_id  numeric (22,0)
+,pobject_id_fld  numeric (22,0)
+,person_id_upd  numeric (22,0)
+,tblfield_person_id_upd  numeric (22,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(38,0)

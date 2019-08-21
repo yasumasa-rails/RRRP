@@ -19,12 +19,12 @@ extend self
                 str<< %Q%date().min('1900/01/01').max('2100/01/01')%
             when "varchar", "textarea","char"
                 str<< %Q%string()%
-                if rec["screenfield_maxvalue"].to_i > 0
+                if rec["screenfield_edoptmaxlength"].to_i > 0
                     str<< %Q%.max(#{rec["screenfield_edoptmaxlength"].to_i})%
                 end   
             when "select"
                 str<< %Q%string()%
-            when "number"
+            when "numeric"
                 str<< %Q%number()%
                 if rec["screenfield_minvalue"].to_i >0
                     str<< %Q%.min(#{rec["screenfield_minvalue"]})%
@@ -55,20 +55,20 @@ extend self
     private
     def strsql screencode
          %Q%select pobject_code_sfd,screenfield_type,screenfield_indisp,screenfield_maxvalue,
-                    screenfield_minvalue,screenfield_formatter,	pobject_code_scr ,
+                    screenfield_minvalue,screenfield_formatter,	pobject_code_scr ,screenfield_edoptmaxlength,
                     max(screenfield_updated_at) screenfield_updated_at,screenfield_paragraph
                     from r_screenfields
                     where (screenfield_editable !=0 and screenfield_type not in('varchar', 'textarea','char')
                     or (screenfield_indisp != 0 or screenfield_maxvalue >0 or screenfield_minvalue >0))
                     #{if screencode then " and pobject_code_scr = '#{screencode}' " else "" end }
-                    group by pobject_code_sfd,screenfield_type,screenfield_indisp,screenfield_maxvalue,
+                    group by pobject_code_sfd,screenfield_type,screenfield_indisp,screenfield_maxvalue,screenfield_edoptmaxlength,
                     screenfield_minvalue,screenfield_formatter,screenfield_paragraph,pobject_code_scr
                     order by 	pobject_code_scr,pobject_code_sfd%
     end    
     def fetchcodesql screencode
          %Q%select pobject_code_sfd,screenfield_paragraph
                     from r_screenfields
-                    where trim(screenfield_paragraph) is not null
+                    where trim(screenfield_paragraph) != ''
                     #{if screencode then " and pobject_code_scr = '#{screencode}' " else "" end }%
     end  
 end

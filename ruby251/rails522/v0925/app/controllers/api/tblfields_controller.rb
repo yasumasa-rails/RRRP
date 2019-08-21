@@ -21,6 +21,16 @@ module Api
                 foo.close
                 params[:messages] = 	messages 
                 render json:{:params=>params}  
+              when 'createUniqueIndex'  ### createUniqueIndex
+                messages,sql = TblField.createUniqueIndex params
+                foo = File.open("#{Rails.root}/vendor/postgresql/tblviewupdate#{(Time.now).strftime("%Y%m%d%H%M%S")}.sql", "w:UTF-8") # 書き込みモード
+                foo.puts sql
+                foo.close
+                foo = File.open("#{Rails.root}/vendor/postgresql/messages#{(Time.now).strftime("%Y%m%d%H%M%S")}.sql", "w:UTF-8") # 書き込みモード
+                foo.puts messages
+                foo.close
+                params[:messages] = 	messages 
+                render json:{:params=>params}  
             end 
           end
           def show

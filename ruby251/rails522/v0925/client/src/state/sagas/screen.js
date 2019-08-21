@@ -28,7 +28,7 @@ export function* ScreenSaga({ payload: {params}  }) {
   const loginState = yield select(getLoginState) 
   let token = loginState.auth["access-token"]       
   let client = loginState.auth.client         
-  let uid = loginState.auth.uid    
+  let uid = loginState.auth.uid 
   let response  = yield call(screenApi,{params ,token,client,uid} )
   if(response){
       switch(params.req) {
@@ -43,32 +43,34 @@ export function* ScreenSaga({ payload: {params}  }) {
             return yield put({ type: SCREEN_SUCCESS, action: response })    
         case "updateGridLineData":
           //screenState.data[params.index]["id"] = response.data.params.addId
-          //screenState.data[params.index]["gridmessage"] = response.data.params.railsUpdateResult
           screenState.data[params.index] = response.data.params
           return yield put({ type: SCREEN_LINEEDIT, payload:{data:screenState.data} })    
+        case "confirm":
+            screenState.data[params.index] = response.data.params
+            return yield put({ type: SCREEN_LINEEDIT, payload:{data:screenState.data} })   
         case "fetch_request":
-            let tmp =  response.data.params.fetchdata
-            if(screenState.data[params.index].gridmessage===""||screenState.data[params.index].gridmessage===null||screenState.data[params.index].gridmessage===undefined)
-                    {screenState.data[params.index].gridmessage={}}
+            let tmp 
+            screenState.data[params.index].confirm_gridmessage =  ""
             if(response.data.params.err){
+                tmp =  JSON.parse(response.data.params.fetchcode)
                 Object.keys(tmp).map((idx)=>{
                   screenState.data[params.index][idx]= tmp[idx]
-                return screenState.data
-                })
-                response.data.params.keys.map((idx)=>{
-                  screenState.data[params.index].gridmessage[idx] = response.data.params.err
+                  screenState.data[params.index][`${idx}_gridmessage`] = response.data.params.err
+                  screenState.data[params.index].confirm_gridmessage =  response.data.params.err
                 return screenState.data
                 })
               return yield put({ type: FETCH_FAILURE, payload: {data:screenState.data} })   
             }
             else{
-               Object.keys(tmp).map((idx)=>{
+                //tmp =  JSON.parse(response.data.params.fetch_data)
+                tmp =  response.data.params.fetch_data
+                Object.keys(tmp).map((idx)=>{
                   screenState.data[params.index][idx]= tmp[idx]
-                  screenState.data[params.index].gridmessage[idx] = ""
+                  screenState.data[params.index][`${idx}_gridmessage`] = "ok"
                 return screenState.data
                 })
-               return yield put({ type: FETCH_RESULT, payload: {data:screenState.data} })   
-              } 
+              return  yield put({ type: FETCH_RESULT, payload: {data:screenState.data} })   
+              }    
         case "yup":  // create yup schema
               return yield put({ type: YUP_RESULT, payload: {message:response.data.params.message} })    
         default:
