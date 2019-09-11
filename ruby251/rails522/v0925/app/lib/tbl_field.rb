@@ -129,7 +129,7 @@ extend self
 							create_modify_field_sql rec
 						end
 					else
-						###修正なし
+						create_modify_field_sql rec
 					end
 				when "numeric"
 						if  (field["numeric_precision"]||=22)  <= rec["fieldcode_dataprecision"].to_i  and 
@@ -183,11 +183,11 @@ extend self
 	end		
 	def create_drop_field_sql table_name,column_name
 		@modifysql << "\n alter table #{ table_name} DROP COLUMN #{column_name} CASCADE;\n"
-		@modifysql << "\n ---- 使用しているview "
-		@modifysql << "\n ---- select * from pobject_code_scr,pobject_code_sfd,
-							   case screenfield_selection when 1 then '選択有' else '' end select,
-								case screenfield_hideflg when 1 then '' else '表示有' end display,
-							   case screenfield_indisp when 1 then '必須' else '' end inquire from r_screenfields "
+		@modifysql << "\n --- 使用しているview "
+		@modifysql << "\n --- select * from pobject_code_scr,pobject_code_sfd,
+							---   case screenfield_selection when 1 then '選択有' else '' end select,
+							---	case screenfield_hideflg when 1 then '' else '表示有' end display,
+							---   case screenfield_indisp when 1 then '必須' else '' end inquire from r_screenfields "
 		@modifysql << "\n ---- where  pobject_code_sfd = '#{column_name}'"
 		@modifysql << "\n ---- update screenfields set expiredate ='2000/01/01',remark =' 項目　#{column_name}が削除　#{Time.now}' "
 		@modifysql << "\n ---- where  pobject_code_sfd = '#{column_name}'"
@@ -195,7 +195,12 @@ extend self
 	def create_modify_field_sql rec
 		case rec["fieldcode_ftype"]
 		when /char/
-			@modifysql << "\n alter table #{rec["pobject_code_tbl"]} ALTER COLUMN #{rec["pobject_code_fld"]}  TYPE #{rec["fieldcode_ftype"]}(#{rec["fieldcode_fieldlength"] });\n"
+			@modifysql << "\n alter table #{rec["pobject_code_tbl"]} ALTER COLUMN #{rec["pobject_code_fld"]}  TYPE #{rec["fieldcode_ftype"]}(#{rec["fieldcode_fieldlength"] })"
+			if rec["pobject_code_fld"] == "sno" or rec["pobject_code_fld"] == "cno" or rec["pobject_code_fld"] == "gno"
+				@modifysql << " not null;\n"
+			else
+				@modifysql << " ;\n"
+			end	
 		when "numeric"
 			@modifysql << "\n alter table  #{rec["pobject_code_tbl"]} ALTER COLUMN #{rec["pobject_code_fld"]}  TYPE #{rec["fieldcode_ftype"]}(#{rec["fieldcode_dataprecision"]},#{rec["fieldcode_datascale"]});\n"
         end
@@ -403,7 +408,7 @@ extend self
 		command_r["pobject_code"] = screenfield
 		command_r["pobject_objecttype"] = "view_field"
 		command_r["pobject_expiredate"] = '2099/12/31'
-		command_r = RorBlkctl.proc_update_table(command_r,1)
+		command_r = RorBlkctl.proc_update_table(command_r,1,nil,nil,nil)
 		if @sio_result_f ==   "9"
 		 	@messages <<  "error  add_pobject_record #{screenfield}"
 		end  
@@ -445,7 +450,7 @@ extend self
 		command_r["screenfield_dataprecision"] = field["fieldcode_dataprecision"]
 		command_r["screenfield_datascale"] = field["fieldcode_datascale"]
 		command_r["screenfield_indisp"] = "0"
-		command_r["screenfield_subindisp"] ="0"
+		command_r["screenfield_subindisp"] =""
 		command_r["screenfield_editable"] =	if ["created_at","updated_at","update_ip"].include?(field["pobject_code_fld"]) or
 													 field["pobject_code_fld"] =~ /_id/  or field["pobject_code_fld"] == "id"
 												"0"
@@ -463,7 +468,7 @@ extend self
 		command_r["screenfield_tblfield_id"] = field["id"]
 		command_r["screenfield_paragraph"] =""
 		command_r["screenfield_formatter"] =""
-		command_r = RorBlkctl.proc_update_table(command_r,1)
+		command_r = RorBlkctl.proc_update_table(command_r,1,nil,nil,nil)
 		if @sio_result_f ==   "9"
 		 	@messages <<  "error  add_screenfield_record #{field["pobject_code_tbl"].chop}_#{field["pobject_code_fld"]}"
 		else  
@@ -502,7 +507,7 @@ extend self
 		command_r["screenfield_dataprecision"] =rec["screenfield_dataprecision"]
 		command_r["screenfield_datascale"] = rec["screenfield_datascale"]
 		command_r["screenfield_indisp"] = "0"
-		command_r["screenfield_subindisp"] ="0"
+		command_r["screenfield_subindisp"] =""
 		command_r["screenfield_editable"] ="0"  ###変更不可
 		command_r["screenfield_maxvalue"] =rec["screenfield_maxvalue"]
 		command_r["screenfield_minvalue"] =rec["screenfield_minvalue"]
@@ -516,7 +521,7 @@ extend self
 		command_r["screenfield_paragraph"] =""
 		command_r["screenfield_formatter"] =rec["screenfield_formatter"]
 		command_r["screenfield_crtfield"] = rec["screenfield_crtfield"]  ###create viewのview
-		command_r = RorBlkctl.proc_update_table(command_r,1)
+		command_r = RorBlkctl.proc_update_table(command_r,1,nil,nil,nil)
 		if @sio_result_f ==   "9"
 		 	@messages <<  "error  add_screenfield_record: r_#{tbl} -->#{rec["pobject_code_sfd"]}"
 		else  
@@ -546,11 +551,16 @@ extend self
 				else	
 					if rec["screenfield_crtfield"]
 						delm = rec["screenfield_crtfield"].split("_")[1]
+						delm = "" if delm.nil?
 					else
-						delm = nil
+						delm = ""
 					end		
-					if delm then delm = "_" + delm else delm = "" end
-					createviewscript << "\n  #{rec["screenfield_crtfield"]}.#{field.sub(delm,'')}  #{field} ,"
+					items = field.split("_")
+					if items[-1] == delm
+						field = items[0..-2].join("_")
+						delm = "_" + delm
+					end 	
+					createviewscript << "\n  #{rec["screenfield_crtfield"]}.#{field}  #{field}#{delm} ,"
 				end	
 			end	
 		end	
@@ -657,9 +667,13 @@ extend self
 		  	fields.each do |sr|
 			  sio_field_strsql << "," + sr["pobject_code_sfd"] + " " 
 			  case  sr["screenfield_type"]
-				  when /char|text|select/
+				when /char|text/
 					  sio_field_strsql << " varchar (" +  sr["fieldcode_fieldlength"].to_s + ") \n"
-				  when /number|numeric/
+				when /select/
+						sio_field_strsql << " varchar (20) \n"
+				when /check/
+						sio_field_strsql << " char (01) \n"
+				when /number|numeric/
 					sio_field_strsql << " numeric "
 					sio_field_strsql << if sr["screenfield_dataprecision"] == "0" or sr["screenfield_dataprecision"].nil?
 											"(22,0)\n"
@@ -780,21 +794,27 @@ extend self
 		ActiveRecord::Base.connection.select_all(strsql).each do |rec|
 			if rec
 				if rec["screenfield_crtfield"] and rec["pobject_code_sfd"].split("_")[0] != tbl.chop
-					chktbl,delm = rec["screenfield_crtfield"].split("_")
-					if delm
-						delm = "_" + delm
-					else
+					chktbl_delm = rec["screenfield_crtfield"].split("_")
+					chktbl = chktbl_delm[0]
+					delm = chktbl_delm[-1]
+					if chktbl == delm
 						delm = ""
 					end	
+					items =  rec["pobject_code_sfd"].split("_")
+					if items[-1] == delm
+						field = items[0..-2].join("_")
+					else
+						field = rec["pobject_code_sfd"]
+					end		
 					strsql = "select	table_name,column_name from 	information_schema.columns 
 											where 	table_catalog='#{ActiveRecord::Base.configurations["development"]["database"]}' 
-											and table_name='r_#{chktbl}s' and column_name = '#{rec["pobject_code_sfd"].sub(delm,"")}' "
+											and table_name='r_#{chktbl}s' and column_name = '#{field}' "
 					chkrecs = ActiveRecord::Base.connection.select_all(strsql)
 					if chkrecs[0].nil?
-						@messages << "<p> view filed #{tbl}.#{rec["pobject_code_sfd"].sub(delm,"")} not exists </p>"
+						@messages << "<p> step 0 : view filed #{tbl}.#{field} not exists </p>"
 					else
 						if chkrecs[1]
-							@messages << "<p>  view filed r_#{tbl}.#{rec["pobject_code_sfd"].sub(delm,"")} duplicate </p>"
+							@messages << "<p>step 1: view filed r_#{tbl}.#{field} duplicate </p>"
 						end		
 					end	
 				else
@@ -805,10 +825,10 @@ extend self
 											and column_name = '#{rec["pobject_code_sfd"].split("_",2)[1].gsub("_id","s_id")}' "
 					chkrecs = ActiveRecord::Base.connection.select_all(strsql)
 					if chkrecs[0].nil?
-						@messages << "<p> view filed #{rec["pobject_code_sfd"].split("_")[0]}s.#{rec["pobject_code_sfd"].split("_",2)[1].gsub("_id","s_id")} not exists</p>"
+						@messages << "<p> step 2: view filed r_#{rec["pobject_code_sfd"].split("_")[0]}s.#{rec["pobject_code_sfd"]} not exists,so auto add</p>"
 					else
 						if chkrecs[1]
-							@messages << "<p> view filed #{rec["pobject_code_sfd"].split("_")[0]}s.#{rec["pobject_code_sfd"].split("_",2)[1].gsub("_id","s_id")} duplicate</p>"
+							@messages << "<p>step 3: view filed #{rec["pobject_code_sfd"].split("_")[0]}s.#{rec["pobject_code_sfd"]} duplicate</p>"
 						end		
 					end	
 				end		
@@ -818,7 +838,7 @@ extend self
 		end
 	end 
 	def createUniqueIndex params
-		@messages = ""   
+		@messages = [] 
 		@sql = ""
 		ukey = {}
 		params["data"].each do |tmp|
@@ -839,14 +859,15 @@ extend self
 			tblname = tbl.to_s
 			val.each do |grp,valseq|  
 				grpname = grp.to_s
-				rslt = chk_constraint tblname,grpname
-				if rslt == "ok"
-					codes = []
-					valseq.sort.each do |valseq,code|
-						codes << code
-					end	
-					creat_uniq_constraint tblname,grpname,codes
+				constraint_exists = chk_constraint tblname,grpname
+				codes = []
+				valseq.sort.each do |valseq,code|
+					codes << code
 				end	
+				if constraint_exists
+					drop_constraint tblname,grpname,codes
+				end	
+				create_uniq_constraint tblname,grpname,codes
 			end	
 		end	
 		return @messages,@sql
@@ -858,17 +879,23 @@ extend self
 					and constraint_name = '#{tblname}_uky#{grpname}'
 					ORDER BY CONSTRAINT_CATALOG, CONSTRAINT_SCHEMA, CONSTRAINT_NAME%
 		chkrecs = ActiveRecord::Base.connection.select_one(strsql)
+		constraint_exists = nil
 		if chkrecs.nil?
-			rslt = "ok"
 			@messages << " create TABLE_CONSTRAINTS :#{tblname}_uky#{grpname} "
 		else
-			rslt = nil
-			@messages << " table:#{tblname} already use :#{tblname}_uky#{grpname} "
+			@messages << " table:#{tblname} already exist :#{tblname}_uky#{grpname} "
+			@messages << " Therefore drop  CONSTRAINT  :#{tblname}_uky#{grpname}"
+			@messages << "	    and  create TABLE_CONSTRAINTS :#{tblname}_uky#{grpname} "
+			constraint_exists = true
 		end
-		return rslt		
+		return 	constraint_exists
 	end	
-	def	creat_uniq_constraint tblname,grpname,codes
+	def	create_uniq_constraint tblname,grpname,codes
 		 @sql << %Q%ALTER TABLE public.#{tblname}
 				ADD CONSTRAINT #{tblname}_uky#{grpname} UNIQUE(#{codes.join(",")});\n%
+	end	 	
+	def	drop_constraint tblname,grpname,codes
+		 @sql << %Q%ALTER TABLE public.#{tblname}
+				drop CONSTRAINT #{tblname}_uky#{grpname} cascade;\n%
 	end	 
 end

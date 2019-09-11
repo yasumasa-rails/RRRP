@@ -21,18 +21,16 @@ function UploadListApi({values}) {
 }
 
 export function* UploadListSaga({ payload: {values} }) {
+  try{
   let response   = yield call(UploadListApi, ({values} ) )
-  if(response.data){
       yield put({ type: UPLOADLIST_SUCCESS, payload: response.data })
   }
-  else{    
-      let message = `error ${response}`;
-      if(response.error){
-      switch (response.status) {
+  catch(e){  
+      let message 
+      switch (e.status) {
               case 500: message = 'Menu Internal Server Error'; break;
               case 401: message = 'Menu Invalid credentials'; break;
-              default: message = `error status ${response.status}`;}
+              default: message = `error status ${e.status}`;}
       yield put({ type: MENU_FAILURE, errors: message })
-      }  
     }
  }      

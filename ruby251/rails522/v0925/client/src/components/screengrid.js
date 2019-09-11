@@ -26,7 +26,6 @@ const renderEditable = (cellInfo)=> {
       className={cellInfo.column.className}  //
       contentEditable={contentEditablechk.type}  //
       suppressContentEditableWarning      
-      //dangerouslySetInnerHTML={{ __html: cellInfo.value}}  //
       dangerouslySetInnerHTML={ contentEditablechk.val }  //
     />
     </Tooltip>
@@ -36,7 +35,6 @@ const renderEditable = (cellInfo)=> {
 const renderNonEditable = (cellInfo)=> {
   return (
     <div
-      /*className={cellInfo.column.className}*/
       contentEditable={false}
       dangerouslySetInnerHTML={{ __html: cellInfo.value  }}
     />
@@ -45,7 +43,7 @@ const renderNonEditable = (cellInfo)=> {
 
 const renderCheckbox = (cellInfo)=> {
   return (    
-    <Tooltip content={data[cellInfo.index][`${cellInfo.column.id}_gridmessage`]}
+    <Tooltip content={data[cellInfo.index][`${cellInfo.column.id}_gridmessage`]?data[cellInfo.index][`${cellInfo.column.id}_gridmessage`]:""}
        tagName="span" arrowSize={2}>
           <input
             type="checkbox"  className="checkbox"
@@ -109,13 +107,14 @@ const  renderFilter = ({column,onChange,filter})=> {
   }　
 }
 
-    const {screenCode, pageSize,filterable,
+const {screenCode, pageSize,filterable,
            loading,handleScreenParamsSet,
 // sorted,handleErrorMsg,handleErrorset,handleScreenLineEditRequest,
             columns,data,pages,params,  //params railsに渡すパラメータを兼ねている。
             handleScreenRequest,handleValite, handleFetchRequest,handleConfirmRequest,
             buttonflg,dropDownList,uid,
-            page, sizePerPageList,screenwidth,yup,originalreq,
+            page, sizePerPageList,screenwidth,yup,originalreq, pageText,
+            message,  //error message
             } = this.props
     
     //let rowIndexCheck = true
@@ -171,6 +170,7 @@ const  renderFilter = ({column,onChange,filter})=> {
       loading={loading}
       columns={tcolumns}
       pageSizeOptions={sizePerPageList}
+      pageText={pageText}
       //filtered={filtered}
       //sorted={sorted}
       manual // informs React Table that you'll be handling sorting and pagination server-side
@@ -219,8 +219,9 @@ const  renderFilter = ({column,onChange,filter})=> {
           onFocus:(e) =>
             {  
               e.target.className = "renderEditableInput"  // カーソルの動きが遅くなる。 let inputval 
-                                            ///screenCode,Name null                          
-             
+                                           ///screenCode,Name null    
+              /* //規定値をセットしようとしたが画面がプロテクトされた
+            */
           } ,
           onClick:(e) =>
              { 
@@ -246,13 +247,25 @@ const  renderFilter = ({column,onChange,filter})=> {
                                          params["linedata"] =  JSON.stringify(data[rowInfo.index])
                                          params["index"] = rowInfo.index 
                                          params["fetchview"] = yup.yupfetchcode[column.id]
-                                         params["uid"] =uid 
+                                         params["uid"] =uid
+                                         params["req"] = "fetch_request"                                      
                                          handleFetchRequest(params)
                                          }
-              if(data[rowInfo.index][`${column.id}_gridmessage`]!=="ok"&&(data[rowInfo.index][column.id]!==inputval||inputval==="")){
+              if(data[rowInfo.index][column.id]!==inputval&&yup.yupcheckcode[column.id]){// 
+                                         rowInfo.row[column.id]=inputval
+                                         data[rowInfo.index][column.id]=inputval
+                                         params["checkcode"] =  JSON.stringify({[column.id]:yup.yupcheckcode[column.id]})
+                                         params["screenCode"] = screenCode
+                                         params["linedata"] =  JSON.stringify(data[rowInfo.index])
+                                         params["index"] = rowInfo.index 
+                                         params["uid"] =uid
+                                         params["req"] = "check_request"                                      
+                                         handleFetchRequest(params)
+                                          }
+              if(data[rowInfo.index][`${column.id}_gridmessage`]!=="ok"||data[rowInfo.index][column.id]!==inputval||inputval===""){
                 　                            rowInfo.row[column.id] = inputval
                                               data[rowInfo.index][column.id]=inputval
-                                              params["linedata"] =  JSON.stringify(data[rowInfo.index])
+                                              //params["linedata"] =  JSON.stringify(data[rowInfo.index])
                                               params["index"] = rowInfo.index
                                               onFieldValite (column.id,params,data)
                                             } ///screenCode,Name null                          
@@ -307,8 +320,9 @@ const  renderFilter = ({column,onChange,filter})=> {
         );
       }}
       </ReactTable>
-        :<h2>please select</h2>}
-        </div>
+        :<h2>please select</h2>
+      }
+      </div>
        )
     }
   }
@@ -332,6 +346,8 @@ const  mapStateToProps = (state) => {
             dropDownList:state.screen.dropDownList,
             dropDownValues:state.screen.dropDownValues?state.screen.dropDownValues:{},
             originalreq:state.screen.originalreq,
+            pageText:state.screen.pageText,
+            message: state.screen.message,
             }
 }
    
@@ -353,8 +369,7 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
     handleConfirmRequest:  (params) =>{ params["req"] = "confirm"
                                       dispatch(ScreenRequest(params))
                                     },
-    handleFetchRequest:  (params) =>{ params["req"] = "fetch_request"
-                                      dispatch(FetchRequest(params))},
+    handleFetchRequest:  (params) =>{dispatch(FetchRequest(params))},
     handleValite:  (data) =>{ 
                            dispatch(YupErrSet(data))},
                       })   

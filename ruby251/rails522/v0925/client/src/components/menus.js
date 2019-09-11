@@ -94,6 +94,7 @@ const  mapStateToProps = (state,ownProps) =>({
   sizePerPageList:state.screen.sizePerPageList?state.screen.sizePerPageList:[25],
   params:state.screen.params,
   originalreq:state.screen.originalreq,
+  message:state.menu.message,
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({

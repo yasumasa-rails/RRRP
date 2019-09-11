@@ -1,0 +1,20 @@
+https://qiita.com/jiggaman0412/items/4e7f66f7c237f3d1e945
+brew install redis
+gem sidekiq
+
+config/sidekiq.yml
+:concurrency: 25
+:pidfile: ./tmp/pids/sidekiq.pid
+:logfile: ./log/sidekiq.log
+:queues:
+ - default
+=> concurrencyは同時実行数だが、sidekiq自身で一つカウントするらしい。
+
+config/application.rb
+# ActiveJobがSidekiqを使うことを宣言
+config.active_job.queue_adapter = :sidekiq
+
+
+$ redis-server
+
+$ bundle exec sidekiq

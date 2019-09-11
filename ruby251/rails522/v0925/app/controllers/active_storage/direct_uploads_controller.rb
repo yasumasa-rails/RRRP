@@ -10,6 +10,7 @@
 class ActiveStorage::DirectUploadsController < ActiveStorage::BaseController
   ##protect_from_forgery with: :exception
   skip_before_action :verify_authenticity_token
+  before_action :check_file_size!
   def create
     blob = ActiveStorage::Blob.create_before_direct_upload!(blob_args)
     render json: direct_upload_json(blob)
@@ -27,4 +28,11 @@ class ActiveStorage::DirectUploadsController < ActiveStorage::BaseController
         headers: blob.service_headers_for_direct_upload
       })
     end
+    def check_file_size!
+           if blob_args[:byte_size] > (1.gigabyte / 10)
+             render json: { message: 'File size must be less than 100M' }, status: :unprocessable_entity
+           end
+    end
 end
+
+##https://qiita.com/troter/items/d43e649da8a7fcfe883b

@@ -6,7 +6,6 @@ import {getScreenState} from '../reducers/screen'
 import {getLoginState} from '../reducers/login'
 //import { ReactReduxContext } from 'react-redux';
 
-
 function screenApi({params,token,client,uid}) {
   const url = 'http://localhost:3001/api/menus'
   const headers = {'access-token':token,'client':client,'uid':uid }
@@ -29,8 +28,8 @@ export function* ScreenSaga({ payload: {params}  }) {
   let token = loginState.auth["access-token"]       
   let client = loginState.auth.client         
   let uid = loginState.auth.uid 
-  let response  = yield call(screenApi,{params ,token,client,uid} )
-  if(response){
+  try {
+      let response  = yield call(screenApi,{params ,token,client,uid} )
       switch(params.req) {
         case 'viewtablereq':
           response.data["params"] = params
@@ -71,18 +70,37 @@ export function* ScreenSaga({ payload: {params}  }) {
                 })
               return  yield put({ type: FETCH_RESULT, payload: {data:screenState.data} })   
               }    
+        case "check_request":   //帰りはfetchと同じ
+                  screenState.data[params.index].confirm_gridmessage =  ""
+                  if(response.data.params.err){
+                      tmp =  JSON.parse(response.data.params.checkcode)
+                      Object.keys(tmp).map((idx)=>{
+                        screenState.data[params.index][`${idx}_gridmessage`] = response.data.params.err
+                        screenState.data[params.index].confirm_gridmessage =  response.data.params.err
+                      return screenState.data
+                      })
+                    return yield put({ type: FETCH_FAILURE, payload: {data:screenState.data} })   
+                  }
+                  else{
+                      tmp =  JSON.parse(response.data.params.checkcode)
+                      Object.keys(tmp).map((idx)=>{
+                        screenState.data[params.index][`${idx}_gridmessage`] = "ok"
+                      return screenState.data
+                      })
+                    return  yield put({ type: FETCH_RESULT, payload: {data:screenState.data} })   
+                    }    
         case "yup":  // create yup schema
               return yield put({ type: YUP_RESULT, payload: {message:response.data.params.message} })    
         default:
           return {}
       }
-  }else
+  }catch(e)
      {  
       let message;
-      switch (response.status) {
+      switch (e.status) {
               case 500: message = 'Internal Server Error'; break;
               case 401: message = 'Invalid credentials'; break;
-              default: message = `Something went wrong ${response.error}` ;}
+              default: message = `Something went wrong ${e.error}` ;}
       yield put({ type: SCREEN_FAILURE, errors: message })
   }
  }      

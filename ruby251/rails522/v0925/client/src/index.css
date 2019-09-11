@@ -137,6 +137,12 @@ input.checkbox {
 	appearance: checkbox;
 }
 
+.checkboxNonEditable {
+	-webkit-appearance: checkbox;
+	appearance: checkbox;
+}
+
+
 input {
   padding: .5rem;
   font-size: 16px;
@@ -229,6 +235,10 @@ button.outline {
   color: #555;
 }
 
+button.-btn {
+  width:150px;
+}
+
 
   
 .react-tabs--selected_custom_head {
@@ -249,7 +259,7 @@ ul.react-tabs_tab_list {
 
 /* 下記のwidth以外では prev nectボタンがコントロールできない。*/
 .-pagination{
-  width:760px
+  width:1200px
 }
 div.-center{
   width:330px

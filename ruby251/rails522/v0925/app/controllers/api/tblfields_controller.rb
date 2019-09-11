@@ -26,7 +26,7 @@ module Api
                 foo = File.open("#{Rails.root}/vendor/postgresql/tblviewupdate#{(Time.now).strftime("%Y%m%d%H%M%S")}.sql", "w:UTF-8") # 書き込みモード
                 foo.puts sql
                 foo.close
-                foo = File.open("#{Rails.root}/vendor/postgresql/messages#{(Time.now).strftime("%Y%m%d%H%M%S")}.sql", "w:UTF-8") # 書き込みモード
+                foo = File.open("#{Rails.root}/vendor/postgresql/messages#{(Time.now).strftime("%Y%m%d%H%M%S")}.txt", "w:UTF-8") # 書き込みモード
                 foo.puts messages
                 foo.close
                 params[:messages] = 	messages 

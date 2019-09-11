@@ -37,9 +37,7 @@ import {ScreenRequest,ButtonFlgRequest,DownloadRequest,GanttChartRequest,GanttRe
                       disabled={disabled}
                       type={val[1]==='inlineedit'||'inlineadd'||'yup'||'ganttchart'?"submit":"button"}
                       onClick ={() =>{ setButtonFlg(val[1],  // buttonflg
-                                                    //screenCode,uid,screenName,
                                                     page,sorted,params
-                                                    //editableflg,
                                                     )
                                       }
                                      }>

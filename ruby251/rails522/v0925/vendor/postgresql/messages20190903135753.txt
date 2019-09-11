@@ -1,0 +1,1 @@
+ table:screenfields already use :screenfields_uky1  create TABLE_CONSTRAINTS :screenfields_uky2 

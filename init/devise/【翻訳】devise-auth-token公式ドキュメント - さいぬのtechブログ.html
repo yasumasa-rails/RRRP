@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<!-- saved from url=(0050)http://sainu.hatenablog.jp/entry/2018/08/11/194319 -->
+<html lang="ja" data-admin-domain="//blog.hatena.ne.jp" data-author="sainu" data-avail-langs="ja en" data-blog="sainu.hatenablog.jp" data-blog-host="sainu.hatenablog.jp" data-blog-is-public="1" data-blog-name="さいぬのtechブログ" data-blog-owner="sainu" data-blog-uri="http://sainu.hatenablog.jp/" data-blog-uuid="8599973812326946475" data-blogs-uri-base="http://sainu.hatenablog.jp" data-brand="hatenablog" data-data-layer="{&quot;hatenablog&quot;:{&quot;analytics&quot;:{&quot;separated_property_id&quot;:&quot;UA-29716941-21&quot;,&quot;property_id&quot;:&quot;&quot;,&quot;brand_property_id&quot;:&quot;&quot;,&quot;non_sampling_property_id&quot;:&quot;&quot;},&quot;permalink_entry&quot;:{&quot;date&quot;:&quot;2018-08-11&quot;,&quot;hour&quot;:&quot;19&quot;,&quot;uri&quot;:&quot;http://sainu.hatenablog.jp/entry/2018/08/11/194319&quot;,&quot;title&quot;:&quot;\u3010\u7ffb\u8a33\u3011devise-auth-token\u516c\u5f0f\u30c9\u30ad\u30e5\u30e1\u30f3\u30c8&quot;,&quot;author_name&quot;:&quot;sainu&quot;,&quot;categories&quot;:&quot;\u7ffb\u8a33\tRubyOnRails&quot;},&quot;router_type&quot;:&quot;blogs&quot;,&quot;page_id&quot;:&quot;entry&quot;,&quot;admin&quot;:{},&quot;brand&quot;:&quot;hatenablog&quot;,&quot;blog&quot;:{&quot;enable_keyword_link&quot;:&quot;true&quot;,&quot;lang&quot;:&quot;ja&quot;,&quot;uri&quot;:&quot;http://sainu.hatenablog.jp/&quot;,&quot;force_pc_view&quot;:&quot;false&quot;,&quot;enable_ads&quot;:&quot;true&quot;,&quot;is_public&quot;:&quot;true&quot;,&quot;content_seems_japanese&quot;:&quot;true&quot;,&quot;owner_name&quot;:&quot;sainu&quot;,&quot;is_sleeping&quot;:&quot;false&quot;,&quot;is_responsive_view&quot;:&quot;false&quot;,&quot;name&quot;:&quot;\u3055\u3044\u306c\u306etech\u30d6\u30ed\u30b0&quot;,&quot;entry_show_footer_related_entries&quot;:&quot;true&quot;,&quot;disable_ads&quot;:&quot;&quot;},&quot;pro&quot;:&quot;free&quot;,&quot;brand_tracking_category&quot;:&quot;hatenablog&quot;}}" data-device="pc" data-dont-recommend-pro="false" data-global-domain="https://hatenablog.com" data-globalheader-color="b" data-globalheader-type="pc" data-has-touch-view="1" data-page="entry" data-parts-domain="https://hatenablog-parts.com" data-plus-available="" data-pro="false" data-router-type="blogs" data-sentry-dsn="https://03a33e4781a24cf2885099fed222b56d@sentry.io/1195218" data-sentry-environment="production" data-sentry-sample-rate="0.1" data-static-domain="https://cdn.blog.st-hatena.com" data-version="2449d06eb7c928314b06f3c014811b9c" itemscope="" itemtype="http://schema.org/Article" data-initial-state="{}"><head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/inferredEvents.js.ダウンロード" async=""></script><script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/1733466696949178" async=""></script><script async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/fbevents.js.ダウンロード"></script><script async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/uwt.js.ダウンロード"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/pageviews"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/segment"></script><script async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/gtm.js(1).ダウンロード"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/pageviews(1)"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/publishertag.prebid.js.ダウンロード"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/segment(1)"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/get"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/td-1.5.1.js.ダウンロード"></script><script async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/tdim-1.1.0.min.js.ダウンロード"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/gtm.js(2).ダウンロード"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/audience"></script><script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/osd.js.ダウンロード"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/recaptcha__ja.js.ダウンロード"></script><script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/pubads_impl_rendering_2019082901.js.ダウンロード"></script><script async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/notices.count.json"></script>
+  
+
+  
+
+
+
+  
+
+
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=7; IE=9; IE=10; IE=11">
+  <title>【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ</title>
+
+  
+  <link rel="canonical" href="http://sainu.hatenablog.jp/entry/2018/08/11/194319">
+
+
+
+  
+  
+
+<meta itemprop="name" content="【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ">
+
+  <meta itemprop="image" content="https://img.esa.io/uploads/production/attachments/9262/2018/08/09/28380/0070ea2d-e6fd-4fe6-9f11-f7b3d0636b86.png">
+
+
+  <meta property="og:title" content="【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ">
+<meta property="og:type" content="article">
+  <meta property="og:url" content="http://sainu.hatenablog.jp/entry/2018/08/11/194319">
+
+  <meta property="og:image" content="https://img.esa.io/uploads/production/attachments/9262/2018/08/09/28380/0070ea2d-e6fd-4fe6-9f11-f7b3d0636b86.png">
+
+<meta property="og:image:alt" content="【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ">
+    <meta property="og:description" content="deviseでトークン認証を実装する機会があり、その時にdevise-token-authを読みながら翻訳したものです。">
+<meta property="og:site_name" content="さいぬのtechブログ">
+
+  <meta property="article:published_time" content="1533984199">
+
+    <meta property="article:tag" content="翻訳">
+    <meta property="article:tag" content="RubyOnRails">
+      <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://img.esa.io/uploads/production/attachments/9262/2018/08/09/28380/0070ea2d-e6fd-4fe6-9f11-f7b3d0636b86.png">  <meta name="twitter:title" content="【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ">    <meta name="twitter:description" content="deviseでトークン認証を実装する機会があり、その時にdevise-token-authを読みながら翻訳したものです。">  <meta name="twitter:app:name:iphone" content="はてなブログアプリ">
+  <meta name="twitter:app:id:iphone" content="583299321">
+  <meta name="twitter:app:url:iphone" content="hatenablog:///open?uri=http%3A%2F%2Fsainu.hatenablog.jp%2Fentry%2F2018%2F08%2F11%2F194319">  <meta name="twitter:site" content="@sainuio">
+  
+    <meta name="description" content="deviseでトークン認証を実装する機会があり、その時にdevise-token-authを読みながら翻訳したものです。">
+    <meta name="keywords" content="ruby,rails,javascript,vue,学生,エンジニア,web">
+
+
+  
+<script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/sdk.js.ダウンロード" async="" crossorigin="anonymous"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/analytics.js.ダウンロード"></script><script id="facebook-jssdk" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/sdk.js(1).ダウンロード"></script><script async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/gtm.js.ダウンロード"></script><script id="embed-gtm-data-layer-loader" data-data-layer-page-specific="{&quot;hatenablog&quot;:{&quot;blogs_permalink&quot;:{&quot;entry_afc_issued&quot;:&quot;false&quot;,&quot;is_blog_sleeping&quot;:&quot;false&quot;,&quot;brand_hide_afc&quot;:&quot;false&quot;,&quot;blog_afc_issued&quot;:&quot;false&quot;,&quot;has_related_entries_with_elasticsearch&quot;:&quot;true&quot;,&quot;is_author_pro&quot;:&quot;false&quot;,&quot;blog_hide_afc_field&quot;:&quot;false&quot;,&quot;blog_struct_hide_afc&quot;:&quot;false&quot;,&quot;blog_hide_afc_func&quot;:&quot;false&quot;}}}">
+(function() {
+  function loadDataLayer(elem, attrName) {
+    if (!elem) { return {}; }
+    var json = elem.getAttribute(attrName);
+    if (!json) { return {}; }
+    return JSON.parse(json);
+  }
+
+  var globalVariables = loadDataLayer(
+    document.documentElement,
+    'data-data-layer'
+  );
+  var pageSpecificVariables = loadDataLayer(
+    document.getElementById('embed-gtm-data-layer-loader'),
+    'data-data-layer-page-specific'
+  );
+
+  var variables = [globalVariables, pageSpecificVariables];
+
+  if (!window.dataLayer) {
+    window.dataLayer = [];
+  }
+
+  for (var i = 0; i < variables.length; i++) {
+    window.dataLayer.push(variables[i]);
+  }
+})();
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-P4CXTW');</script>
+<!-- End Google Tag Manager -->
+
+
+
+
+  <link rel="shortcut icon" href="http://sainu.hatenablog.jp/favicon">
+<link rel="apple-touch-icon" href="https://cdn.blog.st-hatena.com/images/touch-icon-iphone-retina.png">
+<link rel="icon" sizes="192x192" href="https://cdn.blog.st-hatena.com/images/common/meta-icon-global.png">
+
+  
+<link rel="alternate" type="application/atom+xml" title="Atom" href="http://sainu.hatenablog.jp/feed">
+<link rel="alternate" type="application/rss+xml" title="RSS2.0" href="http://sainu.hatenablog.jp/rss">
+<link rel="alternate" type="application/json+oembed" href="https://hatenablog.com/oembed?url=http%3A%2F%2Fsainu.hatenablog.jp%2Fentry%2F2018%2F08%2F11%2F194319&amp;format=json" title="oEmbed Profile of 【翻訳】devise-auth-token公式ドキュメント">
+<link rel="alternate" type="text/xml+oembed" href="https://hatenablog.com/oembed?url=http%3A%2F%2Fsainu.hatenablog.jp%2Fentry%2F2018%2F08%2F11%2F194319&amp;format=xml" title="oEmbed Profile of 【翻訳】devise-auth-token公式ドキュメント">
+  
+  <link rel="author" href="http://www.hatena.ne.jp/sainu/">
+
+  
+
+
+  
+    <link rel="stylesheet" type="text/css" href="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/blog.css">
+
+    
+  <link rel="stylesheet" type="text/css" href="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/9827b1674c9f7de3584732726edeec30258e9c36">
+  
+
+  
+
+  
+<script> </script>
+
+  
+<style>
+  div#google_afc_user,
+  div.google-afc-user-container,
+  div.google_afc_image,
+  div.google_afc_blocklink {
+      display: block !important;
+  }
+</style>
+
+
+  
+    <script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/valve.js.ダウンロード" async=""></script>
+<script id="test-valve-definition">
+  var valve = window.valve || [];
+
+  valve.push(function(v) {
+    v.config({ service: 'blog' });
+    
+    
+
+    
+    v.defineDFPSlot({"slotId":"google_afc_user_container_0","sizes":[[300,250],[336,280],[468,60],"fluid"],"unit":"/4374287/blog_user","lazy":""});
+    
+
+    
+
+    v.sealDFPSlots();
+  });
+</script>
+
+  
+
+  <meta name="author" content="sainu">
+<script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/gpt.js.ダウンロード"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/apstag.js.ダウンロード"></script><link rel="preload" href="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/f.txt" as="script"><script type="text/javascript" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/f.txt"></script><link rel="preload" href="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/f(1).txt" as="script"><script type="text/javascript" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/f(1).txt"></script><script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/pubads_impl_2019082901.js.ダウンロード" async=""></script><script charset="utf-8" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/button.509719336ca39171c37a321231ccaf83.js.ダウンロード"></script><style type="text/css">.fb_hidden{position:absolute;top:-10000px;z-index:10001}.fb_reposition{overflow:hidden;position:relative}.fb_invisible{display:none}.fb_reset{background:none;border:0;border-spacing:0;color:#000;cursor:auto;direction:ltr;font-family:"lucida grande", tahoma, verdana, arial, "hiragino kaku gothic pro",meiryo,"ms pgothic",sans-serif;font-size:11px;font-style:normal;font-variant:normal;font-weight:normal;letter-spacing:normal;line-height:1;margin:0;overflow:visible;padding:0;text-align:left;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;visibility:visible;white-space:normal;word-spacing:normal}.fb_reset>div{overflow:hidden}@keyframes fb_transform{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}.fb_animate{animation:fb_transform .3s forwards}
+.fb_dialog{background:rgba(82, 82, 82, .7);position:absolute;top:-10000px;z-index:10001}.fb_dialog_advanced{border-radius:8px;padding:10px}.fb_dialog_content{background:#fff;color:#373737}.fb_dialog_close_icon{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 0 transparent;cursor:pointer;display:block;height:15px;position:absolute;right:18px;top:17px;width:15px}.fb_dialog_mobile .fb_dialog_close_icon{left:5px;right:auto;top:5px}.fb_dialog_padding{background-color:transparent;position:absolute;width:1px;z-index:-1}.fb_dialog_close_icon:hover{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -15px transparent}.fb_dialog_close_icon:active{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -30px transparent}.fb_dialog_iframe{line-height:0}.fb_dialog_content .dialog_title{background:#6d84b4;border:1px solid #365899;color:#fff;font-size:14px;font-weight:bold;margin:0}.fb_dialog_content .dialog_title>span{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yd/r/Cou7n-nqK52.gif) no-repeat 5px 50%;float:left;padding:5px 0 7px 26px}body.fb_hidden{height:100%;left:0;margin:0;overflow:visible;position:absolute;top:-10000px;transform:none;width:100%}.fb_dialog.fb_dialog_mobile.loading{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ya/r/3rhSv5V8j3o.gif) white no-repeat 50% 50%;min-height:100%;min-width:100%;overflow:hidden;position:absolute;top:0;z-index:10001}.fb_dialog.fb_dialog_mobile.loading.centered{background:none;height:auto;min-height:initial;min-width:initial;width:auto}.fb_dialog.fb_dialog_mobile.loading.centered #fb_dialog_loader_spinner{width:100%}.fb_dialog.fb_dialog_mobile.loading.centered .fb_dialog_content{background:none}.loading.centered #fb_dialog_loader_close{clear:both;color:#fff;display:block;font-size:18px;padding-top:20px}#fb-root #fb_dialog_ipad_overlay{background:rgba(0, 0, 0, .4);bottom:0;left:0;min-height:100%;position:absolute;right:0;top:0;width:100%;z-index:10000}#fb-root #fb_dialog_ipad_overlay.hidden{display:none}.fb_dialog.fb_dialog_mobile.loading iframe{visibility:hidden}.fb_dialog_mobile .fb_dialog_iframe{position:sticky;top:0}.fb_dialog_content .dialog_header{background:linear-gradient(from(#738aba), to(#2c4987));border-bottom:1px solid;border-color:#043b87;box-shadow:white 0 1px 1px -1px inset;color:#fff;font:bold 14px Helvetica, sans-serif;text-overflow:ellipsis;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0;vertical-align:middle;white-space:nowrap}.fb_dialog_content .dialog_header table{height:43px;width:100%}.fb_dialog_content .dialog_header td.header_left{font-size:12px;padding-left:5px;vertical-align:middle;width:60px}.fb_dialog_content .dialog_header td.header_right{font-size:12px;padding-right:5px;vertical-align:middle;width:60px}.fb_dialog_content .touchable_button{background:linear-gradient(from(#4267B2), to(#2a4887));background-clip:padding-box;border:1px solid #29487d;border-radius:3px;display:inline-block;line-height:18px;margin-top:3px;max-width:85px;padding:4px 12px;position:relative}.fb_dialog_content .dialog_header .touchable_button input{background:none;border:none;color:#fff;font:bold 12px Helvetica, sans-serif;margin:2px -12px;padding:2px 6px 3px 6px;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog_content .dialog_header .header_center{color:#fff;font-size:16px;font-weight:bold;line-height:18px;text-align:center;vertical-align:middle}.fb_dialog_content .dialog_content{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/y9/r/jKEcVPZFk-2.gif) no-repeat 50% 50%;border:1px solid #4a4a4a;border-bottom:0;border-top:0;height:150px}.fb_dialog_content .dialog_footer{background:#f5f6f7;border:1px solid #4a4a4a;border-top-color:#ccc;height:40px}#fb_dialog_loader_close{float:left}.fb_dialog.fb_dialog_mobile .fb_dialog_close_button{text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog.fb_dialog_mobile .fb_dialog_close_icon{visibility:hidden}#fb_dialog_loader_spinner{animation:rotateSpinner 1.2s linear infinite;background-color:transparent;background-image:url(https://static.xx.fbcdn.net/rsrc.php/v3/yD/r/t-wz8gw1xG1.png);background-position:50% 50%;background-repeat:no-repeat;height:24px;width:24px}@keyframes rotateSpinner{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.fb_iframe_widget{display:inline-block;position:relative}.fb_iframe_widget span{display:inline-block;position:relative;text-align:justify}.fb_iframe_widget iframe{position:absolute}.fb_iframe_widget_fluid_desktop,.fb_iframe_widget_fluid_desktop span,.fb_iframe_widget_fluid_desktop iframe{max-width:100%}.fb_iframe_widget_fluid_desktop iframe{min-width:220px;position:relative}.fb_iframe_widget_lift{z-index:1}.fb_iframe_widget_fluid{display:inline}.fb_iframe_widget_fluid span{width:100%}</style><link rel="prefetch" href="https://tpc.googlesyndication.com/safeframe/1-0-35/html/container.html"><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/itm.js.ダウンロード"></script><script type="text/javascript" async="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/hatena_bigmining.js.ダウンロード"></script><script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/entries.json" type="text/javascript"></script></head>
+
+  <body class="page-entry category-翻訳 category-RubyOnRails">
+    
+    <div id="header-container">
+     <div id="sp-suggest" style="display: none;"><a id="sp-suggest-link" href="http://sainu.hatenablog.jp/entry/2018/08/11/194319#">スマートフォン用の表示で見る</a></div>
+    </div>
+
+    <div id="globalheader-container" data-brand="hatenablog">
+  <iframe id="globalheader" height="37" frameborder="0" allowtransparency="true" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/saved_resource(1).html"></iframe>
+</div>
+
+
+    <div id="container">
+      <div id="container-inner">
+        <header id="blog-title" data-brand="hatenablog">
+  <div id="blog-title-inner">
+    <div id="blog-title-content">
+      <h1 id="title"><a href="http://sainu.hatenablog.jp/">さいぬのtechブログ</a></h1>
+      
+    </div>
+  </div>
+</header>
+
+        
+
+        
+        
+
+
+
+
+<div id="content" class="hfeed">
+  <div id="content-inner">
+    <div id="wrapper">
+      <div id="main">
+        <div id="main-inner">
+          
+
+
+          
+  
+  <!-- google_ad_section_start -->
+  <!-- rakuten_ad_target_begin -->
+  
+  
+  
+
+  
+
+  
+    
+      
+        <article class="entry hentry js-entry-article date-first autopagerize_page_element chars-200 words-100 mode-markdown entry-odd" id="entry-10257846132609748885" data-keyword-campaign="" data-uuid="10257846132609748885" data-publication-type="entry">
+  <div class="entry-inner">
+    <header class="entry-header">
+  
+    <div class="date entry-date first">
+    <a href="http://sainu.hatenablog.jp/archive/2018/08/11" rel="nofollow">
+      <time pubdate="" datetime="2018-08-11T10:43:19Z" title="2018-08-11T10:43:19Z">
+        <span class="date-year">2018</span><span class="hyphen">-</span><span class="date-month">08</span><span class="hyphen">-</span><span class="date-day">11</span>
+      </time>
+    </a>
+  </div>
+  <h1 class="entry-title">
+  <a href="http://sainu.hatenablog.jp/entry/2018/08/11/194319" class="entry-title-link bookmark">【翻訳】devise-auth-token公式ドキュメント</a>
+</h1>
+
+  
+  
+
+  <div class="entry-categories categories">
+    
+    <a href="http://sainu.hatenablog.jp/archive/category/%E7%BF%BB%E8%A8%B3" class="entry-category-link category-翻訳">翻訳</a>
+    
+    <a href="http://sainu.hatenablog.jp/archive/category/RubyOnRails" class="entry-category-link category-RubyOnRails">RubyOnRails</a>
+    
+  </div>
+
+
+  
+
+  
+
+</header>
+
+    
+
+    <div class="entry-content">
+  
+    <p>deviseで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ン認証を実装する機会があり、その時に<a href="https://devise-token-auth.gitbook.io/devise-token-auth/">devise-token-auth</a>を読みながら翻訳したものです。</p>
+
+<p>以下翻訳↓</p>
+
+<hr>
+
+<h1>インストール</h1>
+
+<p><code>Gemfile</code>に以下を追加してください：</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink="">gem <span class="synSpecial">'</span><span class="synConstant">devise_token_auth</span><span class="synSpecial">'</span>
+</pre>
+
+
+<p>そしたら、bundleを使ってgemをインストールします</p>
+
+<pre class="code" data-lang="" data-unlink="">bundle install</pre>
+
+
+<p>次は設定...</p>
+
+<h1>設定</h1>
+
+<p>userモデルを作成し、ルーティングを定義し、concernsをincludeする必要があるでしょう、そしてこのgemのデフォルトのいくつかの設定を変更することができます。</p>
+
+<pre class="code lang-sh" data-lang="sh" data-unlink="">rails g devise_token_auth:install <span class="synStatement">[</span>USER_CLASS<span class="synStatement">]</span> <span class="synStatement">[</span>MOUNT_PATH<span class="synStatement">]</span>
+</pre>
+
+
+<p><strong>例：</strong></p>
+
+<pre class="code lang-sh" data-lang="sh" data-unlink="">rails g devise_token_auth:install User auth
+</pre>
+
+
+<p>このジェネレーターは次の任意のオプションを許可します：</p>
+
+<table>
+<thead>
+<tr>
+<th>引数 </th>
+<th> デフォルト </th>
+<th> 概要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>USER_CLASS </td>
+<td> <code>User</code> </td>
+<td> ユーザー認証として利用するクラス名</td>
+</tr>
+<tr>
+<td>MOUNT_PATH </td>
+<td> <code>auth</code> </td>
+<td> 認証ルーティングをマウントするためのパス <a href="https://devise-token-auth.gitbook.io/devise-token-auth/configuration#usage-tldr">もっと見る</a></td>
+</tr>
+</tbody>
+</table>
+
+
+<p>次のイベントはジェネレーターを使用すると発火します：</p>
+
+<ul>
+<li>initializerは<code>config/initializers/devise_token_auth.rb</code>を作成します <a href="https://devise-token-auth.gitbook.io/devise-token-auth/configuration/initializer-settings">もっと見る</a></li>
+<li><code>app/models</code><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%A3%A5%EC%A5%AF%A5%C8">ディレクト</a>リにモデルが生成されます。もしモデルがすでに存在する場合、そのファイルの最上位にconcernを挿入します。 <a href="https://devise-token-auth.gitbook.io/devise-token-auth/usage/model-integration">もっと見る</a></li>
+<li>ルーティングは<code>config/routes.rb</code>ファイルに追加されます <a href="https://devise-token-auth.gitbook.io/devise-token-auth/usage/mounting-routes">もっと見る</a></li>
+<li>concernは<code>app/controllers/application_controller.rb</code>にincludeされます <a href="https://devise-token-auth.gitbook.io/devise-token-auth/usage/controller-integration">もっと見る</a></li>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>ファイルは<code>db/migrate</code><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%A3%A5%EC%A5%AF%A5%C8">ディレクト</a>リに作成されます。<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>ファイルの中身を確認し、必要ならばカラムを追加し、それから<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を実行します。</li>
+</ul>
+
+
+<pre class="code lang-sh" data-lang="sh" data-unlink="">rake db:migrate
+</pre>
+
+
+<p>また、以下の項目を設定する必要があるかもしれません：</p>
+
+<ul>
+<li><strong>OmniAuth providers</strong> ・・・<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B5%A1%BC%A5%C9%A5%D1%A1%BC%A5%C6%A5%A3">サードパーティ</a>のoauth2認証を利用している時 <a href="https://devise-token-auth.gitbook.io/devise-token-auth/configuration/omniauth">もっと見る</a></li>
+<li><strong>Cross Origin Request Settings</strong>・・・クロス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>クライアントを使用しているとき <a href="https://devise-token-auth.gitbook.io/devise-token-auth/configuration/cross-origin-requests-cors">もっと見る</a></li>
+<li><strong>Email</strong>・・・メールアドレス登録を利用しているとき <a href="https://devise-token-auth.gitbook.io/devise-token-auth/configuration/email-authentication">もっと見る</a></li>
+<li><strong>Multiple model support</strong>・・・複数のモデルを使用しているとき <a href="https://devise-token-auth.gitbook.io/devise-token-auth/usage/using-multiple-user-classes">もっと見る</a></li>
+</ul>
+
+
+<p>次は初期設定...</p>
+
+<h2>初期設定</h2>
+
+<p><code>config/initializers/devise_token_auth.rb</code>の設定では、次の設定を利用できます：</p>
+
+<table>
+<thead>
+<tr>
+<th>名前 </th>
+<th> デフォルト </th>
+<th> 説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>change_headers_on_each_request</code> </td>
+<td> <code>true</code> </td>
+<td> デフォルトではそれぞれのリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トの後に<a class="keyword" href="http://d.hatena.ne.jp/keyword/access">access</a>-tokenヘッダが変わります。クライアントは変更される<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンを追跡し続ける責務があります。<a href="https://github.com/lynndylanhurley/ng-token-auth">ng-token-auth</a>と<a href="https://github.com/lynndylanhurley/j-toker">j-toker</a>の両方でこれが実行されます。これは安全ですが、管理が難しいです。この設定を<code>false</code>にすると、リク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>ト毎に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンヘッダが変更されなくなります。</td>
+</tr>
+<tr>
+<td><code>token_lifespan</code> </td>
+<td> <code>2.weeks</code> </td>
+<td> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンの有効期限を設定します。ユーザーは最後のログインからこの時間経過した後に再認証する必要があります。</td>
+</tr>
+<tr>
+<td><code>batch_request_buffer_throttle</code> </td>
+<td> <code>5.seconds</code> </td>
+<td> <a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>に複数のリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを同時に行う必要があることがあります。この場合、バッチ内の各リク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トは同じ認証<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンを共有する必要があります。この設定はリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トが同じ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンを使っている間隔を決定します。</td>
+</tr>
+<tr>
+<td><code>omniauth_prefix</code> </td>
+<td> <code>"/omniauth"</code> </td>
+<td> このルートは、すべてのoauth2リダイレクトコールバックの接頭辞になります。例えば、デフォルトの<code>'/ omniauth'</code>設定を使用すると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a> oauth2プロバイダは成功した認証を<code>'/omniauth/github/callback'</code>にリダイレクトします。</td>
+</tr>
+<tr>
+<td><code>default_confirm_success_url</code> </td>
+<td> <code>nil</code> </td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td> <code>default_password_reset_url</code> </td>
+<td> <code>nil</code> </td>
+</tr>
+<tr>
+<td></td>
+<td> <code>redirect_whitelist</code>  </td>
+<td> <code>nil</code> </td>
+</tr>
+<tr>
+<td></td>
+<td> <code>enable_standard_devise_support</code> </td>
+<td> <code>false</code> </td>
+</tr>
+<tr>
+<td></td>
+<td> <code>remove_tokens_after_password_reset</code> </td>
+<td> <code>false</code> </td>
+</tr>
+<tr>
+<td></td>
+<td> <code>default_callbacks</code> </td>
+<td> <code>true</code> </td>
+</tr>
+<tr>
+<td></td>
+<td> <code>bypass_sign_in</code> </td>
+<td> <code>true</code> </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>加えて、<code>config/initializers/devise.rb</code>を手動で作成することでそのほかのdeviseの設定をすることもできます。このファイルでできることのいくつかの例を以下に示します：</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># config/initializers/devise.rb</span>
+<span class="synType">Devise</span>.setup <span class="synStatement">do</span> |<span class="synIdentifier">config</span>|
+  <span class="synComment"># The e-mail address that mail will appear to be sent from</span>
+  <span class="synComment"># If absent, mail is sent from "please-change-me-at-config-initializers-devise@example.com"</span>
+  config.mailer_sender = <span class="synSpecial">"</span><span class="synConstant">support@myapp.com</span><span class="synSpecial">"</span>
+
+  <span class="synComment"># If using rails-api, you may want to tell devise to not use ActionDispatch::Flash</span>
+  <span class="synComment"># middleware b/c rails-api does not include it.</span>
+  <span class="synComment"># See: https://stackoverflow.com/q/19600905/806956</span>
+  config.navigational_formats = [<span class="synConstant">:json</span>]
+<span class="synStatement">end</span>
+</pre>
+
+
+<p>次はOmniAuth...</p>
+
+<h2>OmniAuth</h2>
+
+<h3>OmniAuth認証</h3>
+
+<p>もしomniauth認証を利用したいなら、<code>Gemfile</code>に利用したい認証プロバイダーのgem全てを追加します。</p>
+
+<p><strong><a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/facebook">facebook</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/google">google</a>を使ったomniauthの例；</strong></p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># Gemfile</span>
+gem <span class="synSpecial">'</span><span class="synConstant">omniauth-github</span><span class="synSpecial">'</span>
+gem <span class="synSpecial">'</span><span class="synConstant">omniauth-facebook</span><span class="synSpecial">'</span>
+gem <span class="synSpecial">'</span><span class="synConstant">omniauth-google-oauth2</span><span class="synSpecial">'</span>
+</pre>
+
+
+<p>そしたら、<code>bundle install</code>を実行します。</p>
+
+<p><a href="https://github.com/omniauth/omniauth/wiki/List-of-Strategies">oauth2プロバイダーのリスト</a></p>
+
+<h3>OmniAuthプロバイダーの設定</h3>
+
+<p><code>config/initializers/omniauth.rb</code>にプロバイダー毎の設定を追加します。</p>
+
+<p>これらの設定はプロバイダーから取得されなければなりません。</p>
+
+<p><strong><a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/facebook">facebook</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/google">google</a>を利用した例：</strong></p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># config/initializers/omniauth.rb</span>
+<span class="synType">Rails</span>.application.config.middleware.use <span class="synType">OmniAuth</span>::<span class="synType">Builder</span> <span class="synStatement">do</span>
+  provider <span class="synConstant">:github</span>,        <span class="synIdentifier">ENV</span>[<span class="synSpecial">'</span><span class="synConstant">GITHUB_KEY</span><span class="synSpecial">'</span>],   <span class="synIdentifier">ENV</span>[<span class="synSpecial">'</span><span class="synConstant">GITHUB_SECRET</span><span class="synSpecial">'</span>],   <span class="synConstant">scope</span>: <span class="synSpecial">'</span><span class="synConstant">email,profile</span><span class="synSpecial">'</span>
+  provider <span class="synConstant">:facebook</span>,      <span class="synIdentifier">ENV</span>[<span class="synSpecial">'</span><span class="synConstant">FACEBOOK_KEY</span><span class="synSpecial">'</span>], <span class="synIdentifier">ENV</span>[<span class="synSpecial">'</span><span class="synConstant">FACEBOOK_SECRET</span><span class="synSpecial">'</span>]
+  provider <span class="synConstant">:google_oauth2</span>, <span class="synIdentifier">ENV</span>[<span class="synSpecial">'</span><span class="synConstant">GOOGLE_KEY</span><span class="synSpecial">'</span>],   <span class="synIdentifier">ENV</span>[<span class="synSpecial">'</span><span class="synConstant">GOOGLE_SECRET</span><span class="synSpecial">'</span>]
+<span class="synStatement">end</span>
+</pre>
+
+
+<p>この例では、プロバイダのキーとシークレットキーが<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>に格納されていることを前提としています。これを満たすには、<a href="https://github.com/laserlemon/figaro">figaro</a> gem（または<a href="https://github.com/bkeepers/dotenv">dotenv</a>または<a href="https://github.com/rails/rails/blob/v4.1.0/railties/lib/rails/generators/rails/app/templates/config/secrets.yml">secrets.yml</a>または同等のもの）を使用します。</p>
+
+<h4>OmniAuthコールバックの設定</h4>
+
+<p>プロバイダで設定する「コールバックURL」の設定は、このアプリケーションで定義されている<a href="http://sainu.hatenablog.jp/entry/2018/08/11/194319#%E5%88%9D%E6%9C%9F%E8%A8%AD%E5%AE%9A">omniauth接頭辞</a>の設定に対応している必要があります。<strong>これは、クライアントアプリケーションで使用されているomniauthルートとは異なります。</strong></p>
+
+<p>例えばデモアプリケーションでは、<code>omniauth_prefix</code>のデフォルト設定を<code>/omniauth</code>にしているので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>の「承認コールバックURL」は「<a href="https://devise-token-auth-demo.herokuapp.com/">https://devise-token-auth-demo.herokuapp.com</a><strong>/omniauth</strong>/<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>/callback 」に設定しなければなりません。</p>
+
+<p><strong><a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>のデモ例：</strong></p>
+
+<p><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/omniauth-provider-settings.png" alt="omniauth-provider-settings.png (63.5 kB)"></p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>認証のurlはクライアント側とは異なります。クライアントはomniauth認証のために<code>/[MOUNT_PATH]/:provider</code>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>にアクセスする必要があります。</p>
+
+<p>例えば、アプリが次の設定を使用してマウントされていることを前提にします：</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># config/routes.rb</span>
+mount_devise_token_auth_for <span class="synSpecial">'</span><span class="synConstant">User</span><span class="synSpecial">'</span>, <span class="synConstant">at</span>: <span class="synSpecial">'</span><span class="synConstant">auth</span><span class="synSpecial">'</span>
+</pre>
+
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>のクライアント設定は次のようになります：</p>
+
+<p><strong><a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a>を使ったAngular.jsでの認証設定：</strong></p>
+
+<pre class="code lang-javascript" data-lang="javascript" data-unlink="">angular.module(<span class="synConstant">'myApp'</span>, <span class="synIdentifier">[</span><span class="synConstant">'ng-token-auth'</span><span class="synIdentifier">]</span>)
+  .config(<span class="synIdentifier">function</span>($authProvider) <span class="synIdentifier">{</span>
+    $authProvider.configure(<span class="synIdentifier">{</span>
+      apiUrl: <span class="synConstant">'https://api.example.com'</span>
+      authProviderPaths: <span class="synIdentifier">{</span>
+        github: <span class="synConstant">'/auth/github'</span> <span class="synComment">// &lt;-- これはgithubで設定したものとは異なることに注意してください</span>
+      <span class="synIdentifier">}</span>
+    <span class="synIdentifier">}</span>);
+  <span class="synIdentifier">}</span>);
+</pre>
+
+
+<p>この不一致は、複数のUserクラスとマウントポイントをサポートするために必要です。</p>
+
+<h4><a href="http://pow.cx/">pow</a>と<a href="http://xip.io/">xip.io</a>ユーザーの方へ</h4>
+
+<p>もしpowまたはxip.io URLを使っている時にプロバイダーから<code>redirect-uri-mismatch</code>エラーを受け取ったら、開発環境の設定ファイルに次の設定を追加してください：</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># config/environments/development.rb</span>
+<span class="synComment"># when using pow</span>
+<span class="synType">OmniAuth</span>.config.full_host = <span class="synSpecial">"</span><span class="synConstant">http://app-name.dev</span><span class="synSpecial">"</span>
+
+<span class="synComment"># when using xip.io</span>
+<span class="synType">OmniAuth</span>.config.full_host = <span class="synSpecial">"</span><span class="synConstant">http://xxx.xxx.xxx.app-name.xip.io</span><span class="synSpecial">"</span>
+</pre>
+
+
+<p>次はメール認証....</p>
+
+<h2>メール認証</h2>
+
+<p>もしメール認証を使いたいなら、メールを送信するように<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>アプリケーションを設定する必要があります。<a href="https://guides.rubyonrails.org/action_mailer_basics.html">ここ</a>からもっと見てください。</p>
+
+<p>開発環境では<a href="https://mailcatcher.me/">mailcatcher</a>をお勧めします。</p>
+
+<h3>mailcatcherの開発環境設定例</h3>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># config/environments/development.rb</span>
+<span class="synType">Rails</span>.application.configure <span class="synStatement">do</span>
+  config.action_mailer.default_url_options = { <span class="synConstant">host</span>: <span class="synSpecial">'</span><span class="synConstant">your-dev-host.dev</span><span class="synSpecial">'</span> }
+  config.action_mailer.delivery_method = <span class="synConstant">:smtp</span>
+  config.action_mailer.smtp_settings = { <span class="synConstant">address</span>: <span class="synSpecial">'</span><span class="synConstant">your-dev-host.dev</span><span class="synSpecial">'</span>, <span class="synConstant">port</span>: <span class="synConstant">1025</span> }
+<span class="synStatement">end</span>
+</pre>
+
+
+<p>既定のデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>テンプレートを使用する代わりにカスタム電子メールを送信する場合、<a href="https://devise-token-auth.gitbook.io/devise-token-auth/usage/custom-controller-email-overrides#email-template-overrides">これ</a>を使うこともできます。</p>
+
+<p>次はデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>言語のカスタマイズ...</p>
+
+<h2>デ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>言語のカスタマイズ</h2>
+
+<p>Devise Token Authには、すべてに必要なデフォルトの文言が付属しています。しかし、これは適切ではないかもしれません。<code>config/locales/devise.en.yml</code>YMLファイルを作成し、必要なカスタム値を割り当てることで<a href="https://github.com/plataformatec/devise/blob/master/config/locales/en.yml">deviseのデフォルト</a>を上書きすることができます。例えば、deviseメールの件名を変更するには以下のようにします：</p>
+
+<pre class="code lang-yaml" data-lang="yaml" data-unlink=""><span class="synComment"># config/locales/devise.en.yml</span>
+<span class="synIdentifier">en</span><span class="synSpecial">:</span>
+  <span class="synIdentifier">devise</span><span class="synSpecial">:</span>
+    <span class="synIdentifier">mailer</span><span class="synSpecial">:</span>
+      <span class="synIdentifier">confirmation_instructions</span><span class="synSpecial">:</span>
+        <span class="synIdentifier">subject</span><span class="synSpecial">:</span> <span class="synConstant">"Please confirm your e-mail address"</span>
+      <span class="synIdentifier">reset_password_instructions</span><span class="synSpecial">:</span>
+        <span class="synIdentifier">subject</span><span class="synSpecial">:</span> <span class="synConstant">"Reset password request"</span>
+</pre>
+
+
+<p>次はクロスオリジンリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>ト（CORS）....</p>
+
+<h2>クロスオリジンリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>ト（CORS）</h2>
+
+<p>もし<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>とクライアントが異なる<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>上にあるなら、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>に<a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">cross origin request</a>を許可するような設定をする必要があります。これを満たすには<a href="https://github.com/cyu/rack-cors">rack-cors</a> gemを使います。</p>
+
+<p>次の例はいくつもの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>からリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを許可するので<strong>とても危険</strong>です。必要な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>のみを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DB%A5%EF%A5%A4%A5%C8%A5%EA%A5%B9%A5%C8">ホワイトリスト</a>に登録してください。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># Gemfile</span>
+gem <span class="synSpecial">'</span><span class="synConstant">rack-cors</span><span class="synSpecial">'</span>, <span class="synConstant">:require</span> =&gt; <span class="synSpecial">'</span><span class="synConstant">rack/cors</span><span class="synSpecial">'</span>
+</pre>
+
+
+
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># config/application.rb</span>
+<span class="synPreProc">module</span> <span class="synType">YourApp</span>
+  <span class="synPreProc">class</span> <span class="synType">Application</span> &lt; <span class="synType">Rails</span>::<span class="synType">Application</span>
+    config.middleware.use <span class="synType">Rack</span>::<span class="synType">Cors</span> <span class="synStatement">do</span>
+      allow <span class="synStatement">do</span>
+        origins <span class="synSpecial">'</span><span class="synConstant">*</span><span class="synSpecial">'</span>
+        resource <span class="synSpecial">'</span><span class="synConstant">*</span><span class="synSpecial">'</span>,
+          <span class="synConstant">headers</span>: <span class="synConstant">:any</span>,
+          <span class="synConstant">expose</span>: [<span class="synSpecial">'</span><span class="synConstant">access-token</span><span class="synSpecial">'</span>, <span class="synSpecial">'</span><span class="synConstant">expiry</span><span class="synSpecial">'</span>, <span class="synSpecial">'</span><span class="synConstant">token-type</span><span class="synSpecial">'</span>, <span class="synSpecial">'</span><span class="synConstant">uid</span><span class="synSpecial">'</span>, <span class="synSpecial">'</span><span class="synConstant">client</span><span class="synSpecial">'</span>],
+          <span class="synConstant">methods</span>: [<span class="synConstant">:get</span>, <span class="synConstant">:post</span>, <span class="synConstant">:options</span>, <span class="synConstant">:delete</span>, <span class="synConstant">:put</span>]
+      <span class="synStatement">end</span>
+    <span class="synStatement">end</span>
+  <span class="synPreProc">end</span>
+<span class="synPreProc">end</span>
+</pre>
+
+
+<p><code>Access-Control-Expose-Headers</code>が<code>access-token</code>と<code>expiry</code>、<code>token-type</code>、<code>uid</code>、<code>client</code>を含むことを確認してください（この例で<code>expose</code> paramに設定されているように）。もしクライアントが誤った401応答をする場合、これが原因の可能性があります。</p>
+
+<p>古いブラウザ（IE8、<a class="keyword" href="http://d.hatena.ne.jp/keyword/IE9">IE9</a>）ではCORSが使用できない場合があります。通常これらのブラウザ用のプロキシを設定します。詳細については、<a href="https://github.com/lynndylanhurley/ng-token-auth">ng-token-auth readme</a>または<a href="https://github.com/lynndylanhurley/j-toker">jToker readme</a>を参照してください。</p>
+
+<h1>使い方</h1>
+
+<p>クライアントが使用できるルートは次のとおりです。これらのルートは、このエンジンがマウントされているパスを基準にして実行されます（デフォルトでは<code>auth</code>）。これらのルートは<a href="https://angularjs.org/">AngularJS</a>の<a href="https://github.com/lynndylanhurley/ng-token-auth">ng-token-auth</a>モジュールと<a href="https://jquery.com/">jQuery</a>の<a href="https://github.com/lynndylanhurley/j-toker">jToker</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3">プラグイン</a>で使用されるデフォルトに対応しています。</p>
+
+<table>
+<thead>
+<tr>
+<th>path </th>
+<th> method </th>
+<th> 目的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/ </td>
+<td> POST </td>
+<td> メール登録</td>
+</tr>
+<tr>
+<td>/ </td>
+<td> DELETE </td>
+<td> アカウント削除</td>
+</tr>
+<tr>
+<td>/ </td>
+<td> PUT </td>
+<td> アカウント更新</td>
+</tr>
+<tr>
+<td>/<a class="keyword" href="http://d.hatena.ne.jp/keyword/sign">sign</a>_in </td>
+<td> POST </td>
+<td> メール認証</td>
+</tr>
+<tr>
+<td>/<a class="keyword" href="http://d.hatena.ne.jp/keyword/sign">sign</a>_out </td>
+<td> DELETE </td>
+<td> ユーザーの現在のセッションを終了します。</td>
+</tr>
+<tr>
+<td>/:provider </td>
+<td> GET </td>
+<td> クライアント認証の認証先としてこのルートを設定します。理想的には、これは外部のウィンドウまたはポップアップで発生します。</td>
+</tr>
+<tr>
+<td>/:provider/callback </td>
+<td> GET / POST </td>
+<td> oauth2プロバイダのコールバック<a class="keyword" href="http://d.hatena.ne.jp/keyword/URI">URI</a>のリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>ト先。</td>
+</tr>
+<tr>
+<td>/validate_token </td>
+<td> GET </td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td> /password </td>
+<td> POST | このルートを使用して、メールで登録したユーザーにパスワードリセット確認メールを送信します。</td>
+</tr>
+<tr>
+<td>/password </td>
+<td> PUT </td>
+<td> ユーザーのパスワードを変更するには、このルートを使用します。</td>
+</tr>
+<tr>
+<td>/password/edit </td>
+<td> GET </td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+
+<p>次はrouteのマウンティング...</p>
+
+<h2>routeのマウンティング</h2>
+
+<p>認証ルーティングはプロジェクトにマウントする必要があります。このgemにはそのためのヘルパーがあります：</p>
+
+<p><code>mount_devise_token_auth_for</code> - <code>devise_for</code>に似ています。このメソッドを使用して、ユーザー認証に必要なルートを追加します。このメソッドは、次の引数を受け取ります：</p>
+
+<table>
+<thead>
+<tr>
+<th>引数 </th>
+<th> 型 </th>
+<th> デフォルト </th>
+<th> 説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>class_name</code> </td>
+<td> string </td>
+<td> 'User' </td>
+<td> 認証に使用するクラスの名前です。</td>
+</tr>
+<tr>
+<td><code>options</code> </td>
+<td> object </td>
+<td> {at: 'auth'} </td>
+<td> 認証に使用されるルーティングには、このオブジェクトの<code>at</code>パラメータで指定されたパスの接頭辞が付けられます。</td>
+</tr>
+</tbody>
+</table>
+
+
+<p><strong>例：</strong></p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># config/routes.rb</span>
+mount_devise_token_auth_for <span class="synSpecial">'</span><span class="synConstant">User</span><span class="synSpecial">'</span>, <span class="synConstant">at</span>: <span class="synSpecial">'</span><span class="synConstant">auth</span><span class="synSpecial">'</span>
+</pre>
+
+
+<p>どのモデルクラスも使用できますが、正しく動作するためにはクラスに<a href="https://devise-token-auth.gitbook.io/devise-token-auth/usage/model-integration"><code>DeviseTokenAuth :: Concerns :: User</code></a>を含める必要があります。</p>
+
+<p>このエンジンは、好きなルートにマウントすることができます。<code>/auth</code>はデフォルトで<a href="https://github.com/lynndylanhurley/ng-token-auth">ng-token-auth</a>モジュールと<a href="https://github.com/lynndylanhurley/j-toker">jToker</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3">プラグイン</a>のデフォルトに準拠するために使用されます。</p>
+
+<p>次はコントローラー インテグレーション</p>
+
+<h2>コントローラー インテグレーション</h2>
+
+<h3>Concerns</h3>
+
+<p>このgemは<code>DeviseTokenAuth::Concerns::SetUserByToken</code>という<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a> concernをincludeします。これは<code>authenticate_user!</code>や<code>user_signed_in?</code>のようなコントローラーメソッドにアクセスするためのconcernをincludeします。</p>
+
+<p>concernはリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>ト毎にauth tokenを変更する<a href="https://guides.rubyonrails.org/action_controller_overview.html#filters">after_action</a>も実行します。</p>
+
+<p>全ての子コントローラーがconcernをincludeするように、<code>ApplicationController</code>にconcernをincludeすることを推奨します。</p>
+
+<h4>Concern例</h4>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># app/controllers/application_controller.rb</span>
+<span class="synPreProc">class</span> <span class="synType">ApplicationController</span> &lt; <span class="synType">ActionController</span>::<span class="synType">Base</span>
+  <span class="synPreProc">include</span> <span class="synType">DeviseTokenAuth</span>::<span class="synType">Concerns</span>::<span class="synType">SetUserByToken</span>
+<span class="synPreProc">end</span>
+</pre>
+
+
+<h4>メソッド</h4>
+
+<p>このgemは以下の<a href="https://github.com/plataformatec/devise#controller-filters-and-helpers">devise helper</a>全てへのアクセスを提供します：</p>
+
+<table>
+<thead>
+<tr>
+<th>メソッド </th>
+<th> 説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>before_action :authenticate_user!</code> </td>
+<td> <code>User</code>がサインインしていなければ401エラーを返す</td>
+</tr>
+<tr>
+<td><code>current_user</code> </td>
+<td> 現在サインインしている<code>User</code>または有効になっていなければ<code>nil</code>を返す</td>
+</tr>
+<tr>
+<td><code>user_signed_in?</code> </td>
+<td> <code>User</code>がサインインしていれば<code>true</code>をそうでなければ<code>false</code>を返す</td>
+</tr>
+<tr>
+<td><code>devise_token_auth_group</code> </td>
+<td> 複数のユーザークラスをグループとして操作する</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>メモ）アクセスを試みているモデルが<code>User</code>ではなかったら、ヘルパーメソッド名は変更されます。例えば、モデル名が<code>Admin</code>であれば、ヘルパーメソッドは以下のようになります：</p>
+
+<ul>
+<li><code>before_action :authenticate_admin!</code></li>
+<li><code>admin_signed_in?</code></li>
+<li><code>current_admin</code></li>
+</ul>
+
+
+<h4>例：認証されたユーザーへのアクセス制限：</h4>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># app/controllers/test_controller.rb</span>
+<span class="synPreProc">class</span> <span class="synType">TestController</span> &lt; <span class="synType">ApplicationController</span>
+  before_action <span class="synConstant">:authenticate_user!</span>
+
+  <span class="synPreProc">def</span> <span class="synIdentifier">members_only</span>
+    render <span class="synConstant">json</span>: {
+      <span class="synConstant">data</span>: {
+        <span class="synConstant">message</span>: <span class="synSpecial">"</span><span class="synConstant">Welcome </span><span class="synSpecial">#{</span>current_user.name<span class="synSpecial">}"</span>,
+        <span class="synConstant">user</span>: current_user
+      }
+    }, <span class="synConstant">status</span>: <span class="synConstant">200</span>
+  <span class="synPreProc">end</span>
+<span class="synPreProc">end</span>
+</pre>
+
+
+<h3><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンヘッダー形式</h3>
+
+<p>認証情報はそれぞれのヘッダーにクライアントによって含まれます。ヘッダーは<a href="https://tools.ietf.org/html/rfc6750">RFC 6750 Bearer Token</a>形式に従います：</p>
+
+<h4>認証ヘッダーサンプル：</h4>
+
+<pre class="code" data-lang="" data-unlink="">"access-token": "wwwww",
+"token-type":   "Bearer",
+"client":       "xxxxx",
+"expiry":       "yyyyy",
+"uid":          "zzzzz"</pre>
+
+
+<p>認証ヘッダーは以下のパラメーターで構成されます：</p>
+
+<table>
+<thead>
+<tr>
+<th>パラメーター </th>
+<th> 説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>access-token</code> </td>
+<td> これはリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>ト毎にユーザーのパスワードとして提供されます。この値のハッシュ・バージョンは、後で比較するためにデータベースに保管されます。この値はリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>ト毎に変更されるべきです。</td>
+</tr>
+<tr>
+<td><code>client</code> </td>
+<td> これにより異なるクライアント上で複数の同時セッションを管理することができます。たとえば、携帯電話とラップトップの両方で同時に認証を受けたい場合があります。</td>
+</tr>
+<tr>
+<td><code>expiry</code> </td>
+<td> 現在のセッションが失効になる日にちです。これは、クライアントが<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>リク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを必要とせずに期限切れの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンを無効にするために使用できます。</td>
+</tr>
+<tr>
+<td><code>uid</code> </td>
+<td> ユーザーを識別するために使用される一意の値。アクセス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンでユーザーのDBを検索すると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>が<a href="https://codahale.com/a-lesson-in-timing-attacks/">timing attacks</a>を受けやすくなるため、これが必要です。</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>各リク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トで必要な認証ヘッダは以前のリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トからのレスポンスに使用されます。もしAngularJSの<a href="https://github.com/lynndylanhurley/ng-token-auth">ng-token-auth</a>または<a class="keyword" href="http://d.hatena.ne.jp/keyword/jQuery">jQuery</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3">プラグイン</a>の<a href="https://github.com/lynndylanhurley/j-toker">jToker</a>を利用しているなら、この昨日はすでに提供されています。</p>
+
+<p>次はModel Integration...</p>
+
+<h2>Model Integration</h2>
+
+<h3>DeviseTokenAuth::Concerns::User</h3>
+
+<p>このgemの典型的な使い方は以下のモデルメソッドのいつくかの使用をする必要はありません。全ての認証は<a href="https://devise-token-auth.gitbook.io/devise-token-auth/usage/controller_methods">Controller concerns</a>によって暗黙的に処理される必要があります。</p>
+
+<p><code>DeviseTokenAuth::Concerns::User</code>concernをincludeするモデルは以下のpublicメソッドにアクセスできます。</p>
+
+<ul>
+<li><p><code>valid_token?</code>：認証<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンが有効かどうかを確認します。引数として<code>token</code>と<code>client</code>を受け取り、真偽値を返します。</p>
+
+<p>  <strong>例</strong>:</p></li>
+</ul>
+
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># extract token + client_id from auth header</span>
+client_id = request.headers[<span class="synSpecial">'</span><span class="synConstant">client</span><span class="synSpecial">'</span>]
+token = request.headers[<span class="synSpecial">'</span><span class="synConstant">access-token</span><span class="synSpecial">'</span>]
+
+<span class="synIdentifier">@resource</span>.valid_token?(token, client_id)
+</pre>
+
+
+<ul>
+<li><p><code>create_new_auth_token</code>：必要な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>全てを含む新しい認証<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンを作成します。任意引数として<code>client</code>を受け取ります。何も提供されない場合新しい<code>client</code>を生成します。オブジェクトとしてクライアントによって送信される必要がある認証ヘッダを返します。</p>
+
+<p>  <strong>例</strong>：</p></li>
+</ul>
+
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># extract client_id from auth header</span>
+client_id = request.headers[<span class="synSpecial">'</span><span class="synConstant">client</span><span class="synSpecial">'</span>]
+
+<span class="synComment"># update token, generate updated auth headers for response</span>
+new_auth_header = <span class="synIdentifier">@resource</span>.create_new_auth_token(client_id)
+
+<span class="synComment"># update response with the header that will be required by the next request</span>
+response.headers.merge!(new_auth_header)
+</pre>
+
+
+<ul>
+<li><code>build_auth_header</code>：次のリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トに含めてクライアントに送信される必要がある認証ヘッダを生成します。<code>token</code>と<code>client</code>を引数として受け取り、文字列を返します。</li>
+</ul>
+
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># create client id and token</span>
+client_id = <span class="synType">SecureRandom</span>.urlsafe_base64(<span class="synConstant">nil</span>, <span class="synConstant">false</span>)
+token     = <span class="synType">SecureRandom</span>.urlsafe_base64(<span class="synConstant">nil</span>, <span class="synConstant">false</span>)
+
+<span class="synComment"># store client + token in user's token hash</span>
+<span class="synIdentifier">@resource</span>.tokens[client_id] = {
+  <span class="synConstant">token</span>: <span class="synType">BCrypt</span>::<span class="synType">Password</span>.create(token),
+  <span class="synConstant">expiry</span>: (<span class="synType">Time</span>.zone.now + <span class="synIdentifier">@resource</span>.token_lifespan).to_i
+}
+
+<span class="synComment"># generate auth headers for response</span>
+new_auth_header = <span class="synIdentifier">@resource</span>.build_auth_header(token, client_id)
+
+<span class="synComment"># update response with the header that will be required by the next request</span>
+response.headers.merge!(new_auth_header)
+</pre>
+
+
+<p>次は複数ユーザークラスの使い方...</p>
+
+<h2>複数ユーザークラスの使い方</h2>
+
+<h3>複数ユーザーデモ</h3>
+
+<ul>
+<li><a href="https://ng-token-auth-demo.herokuapp.com/#/multi-user">AngularJS</a></li>
+<li><a href="https://angular2-token.herokuapp.com/">Angular2</a></li>
+<li><a href="https://j-toker-demo.herokuapp.com/#/alt-user">React + jToker</a></li>
+</ul>
+
+
+<p>このgemは複数ユーザーモデルの利用をサポートします。利用可能な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E6%A1%BC%A5%B9%A5%B1%A1%BC%A5%B9">ユースケース</a>の1つは、<code>User</code>というモデルを使用して訪問者を認証し、<code>Admin</code>というモデルで管理者を認証することです。アプリに別の認証モデルを追加するには、次の手順を実行します：</p>
+
+<p>１. 新しいモデルのためのインストールジェネレーターを実行します</p>
+
+<pre class="code lang-sh" data-lang="sh" data-unlink="">rails g devise_token_auth:install Admin admin_auth
+</pre>
+
+
+<p>これは<code>Admin</code>モデルを作成し、<code>/admin_auth</code>ベースパスでモデルの認証ルーティングを定義します。</p>
+
+<p>２. <a href="https://github.com/plataformatec/devise#configuring-routes">devise_scope</a>内の<code>Admin</code>ユーザーが使うルーティングを定義します。</p>
+
+<p> <strong>例</strong>：</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synType">Rails</span>.application.routes.draw <span class="synStatement">do</span>
+ <span class="synComment"># when using multiple models, controllers will default to the first available</span>
+ <span class="synComment"># devise mapping. routes for subsequent devise mappings will need to defined</span>
+ <span class="synComment"># within a `devise_scope` block</span>
+
+ <span class="synComment"># define :users as the first devise mapping:</span>
+ mount_devise_token_auth_for <span class="synSpecial">'</span><span class="synConstant">User</span><span class="synSpecial">'</span>, <span class="synConstant">at</span>: <span class="synSpecial">'</span><span class="synConstant">auth</span><span class="synSpecial">'</span>
+
+ <span class="synComment"># define :admins as the second devise mapping. routes using this class will</span>
+ <span class="synComment"># need to be defined within a devise_scope as shown below</span>
+ mount_devise_token_auth_for <span class="synSpecial">"</span><span class="synConstant">Admin</span><span class="synSpecial">"</span>, <span class="synConstant">at</span>: <span class="synSpecial">'</span><span class="synConstant">admin_auth</span><span class="synSpecial">'</span>
+
+ <span class="synComment"># this route will authorize requests using the User class</span>
+ get <span class="synSpecial">'</span><span class="synConstant">demo/members_only</span><span class="synSpecial">'</span>, <span class="synConstant">to</span>: <span class="synSpecial">'</span><span class="synConstant">demo#members_only</span><span class="synSpecial">'</span>
+
+ <span class="synComment"># routes within this block will authorize requests using the Admin class</span>
+ devise_scope <span class="synConstant">:admin</span> <span class="synStatement">do</span>
+   get <span class="synSpecial">'</span><span class="synConstant">demo/admins_only</span><span class="synSpecial">'</span>, <span class="synConstant">to</span>: <span class="synSpecial">'</span><span class="synConstant">demo#admins_only</span><span class="synSpecial">'</span>
+ <span class="synStatement">end</span>
+<span class="synStatement">end</span>
+</pre>
+
+
+<p>３. 任意の<code>Admin</code>限定コントローラーを設定します。コントローラーは<a href="https://devise-token-auth.gitbook.io/devise-token-auth/usage/multiple_models#methods">ここで定義されたメソッド</a>へのアクセス権を持ちます。</p>
+
+<ul>
+<li><code>before_action :authenticate_admin!</code></li>
+<li><code>current_admin</code></li>
+<li><code>admin_signed_in?</code></li>
+</ul>
+
+
+<h3>グループアクセス</h3>
+
+<p>グループを使用して同時に複数のユーザータイプへのアクセスを制御することもできます。次の例は、コントローラのアクセスを<code>User</code>ユーザーと<code>Admin</code>ユーザの両方に制限する方法を示しています。</p>
+
+<h4>例：グループ認証</h4>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synPreProc">class</span> <span class="synType">DemoGroupController</span> &lt; <span class="synType">ApplicationController</span>
+  devise_token_auth_group <span class="synConstant">:member</span>, <span class="synConstant">contains</span>: [<span class="synConstant">:user</span>, <span class="synConstant">:admin</span>]
+  before_action <span class="synConstant">:authenticate_member!</span>
+
+  <span class="synPreProc">def</span> <span class="synIdentifier">members_only</span>
+    render <span class="synConstant">json</span>: {
+      <span class="synConstant">data</span>: {
+        <span class="synConstant">message</span>: <span class="synSpecial">"</span><span class="synConstant">Welcome </span><span class="synSpecial">#{</span>current_member.name<span class="synSpecial">}"</span>,
+        <span class="synConstant">user</span>: current_member
+      }
+    }, <span class="synConstant">status</span>: <span class="synConstant">200</span>
+  <span class="synPreProc">end</span>
+<span class="synPreProc">end</span>
+</pre>
+
+
+<p>上記の例では、<code>current_user</code>と<code>current_admin</code>に加えて、以下のメソッドを利用することができます。</p>
+
+<ul>
+<li><code>before_action: :authenticate_member!</code></li>
+<li><code>current_member</code></li>
+<li><code>member_signed_in?</code></li>
+</ul>
+
+
+<p>次はモジュールの除外...</p>
+
+<h2>モジュールの除外</h2>
+
+<p>デフォルトではdeviseのほとんど全てのモジュールが含まれます：</p>
+
+<ul>
+<li><a href="https://github.com/plataformatec/devise/blob/master/lib/devise/models/database_authenticatable.rb">database_authenticatable​</a></li>
+<li><a href="https://github.com/plataformatec/devise/blob/master/lib/devise/models/registerable.rb">registerable​</a></li>
+<li><a href="https://github.com/plataformatec/devise/blob/master/lib/devise/models/recoverable.rb">recoverable​</a></li>
+<li><a href="https://github.com/plataformatec/devise/blob/master/lib/devise/models/trackable.rb">trackable​</a></li>
+<li><a href="https://github.com/plataformatec/devise/blob/master/lib/devise/models/validatable.rb">validatable​</a></li>
+<li><a href="https://github.com/plataformatec/devise/blob/master/lib/devise/models/confirmable.rb">confirmable​</a></li>
+<li><a href="https://github.com/plataformatec/devise/blob/master/lib/devise/models/omniauthable.rb">omniauthable​</a></li>
+</ul>
+
+
+<p>これらの機能をすべてアプリで有効にしたくないかもしれません。それは大丈夫です。独自のスタイルに合わせてミックスして合わせることができます。</p>
+
+<p>次の例は、電子メールの確認を無効にする方法を示しています。</p>
+
+<h3>例：メール認証を無効にする</h3>
+
+<p><code>DeviseTokenAuth::Concerns::User</code>model concernをincludeする前に、includeしたいモジュールをリストにするだけです。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># app/models/user.rb</span>
+<span class="synPreProc">class</span> <span class="synType">User</span> &lt; <span class="synType">ActiveRecord</span>::<span class="synType">Base</span>
+
+  <span class="synComment"># notice this comes BEFORE the include statement below</span>
+  <span class="synComment"># also notice that :confirmable is not included in this block</span>
+  devise <span class="synConstant">:database_authenticatable</span>, <span class="synConstant">:recoverable</span>,
+         <span class="synConstant">:trackable</span>, <span class="synConstant">:validatable</span>, <span class="synConstant">:registerable</span>,
+         <span class="synConstant">:omniauthable</span>
+
+  <span class="synComment"># note that this include statement comes AFTER the devise block above</span>
+  <span class="synPreProc">include</span> <span class="synType">DeviseTokenAuth</span>::<span class="synType">Concerns</span>::<span class="synType">User</span>
+<span class="synPreProc">end</span>
+</pre>
+
+
+<p>いくつかの機能はアプリにマウントしたくないルーティングをincludeします。次の例は、OAuthとそのルーティングを無効にする方法を示しています。</p>
+
+<h3>例：<a class="keyword" href="http://d.hatena.ne.jp/keyword/OAuth%C7%A7%BE%DA">OAuth認証</a>を無効にする</h3>
+
+<p>まず、<code>omniauthable</code>モジュールを<code>devise</code>メソッドの引数リストに含めません。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># app/models/user.rb</span>
+<span class="synPreProc">class</span> <span class="synType">User</span> &lt; <span class="synType">ActiveRecord</span>::<span class="synType">Base</span>
+
+  <span class="synComment"># notice that :omniauthable is not included in this block</span>
+  devise <span class="synConstant">:database_authenticatable</span>, <span class="synConstant">:confirmable</span>,
+         <span class="synConstant">:recoverable</span>, <span class="synConstant">:trackable</span>, <span class="synConstant">:validatable</span>,
+         <span class="synConstant">:registerable</span>
+
+  <span class="synPreProc">include</span> <span class="synType">DeviseTokenAuth</span>::<span class="synType">Concerns</span>::<span class="synType">User</span>
+<span class="synPreProc">end</span>
+</pre>
+
+
+<p><code>omniauth_callbacks</code>コントローラーのマウントを<code>skip</code>するヘルパーを呼びます</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># config/routes.rb</span>
+<span class="synType">Rails</span>.application.routes.draw <span class="synStatement">do</span>
+  mount_devise_token_auth_for <span class="synSpecial">'</span><span class="synConstant">User</span><span class="synSpecial">'</span>, <span class="synConstant">at</span>: <span class="synSpecial">'</span><span class="synConstant">auth</span><span class="synSpecial">'</span>, <span class="synConstant">skip</span>: [<span class="synConstant">:omniauth_callbacks</span>]
+<span class="synStatement">end</span>
+</pre>
+
+
+<p>次は、Controller / Mailオーバーライドのカスタマイズ</p>
+
+<h2>Controller / Mailオーバーライドのカスタマイズ</h2>
+
+<h3>コントローラーオーバーライドをカスタム</h3>
+
+<p>組み込みコントローラーは、独自のカスタムコントローラーでオーバーライドすることができます。</p>
+
+<p>例えば、<code>TokenValidationController</code>の<code>validate_token</code>メソッドのデフォルトの動作は、<code>User</code>オブジェクトを<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>（sansパスワードと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンデータ）として返すことです。次の例は、モデルメソッドを含めるために<code>validate_token</code>アクションをオーバーライドする方法を示しています。</p>
+
+<p><strong>例：コントローラーオーバーライド</strong></p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># config/routes.rb</span>
+<span class="synType">Rails</span>.application.routes.draw <span class="synStatement">do</span>
+  ...
+  mount_devise_token_auth_for <span class="synSpecial">'</span><span class="synConstant">User</span><span class="synSpecial">'</span>, <span class="synConstant">at</span>: <span class="synSpecial">'</span><span class="synConstant">auth</span><span class="synSpecial">'</span>, <span class="synConstant">controllers</span>: {
+    <span class="synConstant">token_validations</span>:  <span class="synSpecial">'</span><span class="synConstant">overrides/token_validations</span><span class="synSpecial">'</span>
+  }
+<span class="synStatement">end</span>
+
+<span class="synComment"># app/controllers/overrides/token_validations_controller.rb</span>
+<span class="synPreProc">module</span> <span class="synType">Overrides</span>
+  <span class="synPreProc">class</span> <span class="synType">TokenValidationsController</span> &lt; <span class="synType">DeviseTokenAuth</span>::<span class="synType">TokenValidationsController</span>
+
+    <span class="synPreProc">def</span> <span class="synIdentifier">validate_token</span>
+      <span class="synComment"># @resource will have been set by set_user_by_token concern</span>
+      <span class="synStatement">if</span> <span class="synIdentifier">@resource</span>
+        render <span class="synConstant">json</span>: {
+          <span class="synConstant">data</span>: <span class="synIdentifier">@resource</span>.as_json(<span class="synConstant">methods</span>: <span class="synConstant">:calculate_operating_thetan</span>)
+        }
+      <span class="synStatement">else</span>
+        render <span class="synConstant">json</span>: {
+          <span class="synConstant">success</span>: <span class="synConstant">false</span>,
+          <span class="synConstant">errors</span>: [<span class="synSpecial">"</span><span class="synConstant">Invalid login credentials</span><span class="synSpecial">"</span>]
+        }, <span class="synConstant">status</span>: <span class="synConstant">401</span>
+      <span class="synStatement">end</span>
+    <span class="synPreProc">end</span>
+  <span class="synPreProc">end</span>
+<span class="synPreProc">end</span>
+</pre>
+
+
+<h3><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%F3%A5%C0%A5%EA%A5%F3%A5%B0">レンダリング</a>メソッドをオーバーライド</h3>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%F3%A5%C0%A5%EA%A5%F3%A5%B0">レンダリング</a>をカスタマイズするために、以下のprotected controllerメソッドを実装します、successメソッドでは<code>@resource</code>オブジェクトが利用可能です。</p>
+
+<h4>Registrations Controller</h4>
+
+<ul>
+<li><code>render_create_error_missing_confirm_success_url</code></li>
+<li><code>render_create_error_redirect_url_not_allowed</code></li>
+<li><code>render_create_success</code></li>
+<li><code>render_create_error</code></li>
+<li><code>render_create_error_email_already_exists</code></li>
+<li><code>render_update_success</code></li>
+<li><code>render_update_error</code></li>
+<li><code>render_update_error_user_not_found</code></li>
+</ul>
+
+
+<h4>Sessions Controller</h4>
+
+<ul>
+<li><code>render_new_error</code></li>
+<li><code>render_create_success</code></li>
+<li><code>render_create_error_not_confirmed</code></li>
+<li><code>render_create_error_bad_credentials</code></li>
+<li><code>render_destroy_success</code></li>
+<li><code>render_destroy_error</code></li>
+</ul>
+
+
+<h4>Passwords Controller</h4>
+
+<ul>
+<li><code>render_create_error_missing_email</code></li>
+<li><code>render_create_error_missing_redirect_url</code></li>
+<li><code>render_create_error_not_allowed_redirect_url</code></li>
+<li><code>render_create_success</code></li>
+<li><code>render_create_error</code></li>
+<li><code>render_update_error_unauthorized</code></li>
+<li><code>render_update_error_password_not_required</code></li>
+<li><code>render_update_error_missing_password</code></li>
+<li><code>render_update_success</code></li>
+<li><code>render_update_error</code></li>
+</ul>
+
+
+<h4>Token Validations Controller</h4>
+
+<ul>
+<li><code>render_validate_token_success</code></li>
+<li><code>render_validate_token_error</code></li>
+</ul>
+
+
+<p><strong>例：デフォルト設定のコントローラーオプション</strong></p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink="">mount_devise_token_auth_for <span class="synSpecial">'</span><span class="synConstant">User</span><span class="synSpecial">'</span>, <span class="synConstant">at</span>: <span class="synSpecial">'</span><span class="synConstant">auth</span><span class="synSpecial">'</span>, <span class="synConstant">controllers</span>: {
+  <span class="synConstant">confirmations</span>:      <span class="synSpecial">'</span><span class="synConstant">devise_token_auth/confirmations</span><span class="synSpecial">'</span>,
+  <span class="synConstant">passwords</span>:          <span class="synSpecial">'</span><span class="synConstant">devise_token_auth/passwords</span><span class="synSpecial">'</span>,
+  <span class="synConstant">omniauth_callbacks</span>: <span class="synSpecial">'</span><span class="synConstant">devise_token_auth/omniauth_callbacks</span><span class="synSpecial">'</span>,
+  <span class="synConstant">registrations</span>:      <span class="synSpecial">'</span><span class="synConstant">devise_token_auth/registrations</span><span class="synSpecial">'</span>,
+  <span class="synConstant">sessions</span>:           <span class="synSpecial">'</span><span class="synConstant">devise_token_auth/sessions</span><span class="synSpecial">'</span>,
+  <span class="synConstant">token_validations</span>:  <span class="synSpecial">'</span><span class="synConstant">devise_token_auth/token_validations</span><span class="synSpecial">'</span>
+}
+</pre>
+
+
+<p><strong>注意：</strong>コントローラーオーバーライドは置き換えられると予想されるコントローラーアクションを実装するべきです</p>
+
+<h3>ブロックをコントローラーへ渡す</h3>
+
+<p>動作を完全に再実装することなく、既存のコントローラに動作を追加したいだけかもしれません。この場合、<code>DeviseTokenAuth</code>のコントローラーのいずれかを継承する新しいコントローラーを作成し、ブロックを<code>super</code>に渡すことで振る舞いを追加するメソッドをオーバーライドします。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synPreProc">class</span> <span class="synType">Custom</span>::<span class="synType">RegistrationsController</span> &lt; <span class="synType">DeviseTokenAuth</span>::<span class="synType">RegistrationsController</span>
+
+  <span class="synPreProc">def</span> <span class="synIdentifier">create</span>
+    <span class="synStatement">super</span> <span class="synStatement">do</span> |<span class="synIdentifier">resource</span>|
+      resource.do_something(extra)
+    <span class="synStatement">end</span>
+  <span class="synPreProc">end</span>
+
+<span class="synPreProc">end</span>
+</pre>
+
+
+<p>ブロックはコントローラーが正常なレスポンスを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%F3%A5%C0%A5%EA%A5%F3%A5%B0">レンダリング</a>する前に実行されます。</p>
+
+<h3>Emailテンプレートをオーバーライド</h3>
+
+<p>サインアップとパスワードリセットの確認メールのデフォルトメールテンプレートをオーバーライドしたいかもしれません。次のコマンドを実行して、メールテンプレートをアプリにコピーします。</p>
+
+<pre class="code" data-lang="" data-unlink="">rails generate devise_token_auth:install_views</pre>
+
+
+<p>これは2つの新しいファイルを作成します</p>
+
+<ul>
+<li><code>app/views/devise/mailer/reset_password_instructions.html.erb</code></li>
+<li><code>app/views/devise/mailer/confirmation_instructions.html.erb</code></li>
+</ul>
+
+
+<p>これらのファイルはアプリにあった編集をしても大丈夫です。<a href="https://devise-token-auth.gitbook.io/devise-token-auth/config/devise">この</a>ようにメールの件名をカスタマイズすることもできます。</p>
+
+<p><strong>注意：</strong>これらのテンプレートを修正する場合、むやみに<code>link_to</code>ブロックを変更しないでください</p>
+
+<h2>テスト</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>をテストする際にリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを承認するには、リク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トに4つのヘッダを渡す必要があります。これらのヘッダに適切な値を取得する最も簡単な方法は、<code>resource.create_new_auth_token</code>を使用することです。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink="">  request.headers.merge! resource.create_new_auth_token
+  get <span class="synSpecial">'</span><span class="synConstant">/api/authenticated_resource</span><span class="synSpecial">'</span>
+  <span class="synComment"># success</span>
+</pre>
+
+
+<p>問題や疑問がある場合は＃75をチェックしてください。</p>
+
+<h3><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rspec">Rspec</a>でテスト</h3>
+
+<h4>一般的なリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>ト仕様</h4>
+
+<p>以下は、テストの一般的な例です</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># I've called it authentication_test_spec.rb and placed it in the spec/requests folder</span>
+<span class="synPreProc">require</span> <span class="synSpecial">'</span><span class="synConstant">rails_helper</span><span class="synSpecial">'</span>
+<span class="synPreProc">include</span> <span class="synType">ActionController</span>::<span class="synType">RespondWith</span>
+
+<span class="synComment"># The authentication header looks something like this:</span>
+<span class="synComment"># {"access-token"=&gt;"abcd1dMVlvW2BT67xIAS_A", "token-type"=&gt;"Bearer", "client"=&gt;"LSJEVZ7Pq6DX5LXvOWMq1w", "expiry"=&gt;"1519086891", "uid"=&gt;"darnell@konopelski.info"}</span>
+
+describe <span class="synSpecial">'</span><span class="synConstant">Whether access is ocurring properly</span><span class="synSpecial">'</span>, <span class="synConstant">type</span>: <span class="synConstant">:request</span> <span class="synStatement">do</span>
+  before(<span class="synConstant">:each</span>) <span class="synStatement">do</span>
+    <span class="synIdentifier">@current_user</span> = <span class="synType">FactoryBot</span>.create(<span class="synConstant">:user</span>)
+    <span class="synIdentifier">@client</span> = <span class="synType">FactoryBot</span>.create <span class="synConstant">:client</span>
+  <span class="synStatement">end</span>
+
+  context <span class="synSpecial">'</span><span class="synConstant">context: general authentication via API, </span><span class="synSpecial">'</span> <span class="synStatement">do</span>
+    it <span class="synSpecial">"</span><span class="synConstant">doesn't give you anything if you don't log in</span><span class="synSpecial">"</span> <span class="synStatement">do</span>
+      get api_client_path(<span class="synIdentifier">@client</span>)
+      expect(response.status).to eq(<span class="synConstant">401</span>)
+    <span class="synStatement">end</span>
+
+    it <span class="synSpecial">'</span><span class="synConstant">gives you an authentication code if you are an existing user and you satisfy the password</span><span class="synSpecial">'</span> <span class="synStatement">do</span>
+      login
+      <span class="synComment"># puts "#{response.headers.inspect}"</span>
+      <span class="synComment"># puts "#{response.body.inspect}"</span>
+      expect(response.has_header?(<span class="synSpecial">'</span><span class="synConstant">access-token</span><span class="synSpecial">'</span>)).to eq(<span class="synConstant">true</span>)
+    <span class="synStatement">end</span>
+
+    it <span class="synSpecial">'</span><span class="synConstant">gives you a status 200 on signing in </span><span class="synSpecial">'</span> <span class="synStatement">do</span>
+      login
+      expect(response.status).to eq(<span class="synConstant">200</span>)
+    <span class="synStatement">end</span>
+
+    it <span class="synSpecial">'</span><span class="synConstant">gives you an authentication code if you are an existing user and you satisfy the password</span><span class="synSpecial">'</span> <span class="synStatement">do</span>
+      login
+      expect(response.has_header?(<span class="synSpecial">'</span><span class="synConstant">access-token</span><span class="synSpecial">'</span>)).to eq(<span class="synConstant">true</span>)
+    <span class="synStatement">end</span>
+
+    it <span class="synSpecial">'</span><span class="synConstant">first get a token, then access a restricted page</span><span class="synSpecial">'</span> <span class="synStatement">do</span>
+      login
+      auth_params = get_auth_params_from_login_response_headers(response)
+      new_client = <span class="synType">FactoryBot</span>.create(<span class="synConstant">:client</span>)
+      get api_find_client_by_name_path(new_client.name), <span class="synConstant">headers</span>: auth_params
+      expect(response).to have_http_status(<span class="synConstant">:success</span>)
+    <span class="synStatement">end</span>
+
+    it <span class="synSpecial">'</span><span class="synConstant">deny access to a restricted page with an incorrect token</span><span class="synSpecial">'</span> <span class="synStatement">do</span>
+      login
+      auth_params = get_auth_params_from_login_response_headers(response).tap <span class="synStatement">do</span> |<span class="synIdentifier">h</span>|
+        h.each <span class="synStatement">do</span> |<span class="synIdentifier">k</span>, <span class="synIdentifier">_v</span>|
+          <span class="synStatement">if</span> k == <span class="synSpecial">'</span><span class="synConstant">access-token</span><span class="synSpecial">'</span>
+            h[k] = <span class="synSpecial">'</span><span class="synConstant">123</span><span class="synSpecial">'</span>
+          <span class="synStatement">end</span> <span class="synStatement">end</span>
+      <span class="synStatement">end</span>
+      new_client = <span class="synType">FactoryBot</span>.create(<span class="synConstant">:client</span>)
+      get api_find_client_by_name_path(new_client.name), <span class="synConstant">headers</span>: auth_params
+      expect(response).not_to have_http_status(<span class="synConstant">:success</span>)
+    <span class="synStatement">end</span>
+  <span class="synStatement">end</span>
+
+  <span class="synType">RSpec</span>.shared_examples <span class="synSpecial">'</span><span class="synConstant">use authentication tokens of different ages</span><span class="synSpecial">'</span> <span class="synStatement">do</span> |<span class="synIdentifier">token_age</span>, <span class="synIdentifier">http_status</span>|
+    let(<span class="synConstant">:vary_authentication_age</span>) { token_age }
+
+    it <span class="synSpecial">'</span><span class="synConstant">uses the given parameter</span><span class="synSpecial">'</span> <span class="synStatement">do</span>
+      expect(vary_authentication_age(token_age)).to have_http_status(http_status)
+    <span class="synStatement">end</span>
+
+    <span class="synPreProc">def</span> <span class="synIdentifier">vary_authentication_age</span>(token_age)
+      login
+      auth_params = get_auth_params_from_login_response_headers(response)
+      new_client = <span class="synType">FactoryBot</span>.create(<span class="synConstant">:client</span>)
+      get api_find_client_by_name_path(new_client.name), <span class="synConstant">headers</span>: auth_params
+      expect(response).to have_http_status(<span class="synConstant">:success</span>)
+
+      allow(<span class="synType">Time</span>).to receive(<span class="synConstant">:now</span>).and_return(<span class="synType">Time</span>.now + token_age)
+
+      get api_find_client_by_name_path(new_client.name), <span class="synConstant">headers</span>: auth_params
+      response
+    <span class="synPreProc">end</span>
+  <span class="synStatement">end</span>
+
+  context <span class="synSpecial">'</span><span class="synConstant">test access tokens of varying ages</span><span class="synSpecial">'</span> <span class="synStatement">do</span>
+    include_examples <span class="synSpecial">'</span><span class="synConstant">use authentication tokens of different ages</span><span class="synSpecial">'</span>, <span class="synConstant">2</span>.days, <span class="synConstant">:success</span>
+    include_examples <span class="synSpecial">'</span><span class="synConstant">use authentication tokens of different ages</span><span class="synSpecial">'</span>, <span class="synConstant">5</span>.years, <span class="synConstant">:unauthorized</span>
+  <span class="synStatement">end</span>
+
+  <span class="synPreProc">def</span> <span class="synIdentifier">login</span>
+    post api_user_session_path, <span class="synConstant">params</span>:  { <span class="synConstant">email</span>: <span class="synIdentifier">@current_user</span>.email, <span class="synConstant">password</span>: <span class="synSpecial">'</span><span class="synConstant">password</span><span class="synSpecial">'</span> }.to_json, <span class="synConstant">headers</span>: { <span class="synSpecial">'</span><span class="synConstant">CONTENT_TYPE</span><span class="synSpecial">'</span> =&gt; <span class="synSpecial">'</span><span class="synConstant">application/json</span><span class="synSpecial">'</span>, <span class="synSpecial">'</span><span class="synConstant">ACCEPT</span><span class="synSpecial">'</span> =&gt; <span class="synSpecial">'</span><span class="synConstant">application/json</span><span class="synSpecial">'</span> }
+  <span class="synPreProc">end</span>
+
+  <span class="synPreProc">def</span> <span class="synIdentifier">get_auth_params_from_login_response_headers</span>(response)
+    client = response.headers[<span class="synSpecial">'</span><span class="synConstant">client</span><span class="synSpecial">'</span>]
+    token = response.headers[<span class="synSpecial">'</span><span class="synConstant">access-token</span><span class="synSpecial">'</span>]
+    expiry = response.headers[<span class="synSpecial">'</span><span class="synConstant">expiry</span><span class="synSpecial">'</span>]
+    token_type = response.headers[<span class="synSpecial">'</span><span class="synConstant">token-type</span><span class="synSpecial">'</span>]
+    uid = response.headers[<span class="synSpecial">'</span><span class="synConstant">uid</span><span class="synSpecial">'</span>]
+
+    auth_params = {
+      <span class="synSpecial">'</span><span class="synConstant">access-token</span><span class="synSpecial">'</span> =&gt; token,
+      <span class="synSpecial">'</span><span class="synConstant">client</span><span class="synSpecial">'</span> =&gt; client,
+      <span class="synSpecial">'</span><span class="synConstant">uid</span><span class="synSpecial">'</span> =&gt; uid,
+      <span class="synSpecial">'</span><span class="synConstant">expiry</span><span class="synSpecial">'</span> =&gt; expiry,
+      <span class="synSpecial">'</span><span class="synConstant">token_type</span><span class="synSpecial">'</span> =&gt; token_type
+    }
+    auth_params
+  <span class="synPreProc">end</span>
+<span class="synStatement">end</span>
+</pre>
+
+
+<h4>初めから承認ヘッダーを作成する方法</h4>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synPreProc">require</span> <span class="synSpecial">'</span><span class="synConstant">rails_helper</span><span class="synSpecial">'</span>
+<span class="synPreProc">include</span> <span class="synType">ActionController</span>::<span class="synType">RespondWith</span>
+
+<span class="synPreProc">def</span> <span class="synIdentifier">create_auth_header_from_scratch</span>
+  <span class="synComment"># You need to set up factory bot to use this method</span>
+  <span class="synIdentifier">@current_user</span> = <span class="synType">FactoryBot</span>.create(<span class="synConstant">:user</span>)
+  <span class="synComment"># create client id and token</span>
+  client_id = <span class="synType">SecureRandom</span>.urlsafe_base64(<span class="synConstant">nil</span>, <span class="synConstant">false</span>)
+  token     = <span class="synType">SecureRandom</span>.urlsafe_base64(<span class="synConstant">nil</span>, <span class="synConstant">false</span>)
+
+  <span class="synComment"># store client + token in user's token hash</span>
+  <span class="synIdentifier">@current_user</span>.tokens[client_id] = {
+    <span class="synConstant">token</span>: <span class="synType">BCrypt</span>::<span class="synType">Password</span>.create(token),
+    <span class="synConstant">expiry</span>: (<span class="synType">Time</span>.now + <span class="synConstant">1</span>.day).to_i
+  }
+
+  <span class="synComment"># Now we have to pretend like an API user has already logged in.</span>
+  <span class="synComment"># (When the user actually logs in, the server will send the user</span>
+  <span class="synComment"># - assuming that the user has  correctly and successfully logged in</span>
+  <span class="synComment"># - four auth headers. We are to then use these headers to access</span>
+  <span class="synComment"># things which are typically restricted</span>
+  <span class="synComment"># The following assumes that the user has received those headers</span>
+  <span class="synComment"># and that they are then using those headers to make a request</span>
+
+  new_auth_header = <span class="synIdentifier">@current_user</span>.build_auth_header(token, client_id)
+
+  puts <span class="synSpecial">'</span><span class="synConstant">This is the new auth header</span><span class="synSpecial">'</span>
+  puts new_auth_header.to_s
+
+  <span class="synComment"># update response with the header that will be required by the next request</span>
+  puts response.headers.merge!(new_auth_header).to_s
+<span class="synPreProc">end</span>
+</pre>
+
+
+<h4>リク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トspecの追加例</h4>
+
+<ul>
+<li><a href="https://gist.github.com/blaze182/3a59a6af8c6a7aaff7bf5f8078a5f2b6">https://gist.github.com/blaze182/3a59a6af8c6a7aaff7bf5f8078a5f2b6</a></li>
+<li><a href="https://gist.github.com/niinyarko/f146f24a50125d55396f63043a2696e7">https://gist.github.com/niinyarko/f146f24a50125d55396f63043a2696e7</a></li>
+</ul>
+
+
+<h1>FAQ</h1>
+
+<h2>このgemを標準のdeviseと一緒に使えますか？</h2>
+
+<p>はい！しかし、標準のDeviseと別々のルーティングのサポートを有効にする必要があります。だから、このようになります：</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># config/initializers/devise_token_auth.rb</span>
+<span class="synType">DeviseTokenAuth</span>.setup <span class="synStatement">do</span> |<span class="synIdentifier">config</span>|
+  config.enable_standard_devise_support = <span class="synConstant">true</span>
+<span class="synStatement">end</span>
+</pre>
+
+
+
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># config/routes.rb</span>
+<span class="synType">Rails</span>.application.routes.draw <span class="synStatement">do</span>
+
+  <span class="synComment"># standard devise routes available at /users</span>
+  <span class="synComment"># </span><span class="synTodo">NOTE</span><span class="synComment">: make sure this comes first!!!</span>
+  devise_for <span class="synConstant">:users</span>
+
+  <span class="synComment"># token auth routes available at /api/v1/auth</span>
+  namespace <span class="synConstant">:api</span> <span class="synStatement">do</span>
+    scope <span class="synConstant">:v1</span> <span class="synStatement">do</span>
+      mount_devise_token_auth_for <span class="synSpecial">'</span><span class="synConstant">User</span><span class="synSpecial">'</span>, <span class="synConstant">at</span>: <span class="synSpecial">'</span><span class="synConstant">auth</span><span class="synSpecial">'</span>
+    <span class="synStatement">end</span>
+  <span class="synStatement">end</span>
+
+<span class="synStatement">end</span>
+</pre>
+
+
+<h2>2018年5月にアップデートされたdeviseと一緒に使う別の方法</h2>
+
+<p>何人かのユーザーが<code>config.enable_standard_devise_support = true</code>とすることでdeviseと一緒に利用する際に問題が発生しています。</p>
+
+<p><a href="https://github.com/jotolo">jotolo</a>が示唆するもう1つの方法は、DeviseTokenAuthまたは標準のDeviseを使用する別々の子の<code>application_controller.rb</code>ファイルを作成することです。これらのファイルはすべて、基本の<code>application_controller.rb</code>ファイルを継承します。</p>
+
+<p>例えば、アプリケーションの<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>（Devise Token Authを使用する）の<code>api/v1/application_controller.rb</code>ファイルと、アプリケーションの完全なスタック部分の<code>admin/application_controller.rb</code>ファイル（標準のDevise ）を作ります。アプリケーションの各フローを適切な子の<code>application_controller.rb</code>ファイルにリダイレクトすること</p>
+
+<p>DeviseTokenAuthを使う<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>の子アプリケーションコントローラー</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># controllers/api/v1/application_controller.rb</span>
+<span class="synPreProc">module</span> <span class="synType">Api</span>
+  <span class="synPreProc">module</span> <span class="synType">V1</span>
+    <span class="synPreProc">class</span> <span class="synType">ApplicationController</span> &lt; ::<span class="synType">ApplicationController</span>
+      skip_before_action <span class="synConstant">:verify_authenticity_token</span>
+      <span class="synPreProc">include</span> <span class="synType">DeviseTokenAuth</span>::<span class="synType">Concerns</span>::<span class="synType">SetUserByToken</span>
+    <span class="synPreProc">end</span>
+  <span class="synPreProc">end</span>
+<span class="synPreProc">end</span>
+</pre>
+
+
+<p>標準のdeviseを使う<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EB%A5%B9%A5%BF">フルスタ</a>ック部分の子アプリケーションコントローラー</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># controllers/admin/application_controller.rb</span>
+<span class="synPreProc">module</span> <span class="synType">Admin</span>
+  <span class="synPreProc">class</span> <span class="synType">ApplicationController</span> &lt; ::<span class="synType">ApplicationController</span>
+    before_action <span class="synConstant">:authenticate_admin!</span>
+  <span class="synPreProc">end</span>
+<span class="synPreProc">end</span>
+</pre>
+
+
+<p>ベースとなるアプリケーションコントローラーです。<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSRF">CSRF</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ン保護を使用している場合は、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>固有のアプリケーションコントローラ（<code>api/v1/application_controller.rb</code>）でスキップできます。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># controllers/application_controller.rb</span>
+<span class="synPreProc">class</span> <span class="synType">ApplicationController</span> &lt; <span class="synType">ActionController</span>::<span class="synType">Base</span>
+  protect_from_forgery <span class="synConstant">with</span>: <span class="synConstant">:exception</span>
+<span class="synPreProc">end</span>
+</pre>
+
+
+<p><code>enable_standard_devise_support</code>設定<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%E1%A5%F3%A5%C8%A5%A2%A5%A6%A5%C8">コメントアウト</a>は<code>false</code>のままにしておきます。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink=""><span class="synComment"># config/initializers/devise_token_auth.rb</span>
+
+<span class="synComment"># config.enable_standard_devise_support = false</span>
+</pre>
+
+
+<h2>すでにユーザーが存在していて、どのように新しいフィールドを追加できますか？</h2>
+
+<ol>
+<li>まず、<code>rails g devise_token_auth:install [USER_CLASS] [MOUNT_PATH]</code>コマンドで生成される<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>ファイルを削除します。それから</li>
+<li>別の新しい<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>ファイルを作成します</li>
+</ol>
+
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink="">  <span class="synComment"># create migration by running a command like this (where `User` is your USER_CLASS table):</span>
+  <span class="synComment"># `rails g migration AddTokensToUsers provider:string uid:string tokens:text`</span>
+
+  <span class="synPreProc">def</span> <span class="synIdentifier">up</span>
+    add_column <span class="synConstant">:users</span>, <span class="synConstant">:provider</span>, <span class="synConstant">:string</span>, <span class="synConstant">null</span>: <span class="synConstant">false</span>, <span class="synConstant">default</span>: <span class="synSpecial">'</span><span class="synConstant">email</span><span class="synSpecial">'</span>
+    add_column <span class="synConstant">:users</span>, <span class="synConstant">:uid</span>, <span class="synConstant">:string</span>, <span class="synConstant">null</span>: <span class="synConstant">false</span>, <span class="synConstant">default</span>: <span class="synSpecial">''</span>
+    add_column <span class="synConstant">:users</span>, <span class="synConstant">:tokens</span>, <span class="synConstant">:text</span>
+
+    <span class="synComment"># if your existing User model does not have an existing **encrypted_password** column uncomment below line.</span>
+    <span class="synComment"># add_column :users, :encrypted_password, :null =&gt; false, :default =&gt; ""</span>
+
+    <span class="synComment"># the following will update your models so that when you run your migration</span>
+
+    <span class="synComment"># updates the user table immediately with the above defaults</span>
+    <span class="synType">User</span>.reset_column_information
+
+    <span class="synComment"># finds all existing users and updates them.</span>
+    <span class="synComment"># if you change the default values above you'll also have to change them here below:</span>
+    <span class="synType">User</span>.find_each <span class="synStatement">do</span> |<span class="synIdentifier">user</span>|
+      user.uid = user.email
+      user.provider = <span class="synSpecial">'</span><span class="synConstant">email</span><span class="synSpecial">'</span>
+      user.save!
+    <span class="synStatement">end</span>
+
+    <span class="synComment"># to speed up lookups to these columns:</span>
+    add_index <span class="synConstant">:users</span>, [<span class="synConstant">:uid</span>, <span class="synConstant">:provider</span>], <span class="synConstant">unique</span>: <span class="synConstant">true</span>
+  <span class="synPreProc">end</span>
+
+  <span class="synPreProc">def</span> <span class="synIdentifier">down</span>
+    <span class="synComment"># if you added **encrypted_password** above, add here to successfully rollback</span>
+    remove_columns <span class="synConstant">:users</span>, <span class="synConstant">:provider</span>, <span class="synConstant">:uid</span>, <span class="synConstant">:tokens</span>
+  <span class="synPreProc">end</span>
+</pre>
+
+
+<h1>概念図</h1>
+
+<p>このgemを使用するには以下の情報は必要ありませんが、好奇心が強い場合はこの情報をお読みください。</p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ン管理について</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>へのリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トごとに無効にする必要があります。次の図は、この概念を示しています：</p>
+
+<p><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/token-update-detail.jpg" alt="token-update-detail.jpg (42.9 kB)"></p>
+
+<p>各リク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トの間に、新しい<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンが生成されます。次のリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トで使用されるべき<code>access-token</code>ヘッダが前のリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トに対するレスポンスの<code>access-token</code>ヘッダに戻されます。ダイアグラム内の最後の要求は、以前のリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トによって無効化された<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンを使用しようとするため、失敗します。</p>
+
+<p>期限切れの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンが許可される唯一のケースは、<a href="https://devise-token-auth.gitbook.io/devise-token-auth/conceptual#about-batch-requests">batch requests</a>中のみです。</p>
+
+<p>これらの措置は、このgemを使用するときにデフォルトで採用されます。</p>
+
+<h2>batch requestsについて</h2>
+
+<p>デフォルトでは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>は要求ごとに認証<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンを更新する必要があります（詳細は<a href="https://devise-token-auth.gitbook.io/devise-token-auth/conceptual#about-token-management">こちら</a>を参照）。ただし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>に複数の同時リク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを行う必要がある場合があります。</p>
+
+<h3>Batch request例</h3>
+
+<pre class="code lang-javascript" data-lang="javascript" data-unlink="">$scope.getResourceData = <span class="synIdentifier">function</span>() <span class="synIdentifier">{</span>
+
+  $http.get(<span class="synConstant">'/api/restricted_resource_1'</span>).success(<span class="synIdentifier">function</span>(resp) <span class="synIdentifier">{</span>
+    <span class="synComment">// handle response</span>
+    $scope.resource1 = resp.data;
+  <span class="synIdentifier">}</span>);
+
+  $http.get(<span class="synConstant">'/api/restricted_resource_2'</span>).success(<span class="synIdentifier">function</span>(resp) <span class="synIdentifier">{</span>
+    <span class="synComment">// handle response</span>
+    $scope.resource2 = resp.data;
+  <span class="synIdentifier">}</span>);
+<span class="synIdentifier">}</span>;
+</pre>
+
+
+<p>この場合、最初のレスポンスが完了する前に2番目のリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トが開始されるため、2番目のリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トの<code>access-token</code>ヘッダーを最初のリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トの<code>access-token</code>ヘッダーで更新することは不可能です。サーバーは、これらの並行リク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トのバッチが同じ認証<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンを共有できるようにする必要があります。この図は、batch requestsがサーバーによってどのように識別されるかを示しています。</p>
+
+<p><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/batch-request-overview.jpg" alt="batch-request-overview.jpg (55.7 kB)"></p>
+
+<p>ダイアグラムの "5秒"バッファは、このgemで使用されるデフォルトです。</p>
+
+<p>次の図は、batch requestsを処理する際に使用されるクライアント、サーバー、およびアクセス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンの関係を示しています。</p>
+
+<p><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/batch-request-detail.jpg" alt="batch-request-detail.jpg (33.6 kB)"></p>
+
+<p>サーバーがリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トがbatch requestsの一部であると識別した場合、ユーザーの認証<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンは更新されません。認証<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンは更新され、バッチ内の最初のリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トと共に返され、バッチ内の後続のリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンを返しません。これは、応答の順序がクライアントに保証されないため、最後の有効な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンが返された後にクライアントが古い<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンを受け取らないようにする必要があるためです。</p>
+
+<p>このgemはバッチリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを自動的に管理します。<code>config/initializers/devise_token_auth.rb</code>の<code>batch_request_buffer_throttle</code>パラメータを使用して、バッチリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トとみなされる時間バッファを変更することができます。</p>
+
+<hr>
+
+<p>長かった！w</p>
+
+    
+
+  
+</div>
+
+    
+  <footer class="entry-footer">
+    
+    <p class="entry-footer-section">
+  <span class="author vcard"><span class="fn" data-load-nickname="1" data-user-name="sainu"><span class="user-name-nickname">さいぬ</span> <span class="user-name-paren">(</span><span class="user-name-hatena-id">id:sainu</span><span class="user-name-paren">)</span></span></span>
+  <span class="entry-footer-time"><a href="http://sainu.hatenablog.jp/entry/2018/08/11/194319"><time data-relative="" datetime="2018-08-11T10:43:19Z" title="2018-08-11T10:43:19Z" pubdate="" class="updated">1年前</time></a></span>
+</p>
+
+    
+  <div class="hatena-star-container">
+  <span class="hatena-star-comment-container"><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/comment.gif" tabindex="0" alt="Comments" title="Comments" class="hatena-star-comment-button" style="cursor: pointer; margin: 0px; padding: 0px; border: none; vertical-align: middle; display: none;"></span><span class="hatena-star-star-container"><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/hatena-star-add-button.svg" tabindex="0" alt="Add Star" title="Add Star" class="hatena-star-add-button" style="cursor: pointer; margin: 0px 3px; padding: 0px; border: none; vertical-align: middle;"><a href="http://blog.hatena.ne.jp/hirorock/"><span class="hatena-big-star-star-container"><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/profile.png" tabindex="0" class="hatena-star-user" style="padding: 0px; border: none;"><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/star-green.gif" tabindex="0" class="hatena-star-star" style="padding: 0px; border: none;" alt="hirorock (green)" title=""></span></a><a href="http://blog.hatena.ne.jp/musicjankie/"><span class="hatena-big-star-star-container"><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/profile(1).png" tabindex="0" class="hatena-star-user" style="padding: 0px; border: none;"><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/star.gif" tabindex="0" class="hatena-star-star" style="padding: 0px; border: none;" alt="musicjankie" title=""></span></a><span class="hatena-star-inner-count" tabindex="0" style="font-weight: bold; font-size: 80%; font-family: arial, sans-serif; margin: 0px 2px; color: rgb(244, 177, 40); cursor: pointer;">14</span><a href="http://blog.hatena.ne.jp/leokun0210/"><span class="hatena-big-star-star-container"><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/profile(2).png" tabindex="0" class="hatena-star-user" style="padding: 0px; border: none;"><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/star.gif" tabindex="0" class="hatena-star-star" style="padding: 0px; border: none;" alt="leokun0210" title=""></span></a></span></div>
+  <div class="hatena-star-metadata" style="display: none">
+    <a class="hatena-star-permalink" href="http://sainu.hatenablog.jp/entry/2018/08/11/194319">【翻訳】devise-auth-token公式ドキュメント</a>
+  </div>
+
+
+    
+<div class="social-buttons">
+  
+  
+    <div class="social-button-item">
+      <iframe class="hatena-bookmark-button-frame" title="この記事をはてなブックマークに追加" frameborder="0" scrolling="no" width="84" height="40" src="javascript:false" style="width: 84px; height: 40px;" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/saved_resource(2).html"></iframe>
+    </div>
+  
+  
+    <div class="social-button-item">
+      <div class="fb-share-button fb_iframe_widget" data-layout="box_count" data-href="http://sainu.hatenablog.jp/entry/2018/08/11/194319" fb-xfbml-state="rendered" fb-iframe-plugin-query="app_id=719729204785177&amp;container_width=0&amp;href=http%3A%2F%2Fsainu.hatenablog.jp%2Fentry%2F2018%2F08%2F11%2F194319&amp;layout=box_count&amp;locale=ja_JP&amp;sdk=joey"><span style="vertical-align: bottom; width: 61px; height: 40px;"><iframe name="f195199c256be4" width="1000px" height="1000px" title="fb:share_button Facebook Social Plugin" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" allow="encrypted-media" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/share_button.html" style="border: none; visibility: visible; width: 61px; height: 40px;" class=""></iframe></span></div>
+    </div>
+  
+  
+    <div class="social-button-item">
+      <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" class="twitter-share-button twitter-share-button-rendered twitter-tweet-button" style="position: static; visibility: visible; width: 75px; height: 20px;" title="Twitter Tweet Button" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/tweet_button.097c1f5038f9e8a0d62a39a892838d66.ja.html" data-url="http://sainu.hatenablog.jp/entry/2018/08/11/194319"></iframe>
+    </div>
+  
+  
+  
+  
+</div>
+
+    
+  
+  
+    
+    <div class="google-afc-image test-google-rectangle-ads">      
+      
+      <div id="google_afc_user_container_0" class="google-afc-user-container google_afc_blocklink2_5 google_afc_boder" data-test-unit="/4374287/blog_user" data-google-query-id="CJaI9tPRwuQCFYVpvQodh_8HDg"><div id="google_ads_iframe_/4374287/blog_user_0__container__" style="border: 0pt none;"><iframe id="google_ads_iframe_/4374287/blog_user_0" title="3rd party ad content" name="google_ads_iframe_/4374287/blog_user_0" width="336" height="280" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" data-google-container-id="1" style="border: 0px; vertical-align: bottom;" data-load-complete="true" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/saved_resource(3).html"></iframe></div></div>
+      
+        <a href="http://blog.hatena.ne.jp/guide/pro" class="open-pro-modal" data-guide-pro-modal-ad-url="https://hatenablog.com/guide/pro/modal/ad">広告を非表示にする</a>
+      
+    </div>
+  
+  
+
+
+    <div class="customized-footer">
+      
+
+        
+
+        
+
+          <div class="entry-footer-modules" id="entry-footer-secondary-modules">      
+<div class="hatena-module hatena-module-related-entries">
+      
+  <!-- Hatena-Epic-has-related-entries-with-elasticsearch:true -->
+  <div class="hatena-module-title">
+    関連記事
+  </div>
+  <div class="hatena-module-body">
+    <ul class="related-entries hatena-urllist urllist-with-thumbnails">
+  
+  
+    
+    <li class="urllist-item related-entries-item">
+      <div class="urllist-item-inner related-entries-item-inner">
+        
+                      <div class="urllist-date-link related-entries-date-link">
+  <a href="http://sainu.hatenablog.jp/archive/2016/06/23" rel="nofollow">
+    <time pubdate="" datetime="2016-06-23T01:07:20Z" title="2016-06-23T01:07:20Z">
+      2016-06-23
+    </time>
+  </a>
+</div>
+
+          <a href="http://sainu.hatenablog.jp/entry/2016/06/23/100720" class="urllist-title-link related-entries-title-link  urllist-title related-entries-title">rmagickのインストールでchecking for gmake... noとchecking f…</a>
+
+
+          
+          
+
+                      <div class="urllist-entry-body related-entries-entry-body">OS X 10.11.5 Ruby 2.3.1 エラー内容 これまでrmagickをインス…</div>
+      </div>
+    </li>
+  
+    
+    <li class="urllist-item related-entries-item">
+      <div class="urllist-item-inner related-entries-item-inner">
+        
+                      <div class="urllist-date-link related-entries-date-link">
+  <a href="http://sainu.hatenablog.jp/archive/2016/06/23" rel="nofollow">
+    <time pubdate="" datetime="2016-06-23T00:55:52Z" title="2016-06-23T00:55:52Z">
+      2016-06-23
+    </time>
+  </a>
+</div>
+
+          <a href="http://sainu.hatenablog.jp/entry/2016/06/23/095552" class="urllist-title-link related-entries-title-link  urllist-title related-entries-title">rmagickのインストールでchecking for main() in -licui18n...…</a>
+
+
+          
+          
+
+                      <div class="urllist-entry-body related-entries-entry-body">OS X 10.11.5 Ruby 2.3.1 エラー内容 前回Magick-config... no…</div>
+      </div>
+    </li>
+  
+    
+    <li class="urllist-item related-entries-item">
+      <div class="urllist-item-inner related-entries-item-inner">
+        
+                      <div class="urllist-date-link related-entries-date-link">
+  <a href="http://sainu.hatenablog.jp/archive/2016/06/14" rel="nofollow">
+    <time pubdate="" datetime="2016-06-14T12:51:51Z" title="2016-06-14T12:51:51Z">
+      2016-06-14
+    </time>
+  </a>
+</div>
+
+          <a href="http://sainu.hatenablog.jp/entry/2016/06/14/215151" class="urllist-title-link related-entries-title-link  urllist-title related-entries-title">railsで開発する前にgeneratorの設定をしておこう</a>
+
+
+          
+          
+
+                      <div class="urllist-entry-body related-entries-entry-body">【開発環境】 OSX 10.11.5 Ruby 2.3.1 Rails 4.2.6 MySQL 5.7.1…</div>
+      </div>
+    </li>
+  
+    
+    <li class="urllist-item related-entries-item">
+      <div class="urllist-item-inner related-entries-item-inner">
+        
+                      <a class="urllist-image-link related-entries-image-link" href="http://sainu.hatenablog.jp/entry/2016/06/14/174006">
+  <img alt="【実装編】hubotで自在にカスタマイズできるslackリマインダーを作る" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/https___qiita-image-store.s3.amazonaws.com_0_86426_8ce4a399-40e5-ceed-0376-8c9b8d404867.png" class="urllist-image related-entries-image" title="【実装編】hubotで自在にカスタマイズできるslackリマインダーを作る" width="100">
+</a>
+            <div class="urllist-date-link related-entries-date-link">
+  <a href="http://sainu.hatenablog.jp/archive/2016/06/14" rel="nofollow">
+    <time pubdate="" datetime="2016-06-14T08:40:06Z" title="2016-06-14T08:40:06Z">
+      2016-06-14
+    </time>
+  </a>
+</div>
+
+          <a href="http://sainu.hatenablog.jp/entry/2016/06/14/174006" class="urllist-title-link related-entries-title-link  urllist-title related-entries-title">【実装編】hubotで自在にカスタマイズできるslackリマインダーを作る</a>
+
+
+          
+          
+
+                      <div class="urllist-entry-body related-entries-entry-body">qiitaのadvent calendarに書いた記事です。 まだ、導入編をやっ…</div>
+      </div>
+    </li>
+  
+</ul>
+
+  </div>
+</div>
+  </div>
+        
+
+      
+    </div>
+    
+  <div class="comment-box">
+    
+    <ul class="comment">
+      <li class="read-more-comments" style="display: none;"><a>もっと読む</a></li>
+    </ul>
+    
+      <a class="leave-comment-title" style="display: none;">コメントを書く</a>
+    
+  </div>
+
+  </footer>
+
+  </div>
+</article>
+
+      
+      
+    
+  
+
+  
+  <!-- rakuten_ad_target_end -->
+  <!-- google_ad_section_end -->
+  
+  
+  
+  <div class="pager pager-permalink permalink">
+    
+      
+      <span class="pager-prev">
+        <a href="http://sainu.hatenablog.jp/entry/2018/12/05/125600" rel="prev">
+          <span class="pager-arrow">« </span>
+          Capistrano3でexecuteを使ってシェルを実…
+        </a>
+      </span>
+    
+    
+      
+      <span class="pager-next">
+        <a href="http://sainu.hatenablog.jp/entry/2018/01/02/140228" rel="next">
+           セルの値を使ったCOUNTIF関数の使い方
+          <span class="pager-arrow"> »</span>
+        </a>
+      </span>
+    
+  </div>
+
+
+  
+
+
+
+        </div>
+      </div>
+
+      <aside id="box1">
+  <div id="box1-inner">
+  </div>
+</aside>
+
+    </div><!-- #wrapper -->
+
+    
+<aside id="box2">
+  
+  <div id="box2-inner">
+    
+      
+
+<div class="hatena-module hatena-module-profile">
+  <div class="hatena-module-title">
+    プロフィール
+  </div>
+  <div class="hatena-module-body">
+    
+    <a href="http://sainu.hatenablog.jp/about" class="profile-icon-link">
+      <img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/profile(3).png" alt="id:sainu" class="profile-icon">
+    </a>
+    
+
+    
+    <span class="id">
+      <a href="http://sainu.hatenablog.jp/about" class="hatena-id-link"><span data-load-nickname="1" data-user-name="sainu"><span class="user-name-nickname">さいぬ</span> <span class="user-name-paren">(</span><span class="user-name-hatena-id">id:sainu</span><span class="user-name-paren">)</span></span></a>
+      
+  
+    
+    
+  
+
+
+    </span>
+    
+
+    
+
+    
+
+    
+      <div class="hatena-follow-button-box btn-subscribe js-hatena-follow-button-box">
+
+  <a href="http://sainu.hatenablog.jp/entry/2018/08/11/194319#" class="hatena-follow-button js-hatena-follow-button unsubscribing">
+    <span class="subscribing">
+      <span class="foreground">読者です</span>
+      <span class="background">読者をやめる</span>
+    </span>
+    <span class="unsubscribing" data-track-name="profile-widget-subscribe-button" data-track-once="">
+      <span class="foreground">読者になる</span>
+      <span class="background">読者になる</span>
+    </span>
+  </a>
+  <div class="subscription-count-box js-subscription-count-box" style="display: block;">
+    <i></i>
+    <u></u>
+    <span class="subscription-count js-subscription-count">3</span>
+  </div>
+</div>
+
+    
+
+    
+  </div>
+</div>
+
+    
+      <div class="hatena-module hatena-module-search-box">
+  <div class="hatena-module-title">
+    検索
+  </div>
+  <div class="hatena-module-body">
+    <form class="search-form" role="search" action="http://sainu.hatenablog.jp/search" method="get">
+  <input type="text" name="q" class="search-module-input" value="" placeholder="記事を検索" required="">
+  <input type="submit" value="検索" class="search-module-button">
+</form>
+
+  </div>
+</div>
+
+    
+      <div class="hatena-module hatena-module-links">
+  <div class="hatena-module-title">
+    リンク
+  </div>
+  <div class="hatena-module-body">
+    <ul class="hatena-urllist">
+      
+        <li>
+          <a href="https://hatenablog.com/">はてなブログ</a>
+        </li>
+      
+        <li>
+          <a href="https://hatenablog.com/guide?via=200109">ブログをはじめる</a>
+        </li>
+      
+        <li>
+          <a href="http://blog.hatenablog.com/">週刊はてなブログ</a>
+        </li>
+      
+        <li>
+          <a href="https://hatenablog.com/guide/pro">はてなブログPro</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+    
+      <div class="hatena-module hatena-module-recent-entries ">
+  <div class="hatena-module-title">
+    <a href="http://sainu.hatenablog.jp/archive">
+      最新記事
+    </a>
+  </div>
+  <div class="hatena-module-body">
+    <ul class="recent-entries hatena-urllist ">
+  
+  
+    
+    <li class="urllist-item recent-entries-item">
+      <div class="urllist-item-inner recent-entries-item-inner">
+        
+          
+          <a href="http://sainu.hatenablog.jp/entry/2018/12/05/125600" class="urllist-title-link recent-entries-title-link  urllist-title recent-entries-title">Capistrano3でexecuteを使ってシェルを実行する時に注意したいシンタックス</a>
+
+
+          
+          
+
+                </div>
+    </li>
+  
+    
+    <li class="urllist-item recent-entries-item">
+      <div class="urllist-item-inner recent-entries-item-inner">
+        
+          
+          <a href="http://sainu.hatenablog.jp/entry/2018/08/11/194319" class="urllist-title-link recent-entries-title-link  urllist-title recent-entries-title">【翻訳】devise-auth-token公式ドキュメント</a>
+
+
+          
+          
+
+                </div>
+    </li>
+  
+    
+    <li class="urllist-item recent-entries-item">
+      <div class="urllist-item-inner recent-entries-item-inner">
+        
+          
+          <a href="http://sainu.hatenablog.jp/entry/2018/01/02/140228" class="urllist-title-link recent-entries-title-link  urllist-title recent-entries-title"> セルの値を使ったCOUNTIF関数の使い方</a>
+
+
+          
+          
+
+                </div>
+    </li>
+  
+    
+    <li class="urllist-item recent-entries-item">
+      <div class="urllist-item-inner recent-entries-item-inner">
+        
+          
+          <a href="http://sainu.hatenablog.jp/entry/contenteditable-create-custom-htmltag" class="urllist-title-link recent-entries-title-link  urllist-title recent-entries-title">div[contenteditable=true]で改行時にdivではなくpを生成する</a>
+
+
+          
+          
+
+                </div>
+    </li>
+  
+    
+    <li class="urllist-item recent-entries-item">
+      <div class="urllist-item-inner recent-entries-item-inner">
+        
+          
+          <a href="http://sainu.hatenablog.jp/entry/2016/09/23/121341" class="urllist-title-link recent-entries-title-link  urllist-title recent-entries-title">ハッシュを含む配列に対して特定のキーの合計値の算出でRubyのArray#injectが役に立ったのでメモ</a>
+
+
+          
+          
+
+                </div>
+    </li>
+  
+</ul>
+
+      </div>
+</div>
+
+    
+      
+
+<div class="hatena-module hatena-module-archive" data-archive-type="default" data-archive-url="http://sainu.hatenablog.jp/archive">
+  <div class="hatena-module-title">
+    <a href="http://sainu.hatenablog.jp/archive">月別アーカイブ</a>
+  </div>
+  <div class="hatena-module-body">
+  
+
+  
+    
+    
+      <ul class="hatena-urllist">
+        
+          <li class="archive-module-year" data-year="2018">
+            <div class="archive-module-button">
+              <span class="archive-module-hide-button">▼</span>
+              <span class="archive-module-show-button">▶</span>
+            </div>
+            <a href="http://sainu.hatenablog.jp/archive/2018" class="archive-module-year-title">
+              2018 (3)
+            </a>
+            <ul class="archive-module-months">
+              
+                <li class="archive-module-month">
+                  <a href="http://sainu.hatenablog.jp/archive/2018/12" class="archive-module-month-title">
+                    2018 / 12 (1)
+                  </a>
+                </li>
+              
+                <li class="archive-module-month">
+                  <a href="http://sainu.hatenablog.jp/archive/2018/8" class="archive-module-month-title">
+                    2018 / 8 (1)
+                  </a>
+                </li>
+              
+                <li class="archive-module-month">
+                  <a href="http://sainu.hatenablog.jp/archive/2018/1" class="archive-module-month-title">
+                    2018 / 1 (1)
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          <li class="archive-module-year archive-module-year-hidden" data-year="2017">
+            <div class="archive-module-button">
+              <span class="archive-module-hide-button">▼</span>
+              <span class="archive-module-show-button">▶</span>
+            </div>
+            <a href="http://sainu.hatenablog.jp/archive/2017" class="archive-module-year-title">
+              2017 (1)
+            </a>
+            <ul class="archive-module-months">
+              
+                <li class="archive-module-month">
+                  <a href="http://sainu.hatenablog.jp/archive/2017/12" class="archive-module-month-title">
+                    2017 / 12 (1)
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          <li class="archive-module-year archive-module-year-hidden" data-year="2016">
+            <div class="archive-module-button">
+              <span class="archive-module-hide-button">▼</span>
+              <span class="archive-module-show-button">▶</span>
+            </div>
+            <a href="http://sainu.hatenablog.jp/archive/2016" class="archive-module-year-title">
+              2016 (24)
+            </a>
+            <ul class="archive-module-months">
+              
+                <li class="archive-module-month">
+                  <a href="http://sainu.hatenablog.jp/archive/2016/9" class="archive-module-month-title">
+                    2016 / 9 (1)
+                  </a>
+                </li>
+              
+                <li class="archive-module-month">
+                  <a href="http://sainu.hatenablog.jp/archive/2016/8" class="archive-module-month-title">
+                    2016 / 8 (1)
+                  </a>
+                </li>
+              
+                <li class="archive-module-month">
+                  <a href="http://sainu.hatenablog.jp/archive/2016/7" class="archive-module-month-title">
+                    2016 / 7 (3)
+                  </a>
+                </li>
+              
+                <li class="archive-module-month">
+                  <a href="http://sainu.hatenablog.jp/archive/2016/6" class="archive-module-month-title">
+                    2016 / 6 (19)
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+        
+      </ul>
+    
+  
+
+
+</div>
+</div>
+
+    
+    
+  </div>
+</aside>
+
+
+  </div>
+</div>
+
+
+
+
+        
+
+        
+
+      </div>
+    </div>
+    
+<footer id="footer" data-brand="hatenablog">
+  <div id="footer-inner">
+    
+      <div style="display: block !important;" class="guest-footer js-guide-register test-blogs-register-guide" data-action="guide-register">
+  <div class="guest-footer-content">
+    <h3>はてなブログをはじめよう！</h3>
+    <p>sainuさんは、はてなブログを使っています。あなたもはてなブログをはじめてみませんか？</p>
+    <div class="guest-footer-btn-container">
+      <div class="guest-footer-btn">
+        <a class="btn btn-register" href="http://blog.hatena.ne.jp/register?via=200227" target="_blank">はてなブログをはじめる（無料）</a>
+      </div>
+      <div class="guest-footer-btn">
+        <a href="https://hatenablog.com/guide" target="_blank">はてなブログとは</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+    <address class="footer-address">
+      <a href="http://sainu.hatenablog.jp/">
+        <img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/blog-icon-noimage.png" width="16" height="16" alt="さいぬのtechブログ">
+        <span class="footer-address-name">さいぬのtechブログ</span>
+      </a>
+    </address>
+    <p class="services">
+      Powered by <a href="https://hatenablog.com/">Hatena Blog</a>
+      |
+        <a href="https://blog.hatena.ne.jp/-/abuse_report?target_url=http%3A%2F%2Fsainu.hatenablog.jp%2Fentry%2F2018%2F08%2F11%2F194319" class="report-abuse-link test-report-abuse-link" target="_blank">ブログを報告する</a>
+    </p>
+  </div>
+</footer>
+
+
+    
+
+    
+  <script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/HatenaStar.js.ダウンロード"></script>
+
+
+    
+      <div id="fb-root" class=" fb_reset"><div style="position: absolute; top: -10000px; width: 0px; height: 0px;"><div><iframe name="fb_xdm_frame_https" id="fb_xdm_frame_https" aria-hidden="true" title="Facebook Cross Domain Communication Frame" tabindex="-1" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" allow="encrypted-media" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/xd_arbiter.html" style="border: none;"></iframe></div><div></div></div></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&appId=719729204785177&version=v2.7";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+    
+    
+
+<div class="quote-box" style="display: none;">
+  <div class="tooltip-quote tooltip-quote-star" style="display: block;">
+    <i class="blogicon-star" title="引用スターをつける"></i>
+  </div>
+  <div class="tooltip-quote tooltip-quote-stock" style="display: block;">
+    <i class="blogicon-quote" title="引用をストック"></i>
+  </div>
+  <div class="tooltip-quote tooltip-quote-tweet js-tooltip-quote-tweet">
+    <a class="js-tweet-quote" target="_blank" data-track-name="quote-tweet" data-track-once=""><i class="blogicon-twitter" title="引用してツイートする"></i></a>
+  </div>
+</div>
+
+<div class="message-box" id="quote-star-message-box" style="display: none; position: absolute;">
+  スターをつけました
+</div>
+
+<div class="quote-stock-panel" id="quote-stock-message-box" style="position: absolute; z-index: 3000">
+  <div class="message-box" id="quote-stock-succeeded-message" style="display: none">
+    <p>引用をストックしました</p>
+    <button class="btn btn-primary" id="quote-stock-show-editor-button" data-track-name="curation-quote-edit-button">ストック一覧を見る</button>
+    <button class="btn quote-stock-close-message-button">閉じる</button>
+  </div>
+
+  <div class="message-box" id="quote-login-required-message" style="display: none">
+    <p>引用するにはまずログインしてください</p>
+    <button class="btn btn-primary" id="quote-login-button">ログイン</button>
+    <button class="btn quote-stock-close-message-button">閉じる</button>
+  </div>
+
+  <div class="error-box" id="quote-stock-failed-message" style="display: none">
+    <p>引用をストックできませんでした。再度お試しください</p>
+    <button class="btn quote-stock-close-message-button">閉じる</button>
+  </div>
+
+  <div class="error-box" id="unstockable-quote-message-box" style="display: none; position: absolute; z-index: 3000;">
+    <p>限定公開記事のため引用できません。</p>
+  </div>
+</div>
+
+<script type="x-underscore-template" id="js-requote-button-template">
+  <div class="requote-button js-requote-button">
+    <button class="requote-button-btn tipsy-top" title="引用する"><i class="blogicon-quote"></i></button>
+  </div>
+</script>
+
+
+
+    
+    <div id="hidden-subscribe-button" style="display: none;">
+      <div class="hatena-follow-button-box btn-subscribe js-hatena-follow-button-box">
+
+  <a href="http://sainu.hatenablog.jp/entry/2018/08/11/194319#" class="hatena-follow-button js-hatena-follow-button unsubscribing">
+    <span class="subscribing">
+      <span class="foreground">読者です</span>
+      <span class="background">読者をやめる</span>
+    </span>
+    <span class="unsubscribing" data-track-name="profile-widget-subscribe-button" data-track-once="">
+      <span class="foreground">読者になる</span>
+      <span class="background">読者になる</span>
+    </span>
+  </a>
+  <div class="subscription-count-box js-subscription-count-box" style="display: block;">
+    <i></i>
+    <u></u>
+    <span class="subscription-count js-subscription-count">3</span>
+  </div>
+</div>
+
+    </div>
+
+    
+  <script type="text/javascript" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/widgets.js.ダウンロード"></script>
+
+<script type="text/javascript" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/bookmark_button.js.ダウンロード" charset="utf-8" async="async"></script>
+
+
+
+  <script type="text/javascript" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/react-with-addons.min.js.ダウンロード"></script>
+  <script type="text/javascript" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/react-dom.min.js.ダウンロード"></script>
+
+
+<script type="text/javascript" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/jquery.min.js.ダウンロード"></script>
+<script type="text/javascript" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/jquery-ui.1.10.0.custom.min.js.ダウンロード"></script>
+<script type="text/javascript" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/jquery.flot.js.ダウンロード"></script>
+<script type="text/javascript" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/jquery.flot.time.js.ダウンロード"></script>
+
+
+
+
+
+<script type="text/javascript" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/texts-ja.js.ダウンロード"></script>
+<script id="hatenablog-js" data-env="production" type="text/javascript" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/hatenablog.js.ダウンロード" crossorigin="anonymous"></script><div style="position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; display: none;"></div>
+
+
+  <script type="text/javascript">Hatena.Diary.GlobalHeader.init()</script>
+
+
+<script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/api.js.ダウンロード" async="" defer=""></script>
+
+
+
+
+
+
+    
+  <script id="valve-dmp" data-service="blog" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/dmp.js.ダウンロード" data-test-id="dmpjs" async=""></script>
+
+
+    
+
+
+
+
+
+  
+
+
+<iframe scrolling="no" frameborder="0" allowtransparency="true" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/widget_iframe.097c1f5038f9e8a0d62a39a892838d66.html" title="Twitter settings iframe" style="display: none;"></iframe><div id="cboxOverlay" style="display: none;"></div><div id="colorbox" class="" role="dialog" tabindex="-1" style="display: none;"><div id="cboxWrapper"><div><div id="cboxTopLeft" style="float: left;"></div><div id="cboxTopCenter" style="float: left;"></div><div id="cboxTopRight" style="float: left;"></div></div><div style="clear: left;"><div id="cboxMiddleLeft" style="float: left;"></div><div id="cboxContent" style="float: left;"><div id="cboxTitle" style="float: left;"></div><div id="cboxCurrent" style="float: left;"></div><button type="button" id="cboxPrevious"></button><button type="button" id="cboxNext"></button><button type="button" id="cboxSlideshow"></button><div id="cboxLoadingOverlay" style="float: left;"></div><div id="cboxLoadingGraphic" style="float: left;"></div></div><div id="cboxMiddleRight" style="float: left;"></div></div><div style="clear: left;"><div id="cboxBottomLeft" style="float: left;"></div><div id="cboxBottomCenter" style="float: left;"></div><div id="cboxBottomRight" style="float: left;"></div></div></div><div style="position: absolute; width: 9999px; visibility: hidden; display: none; max-width: none;"></div></div><div style="top: -9999px; z-index: -9999;"></div><iframe src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/iu3.html" style="display: none;"></iframe><iframe id="google_osd_static_frame_6598881383720" name="google_osd_static_frame" style="display: none; width: 0px; height: 0px;" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/saved_resource(4).html"></iframe><script type="text/javascript" id="">(function(a){var b=a.createElement("iframe"),c="https:"==a.location.protocol?"https://":"http://";b.src=c+"cf.im-apps.net/imid/beacon.html";b.style.display="none";a.body.appendChild(b)})(document);</script><iframe src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/beacon.html" style="display: none;"></iframe><script type="text/javascript" id="" src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/pageview.js.ダウンロード"></script><script type="text/javascript" id="">!function(c,d,b,f){if(!d[c]){d[c]=function(){d[c].instances.push(this);this.init&&this.init()};d[c].instances=[];for(var a=0,e=["td_send","td_send_imid"];a<e.length;a++)d[c].prototype[e[a]]=function(a){return function(){this["tmp_"+a]=this["tmp_"+a]||[];this["tmp_"+a].push(Array.prototype.slice.call(arguments))}}(e[a]);a=b.getElementsByTagName(f)[0];b=b.createElement(f);b.async=!0;b.src="//cf.im-apps.net/sdk/tdim-1.1.0.min.js";a.parentNode.insertBefore(b,a)}}("TDIM",window,document,"script");
+var tdimjs=new TDIM;tdimjs.debug=!1;tdimjs.td_host="in.ybi.idcfcloud.net";tdimjs.td_api_key="312/b4f0042d7c26b4f44d2561bbb5c396349b54b10e";tdimjs.td_db="cosmi_6604";tdimjs.im_api_token="TlOjMPj_m54xiIkb8Mzm7Q";tdimjs.td_send_imid("pageviews",{custom_data:"undefined"});</script><div id="UMS_TOOLTIP" style="position: absolute; cursor: pointer; z-index: 2147483647; background: transparent; top: -100000px; left: -100000px;"></div><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="1" height="1" border="0" class="bigmining_dmp_beacon" style="display: none;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" width="1" height="1" border="0" class="bigmining_dmp_beacon" style="display: none;"><img src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/adsct" width="1" height="1" border="0" class="bigmining_dmp_beacon" style="display: none;"><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-P5GX4M');</script><div style="display: none; visibility: hidden;"><script type="text/javascript">!function(c,d,b,f){if(!d[c]){d[c]=function(){d[c].instances.push(this);this.init&&this.init()};d[c].instances=[];for(var a=0,e=["td_send","td_send_imid"];a<e.length;a++)d[c].prototype[e[a]]=function(a){return function(){this["tmp_"+a]=this["tmp_"+a]||[];this["tmp_"+a].push(Array.prototype.slice.call(arguments))}}(e[a]);a=b.getElementsByTagName(f)[0];b=b.createElement(f);b.async=!0;b.src="//cf.im-apps.net/sdk/tdim-0.11.2.js";a.parentNode.insertBefore(b,a)}}("TDIM",window,document,"script");var t=new TDIM;
+t.td_api_key="312/b4f0042d7c26b4f44d2561bbb5c396349b54b10e";t.td_db="cosmi_8045";t.im_api_token="omO0CDJd98sxiIkb8Mzm7Q";t.gtm_dl="dataLayer";t.td_send_imid("pageviews");</script></div><div style="display: none; visibility: hidden;">
+<script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/oct.js.ダウンロード" type="text/javascript"></script>
+<script type="text/javascript">twttr.conversion.trackPid("nudt9",{tw_sale_amount:0,tw_order_quantity:0});</script>
+<noscript></noscript>
+</div><div style="display: none; visibility: hidden;">
+<script>!function(d,e,f,a,b,c){d.twq||(a=d.twq=function(){a.exe?a.exe.apply(a,arguments):a.queue.push(arguments)},a.version="1.1",a.queue=[],b=e.createElement(f),b.async=!0,b.src="//static.ads-twitter.com/uwt.js",c=e.getElementsByTagName(f)[0],c.parentNode.insertBefore(b,c))}(window,document,"script");twq("init","ny5vy");twq("track","PageView");</script>
+</div><div style="display: none; visibility: hidden;">
+<script>!function(b,e,f,g,a,c,d){b.fbq||(a=b.fbq=function(){a.callMethod?a.callMethod.apply(a,arguments):a.queue.push(arguments)},b._fbq||(b._fbq=a),a.push=a,a.loaded=!0,a.version="2.0",a.queue=[],c=e.createElement(f),c.async=!0,c.src=g,d=e.getElementsByTagName(f)[0],d.parentNode.insertBefore(c,d))}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");fbq("init","1733466696949178");fbq("track","PageView");</script>
+<noscript></noscript>
+
+
+</div><script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/adsct(1)" type="text/javascript"></script><script src="./【翻訳】devise-auth-token公式ドキュメント - さいぬのtechブログ_files/adsct(2)" type="text/javascript"></script></body><umsdataelement id="UMSSendDataEventElement"></umsdataelement></html>

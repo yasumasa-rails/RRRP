@@ -1,4 +1,14 @@
 ﻿
+ alter table opeitms DROP COLUMN autoact_p CASCADE;
+
+ ---- 使用しているview 
+ ---- select * from pobject_code_scr,pobject_code_sfd,
+							   case screenfield_selection when 1 then '選択有' else '' end select,
+								case screenfield_hideflg when 1 then '' else '表示有' end display,
+							   case screenfield_indisp when 1 then '必須' else '' end inquire from r_screenfields 
+ ---- where  pobject_code_sfd = 'autoact_p'
+ ---- update screenfields set expiredate ='2000/01/01',remark =' 項目　autoact_pが削除　2019-09-02 16:39:27 +0900' 
+ ---- where  pobject_code_sfd = 'autoact_p'
  --- drop view r_opeitms cascade  
  create or replace view r_opeitms as select  
   shelfno.loca_name_shelfno  loca_name_shelfno ,
@@ -25,8 +35,8 @@ opeitm.boxes_id   opeitm_boxe_id,
 opeitm.packno_flg  opeitm_packno_flg,
 opeitm.opt_fix_flg  opeitm_opt_fix_flg,
 opeitm.units_id_case   opeitm_unit_id_case,
-  itm.itm_unit_id  itm_unit_id ,
   unit_case.unit_name  unit_name_case ,
+  itm.itm_unit_id  itm_unit_id ,
   itm.unit_name  unit_name ,
 opeitm.units_lttime  opeitm_units_lttime,
   itm.unit_code  unit_code ,
@@ -52,8 +62,8 @@ opeitm.persons_id_upd   opeitm_person_id_upd,
   shelfno.shelfno_loca_id_shelfno  shelfno_loca_id_shelfno ,
 opeitm.esttosch  opeitm_esttosch,
 opeitm.chkord_prc  opeitm_chkord_prc,
-opeitm.operation  opeitm_operation,
 opeitm.remark  opeitm_remark,
+opeitm.operation  opeitm_operation,
 opeitm.itms_id   opeitm_itm_id,
 opeitm.locas_id   opeitm_loca_id,
 opeitm.opt_fixoterm  opeitm_opt_fixoterm,
@@ -64,6 +74,9 @@ opeitm.shuffle_loca  opeitm_shuffle_loca,
 opeitm.autocreate_act  opeitm_autocreate_act,
 opeitm.rule_price  opeitm_rule_price,
 opeitm.stktaking_f  opeitm_stktaking_f,
+  boxe.boxe_code  boxe_code ,
+  shelfno.shelfno_name  shelfno_name ,
+  shelfno.shelfno_code  shelfno_code ,
 opeitm.created_at  opeitm_created_at,
   itm.itm_weight  itm_weight ,
   itm.itm_length  itm_length ,
@@ -76,19 +89,15 @@ opeitm.expiredate  opeitm_expiredate,
 opeitm.updated_at  opeitm_updated_at,
 opeitm.contents  opeitm_contents,
   itm.itm_name  itm_name ,
-  loca.loca_code  loca_code ,
   loca.loca_name  loca_name ,
+  loca.loca_code  loca_code ,
   itm.itm_code  itm_code ,
   loca.loca_country  loca_country ,
   itm.itm_std  itm_std ,
   itm.itm_model  itm_model ,
   itm.itm_design  itm_design ,
   itm.itm_material  itm_material ,
-opeitm.autoact_p  opeitm_autoact_p,
   boxe.boxe_name  boxe_name ,
-  boxe.boxe_code  boxe_code ,
-  shelfno.shelfno_code  shelfno_code ,
-  shelfno.shelfno_name  shelfno_name ,
   loca.loca_tel  loca_tel ,
   loca.loca_mail  loca_mail ,
   loca.loca_fax  loca_fax ,
@@ -111,7 +120,8 @@ opeitm.update_ip  opeitm_update_ip,
   shelfno.loca_tel_shelfno  loca_tel_shelfno 
  from opeitms   opeitm,
   r_shelfnos  shelfno ,  r_boxes  boxe ,  r_units  unit_case ,  r_units  unit_prdpurshp ,  r_persons  person_upd ,  r_itms  itm ,  r_locas  loca 
-  where       opeitm.shelfnos_id = shelfno.id      and opeitm.boxes_id = boxe.id      and opeitm.units_id_case = unit_case.id      and opeitm.units_id_prdpurshp = unit_prdpurshp.id      and opeitm.persons_id_upd = person_upd.id      and opeitm.itms_id = itm.id      and opeitm.locas_id = loca.id     ;
+  where       opeitm.shelfnos_id = shelfno.id      and opeitm.boxes_id = boxe.id      and opeitm.units_id_case = unit_case.id      and opeitm.units_id_prdpurshp = unit_prdpurshp.id      and opeitm.persons_id_upd = person_upd.id 
+     and opeitm.itms_id = itm.id      and opeitm.locas_id = loca.id     ;
  DROP TABLE IF EXISTS sio.sio_r_opeitms;
  CREATE TABLE sio.sio_r_opeitms (
           sio_id numeric(38,0)  CONSTRAINT SIO_r_opeitms_id_pk PRIMARY KEY           ,sio_user_code numeric(38,0)
@@ -132,20 +142,23 @@ opeitm.update_ip  opeitm_update_ip,
           ,sio_sidx varchar(256)
 ,itm_code  varchar (50) 
 ,itm_name  varchar (100) 
-,opeitm_processseq  numeric (3,0)
-,opeitm_priority  numeric (3,0)
-,opeitm_shuffle_loca  varchar (1) 
-,opeitm_shuffle_flg  varchar (1) 
-,opeitm_autocreate_inst  varchar (1) 
-,opeitm_autocreate_ord  varchar (1) 
-,opeitm_stktaking_f  varchar (1) 
-,opeitm_rule_price  varchar (1) 
-,opeitm_autocreate_act  varchar (1) 
-,opeitm_opt_fixoterm  numeric (5,2)
 ,loca_code  varchar (50) 
 ,loca_name  varchar (100) 
 ,opeitm_prdpurshp  varchar (5) 
 ,opeitm_operation  varchar (40) 
+,opeitm_processseq  numeric (3,0)
+,opeitm_priority  numeric (3,0)
+,unit_code_case  varchar (50) 
+,unit_name_case  varchar (100) 
+,unit_code_prdpurshp  varchar (50) 
+,opeitm_shuffle_flg  varchar (1) 
+,opeitm_autocreate_inst  varchar (1) 
+,opeitm_autocreate_ord  varchar (1) 
+,opeitm_opt_fixoterm  numeric (5,2)
+,opeitm_shuffle_loca  varchar (1) 
+,opeitm_autocreate_act  varchar (1) 
+,opeitm_rule_price  varchar (1) 
+,opeitm_stktaking_f  varchar (1) 
 ,opeitm_packno_flg  varchar (1) 
 ,itm_length  numeric (22,0)
 ,itm_weight  numeric (22,0)
@@ -160,12 +173,9 @@ opeitm.update_ip  opeitm_update_ip,
 ,opeitm_minqty  numeric (38,6)
 ,opeitm_maxqty  numeric (22,0)
 ,shelfno_contents  varchar (4000) 
-,unit_code_prdpurshp  varchar (50) 
 ,unit_contents_prdpurshp  varchar (4000) 
 ,unit_name_prdpurshp  varchar (100) 
-,unit_code_case  varchar (50) 
 ,unit_contents_case  varchar (4000) 
-,unit_name_case  varchar (100) 
 ,unit_code  varchar (50) 
 ,unit_name  varchar (100) 
 ,opeitm_safestkqty  numeric (38,0)

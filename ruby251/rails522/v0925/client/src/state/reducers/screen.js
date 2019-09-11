@@ -66,6 +66,7 @@ const screenreducer =  (state= {} , action) =>{
         loading:false,
         filterable:action.action.data.params.req==="viewtablereq"?true:false,
         originalreq: action.action.data.params.req,
+        pageText: 'total count xx,xxx,xxx   Page',
       }
     
     
@@ -88,8 +89,7 @@ const screenreducer =  (state= {} , action) =>{
     // set the success and requesting flags to false
     case SCREEN_FAILURE:
       return {
-          body: action.errors.toString(),
-          time: new Date(),
+        message: action.errors.message,
       }
 
     case FETCH_REQUEST:
@@ -102,14 +102,14 @@ const screenreducer =  (state= {} , action) =>{
           //editableflg:false
         }
   
-      case FETCH_FAILURE:
+    case FETCH_FAILURE:
             return {...state,
               data:action.payload.data,  
               loading:false,
               filterable:false,
             }
 
-      case FETCH_RESULT:
+    case FETCH_RESULT:
                   return {...state,
                     data:action.payload.data, 
                     loading:false,
