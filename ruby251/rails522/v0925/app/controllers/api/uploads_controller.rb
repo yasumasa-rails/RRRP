@@ -36,6 +36,7 @@ module Api
       #end 
       def create
         upload = Upload.create!(upload_params)
+        debugger
         ##redirect_to :action => "show", :id => upload.id
         render json:upload
       end

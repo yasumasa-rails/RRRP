@@ -309,7 +309,7 @@ module RorBlkctl
        		@show_data[:allfields].join(",").to_s
   		end   ##  sub_getfield
 
-  def sub_set_chil_tbl_info next_screen_data
+ 	def sub_set_chil_tbl_info next_screen_data
       strwhere = "select ctlb_id from CTL#{next_screen_data[:sio_org_tblname]} where ptblid = #{next_screen_data[:sio_org_tblid]} and "
       strwhere << "ctblname = '#{next_screen_data[:sio_viewname].split("_")[1]}'  "
       ctbl_id = ActiveRecord::Base.connection.select_value(strwhere)
@@ -321,7 +321,7 @@ module RorBlkctl
       end
     end
 
-  def sub_get_sects_id_fm_locas_id  locas_id
+  	def sub_get_sects_id_fm_locas_id  locas_id
 	    sect_id = ActiveRecord::Base.connection.select_value("select id from sects where locas_id_sect = #{locas_id||=0} ")
 		if sect_id.nil?
 	       sect_id = ActiveRecord::Base.connection.select_value("select id from r_sects where loca_code_sect =  'dummy'")
@@ -330,7 +330,7 @@ module RorBlkctl
 	    return sect_id
 	end
 
-  def sub_get_locas_id_fm_sects_id  sects_id
+  	def sub_get_locas_id_fm_sects_id  sects_id
 	    locas_id = ActiveRecord::Base.connection.select_value("select locas_id_sect from sects where id = #{sects_id} ")
 		if locas_id.nil?
 	       p "err logic err?"
@@ -338,7 +338,7 @@ module RorBlkctl
 	    end
 	    return locas_id
 	end
-  def proc_get_dealers_id_fm_locas_id  locas_id
+  	def proc_get_dealers_id_fm_locas_id  locas_id
 	    locas_id ||= 0
 	    dealers_id = ActiveRecord::Base.connection.select_value("select id from dealers where locas_id_dealer = #{locas_id} ")
 		if dealers_id.nil?
@@ -347,7 +347,7 @@ module RorBlkctl
 	    end
 	    return dealers_id
 	end
-  def sub_get_locas_id_fm_dealers_id  dealers_id
+  	def sub_get_locas_id_fm_dealers_id  dealers_id
 	    locas_id = ActiveRecord::Base.connection.select_value("select locas_id_dealer from dealers where id = #{dealers_id} ")
 		if locas_id.nil?
 	       p "err logic err?  dealers_id:#{dealers_id}"
@@ -402,28 +402,6 @@ module RorBlkctl
 			@src_tbl[:id] = 	rec["id"]	
 		end	
 		return rec
-	end
-	def proc_command_instance_variable rec ###@xxxxの作成
-	    str = ""
-        rec.each do |key,val|
-	        case
-		        when key == "rubycoding_rubycode"
-	                @rubycoding_rubycode = val
-		        when key == "button_onclickbutton"
-	                @button_onclickbutton = val
-		        when val.class == String
-	                str << %Q%@#{key} = "#{val.gsub('"','\"')}"\n%
-		        when val.class == Date
-	                str << "@#{key} = %Q%#{val}%.to_date\n"
-		        when val.class == Time
-	                str << "@#{key} = %Q%#{val}%.to_time\n"
-		        when val.class == NilClass
-	                str << "@#{key} = nil\n"
-		        else
-	                str << "@#{key} = #{val}\n"
-	        end
-	    end
-	    eval(str)
 	end
     def undefined
       nil
@@ -782,15 +760,6 @@ module RorBlkctl
 				end
 		end
 		return columns
-	end
-	def proc_get_trg_view_fm_tblname_tblid tblname,srctblname,srctblid  ##レコードが見つからなかったときの処理は親ですること。
-		if block_given?
-			rec = ActiveRecord::Base.connection.select_one("select * from r_#{tblname} where #{tblname.chop}_tblname = '#{srctblname}' and #{tblname.chop}_tblid = #{srctblid} #{yield}")
-		else
-			rec = ActiveRecord::Base.connection.select_one("select * from r_#{tblname} where #{tblname.chop}_tblname = '#{srctblname}' and #{tblname.chop}_tblid = #{srctblid}")
-		end
-		proc_command_instance_variable(rec)
-		return rec.with_indifferent_access if rec
 	end
 	def proc_get_trg_rec_fm_tblname_tblid tblname,srctblname,srctblid  ##レコードが見つからなかったときの処理は親ですること。
 			ActiveRecord::Base.connection.select_one(%Q% select * from #{tblname} where tblname = '#{srctblname}' and tblid = #{srctblid} #{if block_given? then yield else "" end}%)
