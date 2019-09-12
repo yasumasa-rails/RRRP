@@ -35,7 +35,8 @@
     "redux-saga": "0.16.0",
     "style-loader": "^0.23.1",
     "styled-components": "3.1.4",
-    "webpack": "^4.0.0",
+    "webpack": "^4.39.3",
+    "js-yaml":"^3.13.1",
     "yup": "^0.24.0"
   },
   "devDependencies": {
