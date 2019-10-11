@@ -1,12 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types';
-import {Button} from '../../styles/button'
+import Button from '@material-ui/core/Button'
 import {ChangeUploadTitleRequest} from '../../actions'
 
-const Detail = ( {upload,changeUploadTitle} ) => {
-  let excelSrc = (upload[0].excel !== null ?
-    upload[0].excel.url : "https://bulma.io/images/placeholders/128x96.png");
+
+
+const Detail = ({ upload,changeUploadTitle }) => {
+  let excelSrc = upload.excel !== null ?
+    upload.excel.url : "https://bulma.io/images/placeholders/1280x960.png";
 
   return (
     <React.Fragment>
@@ -15,31 +17,23 @@ const Detail = ( {upload,changeUploadTitle} ) => {
           <img src={excelSrc} alt="Upload excel" />
         </figure>
       </div>
-      <table>
-      <tr>
-        <td>id</td><td>fiel name</td><td>title</td><td>contents</td><td>result</td><td>updated</td>
-      </tr>
-      {upload.map((up ,key)=>
-      <tr key={key} >
-        <td className="card-content">{up.id}</td>
-        <td > {up.excel&&up.excel.name}</td>
-        <td className="title is-4"> {up.title}</td>
-          <td> {up.contents}</td>
-          <td> {up.result}</td>
-          <td><time>{up.updated_at.toLocaleString()}</time></td> 
-         <td><Button  
+      <div className="card-content">{upload.id}
+        <p className="title is-4">{upload.title}</p>
+        <div className="content">
+          <p>{upload.contents}</p>
+          <p>{upload.remark}</p>
+          <time>{upload.updated_at.toLocaleString()}</time> 
+          <Button  
             type="button"
-            onClick ={() => changeUploadTitle(up)}>
-              update
-          </Button>  </td> 
-      </tr>    
-      )}
-     </table>
+            onClick ={() => changeUploadTitle(upload)}>
+          </Button>     
+        </div>
+      </div>
     </React.Fragment>
   )
 }
 
-Detail.propTypes = PropTypes.array[{
+Detail.propTypes = {
   upload: PropTypes.shape({
     id: PropTypes.integer,
     excel: PropTypes.shape({url: PropTypes.string}),
@@ -48,14 +42,14 @@ Detail.propTypes = PropTypes.array[{
     remark: PropTypes.string,
     updated_at: PropTypes.string
   }).isRequired
-}];
+};
 
 
 const  mapStateToProps = (state,ownProps) =>({
   token:(state.login.auth?state.login.auth["access-token"]:"") ,
   client:(state.login.auth?state.login.auth.client:""),
   uid:(state.login.auth?state.login.auth.uid:"") ,
-  upload:state.upload.uploadlists,
+  upload:state.upload.upload,
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({

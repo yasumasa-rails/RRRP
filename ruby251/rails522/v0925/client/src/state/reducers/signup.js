@@ -10,13 +10,13 @@ const signupreducer =  (state= initialValues , action) =>{
     case SIGNUP_REQUEST:
       return {...state,
         isSubmitting:true,
-        message: [{ body: 'signining in...', time: new Date() }],
+        messages: [{ body: 'signining in...', time: new Date() }],
       }
 
     // Successful?  Reset the signup state.
     case SIGNUP_SUCCESS:
       return {...state,
-        message: [],
+        messages: [],
         email: action.actions.email,    /// payloadに統一
       }
 

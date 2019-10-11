@@ -1,7 +1,4 @@
 import { LOGIN_REQUEST,LOGIN_SUCCESS,LOGIN_FAILURE,LOGOUT_REQUEST, } from 'actions'
-
-export let getLoginState = state => state.login
-
 const initialValues = {
   isSubmitting:false,
   errors:[],
@@ -17,7 +14,7 @@ const loginreducer =  (state= initialValues , actions) =>{
       return {
         isSubmitting:true,
         errors:[],
-        message: [{ body: 'Logging in...', time: new Date() }],
+        messages: [{ body: 'Logging in...', time: new Date() }],
         isAuthenticated:false,
         email:actions.payload.email,
         auth:{}
@@ -26,7 +23,7 @@ const loginreducer =  (state= initialValues , actions) =>{
     // Successful?  Reset the login state.
     case LOGIN_SUCCESS:
       return {...state,
-        message: [],
+        messages: [],
         isAuthenticated:true,
         auth:actions.action,  /// payloadに統一
       }
@@ -37,7 +34,7 @@ const loginreducer =  (state= initialValues , actions) =>{
       return {errors: {
         body: actions.errors.toString(),
        },       
-        message: [],
+        messages: [],
         isAuthenticated:false,
     }
 

@@ -11,7 +11,7 @@ function EditUploadApi({values}){
                     client:values.client,
                     uid:values.uid,}
   //                  file:values.excel[0]
-  const params = {title:values.title,contents:values.contents,email:values.uid}  
+  const params = {title:values.title,contents:values.contents}  
   let getApi = (url, params) => {
     return axios({
       method:"PUT",

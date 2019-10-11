@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import { Form, Field,withFormik, } from 'formik'
+import { Form, Field,withFormik, setNestedObjectValues } from 'formik'
 import ActiveStorageProvider from 'react-activestorage-provider'
 import ClassNames from "classnames"
 import "../../index.css"
@@ -49,7 +49,7 @@ const formikForm = ({status,values,handleSubmit,setFieldValue,handleChange}) =>{
             <p>excelデータの upload (titleとコメントを付加)</p>
             <ActiveStorageProvider
               endpoint={{
-                          path: 'https://localhost:9292/api/uploads',
+                          path: 'http://localhost:3001/api/uploads',
                           model: 'Upload',
                           attribute: 'excel',
                           method: 'POST',
@@ -58,7 +58,7 @@ const formikForm = ({status,values,handleSubmit,setFieldValue,handleChange}) =>{
                           }}
               headers={{"access-token":auth["access-token"],client:auth.client,uid:auth.uid}}            
               onSubmit={upload => setFieldValue("id",upload.id) }
-              render={({ handleUpload,uploads, ready }) => (
+              render={({ uploads, ready,handleUpload }) => (
                 <div>
                   <input
                     type="file"

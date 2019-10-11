@@ -16,20 +16,18 @@ const Upload = ({ uploadlist,isUpload ,onClieckChangeUploadable}) => (
             <a
             className="button is-primary"
              onClick={()=>onClieckChangeUploadable(isUpload)}>
-              Close
+              {isUpload ? 'Close' : 'Uploadへの変換'}
             </a>
               <EditableUpload />
             </div>
               :
               <div>
-              <p>
-              <a
-              className="button is-primary"
-               onClick={()=>onClieckChangeUploadable(isUpload)}>
-                 Upload画面への移動
-              </a>
-              </p>  
-              <p>過去のuploadデータの参照</p>
+              <p>過去のuploadデータの参照
+                <a
+                className="button is-primary"
+                 onClick={()=>onClieckChangeUploadable(isUpload)}>
+                  {isUpload ? 'Close　　　' : '　　　　Uploadへ'}
+                </a></p>
               <NonEditableUpload uploadlist={uploadlist} />
             </div>
             }

@@ -6,8 +6,8 @@ import { connect } from 'react-redux'
 import { Link,BrowserRouter,Route,} from 'react-router-dom'
 import { Tab, Tabs, TabList, TabPanel, } from 'react-tabs'
 import "react-tabs/style/react-tabs.css"
-import {Button} from '../styles/button'
-import "../index.css"
+import Button from '@material-ui/core/Button'
+import "./index.css"
 
 import { Signup } from './signup'
 import { Login } from './login'
@@ -16,12 +16,12 @@ import ScreenGrid from './screengrid'
 
  class Menus extends React.Component {
   render() {
-    const { isAuthenticated ,menuListData,uid,getScreen, params,
-            pageSize,page,sorted,sizePerPageList} = this.props
+    const { isAuthenticated ,menuListData,token,client,uid,getScreen, 
+            pageSize,page,sorted,filtered,} = this.props
     
     if (isAuthenticated) {
       if(menuListData){
-      let tmpgrpscr =[]   //グルーブ化されたメニュー
+      let tmpgrpscr =[]   
       let ii = 0
       menuListData.map((cate) => {
             if(tmpgrpscr[ii-1]!==cate.grp_name){tmpgrpscr[ii]=cate.grp_name;ii=ii+1}    
@@ -47,8 +47,8 @@ import ScreenGrid from './screengrid'
                     <Tab key={index} >
                       <Button   type="submit"
                       onClick ={() => getScreen(val.screen_code,pageSize?pageSize:val.page_size,
-                                                page,sorted,val.scr_name,uid,sizePerPageList,params
-                                                )}>
+                                                page,sorted,filtered,val.scr_name,
+                                                token,client,uid)}>
                       {val.scr_name}       
                       </Button>             
                     </Tab>)}
@@ -62,13 +62,13 @@ import ScreenGrid from './screengrid'
                 </TabPanel> 
               )}
             </Tabs>
-          <ScreenGrid/>
+            <ScreenGrid/>
            </div>    
       )
     }
      return(
      <div>
-      <p> please wait </p>
+      <p>seq error </p>
     </div>)}
     return (
       <BrowserRouter>
@@ -85,31 +85,23 @@ import ScreenGrid from './screengrid'
 const  mapStateToProps = (state,ownProps) =>({
   isAuthenticated:state.login.isAuthenticated ,
   menuListData:state.menu.menuListData ,
+  token:(state.login.auth?state.login.auth["access-token"]:"") ,
+  client:(state.login.auth?state.login.auth.client:""),
   uid:(state.login.auth?state.login.auth.uid:"") ,
 //画面移動前のpageSize,・・・を持ってくるようにする。  
   pageSize:state.screen?state.screen.pageSize:null,
   page:state.screen?state.screen.page:0,
-  data:state.screen?state.screen.data:[],
-  sorted:state.screen?state.screen.sorted:null, 
-  sizePerPageList:state.screen.sizePerPageList?state.screen.sizePerPageList:[25],
-  params:state.screen.params,
-  originalreq:state.screen.originalreq,
-  message:state.menu.message,
+  sorted:state.screen?state.screen.sorted:[], 
+  filtered:state.screen?state.screen.filtered:[], 
+  
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-      getScreen : (screenCode,pageSize, page,sorted,screenName, uid,sizePerPageList,params) =>{
-        if(params){}else{params={}}
-        params["filtered"]=[] 
-        if(params["dropdownselect"]){}else{params["dropdownselect"]={}}
-        Object.keys(params["dropdownselect"]).map((sel)=>{
-              params["filtered"].push({id:sel,value:params["dropdownselect"][sel]})
-              return params["filtered"] }
-             ) 
-        params= { ...params, page: page, pageSize : pageSize,sizePerPageList:sizePerPageList,
-                        sorted:sorted,   screenName:  screenName,
-                         screenCode:screenCode,uid:uid,req:"viewtablereq",filtered:params?params.filtered:[]} 
-        dispatch(ScreenRequest(params))}
+      getScreen : (screenCode,pageSize, page,sorted,filtered,screenName,token, client, uid) =>{
+        let  params= {  page: page, pageSize : pageSize,
+                        sorted:sorted,  filtered:filtered,      
+                         screenCode:screenCode,uid:uid,req:"viewtablereq"} 
+        dispatch(ScreenRequest(params, token, client, uid,screenName))}
           })    
 
 export default connect(mapStateToProps,mapDispatchToProps)(Menus)

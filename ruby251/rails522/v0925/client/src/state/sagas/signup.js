@@ -33,7 +33,7 @@ export function * SignupSaga ({payload: values, meta: actions}) {
      {yield put({type:SIGNUP_SUCCESS, response})
     // Reset the form just to be clean, then send the user to our Dashboard which "requires"
     // authentication. 
-    yield call(history.push, '/login')
+    yield call(history.push, '/')
     }
   else{ 
     // If our API throws an error we will leverage Formik's existing error system to pass it along

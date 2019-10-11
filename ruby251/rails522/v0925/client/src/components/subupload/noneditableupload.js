@@ -1,16 +1,21 @@
 import React from 'react';
 import {connect} from 'react-redux'
-import {Button} from '../../styles/button'
+import Button from '@material-ui/core/Button'
 import { withFormik, Form, Field, } from 'formik'
 import {UploadListRequest} from '../../actions'
 import Detail from './detail'
 
 
-const formikForm = ({isSubmitting, values,status,handleSubmit,uploadlists}) => (
+const formikForm = ({isSubmitting, values,status,handleSubmit}) => (
   <div className="columns">
   <Form {...values} onSubmit={handleSubmit}>
-    {uploadlists&&
-        <Detail/>
+    {values.uploadlists&&
+      values.uploadlists.map(upload =>
+        <Detail
+          key={upload.id}
+          upload={upload}
+        />
+      )
     }
     <p>email:
     <Field type="email" name="email"  />
@@ -27,12 +32,12 @@ const formikForm = ({isSubmitting, values,status,handleSubmit,uploadlists}) => (
 
 const formikEnhancer = withFormik({
   mapPropsToValues : (props) =>({
-    email:props.values?props.values.email:props.login.auth.uid ,
-    count:props.values?props.values.count:10,
-    uploadlists:props.upload?props.upload.uploadlists:[],}),
-  mapPropsToStatus : (props) =>({
+    email:props.upload.values?props.upload.values.email:props.login.auth.uid ,
+    count:props.upload.values?props.upload.values.count:10,
+    uploadlists:props.upload.uploadlists?props.upload.uploadlists:[],}),
+    mapPropsToStatus : (props) =>({
       uid:props.login.auth.uid ,}),
-      handleSubmit : (values,{props}) =>{let auth = props.login.auth
+  handleSubmit : (values,{props}) =>{let auth = props.login.auth
                                       values["token"] = auth["access-token"]
                                       values["client"] = auth.client
                                       values["uid"] = auth.uid
@@ -43,8 +48,12 @@ const formikEnhancer = withFormik({
 
 const  mapStateToProps = (state,ownProps) =>({
   login:state.login ,
-  uploadlists:state.upload.uploadlists,
+  upload:state.upload,
 })
+
+//const mapDispatchToProps = (dispatch,ownProps ) => ({
+//  onSubmit:(values)=> dispatch(UploadListRequest(values))      
+//    })    
 
  const NonEditableUpload =  connect(mapStateToProps,null)(formikEnhancer)
 

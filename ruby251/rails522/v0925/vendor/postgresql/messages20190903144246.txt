@@ -1,3 +1,0 @@
- table:screenfields already exist :screenfields_uky1 
- Therefore drop  CONSTRAINT  :screenfields_uky1
- create TABLE_CONSTRAINTS :screenfields_uky2 

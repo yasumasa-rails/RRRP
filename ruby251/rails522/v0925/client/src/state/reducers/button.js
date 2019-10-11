@@ -1,6 +1,4 @@
 import {  BUTTONLIST_REQUEST, BUTTONLIST_SUCCESS, BUTTONFLG_REQUEST,
-          DOWNLOAD_REQUEST,DOWNLOAD_SUCCESS,DOWNLOAD_RESET,GANTT_RESET,
-          TBLFIELD_SUCCESS,SCREEN_SUCCESS,GANTTCHART_SUCCESS,
           LOGOUT_REQUEST} from 'actions'
 const initialValues = {
   errors:[],
@@ -9,81 +7,19 @@ const initialValues = {
 
 const buttonreducer =  (state= initialValues , actions) =>{
   switch (actions.type) {
-
-    case BUTTONFLG_REQUEST:
-      return {...state,
-        buttonflg:actions.payload.buttonflg, 
-        screenCode:actions.payload.params.screenCode,
-        screenName:actions.payload.params.screenName,
-        filtered:actions.payload.params.filtered,  
-        disabled:true,  
-        messages:null,
-        message:null, 
-      }
     
     case BUTTONLIST_REQUEST:
-      return {...state,
-        disabled:true,
-        messages:null,
-        message:null,}
-
-    case GANTT_RESET:
-          return {...state,
-            disabled:false,}
-    
+      return {...state}
 
     case BUTTONLIST_SUCCESS:
       return {...state,
       buttonListData:actions.payload,
-      disabled:false,
      }
 
-    case DOWNLOAD_REQUEST:
+    case BUTTONFLG_REQUEST:
        return {...state,
-        excelData:null,
-        totalcnt:null,
-        params:actions.payload.params,
-        downloadloading:"doing",
-        disabled:true,
-        messages:null,
-        message:null,
+        buttonflg:actions.payload.buttonflg,
      }
-    case DOWNLOAD_SUCCESS:
-     return {...state,
-      excelData:actions.payload.data.excelData,
-      totalcnt:actions.payload.data.totalcnt,
-      downloadloading:"done",
-      disabled:false,
-   }
-   case DOWNLOAD_RESET:
-    return {...state,
-      excelData:null,
-      totalcnt:null,
-      buttonflg:null,
-      downloadloading:"",
-      disabled:false,
-  }
-  case TBLFIELD_SUCCESS:
-   return {...state,
-    messages:actions.payload.messages,
-    message:actions.payload.message,
-    disabled:false,
- }
-
- case SCREEN_SUCCESS:
-  return {...state,
-   disabled:false,
-   messages:null,
-   message:null,
-}
-
-case GANTTCHART_SUCCESS:
-  return {...state,
-   disabled:false,
-   messages:null,
-   message:null,
-}
-
 
     case  LOGOUT_REQUEST:
     return {}  

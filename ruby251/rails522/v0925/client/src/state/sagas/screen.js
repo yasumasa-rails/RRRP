@@ -1,10 +1,8 @@
-import { call, put, select } from 'redux-saga/effects'
+
+import React from 'react'
+import { call, put } from 'redux-saga/effects'
 import axios         from 'axios'
-import {SCREEN_SUCCESS,SCREEN_FAILURE,SCREEN_LINEEDIT, FETCH_RESULT, FETCH_FAILURE,YUP_RESULT}
-         from '../../actions'
-import {getScreenState} from '../reducers/screen'
-import {getLoginState} from '../reducers/login'
-//import { ReactReduxContext } from 'react-redux';
+import {SCREEN_SUCCESS,SCREEN_FAILURE} from '../../actions'
 
 function screenApi({params,token,client,uid}) {
   const url = 'http://localhost:3001/api/menus'
@@ -14,94 +12,43 @@ function screenApi({params,token,client,uid}) {
     return axios({
         method: "POST",
         url: url,
-        contentType: "application/json",
-        params:params,
-        headers:headers,
+        params,headers,
     });
   };
   return postApi(url, params, headers)
 }
 
-export function* ScreenSaga({ payload: {params}  }) {
-  const screenState = yield select(getScreenState) //message="" confirm=""になっている。
-  const loginState = yield select(getLoginState) 
-  let token = loginState.auth["access-token"]       
-  let client = loginState.auth.client         
-  let uid = loginState.auth.uid 
-  try {
-      let response  = yield call(screenApi,{params ,token,client,uid} )
-      switch(params.req) {
-        case 'viewtablereq':
-          response.data["params"] = params
-          return yield put({ type: SCREEN_SUCCESS, action: response })    //action --> payload
-        case 'editabletablereq':
-          response.data["params"] = params
-          return yield put({ type: SCREEN_SUCCESS, action: response })     
-        case 'inlineaddreq':
-            response.data["params"] = params
-            return yield put({ type: SCREEN_SUCCESS, action: response })    
-        case "updateGridLineData":
-          //screenState.data[params.index]["id"] = response.data.params.addId
-          screenState.data[params.index] = response.data.params
-          return yield put({ type: SCREEN_LINEEDIT, payload:{data:screenState.data} })    
-        case "confirm":
-            screenState.data[params.index] = response.data.params
-            return yield put({ type: SCREEN_LINEEDIT, payload:{data:screenState.data} })   
-        case "fetch_request":
-            let tmp 
-            screenState.data[params.index].confirm_gridmessage =  ""
-            if(response.data.params.err){
-                tmp =  JSON.parse(response.data.params.fetchcode)
-                Object.keys(tmp).map((idx)=>{
-                  screenState.data[params.index][idx]= tmp[idx]
-                  screenState.data[params.index][`${idx}_gridmessage`] = response.data.params.err
-                  screenState.data[params.index].confirm_gridmessage =  response.data.params.err
-                return screenState.data
-                })
-              return yield put({ type: FETCH_FAILURE, payload: {data:screenState.data} })   
-            }
-            else{
-                //tmp =  JSON.parse(response.data.params.fetch_data)
-                tmp =  response.data.params.fetch_data
-                Object.keys(tmp).map((idx)=>{
-                  screenState.data[params.index][idx]= tmp[idx]
-                  screenState.data[params.index][`${idx}_gridmessage`] = "ok"
-                return screenState.data
-                })
-              return  yield put({ type: FETCH_RESULT, payload: {data:screenState.data} })   
-              }    
-        case "check_request":   //帰りはfetchと同じ
-                  screenState.data[params.index].confirm_gridmessage =  ""
-                  if(response.data.params.err){
-                      tmp =  JSON.parse(response.data.params.checkcode)
-                      Object.keys(tmp).map((idx)=>{
-                        screenState.data[params.index][`${idx}_gridmessage`] = response.data.params.err
-                        screenState.data[params.index].confirm_gridmessage =  response.data.params.err
-                      return screenState.data
-                      })
-                    return yield put({ type: FETCH_FAILURE, payload: {data:screenState.data} })   
-                  }
-                  else{
-                      tmp =  JSON.parse(response.data.params.checkcode)
-                      Object.keys(tmp).map((idx)=>{
-                        screenState.data[params.index][`${idx}_gridmessage`] = "ok"
-                      return screenState.data
-                      })
-                    return  yield put({ type: FETCH_RESULT, payload: {data:screenState.data} })   
-                    }    
-        case "yup":  // create yup schema
-              return yield put({ type: YUP_RESULT, payload: {message:response.data.params.message} })    
-        default:
-          return {}
-      }
-  }catch(e)
+export function* ScreenSaga({ payload: {params,token,client,uid}  }) {
+  let response  = yield call(screenApi,{params ,token,client,uid} )
+  if(response){
+      let temp =[]
+      if(params["req"]==="editabletablereq")
+        {
+          response.data.columns.map((val,index) =>{ 
+           if(val["Cell"] === '1'||val["Cell"] === '2')
+              {val["Cell"] = (row=>(<input type='text' defaultValue={row.value} 
+              />))}
+              else{val["Cell"]=""}
+           if(val["show"] === '0')
+                 {val["show"] =  true}
+            else{val["show"] =  false}     
+            return   temp.push(val)
+        }) 
+      } else{ response.data.columns.map((val,index) =>{ 
+        if(val["show"] === '0')
+              {val["show"] =  true}
+         else{val["show"] =  false}     
+          return  temp.push(val)})
+      }   
+      response.data.columns = temp    
+      yield put({ type: SCREEN_SUCCESS, action: response })
+  }else
      {  
       let message;
-      switch (e.status) {
+      switch (response.status) {
               case 500: message = 'Internal Server Error'; break;
               case 401: message = 'Invalid credentials'; break;
-              default: message = `Something went wrong ${e.error}` ;}
+              default: message = `Something went wrong ${response.error}` ;}
       yield put({ type: SCREEN_FAILURE, errors: message })
   }
  }      
-

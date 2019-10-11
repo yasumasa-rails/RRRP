@@ -1,83 +1,33 @@
-// https://www.npmjs.com/package/react-export-excel
+// joemusacchia/ReactCarrierwaveImageUploadBlogPost.md
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Form, withFormik} from 'formik';
-import {DownloadReset} from '../actions'
-import ReactExport from "react-data-export";
+import {DownloadRequest} from '../actions'
 
-const ExcelFile = ReactExport.ExcelFile;
-const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
-//const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
-const options = { year: 'numeric', month: 'long', day: 'numeric' ,hour:'numeric',minute:'numeric',second:'numeric'};
-const wtime = (new Date()).toLocaleDateString('ja-JA', options).replace(/:/g,"-")
+const Download = (uid,token,client,screenCode,screenName,readFile) => (
+    <div>
+       import Table {screenName}
+      <input type='file' onClick={(files)=>readFile(files,uid,token,client,screenCode)}/>
+    </div>
+  )
 
-/*
-// EXCELのヘッダーの色は変更でない。
-const sample = [
-  {
-      columns: [
-          {title: "Headings"},
-          {title: "Text Style"},
-          {title: "Colors", width: {wpx: 120}},
-      ],
-      data: [
-          [
-              {value: "H1"},
-              {value: "Bold",style: {fill: {patternType: "solid",fgColor: {rgb: "FFF86B"}}}},
-              {value: "Red"},
-          ],
-          [
-              {value: "H2"},
-              {value: "underline",style: {fill: {fgColor:{rgb:"123456"}}}},
-              {value: "Blue"},
-          ],        
-      ]
-  }
-];
-*/
-const formikForm = ({isSubmitting,handleSubmit,status, values}) => {
-        const {screenName,filtered,excelData,totalcnt} = status
-        const dataset = [{columns:JSON.parse(excelData.columns),data:JSON.parse(excelData.data)}]
-        return(                 
-        <div>
-          <Form {...values} onSubmit={handleSubmit}>
-           <p>export Table       --->{screenName}</p>
-           <p>select condition </p>
-           {filtered.length===0?<p>all data selected </p>: filtered.map((val,index) =>{
-                                                    return <p key={index}>{val.id} : {val.value}</p>
-           })}
-           <p>total record count --->{totalcnt}</p>
-               <ExcelFile filename={screenName+wtime} element={<button disabled={isSubmitting}> Data Download </button>} >
-                  <ExcelSheet dataSet={dataset} name="export">
-                  </ExcelSheet>
-               </ExcelFile>
-          </Form>
-        </div> 
-        )             
-}
 
-    const formikEnhancer = withFormik({
-      mapPropsToValues : (props) =>({
-        }),
-      mapPropsToStatus : (props) =>({
-        screenCode:props.button.screenCode,
-        screenName:props.button.screenName,
-        filtered:props.button.filtered?props.button.filtered:[], 
-        excelData:props.button.excelData,
-        totalcnt:props.button.totalcnt,
-        }),
-      handleSubmit : (values,{props}) =>{ /*
-        let params={screenCode:values.screencode,filtered:values.filtered,req:"download"}
-        props.dispatch(DownloadRequest(params)) */
-        props.dispatch(DownloadReset()) 
-            }, 
-          }, 
-    )(formikForm)
+const  mapStateToProps = (state) => ({
+              uid:state.login.auth?state.login.auth.uid:"",
+              token:state.login.auth?state.login.auth["access-token"]:"",
+              client:state.login.auth?state.login.auth.client:"",
+              screenCode:state.screen.screenCode,
+              screenName:state.screen.screenName,
     
-    const mapStateToProps = (state,ownProps)  =>({  
-      button:state.button,
-    })
+  })
+       
+  const mapDispatchToProps = (dispatch,ownProps ) => ({
+      readFile: (files,uid,token,client,screenCode) =>{
+                if(files && files[0]){
+                    let formPayLoad = new FormData();
+                    formPayLoad.append('downloaded_image', files[0]);
+                    dispatch(DownloadRequest(formPayLoad,uid,token,client,screenCode))
+                  }}
+    } )
 
-const  Download =  connect(mapStateToProps,null)(formikEnhancer)
-export  default  Download;
+export default  connect(mapStateToProps,mapDispatchToProps)(Download)

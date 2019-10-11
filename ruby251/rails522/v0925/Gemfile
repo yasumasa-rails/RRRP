@@ -1,11 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.5.6'
-
-##if defined?(RUBY_DESCRIPTION) && RUBY_DESCRIPTION.start_with?("ruby 2.5")
-##  gem "openssl"
-##end
+ruby '2.5.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.3'
@@ -32,7 +28,7 @@ gem 'activestorage','~>5.2.3.rc1'
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
  gem 'rack-cors'
-gem 'devise_token_auth', '>= 1.1.2'
+gem 'devise_token_auth'
 gem 'omniauth'
 
 group :development, :test do
@@ -66,4 +62,3 @@ gem 'json'
 gem 'active_model_serializers'
 
 ###gem 'ngrok-tunnel'
-gem 'sidekiq'

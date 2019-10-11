@@ -16,8 +16,11 @@ const menureducer =  (state= initialValues , actions) =>{
       }
 
     case MENU_FAILURE:
-      return {message:actions.errors.message,
-    }        
+      return {errors:actions.errors,
+              messages: [],
+              isAuthenticated:false,
+    }    
+    
 
     case  LOGOUT_REQUEST:
     return {}  

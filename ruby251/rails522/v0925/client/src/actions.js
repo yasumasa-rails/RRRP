@@ -24,17 +24,12 @@ export const SCREEN_REQUEST = 'SCREEN_REQUEST'
 export const SCREEN_SUCCESS = 'SCREEN_SUCCESS'
 export const SCREEN_PARAMS_SET = 'SCREEN_PARAMS_SET'
 export const SCREEN_FAILURE = 'SCREEN_FAILURE'
-export const SCREEN_ERR_SET = 'SCREEN_ERR_SET'
-export const SCREEN_ERR_CHECK_RESULT = 'SCREEN_ERR_CHECK_RESULT'
-export const SCREEN_ERR_CHECK = 'SCREEN_ERR_CHECK'
 
 export const BUTTONLIST_REQUEST = 'BUTTONLIST_REQUEST'
 export const BUTTONLIST_SUCCESS = 'BUTTONLIST_SUCCESS'
 export const BUTTONLIST_FAILFURE = 'BUTTONLIST_FAILURE'
 
 export const BUTTONFLG_REQUEST = 'BUTTONFLG_REQUEST'
-export const BUTTON_RESET = 'BUTTON_RESET'
-export const GANTT_RESET = 'GANTT_RESET'
 
 export const UPLOAD_REQUEST = 'UPLOAD_REQUEST'
 export const UPLOADLIST_REQUEST = 'UPLOADLIST_REQUEST'
@@ -50,33 +45,10 @@ export const EDITUPLOAD_REQUEST = 'EDITUPLOAD_REQUEST'
 export const EDITUPLOAD_RESULT = 'EDITUPLOAD_RESULT'
 
 export const DOWNLOAD_REQUEST = 'DOWNLOAD_REQUEST'
-export const DOWNLOAD_SUCCESS = 'DOWNLOAD_SUCCESS'
-export const DOWNLOAD_FAILURE = 'DOWNLOAD_FAILURE'
-export const DOWNLOAD_RESET = 'DOWNLOAD_RESET'
-
-export const SCREEN_LINEEDIT = 'SCREEN_LINEEDIT'
-
-
-export const FETCH_REQUEST = 'FETCH_REQUEST'
-export const FETCH_RESULT = 'FETCH_RESULT'
-export const FETCH_FAILURE = 'FETCH_FAILURE'
-export const INPUTFIELDPROTECT_REQUEST = ' INPUTFIELDPROTECT_REQUEST'
-
-export const YUP_RESULT = 'YUP_RESULT'
-export const YUP_REQUEST = 'YUP_REQUEST'
-export const YUP_ERR_SET = 'YUP_ERR_SET'
-export const TBLFIELD_REQUEST = 'TBLFIELD_REQUEST'
-export const TBLFIELD_SUCCESS = 'TBLFIELD_SUCCESS'
-export const TBLFIELD_FAILURE = 'TBLFIELD_FAILFURE'
-export const DROPDOWNVALUE_SET = 'DROPDOWNVALUE_SET'
-
-export const GANTTCHART_REQUEST = 'GANTTCHART_REQUEST'
-export const GANTTCHART_FAILURE = 'GANTTCHART_FAILURE'
-export const GANTTCHART_SUCCESS = 'GANTTCHART_SUCCESS'
-
 
 // LOGIN
 // Attach our Formik actions as meta-data to our action.
+
 
 export const SignupRequest = createAction(
   SIGNUP_REQUEST,
@@ -110,55 +82,26 @@ export const MenuFailure = (errors) => ({
   errors: { errors }  //
 })
 
-export const ScreenRequest = (params) => ({
+export const ScreenRequest = (params,token,client,uid,screenName) => ({
   type:  SCREEN_REQUEST,
-  payload: { params}  //
+  payload: { params,token,client,uid ,screenName}  //
 })
 
-export const ScreenParamsSet = (params) => ({
+export const ScreenParamsSet = (subparams) => ({
   type:  SCREEN_PARAMS_SET,
-  payload: { params}  //
+  payload: { subparams }  //
 })
-
-export const ScreenErrSet = (data,token,client,uid) => ({
-  type:  SCREEN_ERR_SET,
-  payload: { data,token,client,uid }  //
-})
-
-
-export const YupErrSet = (data) => ({
-  type:  YUP_ERR_SET,
-  payload: {data}  //
-})
-
-export const DropDownValueSet = (dropDownValue) => ({
-  type:  DROPDOWNVALUE_SET,
-  payload: {dropDownValue}  //
-})
-
 
 export const ScreenFailure = (errors) => ({
   type: SCREEN_FAILURE,
   errors: { errors }  //
 })
 
-export const DownloadRequest = (params) => ({
+export const DownloadRequest = (formPayLoad) => ({
   type: DOWNLOAD_REQUEST,
-  payload: { params}
+  payload: { formPayLoad}
 })
 
-export const DownloadReset = () => ({
-  type: DOWNLOAD_RESET,
-  payload: { }
-})
-
-
-/*
-export const DownloadSuccess = (response) => ({
-  type: DOWNLOAD_SUCCESS,
-  payload: {response}
-})
-*/
 
 export const ButtonListRequest = (token,client,uid) => ({
   type:  BUTTONLIST_REQUEST,
@@ -174,9 +117,9 @@ export const ButtonListFailure = (error) => ({
 })
 
 
-export const ButtonFlgRequest = (buttonflg,params) => ({
+export const ButtonFlgRequest = (buttonflg) => ({
   type: BUTTONFLG_REQUEST,
-  payload: { buttonflg,params}
+  payload: { buttonflg}
 })
 
 export const ChangeUploadableRequest = (isUpload) => ({
@@ -243,54 +186,3 @@ export const EditUploadResult = (message) => ({
 })
 
 
-export const FetchRequest = (params,token,client,uid) => ({
-  type: FETCH_REQUEST,
-  payload: { params ,token,client,uid}
-})
-
-export const InputFieldProtect = (columns) => ({
-  type: INPUTFIELDPROTECT_REQUEST,
-  payload: { columns}
-})
-
-export const FetchResult = (data,columns) => ({
-  type: FETCH_RESULT,
-  payload: { data,columns}
-})
-
-export const FetchFailure = (data,columns) => ({
-  type: FETCH_FAILURE,
-  payload: { data,columns}
-})
-
-
-export const YupRequest = (params) => ({
-  type:  YUP_REQUEST,
-  payload: { params}  //
-})
-
-export const TblfieldRequest = (params) => ({
-  type:  TBLFIELD_REQUEST,
-  payload: { params}  //
-})
-
-
-export const TblfielSuccess = (messages) => ({
-  type:  TBLFIELD_SUCCESS,
-  payload: { messages}  //
-})
-
-export const GanttChartRequest = (params) => ({
-  type:  GANTTCHART_REQUEST,
-  payload: { params}  //
-})
-
-
-export const ButtonReset = () => ({
-  type:  BUTTON_RESET,
-   //
-})
-
-export const GanttReset = () => ({
-  type:  GANTT_RESET,
-})

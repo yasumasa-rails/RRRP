@@ -14,7 +14,7 @@ $ sudo /etc/init.d/postgresql status
 
 $ su - postgres
 
-
+Accountの設定
 postgres=# CREATE ROLE v10_development LOGIN CREATEDB PASSWORD 'v10_development';
 CREATE ROLE
 postgres=# \du
