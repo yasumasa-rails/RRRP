@@ -28,17 +28,17 @@ export function * SignupSaga ({payload: values, meta: actions}) {
   const {setSubmitting} = actions
   
   // Connect to our "API" and get an API token for future API calls.
-  const response = yield call(signupAPI, values.email, values.password,values.passwordConfirmation)
-  if(response.ok)
-     {yield put({type:SIGNUP_SUCCESS, response})
-    // Reset the form just to be clean, then send the user to our Dashboard which "requires"
-    // authentication. 
-    yield call(history.push, '/')
+  try{
+      const response = yield call(signupAPI, values.email, values.password,values.passwordConfirmation)
+      yield put({type:SIGNUP_SUCCESS, response})
+      // Reset the form just to be clean, then send the user to our Dashboard which "requires"
+      // authentication. 
+      yield call(history.push, '/login')
     }
-  else{ 
-    // If our API throws an error we will leverage Formik's existing error system to pass it along
-    // to the view layer, as well as clearing the loading indicator.
-      yield put({type:SIGNUP_FAILURE, errors:response.statusText})
+  catch(errors){ 
+      // If our API throws an error we will leverage Formik's existing error system to pass it along
+      // to the view layer, as well as clearing the loading indicator.
+      yield put({type:SIGNUP_FAILURE, errors:errors.statusText})
       yield call(setSubmitting, false)
     }  
 }

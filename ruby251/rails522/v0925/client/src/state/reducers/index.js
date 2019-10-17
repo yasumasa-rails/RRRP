@@ -1,4 +1,3 @@
-
 import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
 
@@ -8,6 +7,7 @@ import  menureducer  from './menu'
 import  screenreducer  from './screen'
 import  uploadreducer  from './upload'
 import  buttonreducer  from './button'
+import  ganttchartreducer  from './ganttchart'
 
 
 const reducer = combineReducers({
@@ -17,6 +17,7 @@ const reducer = combineReducers({
   screen:screenreducer,
   upload:uploadreducer,
   button:buttonreducer,
+  ganttchart:ganttchartreducer,
   routing: routerReducer,
 })
 

@@ -1,71 +1,53 @@
-import {  UPLOAD_REQUEST, UPLOADLIST_REQUEST,
-          UPLOAD_SUCCESS,UPLOADLIST_SUCCESS,
-           CHANGEUPLOADABLE_REQUEST,CHANGEUNUPLOAD_REQUEST,
-           CHANGEUPLOADTITLEEDITABLE_REQUEST,EDITUPLOADTITLE_REQUEST,
-           EDITUPLOADTITLE_SUCCESS, EDITUPLOAD_RESULT,
-          LOGOUT_REQUEST} from 'actions'
+import {  UPLOAD_REQUEST,EXCELTOJSON_REQUEST,
+        UPLOAD_SUCCESS,EXCELTOJSON_SUCCESS,
+         CHANGEUPLOADTITLEEDITABLE_REQUEST,CHECKJSONDATA_SUCCESS,
+        LOGOUT_REQUEST} from 'actions'
 const initialValues = {
-  isEditable:false,
-  isUpload:false,
-  isSubmitting:false,
-  errors:[],
+isEditable:false,
+isUpload:false,
+isSubmitting:false,
+errors:[],
 }
 
 const uploadreducer =  (state= initialValues , actions) =>{
-  switch (actions.type) {
-    
-    case UPLOAD_REQUEST:
-      return {...state,
-              values:actions.payload.values}
-     
-    
-    case UPLOAD_SUCCESS:
-      return {...state,
-              imageFromController:actions.payload.imageFromController}          
-
-    case CHANGEUPLOADABLE_REQUEST:
-        return {...state,
-                isUpload:true,}
-
-    case CHANGEUNUPLOAD_REQUEST:
-          return {...state,
-                  isEditable:false, 
-                  isUpload:false,}
-
-    case UPLOADLIST_REQUEST:
-        return {...state,
-                values:actions.payload.values}
-
-    case UPLOADLIST_SUCCESS:
-        return {...state,
-                uploadlists:actions.payload}
-
-    case CHANGEUPLOADTITLEEDITABLE_REQUEST:
-         return {...state,
-                 upload:actions.payload.upload,
-                 isEditable:true, }
-        
-    case EDITUPLOADTITLE_REQUEST:
+switch (actions.type) {
+  
+  case UPLOAD_REQUEST:
     return {...state,
-            upload:actions.payload.upload,
-            isEditable:true, }
-
-    case EDITUPLOADTITLE_SUCCESS:
-         return {...state,
-                 data:actions.payload,
-                 status:"ok", }
+            values:actions.payload.values}
    
-    case EDITUPLOAD_RESULT:
-        return {...state,
-                message:actions.payload.message }
-                               
-                        
-    case  LOGOUT_REQUEST:
-    return {}  
+  
+  case UPLOAD_SUCCESS:
+    return {...state,
+            imageFromController:actions.payload.imageFromController}          
 
-    default:
-      return state
-  }
+  case EXCELTOJSON_REQUEST:
+        return {...state,
+                file:actions.payload.file,
+                screenCode:actions.payload.screenCode,
+                filename:null}
+
+  case EXCELTOJSON_SUCCESS:
+      return {...state,
+              sheet:actions.payload.sheet,
+              filename:actions.payload.filename,  }
+
+  case CHANGEUPLOADTITLEEDITABLE_REQUEST:
+       return {...state,
+               upload:actions.payload.upload,
+               isEditable:true, }
+      
+  case CHECKJSONDATA_SUCCESS:
+       return {...state,
+               results:actions.payload.results,
+         }
+                       
+  case  LOGOUT_REQUEST:
+  return {}  
+
+  default:
+    return {...state}
+        }
 }
 
 export default uploadreducer

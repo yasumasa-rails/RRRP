@@ -12,7 +12,6 @@ class CreateUploadService
       if file?(@params[:excel])
         @upload.create({:title=>@param[:title],:excel=>@param[:excel]}) 
       else
-        debugger
       end  
     end
   

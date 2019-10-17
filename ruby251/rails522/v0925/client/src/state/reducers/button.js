@@ -1,32 +1,96 @@
 import {  BUTTONLIST_REQUEST, BUTTONLIST_SUCCESS, BUTTONFLG_REQUEST,
-          LOGOUT_REQUEST} from 'actions'
+  DOWNLOAD_REQUEST,DOWNLOAD_SUCCESS,DOWNLOAD_RESET,GANTT_RESET,
+  TBLFIELD_SUCCESS,SCREEN_SUCCESS,GANTTCHART_SUCCESS,
+  LOGOUT_REQUEST} from 'actions'
 const initialValues = {
-  errors:[],
-  buttonflg:""
+errors:[],
+buttonflg:""
 }
 
 const buttonreducer =  (state= initialValues , actions) =>{
-  switch (actions.type) {
-    
-    case BUTTONLIST_REQUEST:
-      return {...state}
+switch (actions.type) {
 
-    case BUTTONLIST_SUCCESS:
-      return {...state,
-      buttonListData:actions.payload,
-     }
+case BUTTONFLG_REQUEST:
+return {...state,
+buttonflg:actions.payload.buttonflg, 
+screenCode:actions.payload.params.screenCode,
+screenName:actions.payload.params.screenName,
+filtered:actions.payload.params.filtered,  
+disabled:true,  
+messages:null,
+message:null, 
+}
 
-    case BUTTONFLG_REQUEST:
-       return {...state,
-        buttonflg:actions.payload.buttonflg,
-     }
+case BUTTONLIST_REQUEST:
+return {...state,
+disabled:true,
+messages:null,
+message:null,}
 
-    case  LOGOUT_REQUEST:
-    return {}  
+case GANTT_RESET:
+  return {...state,
+    disabled:false,}
 
-    default:
-      return state
-  }
+
+case BUTTONLIST_SUCCESS:
+return {...state,
+buttonListData:actions.payload,
+disabled:false,
+}
+
+case DOWNLOAD_REQUEST:
+return {...state,
+excelData:null,
+totalcnt:null,
+params:actions.payload.params,
+downloadloading:"doing",
+disabled:true,
+messages:null,
+message:null,
+}
+case DOWNLOAD_SUCCESS:
+return {...state,
+excelData:actions.payload.data.excelData,
+totalcnt:actions.payload.data.totalcnt,
+downloadloading:"done",
+disabled:false,
+}
+case DOWNLOAD_RESET:
+return {...state,
+excelData:null,
+totalcnt:null,
+buttonflg:null,
+downloadloading:"",
+disabled:false,
+}
+case TBLFIELD_SUCCESS:
+return {...state,
+messages:actions.payload.messages,
+message:actions.payload.message,
+disabled:false,
+}
+
+case SCREEN_SUCCESS:
+return {...state,
+disabled:false,
+messages:null,
+message:null,
+}
+
+case GANTTCHART_SUCCESS:
+return {...state,
+disabled:false,
+messages:null,
+message:null,
+}
+
+
+case  LOGOUT_REQUEST:
+return {}  
+
+default:
+return state
+}
 }
 
 export default buttonreducer
