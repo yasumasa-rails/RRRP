@@ -39,6 +39,8 @@ extend self
                 end   
             when "select"
                 str<< %Q%string()%
+            when "check"
+                str<< %Q%string()%
             when "numeric"
                 str<< %Q%number()%
                 if rec["screenfield_minvalue"].to_i >0
@@ -82,9 +84,7 @@ extend self
                     screenfield_minvalue,screenfield_formatter,	pobject_code_scr ,screenfield_edoptmaxlength,
                     max(screenfield_updated_at) screenfield_updated_at,screenfield_paragraph
                     from r_screenfields
-                    where (screenfield_editable !=0 and screenfield_type not in('varchar', 'textarea','char')
-                    or (screenfield_editable !=0 and screenfield_edoptmaxlength >0)
-                    or (screenfield_indisp != 0 or screenfield_maxvalue >0 or screenfield_minvalue >0 ))
+                    where screenfield_editable !=0 
                     #{if screencode then " and pobject_code_scr = '#{screencode}' " else "" end }
                     group by pobject_code_sfd,screenfield_type,screenfield_indisp,screenfield_maxvalue,screenfield_edoptmaxlength,
                     screenfield_minvalue,screenfield_formatter,screenfield_paragraph,pobject_code_scr

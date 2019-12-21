@@ -1,23 +1,23 @@
 module Api
     class GanttchartsController < ApplicationController
         before_action :authenticate_api_user!
-          def index
-          end
-          def create
-            case params[:req] 
-              when 'ganttchart'
-                command_r = JSON.parse params[:linedata]
-                case params[:screenCode] 
-                when /nditms/
-                    opeitms_id = command_r["nditm_opeitm_id"]
-                when /opeitms/
-                    opeitms_id = command_r["opeitm_id"]
-                when /itms/
-                    if command_r["itm_id"]
-                        opeitms_id =  GanttChart.get_opeitms_id_from_itm(command_r["itm_id"])
-                    else
-                        opeitms_id = nil
-                    end    
+            def index
+            end
+            def create
+                case params[:req] 
+                when 'ganttchart'
+                    command_r = JSON.parse params[:linedata]
+                    case params[:screenCode] 
+                        when /nditms/
+                            opeitms_id = command_r["nditm_opeitm_id"]
+                        when /opeitms/
+                            opeitms_id = command_r["opeitm_id"]
+                        when /itms/
+                        if command_r["itm_id"]
+                            opeitms_id =  GanttChart.get_opeitms_id_from_itm(command_r["itm_id"])
+                        else
+                            opeitms_id = nil
+                        end    
                 end
                 if opeitms_id.nil?
                     gantt = []

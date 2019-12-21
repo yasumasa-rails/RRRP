@@ -25,8 +25,8 @@ export const SCREEN_REQUEST = 'SCREEN_REQUEST'
 export const SCREEN_SUCCESS = 'SCREEN_SUCCESS'
 export const SCREEN_PARAMS_SET = 'SCREEN_PARAMS_SET'
 export const SCREEN_FAILURE = 'SCREEN_FAILURE'
-export const SCREEN_ERR_SET = 'SCREEN_ERR_SET'
 export const SCREEN_ERR_CHECK_RESULT = 'SCREEN_ERR_CHECK_RESULT'
+export const SCREEN_ONBLUR = 'SCREEN_ONBLUR'
 
 export const BUTTONLIST_REQUEST = 'BUTTONLIST_REQUEST'
 export const BUTTONLIST_SUCCESS = 'BUTTONLIST_SUCCESS'
@@ -84,7 +84,6 @@ export const SignupRequest = createAction(
   ({actions}) => actions
 )
 
-
 export const authorize = (email, password) => ({
   type: LOGIN_REQUEST,
   payload: { email, password }
@@ -94,17 +93,17 @@ export const LogoutRequest = (token,client,uid) => ({
   type: LOGOUT_REQUEST,
   payload: {token:token,client:client,uid:uid }
 })
+
 export const LogoutSuccess = () => ({
   type: LOGOUT_SUCCESS,
  // payload: {token,client,uid }
 })
 
-
-
 export const MenuRequest = (token,client,uid) => ({
   type:  MENU_REQUEST,
   payload:{token,client,uid} 
 })
+
 export const MenuFailure = (errors) => ({
   type: MENU_FAILURE,
   errors: { errors }  //
@@ -120,22 +119,20 @@ export const ScreenParamsSet = (params) => ({
   payload: { params}  //
 })
 
-export const ScreenErrSet = (data,token,client,uid) => ({
-  type:  SCREEN_ERR_SET,
-  payload: { data,token,client,uid }  //
+export const ScreenOnblur = (data) => ({
+  type:  SCREEN_ONBLUR,
+  payload: {data}  //
 })
 
-
-export const YupErrSet = (data) => ({
+export const YupErrSet = (data,error) => ({
   type:  YUP_ERR_SET,
-  payload: {data}  //
+  payload: {data,error}  //
 })
 
 export const DropDownValueSet = (dropDownValue) => ({
   type:  DROPDOWNVALUE_SET,
   payload: {dropDownValue}  //
 })
-
 
 export const ScreenFailure = (errors) => ({
   type: SCREEN_FAILURE,

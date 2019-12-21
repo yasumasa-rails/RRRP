@@ -28,36 +28,50 @@ export function* TblfieldSaga({ payload: {params}  }) {
   const loginState = yield select(getLoginState) 
   let token = loginState.auth["access-token"]       
   let client = loginState.auth.client         
-  let uid = loginState.auth.uid    
+  let uid = loginState.auth.uid   
   const screenState = yield select(getScreenState) //
   let data =[]
-  screenState.data.map((val,index) =>{ 
-    return data.push({pobject_code_tbl:val.pobject_code_tbl,                      
+  switch(params.req) {
+      case "yup":
+          break
+      case  "createTblViewScreen": 
+            screenState.data.map((val,index) =>{ 
+            return data.push({pobject_code_tbl:val.pobject_code_tbl,                      
+                  pobject_code_fld:val.pobject_code_fld, })
+             }) 
+            params["data"] = data
+            break
+      case "createUniqueIndex": 
+          screenState.data.map((val,index) =>{ 
+          return data.push({pobject_code_tbl:val.pobject_code_tbl,                      
                       pobject_code_fld:val.pobject_code_fld,  // blkuky用
                       blkuky_grp:val.blkuky_grp,
                       blkuky_seqno:val.blkuky_seqno,
                       blkuky_expiredate:val.blkuky_expiredate,})
-  })
-  params["data"] = data
-  let response  = yield call(screenApi,{params ,token,client,uid} )
-  if(response){
-      switch(params.req) {
-        case "yup":  // create yup schema
+           }) 
+           params["data"] = data
+           break
+      default:
+         return {}
+  }
+  try{
+    let response  = yield call(screenApi,{params ,token,client,uid} )
+        switch(params.req) {
+          case "yup":  // create yup schema
               return yield put({ type: TBLFIELD_SUCCESS, payload: {message:response.data.params.message} })   
-        case "createTblViewScreen":  // create  or add field table and create or replacr view  and create screen
+          case  "createTblViewScreen":  // create  or add field table and create or replacr view  and create screen
               return yield put({ type: TBLFIELD_SUCCESS, payload: {messages:response.data.params.messages} })  
-        case "createUniqueIndex":  // create  or add field table and create or replacr view  and create screen
+          case "createUniqueIndex":  // create  or add field table and create or replacr view  and create screen
               return yield put({ type: TBLFIELD_SUCCESS, payload: {messages:response.data.params.messages} })        
-        default:
-          return {}
-      }
-  }else
-     {  
-      let message;
-      switch (response.status) {
+          default:
+            return {}
+        }    
+  }catch(response) {   
+        let message;
+        switch (response.status) {
               case 500: message = 'Internal Server Error'; break;
               case 401: message = 'Invalid credentials'; break;
               default: message = `Something went wrong ${response.error}` ;}
       yield put({ type: TBLFIELD_FAILURE, errors: message })
-  }
+      }
  }      

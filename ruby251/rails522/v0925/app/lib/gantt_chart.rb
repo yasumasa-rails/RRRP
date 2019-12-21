@@ -161,7 +161,6 @@ module GanttChart
         ##dp_id = 0
         ##@bgantts.sort.each  do|key,value|    ###set depends
         ##   if key.size > 3 ###(key+ idx(%4d)
-		##   debugger
         ##     @bgantts[key[0..-4]][:depends] << dp_id.to_s + ","
         ##   end
         ##   dp_id += 1
@@ -495,7 +494,7 @@ module GanttChart
 			end
       return
    end    
-    def proc_add_trngantts	tblchop
+    def gantt_add_trngantts	tblchop
         @bgantts = {}
 		cnt = 0
 		if @opeitm_id

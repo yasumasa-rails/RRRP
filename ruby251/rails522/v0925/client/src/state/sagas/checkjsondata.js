@@ -11,7 +11,7 @@ function jsonApi({lines,screenCode,yup,token,client,uid}){
                     uid:uid,}
 
   const params = {screenCode:screenCode,lines:lines,uid:uid,
-                  yupfetchcode:yup.yupfetchcode,yupcheckcode:yup.yupcheckcode}  
+                  yupfetchcode:yup.yupfetchcode,yupcheckcode:yup.yupcheckcode} 
   let getApi = (url, params) => {
     return axios({
       method:"POST",

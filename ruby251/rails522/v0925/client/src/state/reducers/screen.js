@@ -1,6 +1,6 @@
 import { SCREEN_REQUEST,SCREEN_SUCCESS,SCREEN_FAILURE,
   LOGOUT_REQUEST,SCREEN_PARAMS_SET,
-  SCREEN_LINEEDIT,SCREEN_ERR_CHECK_RESULT,
+  SCREEN_LINEEDIT,SCREEN_ERR_CHECK_RESULT,SCREEN_ONBLUR,
   FETCH_REQUEST,FETCH_RESULT,FETCH_FAILURE,
   YUP_ERR_SET,YUP_RESULT,DROPDOWNVALUE_SET,
 //  INPUTFIELDPROTECT_REQUEST
@@ -26,13 +26,18 @@ return {...state,
   params:action.payload.params,
 }
 
+case SCREEN_ONBLUR:
+return {...state,
+  data:action.payload.data,
+}
+
 case YUP_ERR_SET:
   return {...state,
     data:action.payload.data,
-    loading : false
+    loading : false,
+    error : action.payload.error,
 }
   
-
 case SCREEN_ERR_CHECK_RESULT:
 return {...state,
   data:action.payload.data,
@@ -89,7 +94,7 @@ return {...state,
   token:action.payload.token, 
   client:action.payload.client, 
   uid:action.payload.uid, 
-  loading:true,
+  //loading:true,
   //editableflg:false
 }
 

@@ -48,56 +48,104 @@ module Api
             when "fetch_request"
                 xparams = params.dup  
                 xparams[:parse_linedata] = JSON.parse(params["linedata"])
-                xparams = RorBlkctl.chk_fetch_rec xparams
+                xparams = ControlFields.chk_fetch_rec xparams
                 render json: {:params=>xparams}   
 
             when "check_request"  
-                  status,rparams = RorBlkctl.judge_check_code params
+                  xparams = params.dup  
+                  xparams[:parse_linedata] =  JSON.parse(xparams[:linedata])
+                  rparams = ControlFields.judge_check_code xparams
                   render json: {:params=>rparams}   
 
             when "confirm"
               rparams = params.dup
+              tblnamechop = params[:screenCode].split("_")[1].chop
               yup_fetch_code = JSON.parse(params["yupfetchcode"])
               yup_check_code = JSON.parse(params["yupcheckcode"])
               rparams[:parse_linedata] = JSON.parse(params["linedata"])
+              parse_linedata = rparams[:parse_linedata].dup
               addfield = {}
-              rparams[:parse_linedata].each do |field,val|
+              rparams[:err] = ""
+              parse_linedata.each do |field,val|
                 if yup_fetch_code[field] 
                     ##rparams["fetchcode"] = %Q%{"#{field}":"#{val}"}%  ###clientのreq='fetch_request'で利用
                     if rparams[:parse_linedata]["id"].nil?
                         rparams[:parse_linedata]["aud"]= "add" 
                     end  
                     rparams["fetchview"] = yup_fetch_code[field]
-                    rparams = RorBlkctl.chk_fetch_rec rparams  
-                    if rparams[:err] == ""
-                        if yup_check_code[field] and val != ""
-                            rparams["checkcode"] = %Q%{"#{field}":"#{val}"}%
-                            rparams = RorBlkctl.judge_check_code rparams
-                        end
-                    else
+                    rparams = ControlFields.chk_fetch_rec rparams  
+                    if rparams[:err] != ""
                       rparams[:parse_linedata][:confirm_gridmessage] = rparams[:err] 
                       rparams[:parse_linedata][(field+"_gridmessage").to_sym] = rparams[:err] 
+                      break
                     end
                 end
-              end
+                if rparams[:err] == ""
+                  if yup_check_code[field] 
+                    rparams = ControlFields.judge_check_code rparams  
+                    if rparams[:err] != ""
+                      rparams[:parse_linedata][:confirm_gridmessage] = rparams[:err] 
+                      rparams[:parse_linedata][(field+"_gridmessage").to_sym] = rparams[:err] 
+                      break
+                    end
+                  end
+                end    
+              end	
               if  rparams[:err] == ""
                   command_c =  RorBlkctl.init_from_screen rparams[:uid],rparams[:screenCode]
-                  linedata={}
-                  (rparams[:parse_linedata]).each do |key,val|
-                      command_c[key] = rparams[:parse_linedata][key]
+                  parse_linedata.each do |key,val|
+                      if key.to_s =~ /_id/ and val == ""   and tblnamechop == key.to_s.split("_")[0] and
+                         key.to_s !~ /_gridmessage$/ and  key.to_s !~ /_person_id_upd$/ and  key.to_s != "#{tblnamechop}_id"
+                          rparams[:parse_linedata][:confirm_gridmessage] = " key #{key.to_s} missing"
+                          rparams[:err] = "error  key #{key.to_s} missing"
+                          break
+                      else
+                          command_c[key] = rparams[:parse_linedata][key]
+                      end
                   end 
-                  linedata = rparams[:parse_linedata].dup
+                  ### セカンドkeyのユニークチェック
+                  err = ControlFields.blkuky_check params[:screenCode].split("_")[1],rparams[:parse_linedata]
+                  err.each do |key,recs|
+                    recs.each do |rec|
+                        if command_c["id"] != rec["id"]
+                            rparams[:err] = key + " already exist "
+                            rparams[:parse_linedata][("confirm_gridmessage").to_sym] = rparams[:err] 
+                        end  
+                    end	
+                  end	
+              end
+              if  rparams[:err] == "" and rparams[:screenCode] =~ /tblfields/
+                              strsql =  %Q%  select screenfield_seqno,pobject_code_sfd from r_screenfields  where screenfield_expiredate > current_date and 
+                              id in (select id from r_screenfields where pobject_code_scr = '#{params[:screenCode]}') and
+                              pobject_code_sfd in('screenfield_starttime','screenfield_duedate','screenfield_qty','screenfield_qty_case')
+                  %
+                  seqchkfields ={}
+                  recs = ActiveRecord::Base.connection.select_all(strsql)
+                  recs.each do |rec|
+                    seqchkfields[rec["pobject_code_sfd"]] = rec["screenfield_seqno"]
+                  end  
+                  seqchkfields[rparams[:parse_linedata]["pobject_code_sfd"]] = rparams[:parse_linedata]["screenfield_seqno"]
+                  if (seqchkfields["screenfield_starttime"]||="99999") <  (seqchkfields["screenfield_duedate"]||="0")
+                    rparams[:err] =  " starttime seqno > duedate seqno  "
+                    rparams[:parse_linedata][("confirm_gridmessage").to_sym] = rparams[:err] 
+                  else
+                    if (seqchkfields["screenfield_qty_case"]||="99999") <  (seqchkfields["screenfield_qty"]||="0")
+                        rparams[:err] =  " qty_case seqno > qty seqno  "
+                        rparams[:parse_linedata][("confirm_gridmessage").to_sym] = rparams[:err] 
+                    end
+                  end
+              end
+              if  rparams[:err] == ""
                   if command_c["id"] == ""
                       command_c[:sio_classname] = "_add_update_grid_line_data"
                   else         
                       command_c[:sio_classname] = "_edit_update_grid_line_data"
                   end
-                  command_r = RorBlkctl.add_update_rec(rparams,command_c) 
-                  RorBlkctl.proc_update_table(command_r,1,nil,nil,nil)
-              else 
-                  linedata = rparams[:parse_linedata].dup 
-              end  
-              render json: {:linedata=>linedata}
+                  RorBlkctl.proc_update_table(command_c,1)
+                  rparams[:parse_linedata][:confirm] = true  
+                  rparams[:parse_linedata][("confirm_gridmessage").to_sym] = "done"
+              end 
+              render json: {:linedata=> rparams[:parse_linedata]}
 
             when 'download'
               screenCode = params[:screenCode]

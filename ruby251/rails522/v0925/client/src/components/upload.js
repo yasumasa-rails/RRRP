@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import {yupErrCheckBatch} from './yuperrcheckbatch'
 import CsvDownload from 'react-json-to-csv'
 import {Button} from '../styles/button'
+import EditableUpload from './editableupload'
 import {CheckJsonDataRequest,ExcelToJsonRequest} from '../actions'
 
 function batchcheck(sheet,screenCode,nameToCode) {
@@ -50,7 +51,7 @@ function batchcheck(sheet,screenCode,nameToCode) {
 }
 
 
-const Upload = ({sheet,filename,message,screenCode,yup,
+const Upload = ({sheet,filenamestr,message,screenCode,yup,
                   exceltojson, checkjsondata,nameToCode,results }) =>{
   return (
        
@@ -63,18 +64,19 @@ const Upload = ({sheet,filename,message,screenCode,yup,
              /> 
     <div className="control has-text-left editable-buttons">
       <Button variant="outlined" color="secondary" 
-             type='submit' disabled={filename?false:true}
+             type='submit' disabled={filenamestr?false:true}
             onClick ={() => checkjsondata(sheet,screenCode,yup,nameToCode,)}>
              チェック</Button> 
     </div>
         {message}
 
-      {results&& 
-      <CsvDownload   data={results}  filename={"result_"+filename.split(/[.xlsx,.xls]/)[0]+".csv"} >
+      {results&&filenamestr&& 
+      <CsvDownload   data={results}  filename={`rslt_${filenamestr}.csv`} >
         結果確認
       </CsvDownload >}
+     <EditableUpload/> 
     </div>
-     </React.Fragment>   
+     </React.Fragment>  
     )
   }
 
@@ -90,7 +92,7 @@ const mapDispatchToProps = dispatch => ({
   
 const mapStateToProps = state =>({
     sheet:state.upload.sheet,
-    filename:state.upload.filename,
+    filenamestr:state.upload.filename,
     message:state.upload.message,
     screenCode:state.screen.screenCode,
     yup:state.screen.yup,

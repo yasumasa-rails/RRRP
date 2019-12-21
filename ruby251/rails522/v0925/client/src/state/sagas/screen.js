@@ -1,6 +1,6 @@
 import { call, put, select } from 'redux-saga/effects'
 import axios         from 'axios'
-import {SCREEN_SUCCESS,SCREEN_FAILURE,SCREEN_LINEEDIT, FETCH_RESULT, FETCH_FAILURE,YUP_RESULT}
+import {SCREEN_SUCCESS,SCREEN_FAILURE,SCREEN_LINEEDIT, FETCH_RESULT, FETCH_FAILURE,}
          from '../../actions'
 import {getScreenState} from '../reducers/screen'
 import {getLoginState} from '../reducers/login'
@@ -65,7 +65,8 @@ export function* ScreenSaga({ payload: {params}  }) {
                 tmp =  response.data.params.fetch_data
                 Object.keys(tmp).map((idx)=>{
                   screenState.data[params.index][idx]= tmp[idx]
-                  screenState.data[params.index][`${idx}_gridmessage`] = "ok"
+                  if(tmp[idx]===""){screenState.data[params.index][`${idx}_gridmessage`] = "ok on the way"}
+                                    else{screenState.data[params.index][`${idx}_gridmessage`] = "ok fetch"}
                 return screenState.data
                 })
               return  yield put({ type: FETCH_RESULT, payload: {data:screenState.data} })   
@@ -73,7 +74,7 @@ export function* ScreenSaga({ payload: {params}  }) {
         case "check_request":   //帰りはfetchと同じ
                   screenState.data[params.index].confirm_gridmessage =  ""
                   if(response.data.params.err){
-                      tmp =  JSON.parse(response.data.params.checkcode)
+                      tmp =  JSON.parse(response.data.params.yupcheckcode)
                       Object.keys(tmp).map((idx)=>{
                         screenState.data[params.index][`${idx}_gridmessage`] = response.data.params.err
                         screenState.data[params.index].confirm_gridmessage =  response.data.params.err
@@ -82,15 +83,20 @@ export function* ScreenSaga({ payload: {params}  }) {
                     return yield put({ type: FETCH_FAILURE, payload: {data:screenState.data} })   
                   }
                   else{
-                      tmp =  JSON.parse(response.data.params.checkcode)
+                      tmp =  JSON.parse(response.data.params.yupcheckcode)
                       Object.keys(tmp).map((idx)=>{
-                        screenState.data[params.index][`${idx}_gridmessage`] = "ok"
+                        screenState.data[params.index][`${idx}_gridmessage`] = "ok check"
+                      return screenState.data
+                      })
+                      tmp = response.data.params.linedata
+                      Object.keys(tmp).map((idx)=>{
+                        screenState.data[params.index][idx] = tmp[idx]
                       return screenState.data
                       })
                     return  yield put({ type: FETCH_RESULT, payload: {data:screenState.data} })   
                     }    
-        case "yup":  // create yup schema
-              return yield put({ type: YUP_RESULT, payload: {message:response.data.params.message} })    
+       // case "yup":  // create yup schema
+       //       return yield put({ type: YUP_RESULT, payload: {message:response.data.params.message} })    
         default:
           return {}
       }

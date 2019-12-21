@@ -18,11 +18,13 @@ function loginApi({ email, password}) {
     });
   };
   return postApi(url, params, headers)
+  .then(response => ({ response }))
+  .catch(error => ({ error }))
 }
 
 export function* LoginSaga({ payload: { email, password } }) {
   
-  let response  = yield call(loginApi, { email, password} )
+  let {response,error}  = yield call(loginApi, { email, password} )
     if(response.headers){
       yield put({ type: LOGIN_SUCCESS, action: response.headers })
       const token = {token:response.headers["access-token"]}
@@ -35,11 +37,11 @@ export function* LoginSaga({ payload: { email, password } }) {
       yield put(ButtonListRequest(token,client,uid) )
   }else
      {  
-      let message;
-      switch (response.status) {
+       let message
+      switch (error.status) {
               case 500: message = 'Internal Server Error'; break;
               case 401: message = 'Invalid credentials'; break;
-              default: message = `Something went wrong ${response.error}`;}
+              default: message = `Something went wrong ${error.error}`;}
       yield put({ type: LOGIN_FAILURE, payload: message })
   }
  }      

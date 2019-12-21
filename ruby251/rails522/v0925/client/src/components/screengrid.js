@@ -2,7 +2,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import ReactTable from 'react-table'
-import {ScreenRequest,FetchRequest, YupErrSet,} from '../actions'
+import {ScreenRequest,FetchRequest, YupErrSet,ScreenOnblur} from '../actions'
 import "react-table/react-table.css"
 import ButtonList from './buttonlist'
 import DropDown from './dropdown'
@@ -10,6 +10,7 @@ import   '../index.css'
 import {yupschema} from '../yupschema'
 import Tooltip from 'react-tooltip-lite'
 import {contentEditablefunc} from './functions'
+import {onBlurFunc} from './onblurfunc'
 import {yupErrCheck} from './yuperrcheck'
 
 
@@ -27,7 +28,7 @@ const renderEditable = (cellInfo)=> {
       className={cellInfo.column.className}  //
       contentEditable={contentEditablechk.type}  //
       suppressContentEditableWarning      
-      dangerouslySetInnerHTML={ contentEditablechk.val }  //
+      dangerouslySetInnerHTML={contentEditablechk.val}  //
     />
     </Tooltip>
   );
@@ -85,6 +86,7 @@ const renderSelectCell = (cellInfo)=> {
     <DropDown dropDownValue={{val:cellInfo.value,index:cellInfo.index,field:cellInfo.column.id,classes:cellInfo.classes}} />
   );
 }
+
 const  renderFilter = ({column,onChange,filter})=> {
   try{
     let val
@@ -108,11 +110,11 @@ const  renderFilter = ({column,onChange,filter})=> {
   }　
 }
 
-const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,
+const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
 // sorted,handleErrorMsg,handleErrorset,handleScreenLineEditRequest,
             columns,data,pages,params,  //params railsに渡すパラメータを兼ねている。
             handleScreenRequest,handleValite, handleFetchRequest,handleConfirmRequest,
-            buttonflg,dropDownList,uid,
+            buttonflg,dropDownList,uid,handleScreenOnblur,
             page, sizePerPageList,screenwidth,yup,originalreq, pageText,
             } = this.props
     
@@ -133,32 +135,34 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,
      let onLineValite = (field,params,data) =>
         {
           let linedata = {}
-          let tmp = data[params.index]["confirm_gridmessage"] 
-          if(tmp==="*"||tmp===""||tmp===undefined){
-            let screenSchema = Yup.object().shape(yupschema[screenCode])
-            const tdata = yupErrCheck(screenSchema,field,params,data)
-            if(tdata[params.index]["confirm_gridmessage"]==="*"){
+          let screenSchema = Yup.object().shape(yupschema[screenCode])
+          yupErrCheck(screenSchema,field,params,data)
+          if(data[params.index]["confirm_gridmessage"]==="done"){
               params["screenCode"] = screenCode
               Object.keys(data[params.index]).map((field)=>{
-                if(field.match(/^[a-z]/)){linedata[field] = data[params.index][field]}
+                if(field.match(/^[a-z]/)){
+                  if(field.match(/_gridmessage/)){}
+                  else{linedata[field] = data[params.index][field]
+                        }
+                }
                 return linedata
-              })
+              }) 
               params["linedata"] =  JSON.stringify(linedata)
               params["yupfetchcode"] = yup.yupfetchcode
               params["yupcheckcode"] = yup.yupcheckcode
               handleConfirmRequest(params)
-             }
-            else{handleValite(tdata)}
           }
-          else{handleValite(data)}
+          else{ let errmsg = data[params.index]["confirm_gridmessage"]
+              handleValite(data,errmsg)}
     }
      
-     let onFieldValite = (field,params,data) =>
+     let onFieldValite = (field,params,data,error) =>
           { let schema =  fieldSchema(field)
-            data[params.index][`${field}_gridmessage`] = ""
-            const tdata =  yupErrCheck (schema,field,params,data)
-            if(tdata[params.index][`${field}_gridmessage`]!==""){
-              handleValite(tdata)
+            yupErrCheck (schema,field,params,data)
+            let errmsg = data[[params.index]][`${field}_gridmessage`]
+            if(errmsg!=="ok"||error===true){
+              data[[params.index]]["confirm_gridmessage"] =  errmsg
+              handleValite(data,errmsg)
             }
           }
      /*
@@ -166,7 +170,6 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,
     //let tcolumns=params.req!=="viewtablereq"?editableColumns(columns):columns   
     let tcolumns=editableColumns(columns)   
     //let filtered =[]
-       
 
     return(
     <div>
@@ -232,64 +235,84 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,
                                            ///screenCode,Name null    
               /* //規定値をセットしようとしたが画面がプロテクトされた
             */
+          } , 
+          onKeyPress:(e) =>
+            {  
+              data[rowInfo.index][`${column.id}_gridmessage`] = "in" //
+            //  rowInfo.row[`${column.id}_gridmessage`] = "in"
           } ,
           onClick:(e) =>
              { 
              if(e.target.checked&&column.id==="confirm")
                   { params["uid"] = uid
                     params["index"] = rowInfo.index
-                  /*  Object.keys(rowInfo.row).map((field)=>{
-                      data[rowInfo.index][field] = rowInfo.row[field]
+                    data[rowInfo.index].confirm_gridmessage = "*"
+                    Object.keys(rowInfo.row).map((field)=>{
+                      if(data[rowInfo.index][field]===""){data[rowInfo.index][field] = rowInfo.row[field]}
                       return data[rowInfo.index]
-                    })*/
+                    }) 
                     onLineValite("confirm",params,data) //
                   }
           },
           onBlur:(e) =>   
              { let inputval 
+              let rval
               let linedata = {}
-             if(e.target.tagName==="SELECT"){inputval= e.target.value}else{if(e.target.tagName==="DIV"){inputval= e.target.textContent}} 
-              if(data[rowInfo.index][column.id]!==inputval&&yup.yupfetchcode[column.id]){// 
+              if(data[rowInfo.index][`${column.id}_gridmessage`] === "in" ||/err|Invalid/.test(data[rowInfo.index][`${column.id}_gridmessage`]) ||
+                  data[rowInfo.index][column.id]!== e.target.textContent){
+              if(e.target.tagName==="SELECT"){inputval= e.target.value}else{if(e.target.tagName==="DIV"){inputval= e.target.textContent}} 
+                if(column.id!=="confirm"){
+        　            rowInfo.row[column.id] = inputval
+                      data[rowInfo.index][column.id]=inputval
+                      //params["linedata"] =  JSON.stringify(data[rowInfo.index])
+                      params["index"] = rowInfo.index
+                      onFieldValite (column.id,params,data,error)
+                      }
+                if(data[rowInfo.index][`${column.id}_gridmessage`]==="ok"){
+                        rval =   onBlurFunc(screenCode,data[rowInfo.index],column.id)
+                        linedata = rval["linedata"]
+                        Object.keys(linedata).map((field)=>{
+                                            data[rowInfo.index][field] = linedata[field]
+                                          return data
+                                        })
+                        if (rval["sw"]){handleScreenOnblur(data)}                
+                      }   
+                if(yup.yupcheckcode[column.id]&&data[rowInfo.index][`${column.id}_gridmessage`]==="ok"){// 
+                                // rowInfo.row[column.id]=inputval
+                                  let chkcondtion = yup.yupcheckcode[column.id].split(",")[1]
+                                  if(chkcondtion===undefined||(chkcondtion==="add"&data[rowInfo.index]["id"]==="")||(chkcondtion==="update"&data[rowInfo.index]["id"]!=="")){
+                                        data[rowInfo.index][column.id] = inputval
+                                        params["yupcheckcode"] =  JSON.stringify({[column.id]:yup.yupcheckcode[column.id]})
+                                        params["screenCode"] = screenCode
+                                        Object.keys(data[rowInfo.index]).map((field)=>{                                             // data[rowInfo.index][field]}}
+                                                     if(field.match(/^[a-z]/)){if(field.match(/_gridmessage/)){}else{linedata[field] = data[rowInfo.index][field]}}
+                                                          return linedata
+                                                        })
+                                        params["linedata"] =  JSON.stringify(linedata)
+                                        params["index"] = rowInfo.index 
+                                        params["uid"] = uid
+                                        params["req"] = "check_request"                                      
+                                        handleFetchRequest(params)}}
+                if(yup.yupfetchcode[column.id]&&(data[rowInfo.index][`${column.id}_gridmessage`]==="ok"||data[rowInfo.index][`${column.id}_gridmessage`]==="ok on the way")){// 
                                         //rowInfo.row[column.id]=inputval
                                         data[rowInfo.index][column.id]=inputval
-                                        // let params = {}
-                                         params["fetchcode"] = {[column.id]:inputval}
-                                         params["screenCode"] = screenCode
+                                        params["fetchcode"] = {[column.id]:inputval}
+                                        params["screenCode"] = screenCode
                                          Object.keys(data[rowInfo.index]).map((field)=>{
-                                           if(field.match(/^[a-z]/)){linedata[field] = data[rowInfo.index][field]}
-                                           return linedata
-                                         })
-                                         params["linedata"] =  JSON.stringify(linedata)
-                                         params["index"] = rowInfo.index 
-                                         params["fetchview"] = yup.yupfetchcode[column.id]
-                                         params["uid"] =uid
-                                         params["req"] = "fetch_request"                                      
-                                         handleFetchRequest(params)
-                                         }
-              if(data[rowInfo.index][column.id]!==inputval&&yup.yupcheckcode[column.id]){// 
-                                        // rowInfo.row[column.id]=inputval
-                                         data[rowInfo.index][column.id]=inputval
-                                         params["checkcode"] =  JSON.stringify({[column.id]:yup.yupcheckcode[column.id]})
-                                         params["screenCode"] = screenCode
-                                         params["linedata"] =  JSON.stringify(data[rowInfo.index])
-                                         params["index"] = rowInfo.index 
-                                         params["uid"] =uid
-                                         params["req"] = "check_request"                                      
-                                         handleFetchRequest(params)
-                                          }
-              if(data[rowInfo.index][`${column.id}_gridmessage`]!=="ok"||data[rowInfo.index][column.id]!==inputval||inputval===""){
-                    if(column.id!=="confirm"){
-                　                            //rowInfo.row[column.id] = inputval
-                                              data[rowInfo.index][column.id]=inputval
-                                              //params["linedata"] =  JSON.stringify(data[rowInfo.index])
-                                              params["index"] = rowInfo.index
-                                              onFieldValite (column.id,params,data)}
-                                            } ///screenCode,Name null                          
-                                          } ,
-          }
-        }
-      }
-      
+                                                      if(field.match(/^[a-z]/)){if(field.match(/_gridmessage/)){}else{linedata[field] = data[rowInfo.index][field]}}
+                                                           return linedata
+                                                         })
+                                        params["linedata"] =  JSON.stringify(linedata)
+                                        params["index"] = rowInfo.index 
+                                        params["fetchview"] = yup.yupfetchcode[column.id]
+                                        params["uid"] = uid
+                                        params["req"] = "fetch_request"                                      
+                                        handleFetchRequest(params)
+                                                         }
+            }                                         
+          },
+       }}
+       }
       getTheadProps={()=>{ return {
         style: {           
                 width:`${screenwidth}px`
@@ -363,7 +386,7 @@ const  mapStateToProps = (state) => {
             dropDownValues:state.screen.dropDownValues?state.screen.dropDownValues:{},
             originalreq:state.screen.originalreq,
             pageText:state.screen.pageText,
-            message: state.screen.message,
+            error: state.screen.error,
             }
 }
    
@@ -382,11 +405,16 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
                                  ) 
                             params = {...params,page:page,pageSize:pageSize}
                             dispatch(ScreenRequest(params))},
+
     handleConfirmRequest:  (params) =>{ params["req"] = "confirm"
                                       dispatch(ScreenRequest(params))
                                     },
     handleFetchRequest:  (params) =>{dispatch(FetchRequest(params))},
-    handleValite:  (data) =>{ 
-                           dispatch(YupErrSet(data))},
+    
+    handleValite:  (data,errmsg) =>{ 
+                          let error 
+                          if(errmsg==="ok"||errmsg==="done"){ error=false}else{error=true} 
+                           dispatch(YupErrSet(data,error))},
+    handleScreenOnblur: (data) =>{dispatch(ScreenOnblur(data))}
                       })   
 export default connect(mapStateToProps,mapDispatchToProps)(ScreenGrid)

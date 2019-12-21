@@ -7,7 +7,8 @@
 # Creates a new blob on the server side in anticipation of a direct-to-service upload from the client side.
 # When the client-side upload is completed, the signed_blob_id can be submitted as part of the form to reference
 # the blob that was created up front.
-class ActiveStorage::DirectUploadsContsroller < ActiveStorage::BaseController
+##    ActiveStorage::DirectUploadsController
+class ActiveStorage::DirectUploadsController < ActiveStorage::BaseController
   ##protect_from_forgery with: :exception
   skip_before_action :verify_authenticity_token
   before_action :check_file_size!

@@ -5,7 +5,7 @@ export function  contentEditablefunc (cellInfo){
     if(cellInfo.row.screenfield_type){type = cellInfo.row.screenfield_type}
     else{
         if(cellInfo.row.fieldcode_ftype){type = cellInfo.row.fieldcode_ftype}
-        else{ response["type"] = true 　//  response["type"] = true 　画面からの修正可能
+        else{response["type"] = true 　//  response["type"] = true 　画面からの修正可能
                       response["val"] = { __html: cellInfo.value}}}
 //ダイナミックに入力・可・不可    
     if(type){ //type 入力の可否
@@ -193,30 +193,30 @@ export function  contentEditablefunc (cellInfo){
         }
     }
  
-//規定値       yupで対応できず   
-    if(cellInfo.styles.textAlign=== "right"){  // 数字判断
-        if(cellInfo.column.id.match(/_priority_/g)){
-            response["val"] = { __html: cellInfo.value?cellInfo.value:999};
-            cellInfo.row[cellInfo.column.id] =  cellInfo.value?cellInfo.value!==""?cellInfo.value:999:999
-        }else{
-        response["val"] = { __html: cellInfo.value?cellInfo.value:0};
-        cellInfo.row[cellInfo.column.id] =  cellInfo.value?cellInfo.value!==""?cellInfo.value:0:0
-        }
+    //規定値       yupで対応できず   
+    if(cellInfo.styles.textAlign === "right"){  // 数字判断
+        //if(/_priority/.test(cellInfo.column.id)||/_processseq/.test(cellInfo.column.id)){
+        //    response["val"] = { __html: cellInfo.value?cellInfo.value:999};
+        //    cellInfo.row[cellInfo.column.id] =  cellInfo.value.isInteger?cellInfo.value:999
+        //}else{
+            response["val"] = { __html: cellInfo.value?cellInfo.value:0};
+            //cellInfo.row[cellInfo.column.id] =  isNaN(cellInfo.value)?cellInfo.value:0
+       // }
     }   
-    let today = new Date(); 
-    switch( true ){
+    let today = new Date();
+    switch( true ){ //初期値
         case /_expiredate/.test(cellInfo.column.id):
-            response["type"] = true;
-            response["val"] = { __html: cellInfo.value?cellInfo.value:"2099-12-31"};
-            cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value.length>3?cellInfo.value:"2099-12-31":"2099-12-31"
+                response["type"] = true;
+                response["val"] = { __html: cellInfo.value?cellInfo.value:"2099-12-31"};
+                cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value.length>3?cellInfo.value:"2099-12-31":"2099-12-31"
             break
         case /_isudate/.test(cellInfo.column.id):   
-            response["val"] = { __html: cellInfo.value?cellInfo.value:today.getFullYear() + "-" + (today.getMonth() + 1) + "-" +  today.getDate()};
-            cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:today.getFullYear() + "-" + (today.getMonth() + 1) + "-" +  today.getDate();
-            break
-        case /_starttime/.test(cellInfo.column.id):
                 response["val"] = { __html: cellInfo.value?cellInfo.value:today.getFullYear() + "-" + (today.getMonth() + 1) + "-" +  today.getDate()};
                 cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:today.getFullYear() + "-" + (today.getMonth() + 1) + "-" +  today.getDate();
+            break
+        case /pobject_objecttype_tbl/.test(cellInfo.column.id):
+                    response["val"] = { __html: cellInfo.value?cellInfo.value:"tbl"};
+                    cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"tbl";
             break
         default: break    
         }

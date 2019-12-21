@@ -1,5 +1,5 @@
 
-import {takeLatest} from 'redux-saga/effects'
+import {takeEvery} from 'redux-saga/effects'
 
 import {LOGIN_REQUEST,SIGNUP_REQUEST,MENU_REQUEST,
         LOGOUT_REQUEST,SCREEN_REQUEST,BUTTONLIST_REQUEST,
@@ -26,17 +26,17 @@ import {LogoutSaga} from './logout'
 // Routes that require side effects on load are mapped here, [type]: saga.
 // Watch for all actions dispatched that have an action type in our saga routesMap.
 export function * sagas () {
-  yield takeLatest(LOGIN_REQUEST,LoginSaga)
-  yield takeLatest(SIGNUP_REQUEST,SignupSaga)
-  yield takeLatest(MENU_REQUEST,MenuSaga)
-  yield takeLatest(SCREEN_REQUEST,ScreenSaga)
-  yield takeLatest(FETCH_REQUEST,ScreenSaga)
-  yield takeLatest(BUTTONLIST_REQUEST,ButtonListSaga)
-  yield takeLatest(EXCELTOJSON_REQUEST,ExcelToJsonSaga)
-  yield takeLatest(CHECKJSONDATA_REQUEST,CheckJsonDataSaga)
-  yield takeLatest(DOWNLOAD_REQUEST,DownloadSaga)
-  yield takeLatest(YUP_REQUEST,TblfieldSaga)
-  yield takeLatest(TBLFIELD_REQUEST,TblfieldSaga)
-  yield takeLatest(GANTTCHART_REQUEST,GanttChartSaga)
-  yield takeLatest(LOGOUT_REQUEST,LogoutSaga)
+  yield takeEvery(LOGIN_REQUEST,LoginSaga)
+  yield takeEvery(SIGNUP_REQUEST,SignupSaga)
+  yield takeEvery(MENU_REQUEST,MenuSaga)
+  yield takeEvery(SCREEN_REQUEST,ScreenSaga)
+  yield takeEvery(FETCH_REQUEST,ScreenSaga)
+  yield takeEvery(BUTTONLIST_REQUEST,ButtonListSaga)
+  yield takeEvery(EXCELTOJSON_REQUEST,ExcelToJsonSaga)
+  yield takeEvery(CHECKJSONDATA_REQUEST,CheckJsonDataSaga)
+  yield takeEvery(DOWNLOAD_REQUEST,DownloadSaga)
+  yield takeEvery(YUP_REQUEST,TblfieldSaga)
+  yield takeEvery(TBLFIELD_REQUEST,TblfieldSaga)
+  yield takeEvery(GANTTCHART_REQUEST,GanttChartSaga)
+  yield takeEvery(LOGOUT_REQUEST,LogoutSaga)
 }

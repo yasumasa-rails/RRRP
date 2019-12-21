@@ -132,7 +132,7 @@ screenfield.id id,
 ,screenfield_edoptsize  numeric (38,0)
 ,screen_width  numeric (38,0)
 ,screen_strorder  varchar (4000) 
-,screenfield_subindisp  varchar (10) 
+,screenfield_subindisp  varchar (100) 
 ,screenfield_crtfield  varchar (100) 
 ,screenfield_sumkey  varchar (1) 
 ,screenfield_contents  varchar (4000) 

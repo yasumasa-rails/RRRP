@@ -22,7 +22,7 @@ select case when x.name is null then  case when y.name is null then  pobject_cod
 				inner join  persons  p on p.usrgrps_id = t.usrgrps_id and email= $1
 				where t.expiredate > current_date) y
         on y.pobjects_id = s.pobject_id_fld 
- where pobject_code_scr = $2 and s.pobject_objecttype_sfd = 'view_field' and screenfield_expiredate > current_date and screenfield_selection = 1
+ where pobject_code_scr = $2 and s.pobject_objecttype_sfd = 'view_field' and screenfield_expiredate > current_date and screenfield_selection != 0
         order by screenfield_seqno
 $$
 language sql
