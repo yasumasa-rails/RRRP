@@ -27,16 +27,18 @@ export function* DownloadSaga({ payload: {params}  }) {
   let token = loginState.auth["access-token"]       
   let client = loginState.auth.client         
   let uid = loginState.auth.uid 
-  let response  = yield call(screenApi,{params ,token,client,uid} )
-  if(response){
+  try{
+      let response  = yield call(screenApi,{params ,token,client,uid} )
+      if(response){
           return yield put({ type: DOWNLOAD_SUCCESS, payload: response })   
-  }else
+      }
+  }catch(e)
      {  
       let message;
-      switch (response.status) {
+      switch (e.status) {
               case 500: message = 'Internal Server Error'; break;
               case 401: message = 'Invalid credentials'; break;
-              default: message = `Something went wrong ${response.error}` ;}
+              default: message = `Something went wrong ${e.error}` ;}
       yield put({ type: DOWNLOAD_FAILURE, errors: message })
   }
  } 

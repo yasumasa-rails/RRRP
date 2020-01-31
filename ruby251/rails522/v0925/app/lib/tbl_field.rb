@@ -43,7 +43,11 @@ extend self
 		###テーブルの追加修正が完了したので、画面項目とviewの作成
 		@checktbls.each do |tbl,flg|
 			if flg == "done"
-				##外部keyの作成 @add_id_to_tbl
+				strsql = %Q% delete from screenfields where id in(select id from r_screenfields 
+								where pobject_code_scr  = 'r_#{tbl}' )
+								and (created_at = updated_at or expiredate < current_date)		
+						%
+				ActiveRecord::Base.connection.delete(strsql)
 				create_foreign_key_constraint
 				delete_foreign_key_constraint
 				###seq の作成
@@ -127,7 +131,7 @@ extend self
 		if field["column_name"] == rec["pobject_code_fld"]
 			if (field["udt_name"] == rec["fieldcode_ftype"] or (field["udt_name"] == 'bpchar' and  rec["fieldcode_ftype"] == 'char'))
 				case field["udt_name"] 
-				when "varchar"
+				when "varchar","char"
 					if field["character_maximum_length"] > rec["fieldcode_fieldlength"].to_i
 					   	rslt = check_exists_fieldid rec["pobject_code_tbl"],rec["pobject_code_fld"]
 					  	if rslt
@@ -136,8 +140,10 @@ extend self
 					   	else	 
 							create_modify_field_sql rec
 						end
-					##else  OK
-					##	create_modify_field_sql rec
+					else  
+						if field["character_maximum_length"] < rec["fieldcode_fieldlength"].to_i
+							create_modify_field_sql rec
+						end
 					end
 				when "numeric"
 						if  (field["numeric_precision"]||=22)  <= rec["fieldcode_dataprecision"].to_i  and 
@@ -448,7 +454,7 @@ extend self
 		command_r["pobject_expiredate"] = '2099/12/31'
 		###screenfield_screen_id = 1201 and  screenfield_pobject_id_sfd = 13952
 		p command_r if command_r["screenfield_pobject_id_sfd"].to_s == "13952"
-		command_r,processreqs_id = RorBlkctl.private_aud_rec(command_r,1,nil) 
+		command_r,processreqs_id = RorBlkctl.proc_private_aud_rec(command_r,1,nil) 
 		if @sio_result_f ==   "9"
 		 	@messages <<  "error  add_pobject_record #{screenfield}"
 		end  
@@ -528,7 +534,7 @@ extend self
 			command_r["screenfield_paragraph"] =""
 			command_r["screenfield_formatter"] =""
 			p command_r if command_r["screenfield_pobject_id_sfd"].to_s == "13952"
-			command_r,processreqs_id = RorBlkctl.private_aud_rec(command_r,1,nil) 
+			command_r,processreqs_id = RorBlkctl.proc_private_aud_rec(command_r,1,nil) 
 			if @sio_result_f ==   "9"
 		 		@messages <<  "error  add_screenfield_record #{field["pobject_code_tbl"].chop}_#{field["pobject_code_fld"]}"
 			else  
@@ -586,7 +592,7 @@ extend self
 		command_r["screenfield_formatter"] =rec["screenfield_formatter"]
 		command_r["screenfield_crtfield"] = rec["screenfield_crtfield"]  ###create viewのview
 		p command_r if command_r["screenfield_pobject_id_sfd"].to_s == "13952"
-		command_r,processreqs_id = RorBlkctl.private_aud_rec(command_r,1,nil) 
+		command_r,processreqs_id = RorBlkctl.proc_private_aud_rec(command_r,1,nil) 
 		if @sio_result_f ==   "9"
 		 	@messages <<  "error  add_screenfield_record: r_#{tbl} -->#{rec["pobject_code_sfd"]}"
 		else  
@@ -753,50 +759,6 @@ extend self
 		  end
 		  return sio_field_strsql
 	end 
-	def proc_set_search_code_of_screen   pobject_code_scr
-		### 以下　blkukysに変更して　全面コーディングし直した　2014/12/26
-		strsql = "select * from r_screenfields where pobject_code_scr = '#{pobject_code_scr}'
-							 and  screenfield_selection != 0 and screenfield_expiredate > current_date "
-		screenfields = ActiveRecord::Base.connection.select_all(strsql)
-		screenfields.each do |key|
-			tgtblchop = key["pobject_code_sfd"].split("_")[0].chop
-			if key["pobject_code_sfd"] =~ /_code/ and key["screenfield_indisp"] == "1" and  tgtblchop != pobject_code_scr.split("_",2)[1]
-				strsql = "select * from r_blkukys
-				           where pobject_code_tbl = '#{tgtblchp}s'  and pobject_code_fld = '#{key["pobject_code_sfd"].split("_")[1]}'"
-				ukygrp = ActiveRecord::Base.connection.select_one(strsql)
-				dlm = ""
-				if ukysgrp.nil?  ###_xxxを使用していた時
-					strsql = "select * from r_blkukys
-				           where pobject_code_tbl = '#{tgtblchop}s'  and pobject_code_fld = '#{tgtblchop}_code}'"
-					ukygrp = ActiveRecord::Base.connection.select_one(strsql)
-					dlm = key["pobject_code_sfd"].split("_code",2)[1]
-				end
-				strsql = "select * from r_blkukys
-				           where pobject_code_tbl = '#{pobject_code_scr.split("_",2)[1]}'  and blkuky_grp = '#{ukygrp["blkuky_grp"]}'"
-				ukys = ActiveRecord::Base.connection.select_one(strsql)
-				ukys.each do|ukey|
-					strsql = "select * from r_screenfields where pobject_code_scr = '#{pobject_code_scr}' and
-																 pobject_code_sfd = '#{ukey["pobject_code_sfd"]+dlm}'
-																 and screenfield_expiredate > current_date "  ###dlm = "_xxxx"
-					screenfield = ActiveRecord::Base.connection.select_one(strsql)
-					if screenfield["screenfield_paragraph"].nil?
-						updatestr = ""
-						if   screenfield["screenfield_remark"] !~ /by proc_set_search_code_of_screen/
-							updatestr << if screenfield["screenfield_remark"].size <  50  then %Q& remark = '#{screenfield["screenfield_remark"]} _ by proc_set_search_code_of_screen'  & else ""  end
-						end
-						updatestr << %Q&,paragraph = '#{pobject_code_scr + if dlm == "" then "" else ":" + dlm end}' &
-						Screenfield.where(:id=>screenfield["id"]).update_all(updatestr)
-					end
-                end
-			end
-			if key["pobject_code_sfd"] =~ /_sno_/ and key["screenfield_indisp"] == "1" and key["pobject_code_sfd"].split("_")[0] == pobject_code_scr.split("_",2)[1].chop
-				if screenfield[:screenfield_paragraph].nil?
-					updatestr = %Q& paragraph = 'r_#{pobject_code_scr.split("_")[1][3..-1]}#{key["pobject_code_sfd"].split("_sno_")[1]}s'&  ## xxxords,xxxinsts  xxx は3桁
-					Screenfield.where(:id=>key["id"]).update_all(updatestr)
-				end
-            end
-		end
-	end
 
 	def proc_drop_index tblname
 		proc_blk_get_constrains(tblname,'U').each do |key|
@@ -833,6 +795,7 @@ extend self
     	end  ## subfields.each
     	yield k
 	end
+	
 	def set_tblfield_id join_rtbl ,sfd_code,tmpfld
 		if join_rtbl == "upd_persons"
 			njoin_rtbl = "r_persons"
@@ -906,13 +869,19 @@ extend self
 						@messages << "<p>step 1-2: view field #{view} duplicate </p>"
 					end
 				else
-					if tblname != tbl
-						strsql =%Q% delete from screenfields where id in(select id from r_screenfields 
-								where pobject_code_scr  = 'r_#{tbl}'
-										and  pobject_code_sfd = '#{view}'  )
-						%
-						ActiveRecord::Base.connection.delete(strsql)
-					end
+					##if tblname != tbl
+					##	strsql =%Q% delete from screenfields where id in(select id from r_screenfields 
+					##			where pobject_code_scr  = 'r_#{tbl}' and  pobject_code_sfd = '#{view}')
+					##			and (created_at = updated_at or expiredate < current_date)		
+					##	%
+					##	ActiveRecord::Base.connection.delete(strsql)
+					##end
+					##strsql =%Q% delete from screenfields where id in(select id from r_screenfields 
+					##			where pobject_code_scr  = 'r_#{tbl}' )
+					##			and (created_at = updated_at or expiredate < current_date)		
+					##	%
+					##	ActiveRecord::Base.connection.delete(strsql)
+									
 				end
 			##end
 		end

@@ -6,25 +6,30 @@ module Api
             def create
                 case params[:req] 
                 when 'ganttchart'
-                    command_r = JSON.parse params[:linedata]
-                    case params[:screenCode] 
-                        when /nditms/
-                            opeitms_id = command_r["nditm_opeitm_id"]
-                        when /opeitms/
-                            opeitms_id = command_r["opeitm_id"]
-                        when /itms/
-                        if command_r["itm_id"]
-                            opeitms_id =  GanttChart.get_opeitms_id_from_itm(command_r["itm_id"])
-                        else
-                            opeitms_id = nil
-                        end    
+                    if params[:linedata]
+                        command_r = JSON.parse params[:linedata]
+                        case params[:screenCode] 
+                            when /nditms/
+                                opeitms_id = command_r["nditm_opeitm_id"]
+                            when /opeitms/
+                                opeitms_id = command_r["opeitm_id"]
+                            when /itms/
+                            if command_r["itm_id"]
+                                opeitms_id =  GanttChart.get_opeitms_id_from_itm(command_r["itm_id"])
+                            else
+                                opeitms_id = nil
+                            end
+                    else
+                        gantt = []
+                        return
+                    end    
                 end
                 if opeitms_id.nil?
                     gantt = []
                     return
                 else 
                     gantt =[]
-                    ganttchartData =  GanttChart.get_ganttchart_data(nil,opeitms_id)   
+                    ganttchartData =  GanttChart.proc_get_ganttchart_data(opeitms_id)   
                     ganttchartData.each do |level,ganttdata|
                       gantt << [level,ganttdata["itm_code"],
                                 "Date(#{ganttdata["start"].year},#{ganttdata["start"].month-1},#{ganttdata["start"].day})",

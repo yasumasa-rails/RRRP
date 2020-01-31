@@ -16,65 +16,93 @@ class CreateOtherTableRecordJob < ApplicationJob
                 end  
                 idx = 0
                 strsql = %Q%select * from  r_#{req["tblname"]} where id = #{req["tblid"]}%
-                parent = ActiveRecord::Base.connection.select_one(strsql) ###依頼元            
-                orgreqparams = JSON.parse(req["reqparams"])
-                if  parent                                                                      ###req  processreqs
-                    orgreqparams["segment"].each do |segment|                                                    
+                parent = ActiveRecord::Base.connection.select_one(strsql) ###依頼元
+                orgReqParams = JSON.parse(req["reqparams"])
+                if  parent                                                                              ###req  processreqs
+                    orgReqParams["segment"].each do |segment|                                                    
                         idx += 1                                                                    ###process processcontrols 
                         case segment
                         when "skip" 
                         when "mkschs"  ###XXXschs作成 XXXXschs,ordsの時作成
-                            strsql = %Q%select 1 from trngantts where paretblname = '#{req["tblname"]}' and paretblid = '#{req["tblid"]}'
-                                        and (tblname != '#{req["tblname"]}' or tblid != '#{req["tblid"]}')%
-                            recs = ActiveRecord::Base.connection.select_all(strsql) ###子供がないことの確認
+                            case req["tblname"]
+                                when /^cust/  ###itm_code = 'dummyship'初期設定での登録が必要
+                                    strsql = %Q%select id from r_opeitms where itm_code = 'dummyship' and opeitm_processseq = 999
+                                    %
+                                    val  = ActiveRecord::Base.connection.select_value(strsql)
+                                    if val.nil? ###nditmは自動作成
+                                        p " missing item 'dummyship' please entry"
+                                        p " missing item 'dummyship' please entry"
+                                        p " missing item 'dummyship' please entry"
+                                        raise
+                                    end    
+                                    strsql = %Q%select * from nditms where expiredate > current_date and 
+                                                opeitms_id = #{val} and itms_id_nditm = #{parent["opeitm_itm_id"]} 
+                                                and processseq_nditm = #{parent["opeitm_processseq"]} limit 1
+                                    %
+                                else
+                                    tbl_opeitm_id = req["tblname"].chop + "_opeitm_id"
+                                    strsql = %Q%select * from nditms where expiredate > current_date and opeitms_id = #{parent[tbl_opeitm_id]}%
+                            end
+                            reqparams = orgReqParams.dup
                             trnganttkey = 0
-                            key = orgreqparams["trnganttkey"]||=""
-                            if recs.empty?
-                                tbl_opeitm_id = req["tblname"].chop + "_opeitm_id"
-                                strsql = %Q%select * from nditms where expiredate > current_date and opeitms_id = #{parent[tbl_opeitm_id]}%
-                                ActiveRecord::Base.connection.select_all(strsql).each do |child|
+                            key = orgReqParams["trnganttkey"]
+                            if key
+                                reqparams["orgtrnganttkey"] = key 
+                            else
+                                reqparams["orgtrnganttkey"] = "00000"
+                                key = ""
+                            end    
+                            ActiveRecord::Base.connection.select_all(strsql).each do |child|
                                     command_r,opeitm = Operation.proc_add_update_table_from_nditm  child,parent
                                     trnganttkey += 1
-                                    reqparams = orgreqparams.dup
                                     reqparams["trnganttkey"] = key + format('%05d', trnganttkey)
                                     reqparams["paretblname"] = req["tblname"]
                                     reqparams["paretblid"] = req["tblid"]
                                     reqparams["child"] = child
-                                    reqparams["opeitm"] = opeitm
-				                    command_r,processreqs_ids = RorBlkctl.private_aud_rec(command_r,1,reqparams) 
+                                    reqparams["opeitm"] = opeitm  ###子部品のopeitms
+				                    command_r,processreqs_ids = RorBlkctl.proc_private_aud_rec(command_r,1,reqparams) 
                                     command_r[:sio_result_f] =  "1"   ## 1 normal end
                                     command_r[:sio_message_contents] = nil
                                     tblname = command_r[:sio_viewname].split("_")[1]
                                     tblid = command_r[(tblname.chop + "_id")] =  command_r["id"]
                                     RorBlkctl.proc_insert_sio_r(command_r) #### if @pare_class != "batch"    ## 結果のsio書き込み
                                     gids << processreqs_ids if  processreqs_ids 
-                                end  
-                            else  ###更新データがなぜかあった。　logic　エラー
-                                strsql = "update processreqs set remark ='mksch logic error' where id = #{req["id"]}  "
-                                ActiveRecord::Base.connection.update(strsql)
                             end  
-                        when "consume_child_parts"  ###子部品の変更　展開
+                        when "consume_child_parts"  ###子部品の消費
                             strsql =%Q% select * from trngantts where paretblname = '#{req["paretblname"]}' and 
-                                                    and paretblid = #{req["paretblid"]} and qty >0  and 
-                                                    (tblname != '#{req["paretblname"]}' or tblid = #{req["tblid"]})
+                                                    paretblid = #{req["paretblid"]} and qty > 0  and 
+                                                    (tblname != '#{req["paretblname"]}' or tblid != #{req["tblid"]})
                             %
                             ActiveRecord::Base.connection.select_all(strsql).each do |rec|
                                 Operation.proc_consume_child_parts rec
                             end
-                        when "lotstkhists"  ###
-                            Operation.proc_lotstkhists orgreqparams["trngantts_id"]
+                        when "opeitm_stktaking_proc"  ###
+                                Operation.proc_stkinouts(req["tblname"],req["tblid"],parent,orgReqParams["trngantts_id"])
+                        when "opeitm_acceptance_proc"  ###
+                            strsql = %Q% select email from persons where id = #{orgReqParams["tbldata"]["persons_id_upd"]}
+                            %
+                            email = ActiveRecord::Base.connection.select_value(strsql) ###
+                            case req["tblname"]
+                            when "purords"  
+                                    Operation.proc_createtable("purords","inspords",parent,email)
+                                    Operation.proc_createtable("purords","payschs",parent,email)
+                            when "puracts"
+                                if parent["opeitm_acceptance_proc"] == "1" 
+                                    Operation.proc_createtable("puracts","inspacts",parent,email)
+                                end    
+                            when "inspacts"
+                                Operation.proc_createtable("inspacts","payords",parent,email)
+                            when /^pay/
+                                Operation.proc_amtinouts(req["tblname"],req["tblid"],parent,orgReqParams["trngantts_id"])
+                            end
                         when "sumrequest" 
                         when "splitrequest"  
                         when "createtable"
-                        when "chng_trngantts_tbl"
-                            roottbl = ControlField[prevTbl[req["tblname"]]]
-                            strsql = %Q%select id from #{roottbl} where sno = #{srctbl["sno_#{statusTbl[roottbl]}"]}
-                                %
-                            rootid =  ActiveRecord::Base.connection.select_value(strsql)
-                            Operation.proc_chng_trngantts_tbl roottbl,rootid,req["tblname"],req["tblid"],orgreqparams
-                        when "mkshpschs"
-                            strsql = %Q% select * from trngannts where where paretblname = '#{req["tblname"]}' and paretblid = #{rec["tblid"]}  
-                                                        and locas_id_fm != locas_id_pare   and pare_qty > 0 and qty > 0                         
+                            ### 仕入れ先登録時仕入れ先の棚番自動登録
+                            ### 作業場所の棚番自動登録
+                        when "mkshpschs"  ###出庫の作成　
+                            strsql = %Q% select * from trngantts where paretblname = '#{req["tblname"]}' and paretblid = #{req["tblid"]}  
+                                                        and shelfnos_id_fm != locas_id_pare   and qty_pare > 0 and qty > 0                         
                             %
                             recs = ActiveRecord::Base.connection.select_all(strsql)
                             Operation.proc_mkshpschs recs

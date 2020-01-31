@@ -1,16 +1,17 @@
-﻿ --- drop view r_classlists cascade  
+﻿
+ --- drop view r_classlists cascade  
  create or replace view r_classlists as select  
 classlist.code  classlist_code,
-classlist.name  classlist_name,
-classlist.remark  classlist_remark,
-classlist.created_at  classlist_created_at,
-classlist.update_ip  classlist_update_ip,
-classlist.expiredate  classlist_expiredate,
-classlist.updated_at  classlist_updated_at,
-classlist.id id,
 classlist.id  classlist_id,
+classlist.id id,
+classlist.contents  classlist_contents,
+classlist.remark  classlist_remark,
+classlist.expiredate  classlist_expiredate,
 classlist.persons_id_upd   classlist_person_id_upd,
-classlist.contents  classlist_contents
+classlist.update_ip  classlist_update_ip,
+classlist.created_at  classlist_created_at,
+classlist.updated_at  classlist_updated_at,
+classlist.name  classlist_name
  from classlists   classlist,
   r_persons  person_upd 
   where       classlist.persons_id_upd = person_upd.id     ;
@@ -32,11 +33,11 @@ classlist.contents  classlist_contents
           ,sio_sord varchar(256)
           ,sio_search varchar(10)
           ,sio_sidx varchar(256)
-,classlist_name  varchar (100) 
 ,classlist_code  varchar (50) 
+,classlist_name  varchar (100) 
+,classlist_expiredate   date 
 ,classlist_contents  varchar (4000) 
 ,classlist_remark  varchar (4000) 
-,classlist_expiredate   date 
 ,classlist_created_at   timestamp(6) 
 ,classlist_updated_at   timestamp(6) 
 ,id  numeric (38,0)

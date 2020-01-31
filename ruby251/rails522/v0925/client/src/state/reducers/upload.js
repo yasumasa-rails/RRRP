@@ -1,6 +1,6 @@
 import {  UPLOAD_REQUEST,EXCELTOJSON_REQUEST,
         UPLOAD_SUCCESS,EXCELTOJSON_SUCCESS,
-         CHANGEUPLOADTITLEEDITABLE_REQUEST,CHECKJSONDATA_SUCCESS,
+         CHANGEUPLOADTITLEEDITABLE_REQUEST,SETRESULTS_REQUEST,
         LOGOUT_REQUEST} from 'actions'
 const initialValues = {
 isEditable:false,
@@ -29,6 +29,7 @@ switch (actions.type) {
 
   case EXCELTOJSON_SUCCESS:
       return {...state,
+              results:"",
               sheet:actions.payload.sheet,
               filename:actions.payload.filename,  }
 
@@ -36,11 +37,12 @@ switch (actions.type) {
        return {...state,
                upload:actions.payload.upload,
                isEditable:true, }
-      
-  case CHECKJSONDATA_SUCCESS:
-       return {...state,
-               results:actions.payload.results,
-         }
+        
+case SETRESULTS_REQUEST:
+        return {...state,
+          results: actions.payload.e.results,
+    }
+           
                        
   case  LOGOUT_REQUEST:
   return {}  

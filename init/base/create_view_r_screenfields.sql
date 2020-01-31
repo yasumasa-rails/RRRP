@@ -1,5 +1,5 @@
 ﻿
- drop view r_screenfields cascade  
+ ---drop view r_screenfields cascade  
  create or replace view r_screenfields as select  
 screenfield.width  screenfield_width,
   screen.pobject_objecttype_scr  pobject_objecttype_scr ,
@@ -86,7 +86,7 @@ screenfield.id id,
   tblfield.pobject_code_fld  pobject_code_fld ,
   tblfield.pobject_code_tbl  pobject_code_tbl 
  from screenfields   screenfield,
-  r_persons  person_upd ,  r_screens  screen ,  r_tblfields  tblfield ,  r_pobjects  pobject_sfd 
+  upd_persons  person_upd ,  r_screens  screen ,  r_tblfields  tblfield ,  r_pobjects  pobject_sfd 
   where       screenfield.persons_id_upd = person_upd.id      and screenfield.screens_id = screen.id      and screenfield.tblfields_id = tblfield.id      and screenfield.pobjects_id_sfd = pobject_sfd.id     ;
  DROP TABLE IF EXISTS sio.sio_r_screenfields;
  CREATE TABLE sio.sio_r_screenfields (

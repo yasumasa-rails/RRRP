@@ -4,7 +4,6 @@
  ;
 
 
-
     CREATE OR REPLACE  VIEW SGRP_POBJECTS
  (POBJECT_CODE,  POBJECT_EXPIREDATE, POBJECT_UPDATED_AT,
   POBJECT_REMARK,
@@ -113,78 +112,6 @@ usrgrp.usrgrp_name usrgrp_name, usrgrp.usrgrp_contents usrgrp_contents, pobjgrp.
 ;
 
 
- CREATE OR REPLACE  VIEW R_CHRGS (
-  ID
-  , CHRG_ID
-  , CHRG_REMARK
-  , CHRG_EXPIREDATE
-  , CHRG_UPDATE_IP
-  , CHRG_CREATED_AT
-  , CHRG_UPDATED_AT
-  , CHRG_PERSON_ID_UPD
-  , PERSON_ID_UPD
-  , PERSON_CODE_UPD
-  , PERSON_NAME_UPD
-  , CHRG_PERSON_ID
-  , PERSON_CODE_CHRG
-  , PERSON_EXPIREDATE_CHRG
-  , PERSON_NAME_CHRG
-  , PERSON_REMARK_CHRG
-  ,                                               ---PERSON_USRGRP_ID_CHRG,
-  USRGRP_NAME_CHRG
-  , USRGRP_CODE_CHRG
-  ,                                               -----USRGRP_REMARK_CHRG, USRGRP_ID_CHRG,
-  PERSON_EMAIL_CHRG
-  , PERSON_ID_CHRG
-  , PERSON_SECT_ID
-  , SECT_ID
-  , LOCA_ID_SECT
-  , LOCA_CODE_SECT
-  , LOCA_NAME_SECT
-  , LOCA_ABBR_SECT
-  , LOCA_ZIP_SECT
-  , LOCA_COUNTRY_SECT
-  , LOCA_PRFCT_SECT
-  , LOCA_ADDR1_SECT
-  , LOCA_ADDR2_SECT
-) AS
-select
-  person_chrg.person_id  id
-  , person_chrg.person_id  CHRG_id
-  , person_chrg.person_remark  CHRG_remark
-  , person_chrg.person_expiredate  CHRG_expiredate
-  , person_chrg.person_update_ip  CHRG_update_ip
-  , person_chrg.person_created_at  CHRG_created_at
-  , person_chrg.person_updated_at  CHRG_updated_at
-  , person_chrg.person_id_upd chrg_person_id_upd
-  , person_upd.person_id_upd person_id_upd
-  , person_upd.person_code_upd person_code_upd
-  , person_upd.person_name_upd person_name_upd
-  , person_chrg.person_id  CHRG_person_id_chrg
-  , person_chrg.person_code person_code_chrg
-  , person_chrg.person_expiredate person_expiredate_chrg
-  , person_chrg.person_name person_name_chrg
-  , person_chrg.person_remark person_remark_chrg
-  ,person_chrg.usrgrp_name usrgrp_name_chrg
-  , person_chrg.usrgrp_code usrgrp_code_chrg
-  ,person_chrg.person_email person_email_chrg
-  , person_chrg.person_id person_id_chrg
-  , person_chrg.person_sect_id person_sect_id_chrg
-  , person_chrg.sect_id sect_id_chrg
-  , person_chrg.loca_id_sect loca_id_sect_chrg
-  , person_chrg.loca_code_sect loca_code_sect_chrg
-  , person_chrg.loca_name_sect loca_name_sect_chrg
-  , person_chrg.loca_abbr_sect loca_abbr_sect_chrg
-  , person_chrg.loca_zip_sect loca_zip_sect_chrg
-  , person_chrg.loca_country_sect loca_country_sect_chrg
-  , person_chrg.loca_prfct_sect loca_prfct_sect_chrg
-  , person_chrg.loca_addr1_sect loca_addr1_sect_chrg
-  , person_chrg.loca_addr2_sect loca_addr2_sect_chrg
-from upd_persons person_upd
-  , r_persons person_chrg
-where
-  person_upd.id = person_chrg.person_id_upd
-  ;
 
   CREATE
 OR REPLACE VIEW R_FIELDCODES (
@@ -671,3 +598,34 @@ from rubycodings rubycoding ,r_pobjects  pobject,upd_persons  person_upd
 where  pobject.id = rubycoding.pobjects_id and  person_upd.id = rubycoding.persons_id_upd
 ;
 
+CREATE VIEW r_sects AS
+ SELECT sect.id,
+    sect.id AS sect_id,
+    loca_sect.loca_id AS sect_loca_id_sect,
+    loca_sect.loca_code AS loca_code_sect,
+    loca_sect.loca_name AS loca_name_sect,
+    loca_sect.loca_abbr AS loca_abbr_sect,
+    loca_sect.loca_zip AS loca_zip_sect,
+    loca_sect.loca_country AS loca_country_sect,
+    loca_sect.loca_prfct AS loca_prfct_sect,
+    loca_sect.loca_addr1 AS loca_addr1_sect,
+    loca_sect.loca_addr2 AS loca_addr2_sect,
+    loca_sect.loca_tel AS loca_tel_sect,
+    loca_sect.loca_fax AS loca_fax_sect,
+    loca_sect.loca_mail AS loca_mail_sect,
+    loca_sect.loca_remark AS loca_remark_sect,
+    sect.remark AS sect_remark,
+    sect.expiredate AS sect_expiredate,
+    sect.persons_id_upd AS sect_person_id_upd,
+    person_upd.id AS person_id_upd,
+    person_upd.code AS person_code_upd,
+    person_upd.name AS person_name_upd,
+    person_upd.email AS person_email_upd,
+    sect.update_ip AS sect_update_ip,
+    sect.created_at AS sect_created_at,
+    sect.updated_at AS sect_updated_at
+   FROM sects sect,
+    r_locas loca_sect,
+    persons person_upd
+  WHERE ((loca_sect.loca_id = sect.locas_id_sect) AND (person_upd.id = sect.persons_id_upd))
+;

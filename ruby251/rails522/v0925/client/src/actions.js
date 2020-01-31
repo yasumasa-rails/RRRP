@@ -72,8 +72,7 @@ export const GANTTCHART_REQUEST = 'GANTTCHART_REQUEST'
 export const GANTTCHART_FAILURE = 'GANTTCHART_FAILURE'
 export const GANTTCHART_SUCCESS = 'GANTTCHART_SUCCESS'
 
-export const CHECKJSONDATA_REQUEST = 'CHECKJSONDATA_REQUEST'
-export const CHECKJSONDATA_SUCCESS = 'CHECKJSONDATA_SUCCESS'
+export const SETRESULTS_REQUEST = 'SETRESULTS_REQUEST'
 
 // LOGIN
 // Attach our Formik actions as meta-data to our action.
@@ -218,17 +217,6 @@ export const ChangeUploadTitleRequest = (upload) => ({
 })
 
 
-export const CheckJsonDataRequest = (lines,screenCode,yup) => ({
-  type: CHECKJSONDATA_REQUEST,
-  payload: {lines,screenCode,yup}
-})
-
-export const CheckJsonData = (data) => ({
-  type: CHECKJSONDATA_SUCCESS,
-  payload: { data}
-})
-
-
 export const ExcelToJsonRequest = (file,screenCode) => ({
   type: EXCELTOJSON_REQUEST,
   payload: { file,screenCode}
@@ -290,5 +278,10 @@ export const ButtonReset = () => ({
 
 export const GanttReset = () => ({
   type:  GANTT_RESET,
+})
+
+export const SetResultsRequest = (e) => ({
+  type:  SETRESULTS_REQUEST,
+  payload:{e}
 })
 

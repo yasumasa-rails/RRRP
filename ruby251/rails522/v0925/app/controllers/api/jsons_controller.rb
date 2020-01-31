@@ -49,7 +49,6 @@ module Api
                             if yupcheckcode[field] and val != ""
                                 jparams["yupcheckcode"] = %Q%{"#{field}":"#{val}"}%
                                 jparams = ControlFields.judge_check_code jparams
-                                debugger
                                 if jparams[:err] == ""
                                     ##
                                 else
@@ -107,7 +106,7 @@ module Api
                 begin
                     ActiveRecord::Base.connection.begin_db_transaction()
                     command_c.each do |command_cn|
-                        command_rn,processreqs_ids = RorBlkctl.private_aud_rec(command_cn,r_cnt0,nil) ###最後のパラメータはreqparams
+                        command_rn,processreqs_ids = RorBlkctl.proc_private_aud_rec(command_cn,r_cnt0,nil) ###最後のパラメータはreqparams
                         acommand << command_rn
                         aprocessreqs_id  << processreqs_ids if processreqs_ids
                         idx += 1

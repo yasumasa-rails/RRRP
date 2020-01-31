@@ -1,0 +1,1 @@
+ create TABLE_CONSTRAINTS :custs_uky10 

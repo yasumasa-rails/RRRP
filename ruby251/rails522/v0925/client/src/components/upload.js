@@ -4,7 +4,8 @@ import {yupErrCheckBatch} from './yuperrcheckbatch'
 import CsvDownload from 'react-json-to-csv'
 import {Button} from '../styles/button'
 import EditableUpload from './editableupload'
-import {CheckJsonDataRequest,ExcelToJsonRequest} from '../actions'
+import exportFromJSON from 'export-from-json'
+import {ExcelToJsonRequest} from '../actions'
 
 function batchcheck(sheet,screenCode,nameToCode) {
   let lines =[]
@@ -22,7 +23,13 @@ function batchcheck(sheet,screenCode,nameToCode) {
               row.map((colunm,idx)=>{
                   orgheader.push(colunm)
                   if(nameToCode[colunm]){
-                        header.push(nameToCode[colunm])}
+                        if(header.indexOf(nameToCode[colunm])===-1){
+                            header.push(nameToCode[colunm])
+                        }else{
+                            header.push(`duplicate field error ${idx+1}`)
+                            errorheader = true
+                             }
+                    }
                   else{header.push(`field error ${idx+1}`)
                         errorheader = true}      
                   return header
@@ -45,37 +52,42 @@ function batchcheck(sheet,screenCode,nameToCode) {
             importdata = Array.from(lines)
           }else{
             importdata =  yupErrCheckBatch(lines,screenCode)
-          }
+          } 
   return JSON.stringify(importdata)
   //finally{fileDownload(JSON.stringify(rimportdata), files[0].name+".json")}
 }
 
-
-const Upload = ({sheet,filenamestr,message,screenCode,yup,
-                  exceltojson, checkjsondata,nameToCode,results }) =>{
-  return (
-       
+const Upload = ({sheet,filename,message,screenCode,token,client,uid,
+                  exceltojson, nameToCode,results }) =>{
+  return (   
     <React.Fragment>
     <div className="has-text-right buttons-padding">
-            <input
-                    type="file" id="inputExcel" 
-                    /* disabled={!ready} */
-                    onChange={ev =>exceltojson(ev.currentTarget.files[0],screenCode)}
-             /> 
-    <div className="control has-text-left editable-buttons">
-      <Button variant="outlined" color="secondary" 
-             type='submit' disabled={filenamestr?false:true}
-            onClick ={() => checkjsondata(sheet,screenCode,yup,nameToCode,)}>
-             チェック</Button> 
-    </div>
-        {message}
+              <input
+                      type="file" id="inputExcel" 
+                      /* disabled={!ready} */
+                      placeholder="Excel File"
+                      onChange={ev =>{let excelfilename =  ev.currentTarget.files[0].name
+                                      if(excelfilename.search(/\.xlsx$|\.xls$/)>1)
+                                          {exceltojson(ev.currentTarget.files[0],screenCode)}
+                                      else{alert("please input Excel File")
+                                          }
+                                    }}
+               /> 
+                 <Button variant="outlined" color="secondary" 
+                        type='submit' disabled={filename?false:true}
+                        onClick ={() =>{let lines = batchcheck(sheet,screenCode,nameToCode)
+                                        let fileName = filename.replace("@","-") + "@" +  screenCode + "@"
+                                        exportFromJSON({data:lines,fileName:fileName,exportType:"json" })
+                                  }}>
+                  JSON</Button>   
+          <EditableUpload></EditableUpload>
 
-      {results&&filenamestr&& 
-      <CsvDownload   data={results}  filename={`rslt_${filenamestr}.csv`} >
-        結果確認
-      </CsvDownload >}
-     <EditableUpload/> 
+          {results&&
+          <CsvDownload   data={results}  filename={`rslt_${filename}.csv`} >
+            結果確認
+          </CsvDownload >}
     </div>
+          {message}
      </React.Fragment>  
     )
   }
@@ -84,20 +96,19 @@ const mapDispatchToProps = dispatch => ({
   exceltojson :(file,screenCode)=>{
     dispatch(ExcelToJsonRequest(file,screenCode))
     },  
-    checkjsondata :(sheet,screenCode,yup,nameToCode)=>{
-      let lines = batchcheck(sheet,screenCode,nameToCode)
-      dispatch(CheckJsonDataRequest(lines,screenCode,yup))
-      },  
   })
   
 const mapStateToProps = state =>({
     sheet:state.upload.sheet,
-    filenamestr:state.upload.filename,
+    filename:state.upload.filename,
     message:state.upload.message,
     screenCode:state.screen.screenCode,
     yup:state.screen.yup,
     nameToCode:state.screen.nameToCode,
     results:state.upload.results,
+    token:(state.login.auth?state.login.auth["access-token"]:"") ,
+    client:(state.login.auth?state.login.auth.client:""),
+    uid:(state.login.auth?state.login.auth.uid:"") ,
   })
   
 

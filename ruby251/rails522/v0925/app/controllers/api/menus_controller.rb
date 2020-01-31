@@ -25,21 +25,21 @@ module Api
 
             when 'viewtablereq','editabletablereq'
               screenCode = params[:screenCode]
-              column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info,nameToCode = RorBlkctl.create_grid_editable_columns_info screenCode,current_api_user[:email],params[:req]   
+              column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info,nameToCode = RorBlkctl.proc_create_grid_editable_columns_info screenCode,current_api_user[:email],params[:req]   
               if params["filtered"]
-                where_str = RorBlkctl.create_filteredstr params["filtered"],where_info
+                where_str = RorBlkctl.proc_create_filteredstr params["filtered"],where_info
               else
                  where_str = (where_info["filtered"]||"")
               end    
               page_info[:pageNo] = (params[:page]||=0).to_f 
               page_info[:pageNo] += 1.0 
               page_info[:sizePerPage] =params[:pageSize].to_f
-              pagedata,page_info = RorBlkctl.fetch_data_blk screenCode,select_fields,page_info,where_str,sort_info
+              pagedata,page_info = RorBlkctl.proc_search_blk screenCode,select_fields,page_info,where_str,sort_info
               render json:{:columns=>column_info,:data=>pagedata,:pageInfo=>page_info,:yup=>yup,:dropdownlist=>dropdownlist,:nameToCode=>nameToCode}       
             
             when 'inlineaddreq'
               screenCode = params[:screenCode]
-              column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info,nameToCode = RorBlkctl.create_grid_editable_columns_info screenCode,current_api_user[:email] ,params[:req]  
+              column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info,nameToCode = RorBlkctl.proc_create_grid_editable_columns_info screenCode,current_api_user[:email] ,params[:req]  
               page_info[:pageNo] = 1
               page_info[:sizePerPage] = params[:pageSize].to_f
               pagedata,page_info = RorBlkctl.add_empty_data screenCode,column_info,page_info  ### nil filtered sorting
@@ -130,7 +130,7 @@ module Api
                     rparams[:parse_linedata][("confirm_gridmessage").to_sym] = rparams[:err] 
                   else
                     if (seqchkfields["screenfield_qty_case"]||="99999") <  (seqchkfields["screenfield_qty"]||="0")
-                        rparams[:err] =  " qty_case seqno > qty seqno  "
+                        rparams[:err] =  " qty_case seqno > qty seqno  "  ###画面表示順　　包装単位の計算ため
                         rparams[:parse_linedata][("confirm_gridmessage").to_sym] = rparams[:err] 
                     end
                   end
@@ -151,7 +151,7 @@ module Api
               screenCode = params[:screenCode]
               column_info,where_info,select_fields,columns_color = RorBlkctl.create_download_columns_info screenCode,current_api_user[:email]  
               if params["filtered"]
-                where_str = RorBlkctl.create_filteredstr params["filtered"],where_info
+                where_str = RorBlkctl.proc_create_filteredstr params["filtered"],where_info
               else
                  where_str = (where_info["filtered"]||"")
               end    

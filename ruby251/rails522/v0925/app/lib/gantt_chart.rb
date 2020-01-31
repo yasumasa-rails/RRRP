@@ -26,7 +26,7 @@ module GanttChart
 								:duedate=>time_now,:starttime=>time_now,:depends=>"",:id=>"000",:starttime => Time.now}
             until ngantts.size == 0
 				cnt += 1
-				ngantts = proc_get_tree_pare_itms_locas ngantts,gantt_reverse  ###trngantt 作成時も利用
+				ngantts = get_tree_pare_itms_locas ngantts,gantt_reverse  ###trngantt 作成時も利用
 				break if cnt >= 1000
             end
           else
@@ -546,7 +546,7 @@ module GanttChart
 						:autoord_p=>auto_cust["autoord_p"],
 						:duedate=>eval("@#{tblchop}_duedate"),:id=>"001",
 						:qty=>eval("@#{tblchop}_qty||=0"),:qty_src=>eval("@#{tblchop}_qty_src"),:qty_stk=>eval("@#{tblchop}_qty_stk||=0"),
-						:duration=>proc_get_duration_by_loca(eval("@#{tblchop}_loca_id_fm"),eval("@#{tblchop}_loca_id_to"),nil)[:duration],
+						:duration=>get_duration_by_loca(eval("@#{tblchop}_loca_id_fm"),eval("@#{tblchop}_loca_id_to"),nil)[:duration],
 					:opeitms_id=>r0["id"]} ###,
 						###:subtblid=>"opeitms_"+r0["id"].to_s,:opeitms_id=>r0["id"]}
 			@bgantts["001"][:starttime] = proc_get_starttime(@bgantts["001"][:duedate],(@bgantts["001"][:duration]) ,"day",nil)
@@ -569,13 +569,13 @@ module GanttChart
 					:autocreate_ord=>r0["autocreate_ord"],:autoord_p=>r0["autoord_p"],:autocreate_inst=>r0["autocreate_inst"],
 					:duedate=>eval("@#{tblchop}_duedate"),:id=>"001",
 					:qty=>eval("@#{tblchop}_qty"),:qty_src=>eval("@#{tblchop}_qty_src"),:qty_stk=>eval("@#{tblchop}_qty_stk||=0"),
-					:duration=>proc_get_duration_by_loca(eval("@#{tblchop}_loca_id_fm"),eval("@#{tblchop}_loca_id_to"),nil)[:duration],
+					:duration=>get_duration_by_loca(eval("@#{tblchop}_loca_id_fm"),eval("@#{tblchop}_loca_id_to"),nil)[:duration],
 					:opeitms_id=>r0["id"]} ###,
 					####:subtblid=>"opeitms_"+r0["id"].to_s,:opeitms_id=>r0["id"]}
 		end
         until ngantts.size == 0
             cnt += 1
-            ngantts = proc_get_tree_pare_itms_locas ngantts,"gantttrn"
+            ngantts = get_tree_pare_itms_locas ngantts,"gantttrn"
              break if cnt >= 10000
         end
         @bgantts["000"][:starttime] = if @min_time < Time.now then Time.now else @min_time end
@@ -600,15 +600,14 @@ module GanttChart
 			RorBlkctl.proc_tbl_add_arel("trngantts",tmp_gantt)
 			Operation.proc_create_prdpurshp_alloc(tmp_gantt[:id],sio_classname)
 		end
-		proc_sch_chil_get(tblchop+"s",eval("@#{tblchop}_id"))
 	end
-    def proc_get_tree_pare_itms_locas ngantts,gantt_reverse ### bgantt 表示内容　ngantt treeスタック  itms_idは必須
+    def get_tree_pare_itms_locas ngantts,gantt_reverse ### bgantt 表示内容　ngantt treeスタック  itms_idは必須
       n0 = ngantts.shift
 	    if n0.size > 0  ###子部品がいなかったとき{}になる。
 				case gantt_reverse
 				when /gantt/
-					starttime,duedate = proc_get_item_loca_contents(n0,gantt_reverse)
-					tmp = get_ganttchart_data(opeitms_id)
+					starttime,duedate = get_item_loca_contents(n0,gantt_reverse)
+					tmp = proc_get_ganttchart_data(opeitms_id)
 					ngantts.concat(tmp) if tmp[0].size > 0
 					tmpx = vproc_get_prev_process(n0,starttime)
 					if tmpx[0].size > 0
@@ -620,7 +619,7 @@ module GanttChart
 							end
 					end
 				when /reverse/
-					starttime,duedate = proc_get_item_loca_contents(n0,gantt_reverse)
+					starttime,duedate = get_item_loca_contents(n0,gantt_reverse)
 					tmp = vproc_get_pare_itms(n0,duedate)
 					ngantts.concat(tmp) if tmp[0].size > 0
 					tmp = vproc_get_after_process(n0,duedate)
@@ -677,7 +676,7 @@ module GanttChart
                 end
         end
     end
-    def proc_get_duration_by_loca(loca_id_fm,loca_id_to,priority)
+    def get_duration_by_loca(loca_id_fm,loca_id_to,priority)
         {:duration=>1,:transport_id =>ActiveRecord::Base.connection.select_value("select id from transports where code = 'dummy' ")}
     end
     def get_opeitms_id_from_itm itms_id ###
@@ -713,24 +712,17 @@ module GanttChart
 				opeitms_id = nil	
 			end		
 		return opeitms_id
-    end
-	def proc_sch_chil_get orgtblname,orgtblid	##
-		strsql = "select alloctbl.id alloctbl_id from trngantts trn ,alloctbls alloctbl where trn.orgtblname = '#{orgtblname}' and trn.orgtblid = #{orgtblid}
-						and alloctbl.srctblname = 'trngantts' and alloctbl.srctblid = trn.id
-						and (destblname like 'pur%' or destblname like 'prd%' or destblname like 'dym%') order by trn.key "
-		alloc_ids = ActiveRecord::Base.connection.select_values(strsql)
-		alloc_ids.each do |alloc_id|
-			proc_get_trngantt_cons_chil_inout_fm_alloc_id(alloc_id)
-		end
 	end
-    def proc_get_item_loca_contents(n0,gantt_reverse)   ##n0[:itms_id] r0[:itms_id]
+	
+	def get_item_loca_contents(n0,gantt_reverse)   ##n0[:itms_id] r0[:itms_id]
 	    qty = if n0[:seq].size > 4 then (@bgantts[n0[:seq][0..-4]][:qty] ||= 1) else  (@bgantts["000"][:qty] ||= 1) end
 	    new_qty = qty.to_f / (n0[:parenum]||=1) * (n0[:chilnum]||=1)
 		###:autocreate_ord,:autocreate_instは画面にはセットしない。
 		if gantt_reverse =~ /mst$/
 			itm = ActiveRecord::Base.connection.select_one("select * from itms where id = #{n0[:itms_id]}  ")
 			loca = ActiveRecord::Base.connection.select_one("select * from locas where id = #{n0[:locas_id]}  ")
-			bgantt = {:mlevel=>n0[:mlevel],:itm_code=>itm["code"], :itm_name=>itm["name"],:loca_code=>loca["code"],:loca_name=>loca["name"],
+			bgantt = {:mlevel=>n0[:mlevel],:itm_code=>itm["code"], :itm_name=>itm["name"],
+								:loca_code=>loca["code"],:loca_name=>loca["name"],
 								:duration=>(n0[:duration]||=1),:depends=>"",:shelfnos_id=>n0[:shelfnos_id],:shuffleflg=>n0[:shuffleflg],
 								 :parenum=>n0[:parenum]||=1,:chilnum=>n0[:chilnum]||=1,:prdpurshp=>n0[:prdpurshp],
 								 :consumtype=>n0[:consumtype],:consumauto=>n0[:consumauto],
@@ -741,92 +733,94 @@ module GanttChart
 		else  ###trngantts insert 用
 			bgantt = {:mlevel=>n0[:mlevel],###:itm_code=>itm["code"], :itm_name=>itm["name"],:loca_code=>loca["code"],:loca_name=>loca["name"],
 								:duration=>(n0[:duration]||=1),:depends=>"",
-								 :parenum=>n0[:parenum]||=1,:chilnum=>n0[:chilnum]||=1,:prdpurshp=>n0[:prdpurshp],
-								 :consumtype=>n0[:consumtype],:consumauto=>n0[:consumauto],:shelfnos_id=>n0[:shelfnos_id],:shuffleflg=>n0[:shuffleflg],
-                                 :id=>n0[:id],:itms_id=>n0[:itms_id],:locas_id=>n0[:locas_id],
+								:parenum=>n0[:parenum]||=1,:chilnum=>n0[:chilnum]||=1,:prdpurshp=>n0[:prdpurshp],
+								:consumtype=>n0[:consumtype],:consumauto=>n0[:consumauto],
+								:shelfnos_id=>n0[:shelfnos_id],:shuffleflg=>n0[:shuffleflg],
+                                :id=>n0[:id],:itms_id=>n0[:itms_id],:locas_id=>n0[:locas_id],
 								:autocreate_ord=>n0[:autocreate_ord],:autoord_p=>n0[:autoord_p],:autocreate_inst=>n0[:autocreate_inst],
 								:processseq=>n0[:processseq],:priority=>n0[:priority],:qty=>new_qty,:qty_src=>new_qty,:qty_stk=>0}
 		end
-		 case gantt_reverse
+		case gantt_reverse
 			when /gantt/
 				cgantt = {:duedate=>n0[:duedate],:duedate_est=>n0[:duedate],
-									:starttime=>proc_get_starttime(n0[:duedate],(n0[:duration]||=1),"day",nil),
-									:starttime_est=>proc_get_starttime(n0[:duedate],(n0[:duration]||=1),"day",nil)}
+									:starttime=>get_starttime(n0[:duedate],(n0[:duration]||=1),"day",nil),
+									:starttime_est=>get_starttime(n0[:duedate],(n0[:duration]||=1),"day",nil)}
 			when /reverse/
 				cgantt = {:starttime=>n0[:starttime],:starttime_est=>n0[:starttime],
-									:duedate=>proc_get_starttime(n0[:starttime],(n0[:duration]||=1)*-1,"day",nil),
-									:duedate_est=>proc_get_starttime(n0[:starttime],(n0[:duration]||=1)*-1,"day",nil)}
-		 end
+									:duedate=>get_starttime(n0[:starttime],(n0[:duration]||=1)*-1,"day",nil),
+									:duedate_est=>get_starttime(n0[:starttime],(n0[:duration]||=1)*-1,"day",nil)}
+		end
         bgantt.merge! cgantt
 		@bgantts[n0[:seq]] = bgantt
 	    @min_time = cgantt[:starttime] if (@min_time||="2099/12/31".to_time) > cgantt[:starttime]
 		@max_time = cgantt[:duedate] if (@max_time||=Time.now)  < cgantt[:duedate]
         return cgantt[:starttime],cgantt[:duedate]
-    end
-	def get_ganttchart_data(level,opeitms_id)  ###工程の始まり=前工程の終わり
-		if level.nil?
-			level = "0"
-			@ganttchartData ={}
+	end
+	
+	def proc_get_ganttchart_data(id)  ###工程の始まり=前工程の終わり
+		@ganttchartData = {}
+		@stacklevel = []
+		@stacklevel << [id,"0"]  
+		until @stacklevel == []
+			opeitms_id,level = @stacklevel.shift
 			start = Time.now - 1* 24 * 60 * 60 
-			rec = ActiveRecord::Base.connection.select_one("select  * from r_opeitms where id = #{opeitms_id}")
-			@ganttchartData[level] = {"opeitm_id"=>opeitms_id,"duration"=>1,
-									##	"start"=>"#{start.year},#{start.month},#{start.day}",
-									##	"end"=>"#{Time.now.year},#{Time.now.month},#{Time.now.day}",
-										"start"=>start,
-										"end"=>Time.now,
-										"parenum"=>1,"chilnum"=>1,"itms_id"=>nil,"itm_code"=>rec["itm_code"],"itm_name"=>rec["itm_name"]}
-			@stacklevel =[]
-		end	
-		depend = []
-		##new_end = Time.parse(@ganttchartData[level]["end"]) - ((@ganttchartData[level]["duration"]).to_i + 1) * 24 * 60 * 60 
-		new_end = @ganttchartData[level]["start"] -  24 * 60 * 60 
-		rnditms = ActiveRecord::Base.connection.select_all("select * from r_nditms where nditm_opeitm_id = #{@ganttchartData[level]["opeitm_id"]} 
-															and nditm_Expiredate > current_date order by itm_code_nditm  ")
-		rnditms.each_with_index  do |rec,index|
-			nopeitms_id =get_opeitms_id_from_itm_by_processseq(rec["nditm_itm_id_nditm"],rec["nditm_processseq_nditm"])
-			duration= 	rec["nditm_duration"].to_i
-			new_start = new_end - (rec["nditm_duration"].to_i) * 24 * 60 * 60 
-			contents ={"opeitm_id"=>nopeitms_id,
+			strsql = "select  * from r_opeitms where id = #{opeitms_id}"
+			rec = ActiveRecord::Base.connection.select_one(strsql)
+			if level == "0"
+				@ganttchartData[level] = {"opeitm_id"=>opeitms_id,"duration"=>1,"start"=>start,
+									"end"=>Time.now,
+									"parenum"=>1,"chilnum"=>1,"itms_id"=>nil,
+									"itm_code"=>rec["itm_code"],"itm_name"=>rec["itm_name"]}
+			end
+			new_end = @ganttchartData[level]["start"] -  24 * 60 * 60 
+			strsql = "select * from r_nditms where nditm_opeitm_id = #{opeitms_id} 
+						and nditm_Expiredate > current_date order by itm_code_nditm  "
+			rnditms = ActiveRecord::Base.connection.select_all(strsql)
+			depend = []
+			rnditms.each_with_index  do |rec,index|
+				nopeitms_id = get_opeitms_id_from_itm_by_processseq(rec["nditm_itm_id_nditm"],
+																rec["nditm_processseq_nditm"])
+				duration = rec["nditm_duration"].to_i
+				new_start = new_end - (rec["opeitm_duration"].to_i) * 24 * 60 * 60 
+				contents = {"opeitm_id"=>nopeitms_id,
 						"start"=>new_start,
 						"end"=>new_end,
 						"parenum"=>rec["nditm_parenum"],"chilnum"=>rec["nditm_chilnum"],
-						"itms_id"=>rec["itm_id_nditm"],"itm_code"=>rec["itm_code_nditm"],"itm_name"=>rec["itm_name_nditm"]}
-			nlevel = level + "_" + format('%04d', index)
-			@ganttchartData[nlevel] = contents
-			@stacklevel << nlevel  if nopeitms_id
-			depend << nlevel
-		end
-		@ganttchartData[level]["depend"] = depend.join(",")
-		until @stacklevel == []
-			 vget_ganttchart_data @stacklevel.shift
-		end	 
-
+						"itms_id"=>rec["itm_id_nditm"],"itm_code"=>rec["itm_code_nditm"],
+						"itm_name"=>rec["itm_name_nditm"]}
+				nlevel = level + "_" + format('%04d', index)
+				@ganttchartData[nlevel] = contents
+				@stacklevel << [nopeitms_id,nlevel]
+				depend << nlevel
+			end
+			@ganttchartData[level]["depend"] = depend.join(",")   ###親の依存を調べる。
+		end	
 		return @ganttchartData
 	end
-	def vget_ganttchart_data level
-		if @ganttchartData[level]["opeitm_id"]
-			get_ganttchart_data(level,@ganttchartData[level]["opeitm_id"])
-		end	
-	end	
-    def vproc_get_prev_process(n0,starttime)  ###工程の始まり=前程の終わり
-        rec = ActiveRecord::Base.connection.select_one("select * from opeitms where itms_id = #{n0[:itms_id]} and Expiredate > current_date
-                                                                              and Priority = #{n0[:priority]} and processseq < #{n0[:processseq]}  order by   processseq desc")
+	
+	def vproc_get_prev_process(n0,starttime)  ###工程の始まり=前程の終わり
+		strsql = "select * from opeitms where itms_id = #{n0[:itms_id]} and Expiredate > current_date
+						and Priority = #{n0[:priority]} and processseq < #{n0[:processseq]}  order by   processseq desc"
+        rec = ActiveRecord::Base.connection.select_one(strsql)
         if rec
              ngantts = []
-                  ngantts << {:seq=>(n0[:seq] + "000"),:mlevel=>n0[:mlevel]+1,:itms_id=>rec["itms_id"],:locas_id=>rec["locas_id"],:opeitms_id=>rec["id"],
-                              :locas_id_to=>n0[:locas_id],:shelfnos_id=>rec["shelfnos_id"],:shuffleflg=>rec["shuffleflg"],
-                              :duedate=>starttime,:prdpurshp=>rec["prdpurshp"],:duration=>(rec["duration"]||=1),
-                              :parenum=>rec["parenum"],:chilnum=>rec["chilnum"],
-                              :autocreate_ord=>rec["autocreate_ord"],:autocreate_inst=>rec["autocreate_inst"],
-                              :autoord_p=>rec["autoord_p"],
-                              :consumtype=>rec["consumtype"],:consumauto=>n0[:consumauto],
-                              :safestkqty=>rec["safestkqty"],:id=>"opeitms_"+rec["id"].to_s,:priority=>rec["priority"],:processseq=>rec["processseq"],
-                              :starttime => proc_get_starttime(starttime ,(rec["duration"]||=1),"day",nil)}  ###基準日　期間　タイプ　休日考慮
+				  ngantts << {:seq=>(n0[:seq] + "000"),:mlevel=>n0[:mlevel]+1,:itms_id=>rec["itms_id"],
+							:locas_id=>rec["locas_id"],:opeitms_id=>rec["id"],
+                            :locas_id_to=>n0[:locas_id],:shelfnos_id=>rec["shelfnos_id"],:shuffleflg=>rec["shuffleflg"],
+                            :duedate=>starttime,:prdpurshp=>rec["prdpurshp"],:duration=>(rec["duration"]||=1),
+                            :parenum=>rec["parenum"],:chilnum=>rec["chilnum"],
+                            :autocreate_ord=>rec["autocreate_ord"],:autocreate_inst=>rec["autocreate_inst"],
+                            :autoord_p=>rec["autoord_p"],
+                            :consumtype=>rec["consumtype"],:consumauto=>n0[:consumauto],
+							:safestkqty=>rec["safestkqty"],:id=>"opeitms_"+rec["id"].to_s,
+							:priority=>rec["priority"],:processseq=>rec["processseq"],
+                            :starttime => proc_get_starttime(starttime ,(rec["duration"]||=1),"day",nil)}  ###基準日　期間　タイプ　休日考慮
           else
             ngantts = [{}]
         end
         return ngantts
-    end
+	end
+	
     def vproc_get_pare_itms(n0,duedate)  ###
           strsql = "select * from nditms where itms_id_nditm = #{n0[:itms_id]} and locas_id_nditm = #{n0[:locas_id]} and processseq_nditm = #{n0[:processseq]} and Expiredate > current_date  "
           nditms = ActiveRecord::Base.connection.select_all(strsql)
@@ -860,7 +854,7 @@ module GanttChart
         if rec
              ngantts = []
              ngantts << {:seq=>(n0[:seq] + "000"),:mlevel=>n0[:mlevel]+1,:itms_id=>rec["itms_id"],:locas_id=>rec["locas_id"],:opeitms_id=>rec["id"],
-             :locas_id_to=>n0[:locas_id],:prdpurshp=>rec["prdpurshp"],:duedate=>proc_get_starttime(duedate,(rec["duration"]||=1)*-1,"day",nil),
+             :locas_id_to=>n0[:locas_id],:prdpurshp=>rec["prdpurshp"],:duedate=>get_starttime(duedate,(rec["duration"]||=1)*-1,"day",nil),
              :duration=>(rec["duration"]||=1),:parenum=>rec["parenum"],:chilnum=>rec["chilnum"],:shelfnos_id=>rec["shelfnos_id"],:shuffleflg=>rec["shuffleflg"],
              :autocreate_ord=>rec["autocreate_ord"],:autocreate_inst=>rec["autocreate_inst"],:autoord_p=>rec["autoord_p"],
              :safestkqty=>rec["safestkqty"],:id=>"opeitms_"+rec["id"].to_s,:priority=>rec["priority"],:processseq=>rec["processseq"],

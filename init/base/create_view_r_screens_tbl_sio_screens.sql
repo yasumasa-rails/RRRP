@@ -38,7 +38,7 @@ screen.pobjects_id_sgrp   screen_pobject_id_sgrp,
 screen.width  screen_width,
   pobject_sgrp.pobject_code  pobject_code_sgrp 
  from screens   screen,
-  r_persons  person_upd ,  r_pobjects  pobject_scr ,  r_pobjects  pobject_view ,  r_scrlvs  scrlv ,  r_pobjects  pobject_sgrp 
+  upd_persons  person_upd ,  r_pobjects  pobject_scr ,  r_pobjects  pobject_view ,  r_scrlvs  scrlv ,  r_pobjects  pobject_sgrp 
   where       screen.persons_id_upd = person_upd.id      and screen.pobjects_id_scr = pobject_scr.id      and screen.pobjects_id_view = pobject_view.id      and screen.scrlvs_id = scrlv.id      and screen.pobjects_id_sgrp = pobject_sgrp.id     ;
  DROP TABLE IF EXISTS sio.sio_r_screens;
  CREATE TABLE sio.sio_r_screens (

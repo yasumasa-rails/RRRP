@@ -1,134 +1,86 @@
 ﻿
  --- drop view r_outstks cascade  
  create or replace view r_outstks as select  
-outstk.remark  outstk_remark,
-outstk.created_at  outstk_created_at,
-outstk.update_ip  outstk_update_ip,
-outstk.expiredate  outstk_expiredate,
-outstk.updated_at  outstk_updated_at,
-outstk.id id,
-outstk.id  outstk_id,
-outstk.persons_id_upd   outstk_person_id_upd,
-outstk.starttime  outstk_starttime,
-outstk.inoutflg  outstk_inoutflg,
-outstk.lotno  outstk_lotno,
-outstk.qty_stk  outstk_qty_stk,
-outstk.packno  outstk_packno,
-outstk.trngantts_id   outstk_trngantt_id,
-outstk.locas_id_in   outstk_loca_id_in,
-outstk.locas_id_out   outstk_loca_id_out,
+  trngantt.trngantt_consumauto  trngantt_consumauto ,
+outstk.qty  outstk_qty,
+  shelfno_out.shelfno_code  shelfno_code_out ,
+  trngantt.shelfno_code_fm  shelfno_code_fm ,
+  trngantt.trngantt_processseq  trngantt_processseq ,
+  shelfno_out.shelfno_name  shelfno_name_out ,
+  trngantt.shelfno_name_fm  shelfno_name_fm ,
+  trngantt.prjno_name  prjno_name ,
+  trngantt.trngantt_starttime  trngantt_starttime ,
+  trngantt.unit_code_pare  unit_code_pare ,
+  trngantt.unit_code  unit_code ,
+  trngantt.unit_name_pare  unit_name_pare ,
+  trngantt.unit_name  unit_name ,
   trngantt.trngantt_consumunitqty  trngantt_consumunitqty ,
-  trngantt.trngantt_paretblname  trngantt_paretblname ,
-  trngantt.trngantt_paretblid  trngantt_paretblid ,
   trngantt.trngantt_consumminqty  trngantt_consumminqty ,
+  trngantt.trngantt_itm_id  trngantt_itm_id ,
+  trngantt.trngantt_shuffle_flg  trngantt_shuffle_flg ,
+  trngantt.itm_code_pare  itm_code_pare ,
+  trngantt.itm_code  itm_code ,
+  trngantt.itm_name_pare  itm_name_pare ,
+  trngantt.itm_name  itm_name ,
   trngantt.trngantt_consumchgoverqty  trngantt_consumchgoverqty ,
+  trngantt.trngantt_qty_stk  trngantt_qty_stk ,
   trngantt.trngantt_tblname  trngantt_tblname ,
   trngantt.trngantt_tblid  trngantt_tblid ,
+  trngantt.loca_tel_pare  loca_tel_pare ,
+  shelfno_out.loca_code_shelfno  loca_code_shelfno_out ,
+  trngantt.loca_code_shelfno_fm  loca_code_shelfno_fm ,
+  trngantt.loca_code_pare  loca_code_pare ,
+  shelfno_out.loca_name_shelfno  loca_name_shelfno_out ,
+  trngantt.loca_name_shelfno_fm  loca_name_shelfno_fm ,
+  trngantt.loca_name_pare  loca_name_pare ,
+  trngantt.itm_unit_id_pare  itm_unit_id_pare ,
+  trngantt.itm_unit_id  itm_unit_id ,
+  trngantt.itm_classlist_id_pare  itm_classlist_id_pare ,
+  trngantt.itm_classlist_id  itm_classlist_id ,
+  trngantt.trngantt_parenum  trngantt_parenum ,
+  trngantt.trngantt_chilnum  trngantt_chilnum ,
   trngantt.trngantt_duedate  trngantt_duedate ,
-  trngantt.trngantt_starttime  trngantt_starttime ,
-  trngantt.trngantt_itm_id  trngantt_itm_id ,
-  trngantt.trngantt_processseq  trngantt_processseq ,
-  trngantt.trngantt_loca_id_fm  trngantt_loca_id_fm ,
-  trngantt.itm_weight  itm_weight ,
-  trngantt.unit_contents  unit_contents ,
-  trngantt.classlist_name  classlist_name ,
-  trngantt.classlist_contents  classlist_contents ,
-  trngantt.classlist_code  classlist_code ,
-  trngantt.itm_length  itm_length ,
-  trngantt.itm_design  itm_design ,
-  trngantt.itm_wide  itm_wide ,
-  trngantt.itm_deth  itm_deth ,
-  trngantt.itm_material  itm_material ,
-  trngantt.itm_std  itm_std ,
-  trngantt.itm_model  itm_model ,
-  trngantt.itm_datascale  itm_datascale ,
-  trngantt.unit_name  unit_name ,
-  trngantt.unit_code  unit_code ,
-  trngantt.itm_code  itm_code ,
-  trngantt.itm_name  itm_name ,
-  trngantt.loca_code_fm  loca_code_fm ,
-  trngantt.loca_country_fm  loca_country_fm ,
-  trngantt.loca_abbr_fm  loca_abbr_fm ,
-  trngantt.loca_prfct_fm  loca_prfct_fm ,
-  trngantt.loca_tel_fm  loca_tel_fm ,
-  trngantt.loca_mail_fm  loca_mail_fm ,
-  trngantt.loca_addr1_fm  loca_addr1_fm ,
-  trngantt.loca_zip_fm  loca_zip_fm ,
-  trngantt.loca_fax_fm  loca_fax_fm ,
-  trngantt.loca_addr2_fm  loca_addr2_fm ,
-  trngantt.loca_name_fm  loca_name_fm ,
+  trngantt.trngantt_qty  trngantt_qty ,
+  trngantt.trngantt_mlevel  trngantt_mlevel ,
+  trngantt.trngantt_orgtblname  trngantt_orgtblname ,
+  trngantt.trngantt_key  trngantt_key ,
+  trngantt.trngantt_shelfno_id_fm  trngantt_shelfno_id_fm ,
+  trngantt.trngantt_itm_id_pare  trngantt_itm_id_pare ,
   trngantt.trngantt_processseq_pare  trngantt_processseq_pare ,
   trngantt.trngantt_loca_id_pare  trngantt_loca_id_pare ,
-  trngantt.trngantt_itm_id_pare  trngantt_itm_id_pare ,
-  trngantt.loca_code_pare  loca_code_pare ,
-  trngantt.loca_country_pare  loca_country_pare ,
-  trngantt.loca_abbr_pare  loca_abbr_pare ,
-  trngantt.loca_prfct_pare  loca_prfct_pare ,
-  trngantt.loca_tel_pare  loca_tel_pare ,
-  trngantt.loca_mail_pare  loca_mail_pare ,
-  trngantt.loca_addr1_pare  loca_addr1_pare ,
-  trngantt.loca_zip_pare  loca_zip_pare ,
-  trngantt.loca_fax_pare  loca_fax_pare ,
-  trngantt.loca_addr2_pare  loca_addr2_pare ,
-  trngantt.loca_name_pare  loca_name_pare ,
-  trngantt.itm_weight_pare  itm_weight_pare ,
-  trngantt.unit_contents_pare  unit_contents_pare ,
-  trngantt.classlist_name_pare  classlist_name_pare ,
-  trngantt.classlist_contents_pare  classlist_contents_pare ,
-  trngantt.classlist_code_pare  classlist_code_pare ,
-  trngantt.itm_length_pare  itm_length_pare ,
-  trngantt.itm_design_pare  itm_design_pare ,
-  trngantt.itm_wide_pare  itm_wide_pare ,
-  trngantt.itm_deth_pare  itm_deth_pare ,
-  trngantt.itm_material_pare  itm_material_pare ,
-  trngantt.itm_std_pare  itm_std_pare ,
-  trngantt.itm_model_pare  itm_model_pare ,
-  trngantt.itm_datascale_pare  itm_datascale_pare ,
-  trngantt.unit_name_pare  unit_name_pare ,
-  trngantt.unit_code_pare  unit_code_pare ,
-  trngantt.itm_code_pare  itm_code_pare ,
-  trngantt.itm_name_pare  itm_name_pare ,
-  trngantt.trngantt_qty_stk_pare  trngantt_qty_stk_pare ,
+outstk.id  outstk_id,
+outstk.id id,
+outstk.starttime  outstk_starttime,
+outstk.qty_stk  outstk_qty_stk,
+outstk.lotno  outstk_lotno,
+outstk.packno  outstk_packno,
+outstk.inoutflg  outstk_inoutflg,
+outstk.expiredate  outstk_expiredate,
+outstk.remark  outstk_remark,
+outstk.persons_id_upd   outstk_person_id_upd,
+outstk.created_at  outstk_created_at,
+outstk.updated_at  outstk_updated_at,
+outstk.update_ip  outstk_update_ip,
+outstk.trngantts_id   outstk_trngantt_id,
   trngantt.trngantt_qty_pare  trngantt_qty_pare ,
-  trngantt.trngantt_mlevel  trngantt_mlevel ,
-  trngantt.trngantt_orgtblid  trngantt_orgtblid ,
-  trngantt.trngantt_consumauto  trngantt_consumauto ,
-  trngantt.trngantt_shuffle_flg  trngantt_shuffle_flg ,
-  trngantt.trngantt_prjno_id  trngantt_prjno_id ,
-  trngantt.trngantt_key  trngantt_key ,
-  trngantt.trngantt_parenum  trngantt_parenum ,
-  trngantt.prjno_code  prjno_code ,
-  trngantt.prjno_name  prjno_name ,
-  trngantt.trngantt_chilnum  trngantt_chilnum ,
-  trngantt.trngantt_qty  trngantt_qty ,
-  trngantt.trngantt_qty_stk  trngantt_qty_stk ,
-  trngantt.trngantt_orgtblname  trngantt_orgtblname ,
+  trngantt.trngantt_qty_stk_pare  trngantt_qty_stk_pare ,
+outstk.shelfnos_id_out   outstk_shelfno_id_out,
+  trngantt.classlist_code_pare  classlist_code_pare ,
+  trngantt.classlist_code  classlist_code ,
+  trngantt.classlist_name_pare  classlist_name_pare ,
+  trngantt.classlist_name  classlist_name ,
+  trngantt.trngantt_paretblname  trngantt_paretblname ,
+  trngantt.trngantt_paretblid  trngantt_paretblid ,
   trngantt.prjno_code_chil  prjno_code_chil ,
-  loca_in.loca_code  loca_code_in ,
-  loca_in.loca_country  loca_country_in ,
-  loca_in.loca_abbr  loca_abbr_in ,
-  loca_in.loca_prfct  loca_prfct_in ,
-  loca_in.loca_tel  loca_tel_in ,
-  loca_in.loca_mail  loca_mail_in ,
-  loca_in.loca_addr1  loca_addr1_in ,
-  loca_in.loca_zip  loca_zip_in ,
-  loca_in.loca_fax  loca_fax_in ,
-  loca_in.loca_addr2  loca_addr2_in ,
-  loca_in.loca_name  loca_name_in ,
-  loca_out.loca_code  loca_code_out ,
-  loca_out.loca_country  loca_country_out ,
-  loca_out.loca_abbr  loca_abbr_out ,
-  loca_out.loca_prfct  loca_prfct_out ,
-  loca_out.loca_tel  loca_tel_out ,
-  loca_out.loca_mail  loca_mail_out ,
-  loca_out.loca_addr1  loca_addr1_out ,
-  loca_out.loca_zip  loca_zip_out ,
-  loca_out.loca_fax  loca_fax_out ,
-  loca_out.loca_addr2  loca_addr2_out ,
-  loca_out.loca_name  loca_name_out 
+  trngantt.trngantt_orgtblid  trngantt_orgtblid ,
+  trngantt.prjno_code  prjno_code ,
+  shelfno_out.shelfno_loca_id_shelfno  shelfno_loca_id_shelfno_out ,
+  trngantt.shelfno_loca_id_shelfno_fm  shelfno_loca_id_shelfno_fm ,
+  shelfno_out.shelfno_contents  shelfno_contents_out ,
+  trngantt.trngantt_prjno_id  trngantt_prjno_id 
  from outstks   outstk,
-  r_persons  person_upd ,  r_trngantts  trngantt ,  r_locas  loca_in ,  r_locas  loca_out 
-  where       outstk.persons_id_upd = person_upd.id      and outstk.trngantts_id = trngantt.id      and outstk.locas_id_in = loca_in.id      and outstk.locas_id_out = loca_out.id     ;
+  r_persons  person_upd ,  r_trngantts  trngantt ,  r_shelfnos  shelfno_out 
+  where       outstk.persons_id_upd = person_upd.id      and outstk.trngantts_id = trngantt.id      and outstk.shelfnos_id_out = shelfno_out.id     ;
  DROP TABLE IF EXISTS sio.sio_r_outstks;
  CREATE TABLE sio.sio_r_outstks (
           sio_id numeric(38,0)  CONSTRAINT SIO_r_outstks_id_pk PRIMARY KEY           ,sio_user_code numeric(38,0)
@@ -147,131 +99,83 @@ outstk.locas_id_out   outstk_loca_id_out,
           ,sio_sord varchar(256)
           ,sio_search varchar(10)
           ,sio_sidx varchar(256)
-,unit_code  varchar (50) 
-,itm_name  varchar (100) 
-,loca_code_fm  varchar (50) 
-,prjno_name  varchar (100) 
-,loca_name_in  varchar (100) 
-,loca_code_in  varchar (50) 
 ,prjno_code_chil  varchar (50) 
-,loca_name_pare  varchar (100) 
-,unit_name  varchar (100) 
-,itm_code  varchar (50) 
-,unit_code_pare  varchar (50) 
-,unit_name_pare  varchar (100) 
 ,classlist_name  varchar (100) 
-,loca_name_fm  varchar (100) 
-,prjno_code  varchar (50) 
-,classlist_code_pare  varchar (50) 
 ,classlist_name_pare  varchar (100) 
-,loca_code_pare  varchar (50) 
 ,classlist_code  varchar (50) 
-,itm_name_pare  varchar (100) 
+,unit_name_pare  varchar (100) 
+,unit_name  varchar (100) 
+,shelfno_code_fm  varchar (50) 
+,unit_code  varchar (50) 
+,loca_code_shelfno_out  varchar (50) 
+,loca_code_shelfno_fm  varchar (50) 
+,loca_code_pare  varchar (50) 
+,loca_name_shelfno_out  varchar (100) 
+,loca_name_shelfno_fm  varchar (100) 
+,loca_name_pare  varchar (100) 
+,prjno_code  varchar (50) 
+,shelfno_name_out  varchar (100) 
 ,itm_code_pare  varchar (50) 
-,loca_name_out  varchar (100) 
-,loca_code_out  varchar (50) 
-,outstk_starttime   timestamp(6) 
+,classlist_code_pare  varchar (50) 
+,itm_code  varchar (50) 
+,itm_name_pare  varchar (100) 
+,itm_name  varchar (100) 
+,shelfno_name_fm  varchar (100) 
+,prjno_name  varchar (100) 
+,shelfno_code_out  varchar (50) 
+,unit_code_pare  varchar (50) 
+,outstk_qty  numeric (18,4)
 ,outstk_inoutflg  varchar (3) 
 ,outstk_packno  varchar (10) 
 ,outstk_lotno  varchar (50) 
+,outstk_starttime   timestamp(6) 
 ,outstk_expiredate   date 
 ,outstk_qty_stk  numeric (38,4)
-,loca_fax_fm  varchar (20) 
-,loca_addr2_fm  varchar (50) 
-,trngantt_processseq_pare  numeric (38,0)
-,loca_country_pare  varchar (20) 
-,loca_abbr_pare  varchar (50) 
-,loca_prfct_pare  varchar (20) 
-,loca_tel_pare  varchar (20) 
-,loca_mail_pare  varchar (20) 
-,loca_addr1_pare  varchar (50) 
-,loca_zip_pare  varchar (10) 
-,loca_fax_pare  varchar (20) 
-,loca_addr2_pare  varchar (50) 
-,itm_weight_pare  numeric (22,0)
-,unit_contents_pare  varchar (4000) 
-,loca_addr1_in  varchar (50) 
+,trngantt_duedate   timestamp(6) 
+,trngantt_processseq  numeric (38,0)
+,trngantt_starttime   timestamp(6) 
 ,trngantt_consumunitqty  numeric (22,6)
-,trngantt_paretblname  varchar (30) 
-,trngantt_paretblid  numeric (38,0)
 ,trngantt_consumminqty  numeric (22,6)
+,trngantt_shuffle_flg  varchar (1) 
 ,trngantt_consumchgoverqty  numeric (22,6)
+,trngantt_qty_stk  numeric (22,0)
 ,trngantt_tblname  varchar (30) 
 ,trngantt_tblid  numeric (38,0)
-,trngantt_duedate   timestamp(6) 
-,trngantt_starttime   timestamp(6) 
-,trngantt_processseq  numeric (38,0)
-,itm_weight  numeric (22,0)
-,unit_contents  varchar (4000) 
-,classlist_contents  varchar (4000) 
-,itm_length  numeric (22,0)
-,itm_design  varchar (50) 
-,itm_wide  numeric (22,0)
-,itm_deth  numeric (22,0)
-,itm_material  varchar (50) 
-,itm_std  varchar (50) 
-,itm_model  varchar (50) 
-,itm_datascale  numeric (22,0)
-,loca_country_fm  varchar (20) 
-,loca_abbr_fm  varchar (50) 
-,loca_prfct_fm  varchar (20) 
-,loca_tel_fm  varchar (20) 
-,loca_mail_fm  varchar (20) 
-,loca_addr1_fm  varchar (50) 
-,loca_zip_fm  varchar (10) 
-,loca_prfct_in  varchar (20) 
-,loca_tel_in  varchar (20) 
-,loca_mail_in  varchar (20) 
-,loca_zip_in  varchar (10) 
-,loca_fax_in  varchar (20) 
-,loca_addr2_in  varchar (50) 
-,loca_country_out  varchar (20) 
-,loca_abbr_out  varchar (50) 
-,loca_prfct_out  varchar (20) 
-,loca_tel_out  varchar (20) 
-,loca_mail_out  varchar (20) 
-,loca_addr1_out  varchar (50) 
-,loca_zip_out  varchar (10) 
-,loca_fax_out  varchar (20) 
-,loca_addr2_out  varchar (50) 
-,classlist_contents_pare  varchar (4000) 
-,itm_length_pare  numeric (22,0)
-,itm_design_pare  varchar (50) 
-,itm_wide_pare  numeric (22,0)
-,itm_deth_pare  numeric (22,0)
-,itm_material_pare  varchar (50) 
-,itm_std_pare  varchar (50) 
-,itm_model_pare  varchar (50) 
-,itm_datascale_pare  numeric (22,0)
-,trngantt_qty_stk_pare  numeric (22,0)
-,trngantt_qty_pare  numeric (22,0)
-,trngantt_mlevel  numeric (3,0)
-,trngantt_orgtblid  numeric (22,0)
-,trngantt_consumauto  varchar (1) 
-,trngantt_shuffle_flg  varchar (1) 
-,trngantt_key  varchar (250) 
+,loca_tel_pare  varchar (20) 
 ,trngantt_parenum  numeric (22,0)
 ,trngantt_chilnum  numeric (22,0)
+,trngantt_consumauto  varchar (1) 
 ,trngantt_qty  numeric (18,4)
-,trngantt_qty_stk  numeric (22,0)
+,trngantt_mlevel  numeric (3,0)
 ,trngantt_orgtblname  varchar (30) 
-,loca_country_in  varchar (20) 
-,loca_abbr_in  varchar (50) 
+,trngantt_key  varchar (250) 
+,trngantt_processseq_pare  numeric (38,0)
+,trngantt_qty_pare  numeric (22,0)
+,trngantt_qty_stk_pare  numeric (22,0)
+,trngantt_paretblname  varchar (30) 
+,trngantt_paretblid  numeric (38,0)
+,trngantt_orgtblid  numeric (22,0)
+,shelfno_contents_out  varchar (4000) 
 ,outstk_remark  varchar (4000) 
-,outstk_trngantt_id  numeric (38,0)
-,outstk_person_id_upd  numeric (38,0)
-,outstk_created_at   timestamp(6) 
-,outstk_loca_id_in  numeric (22,0)
 ,outstk_updated_at   timestamp(6) 
 ,outstk_update_ip  varchar (40) 
-,outstk_id  numeric (38,0)
+,outstk_trngantt_id  numeric (38,0)
+,outstk_created_at   timestamp(6) 
+,outstk_shelfno_id_out  numeric (22,0)
 ,id  numeric (38,0)
-,outstk_loca_id_out  numeric (22,0)
-,trngantt_loca_id_pare  numeric (38,0)
+,outstk_id  numeric (38,0)
+,outstk_person_id_upd  numeric (38,0)
+,itm_classlist_id_pare  numeric (38,0)
+,itm_unit_id  numeric (22,0)
+,shelfno_loca_id_shelfno_out  numeric (38,0)
+,shelfno_loca_id_shelfno_fm  numeric (38,0)
+,itm_unit_id_pare  numeric (22,0)
 ,trngantt_itm_id_pare  numeric (38,0)
-,trngantt_loca_id_fm  numeric (38,0)
-,trngantt_prjno_id  numeric (22,0)
+,trngantt_prjno_id  numeric (38,0)
 ,trngantt_itm_id  numeric (38,0)
+,trngantt_loca_id_pare  numeric (38,0)
+,trngantt_shelfno_id_fm  numeric (22,0)
+,itm_classlist_id  numeric (38,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(38,0)

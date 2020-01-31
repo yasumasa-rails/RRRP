@@ -3,8 +3,7 @@ import {takeEvery} from 'redux-saga/effects'
 
 import {LOGIN_REQUEST,SIGNUP_REQUEST,MENU_REQUEST,
         LOGOUT_REQUEST,SCREEN_REQUEST,BUTTONLIST_REQUEST,
-        EXCELTOJSON_REQUEST,CHECKJSONDATA_REQUEST,
-        FETCH_REQUEST,GANTTCHART_REQUEST,
+        EXCELTOJSON_REQUEST,FETCH_REQUEST,GANTTCHART_REQUEST,
         DOWNLOAD_REQUEST,
         YUP_REQUEST,TBLFIELD_REQUEST,
       //  UPLOAD_REQUEST,
@@ -15,7 +14,6 @@ import {LoginSaga} from './login'
 import {SignupSaga} from './signup'
 import {MenuSaga} from './menus'
 import {ExcelToJsonSaga} from './exceltojson'
-import {CheckJsonDataSaga} from './checkjsondata'
 import {DownloadSaga} from './download'
 import {ScreenSaga} from './screen'//
 import {ButtonListSaga} from './buttonlist'
@@ -33,7 +31,6 @@ export function * sagas () {
   yield takeEvery(FETCH_REQUEST,ScreenSaga)
   yield takeEvery(BUTTONLIST_REQUEST,ButtonListSaga)
   yield takeEvery(EXCELTOJSON_REQUEST,ExcelToJsonSaga)
-  yield takeEvery(CHECKJSONDATA_REQUEST,CheckJsonDataSaga)
   yield takeEvery(DOWNLOAD_REQUEST,DownloadSaga)
   yield takeEvery(YUP_REQUEST,TblfieldSaga)
   yield takeEvery(TBLFIELD_REQUEST,TblfieldSaga)

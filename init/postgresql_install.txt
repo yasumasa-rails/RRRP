@@ -26,7 +26,7 @@ postgres=# CREATE DATABASE v10_development OWNER v10_development;
 CREATE DATABASE
 postgres=# \l
                   
-
+ pg_dump  --port=5433 --dbname=v10_development > /mnt/c/ubuntu/rrrp/dumpfile
 
 
 Railの設定

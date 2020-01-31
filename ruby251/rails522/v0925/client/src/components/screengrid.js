@@ -170,7 +170,11 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
     //let tcolumns=params.req!=="viewtablereq"?editableColumns(columns):columns   
     let tcolumns=editableColumns(columns)   
     //let filtered =[]
-
+    let styleHeight = buttonflg  => {switch(buttonflg) {
+                                      case "export":return "500px"
+                                      case "import":return "300px"
+                                      default: return     "840px"                                    } 
+                                    }      
     return(
     <div>
     {screenCode?
@@ -193,7 +197,8 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
       
       //className="-striped -highlight" //-striped  奇数行、偶数行色分け　 -highlight：マウスがヒットした時の色の強調
       
-      style={buttonflg!=="export"?{ height: "800px" }:{height:"200px"}}
+      //style={buttonflg!=="export"?{ height: "840px" }:{height:"300px"}}
+      style={{ height: styleHeight(buttonflg) }}
      //style={buttonflg!=="export"?{ height: "800px" ,width:"2380px" }:{height:"200px",width:"2380px"}}
        // This will force the table body to overflow and scroll, since there is not enough room
       
@@ -255,20 +260,20 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
                   }
           },
           onBlur:(e) =>   
-             { let inputval 
-              let rval
-              let linedata = {}
-              if(data[rowInfo.index][`${column.id}_gridmessage`] === "in" ||/err|Invalid/.test(data[rowInfo.index][`${column.id}_gridmessage`]) ||
+            { let inputval 
+            let rval
+            let linedata = {}
+            if(data[rowInfo.index][`${column.id}_gridmessage`] === "in" ||/err|Invalid/.test(data[rowInfo.index][`${column.id}_gridmessage`]) ||
                   data[rowInfo.index][column.id]!== e.target.textContent){
               if(e.target.tagName==="SELECT"){inputval= e.target.value}else{if(e.target.tagName==="DIV"){inputval= e.target.textContent}} 
-                if(column.id!=="confirm"){
+              if(column.id!=="confirm"){
         　            rowInfo.row[column.id] = inputval
                       data[rowInfo.index][column.id]=inputval
                       //params["linedata"] =  JSON.stringify(data[rowInfo.index])
                       params["index"] = rowInfo.index
                       onFieldValite (column.id,params,data,error)
                       }
-                if(data[rowInfo.index][`${column.id}_gridmessage`]==="ok"){
+              if(data[rowInfo.index][`${column.id}_gridmessage`]==="ok"){
                         rval =   onBlurFunc(screenCode,data[rowInfo.index],column.id)
                         linedata = rval["linedata"]
                         Object.keys(linedata).map((field)=>{
@@ -277,7 +282,7 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
                                         })
                         if (rval["sw"]){handleScreenOnblur(data)}                
                       }   
-                if(yup.yupcheckcode[column.id]&&data[rowInfo.index][`${column.id}_gridmessage`]==="ok"){// 
+              if(yup.yupcheckcode[column.id]&&data[rowInfo.index][`${column.id}_gridmessage`]==="ok"){// 
                                 // rowInfo.row[column.id]=inputval
                                   let chkcondtion = yup.yupcheckcode[column.id].split(",")[1]
                                   if(chkcondtion===undefined||(chkcondtion==="add"&data[rowInfo.index]["id"]==="")||(chkcondtion==="update"&data[rowInfo.index]["id"]!=="")){
@@ -293,7 +298,7 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
                                         params["uid"] = uid
                                         params["req"] = "check_request"                                      
                                         handleFetchRequest(params)}}
-                if(yup.yupfetchcode[column.id]&&(data[rowInfo.index][`${column.id}_gridmessage`]==="ok"||data[rowInfo.index][`${column.id}_gridmessage`]==="ok on the way")){// 
+              if(yup.yupfetchcode[column.id]&&(data[rowInfo.index][`${column.id}_gridmessage`]==="ok"||data[rowInfo.index][`${column.id}_gridmessage`]==="ok on the way")){// 
                                         //rowInfo.row[column.id]=inputval
                                         data[rowInfo.index][column.id]=inputval
                                         params["fetchcode"] = {[column.id]:inputval}
@@ -306,7 +311,8 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
                                         params["index"] = rowInfo.index 
                                         params["fetchview"] = yup.yupfetchcode[column.id]
                                         params["uid"] = uid
-                                        params["req"] = "fetch_request"                                      
+                                        params["req"] = "fetch_request"    
+                                        params["buttonflg"] = buttonflg                                 
                                         handleFetchRequest(params)
                                                          }
             }                                         

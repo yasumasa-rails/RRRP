@@ -1,4 +1,3 @@
-  
 # -*- coding: utf-8 -*-
 module ControlFields
 ### 個別項目　チェック
@@ -7,13 +6,19 @@ module ControlFields
 	def  chk_fetch_rec params  
 		fetch_data,mainviewflg,keys,findstatus,screendata,missing = get_fetch_rec params
 	  	if findstatus
-			if mainviewflg and  params[:parse_linedata]["aud"] == "add"  ##mainviewflg = true 自分自身の登録
-				params[:err] = "error duplicate code #{keys} "
-				params[:keys] = []
-				keys.split(",").each do |key| 
-				  	params[:keys] =  [key.split(":")[0].gsub(" ","")] 
-				end  
-				params[:fetch_data] = {}
+			if mainviewflg 
+				if 	params[:parse_linedata]["aud"] == "add" or params["buttonflg"] =~ /add/  ##mainviewflg = true 自分自身の登録
+					params[:err] = "error duplicate code #{keys} "
+					params[:keys] = []
+					keys.split(",").each do |key| 
+				  		params[:keys] =  [key.split(":")[0].gsub(" ","")] 
+					end  
+					params[:fetch_data] = {}
+				else
+					fetch_data.each do |key,val|
+						params[:fetch_data] = {"id" => val}
+					end
+				end		
 			else
 				params[:fetch_data] = fetch_data
 				keys.split(",").each do |key| ###コードが変更されたとき既に使用されている？
@@ -30,7 +35,7 @@ module ControlFields
 					params[:fetch_data] = fetch_data
 				else
 					params[:err] =  "error   --->not find #{keys} "
-					 params[:fetch_data] = {}
+					params[:fetch_data] = {}
 				end	  
 			end  
 	  	end 
@@ -43,6 +48,9 @@ module ControlFields
 			mainviewflg = true  ##自分自身の登録か？
 			keys = ""
 			fetch_data = {}
+			tblnamechop = ""
+			xno = ""
+			orgtblnamechop = ""
 			fetchview = params[:fetchview].split(":")[0]  ##拡張子の確認
 			tblnamechop = fetchview.split("_")[1].chop
 			screendata = params[:parse_linedata]
@@ -57,53 +65,85 @@ module ControlFields
 								 where pobject_code_scr =  '#{params[:screenCode]}' 
 								 and screenfield_paragraph = '#{params[:fetchview]}'"	
 			delm = (params[:fetchview].split(":")[1]||="")
-			missing = false
+			missing = false   ###missing:true パラメータが未だ未設定　　false:チェックok
 			strsql = " select * from #{fetchview}  where "
 			ActiveRecord::Base.connection.select_all(fetcfieldgetsql).each do |rec|
-				keys <<  "  #{rec["pobject_code_sfd"]} : '#{screendata[rec["pobject_code_sfd"]].gsub(",","_")}',"  ###入力項目に「,」が入っていた時
+				xfield = screendata[rec["pobject_code_sfd"]].to_s.gsub(",","_") ###入力項目に「,」が入っていた時
+				keys <<  "  #{rec["pobject_code_sfd"]} : '#{xfield}',"  ###入力項目に「,」が入っていた時
 				if screendata[rec["pobject_code_sfd"]] == "" or screendata[rec["pobject_code_sfd"]].nil?   ###未入力
 					missing = true
-				else	
-					if delm == ""
-						strsql << "  #{rec["pobject_code_sfd"]} = '#{screendata[rec["pobject_code_sfd"]]}'        and"
+				else
+					if rec["pobject_code_sfd"] 	=~ /_sno_|_cno_|_gno_/
+						tblnamechop,xno,orgtblnamechop = rec["pobject_code_sfd"].split("_")
+						strsql << " #{orgtblnamechop}_#{xno} = '#{screendata[rec["pobject_code_sfd"]]}'       and"
 					else
-						strsql << "  #{rec["pobject_code_sfd"].split(delm)[0]} = '#{screendata[rec["pobject_code_sfd"]]}'       and"
-					end		
+						if delm == ""
+							strsql << "  #{rec["pobject_code_sfd"]} = '#{screendata[rec["pobject_code_sfd"]]}'        and"
+						else
+							strsql << "  #{rec["pobject_code_sfd"].split(delm)[0]} = '#{screendata[rec["pobject_code_sfd"]]}'       and"
+						end
+					end
 				end
 				fetch_data[rec["pobject_code_sfd"]] = screendata[rec["pobject_code_sfd"]]	
 			end
 			if missing == false
-				rec =  ActiveRecord::Base.connection.select_one(strsql[0..-8]+ " limit 1")
+				rec =  ActiveRecord::Base.connection.select_one(strsql[0..-8] + " limit 1")
 			else
 				rec = nil
 			end
 			if rec
 				missing = false
 				screendata.each do |key,val|  ###結果をセット
-						items = key.split("_")
-						if items[-1] == delm[1..-1]   ##delmは_(アンダーバー付き)
-							field = items[0..-2].join("_")
-						else	
-							field = items.join("_")
-						end	
-						if rec[field] and key !="id" and key !~ /person.*upd/ 
-							 fetch_data[field+delm] =  rec[field]
+					items = key.split("_")
+					if items[-1] == delm[1..-1]   ##delmは_(アンダーバー付き)
+						field = items[0..-2].join("_")
+					else	
+						field = items.join("_")
+					end	
+					if rec[field] and key !="id" and key !~ /person.*upd/ and field !~ /^#{params[:screenCode].split("_")[1].chop}/ 
+						fetch_data[field+delm] =  rec[field]
+					else
+						if 	field =~ /^#{tblnamechop}/ and  rec[field.gsub(tblnamechop,orgtblnamechop)] and
+								field !~ /_isudate$|_sno$|_gno$|_cno$/ and field != "#{tblnamechop}_id"
+							fetch_data[field] =  rec[field.gsub(tblnamechop,orgtblnamechop)]
+						else
+							if  field =~ /^#{tblnamechop}_qty_stk/ and rec["#{orgtblnamechop}_qty"] 
+								strsql = %Q% select sum(qty) qty,sum(qty_stk) qty_stk from trngantts
+												where tblname = '#{orgtblnamechop}s' and tblid = #{rec["id"]}
+								%  ###次のステータスに移行していないqty
+								org =  ActiveRecord::Base.connection.select_one(strsql)
+								if tblnamechop =~ /act$/
+									if  orgtblnamechop =~ /act$/
+										fetch_data["#{tblnamechop}_qty_stk"] = org["qty_stk"] 
+									else
+										fetch_data["#{tblnamechop}_qty_stk"] = org["qty"]
+									end
+								else
+									if  orgtblnamechop =~ /act$/
+										fetch_data["#{tblnamechop}_qty"] = org["qty_stk"] 
+									else
+										fetch_data["#{tblnamechop}_qty"] = org["qty"]
+									end
+								end
+							else
+							end
 						end
+					end
 				end	
 				field = params[:screenCode].split("_")[1].chop+"_"+tblnamechop+"_id"+delm
 				if params[:parse_linedata][field]
 					fetch_data[field] =  rec["id"]
 				end
 				field = tblnamechop+"_id"+delm
-				if params[:parse_linedata][field]
+				if params[:parse_linedata][field] and fetchview.split("_")[1].chop == tblnamechop
 					fetch_data[field] =  rec["id"]
 				end	
 				findstatus = true
 			else
 				fetch_data[params[:screenCode].split("_")[1].chop+"_"+tblnamechop+"_id"+delm] =  ""  ##再入力時のNgに対応
 				findstatus = false
-			end		
-			return fetch_data,mainviewflg,keys,findstatus,screendata,missing
+			end	
+		return fetch_data,mainviewflg,keys,findstatus,screendata,missing
 	end		
 
 	def blkuky_check tbl,linedata   ###重複チェック
@@ -164,11 +204,23 @@ module ControlFields
 		else	
 			if linedata["screenfield_paragraph"]
 				screen,delm = linedata["screenfield_paragraph"].split(":",2)
-				if delm
-					field =  linedata["pobject_code_sfd"].gsub(delm,"")
-				else	
-					field =  linedata["pobject_code_sfd"]
-				end	
+				if linedata["pobject_code_sfd"] =~ /_sno_|_cno_|_gno_/
+					case linedata["pobject_code_sfd"] 
+					when /_sno_/
+						field = linedata["pobject_code_sfd"].split("_sno_")[1] + "_sno"
+					when /_cno_/
+						field = linedata["pobject_code_sfd"].split("_cno_")[1] + "_cno"
+					when /_gno_/
+						field = linedata["pobject_code_sfd"].split("_gno_")[1] + "_gno"
+					else
+					end
+				else
+					if delm
+						field =  linedata["pobject_code_sfd"].gsub(delm,"")
+					else	
+						field =  linedata["pobject_code_sfd"]
+					end
+				end
 				strsql = %Q%select 1 from r_screenfields where pobject_code_scr ='#{screen}' and pobject_code_sfd = '#{field}' %
 				rec = ActiveRecord::Base.connection.select_one(strsql)
 				if rec
@@ -182,8 +234,41 @@ module ControlFields
 		return params
 	end	
 
-	def strorder
+	def check_strorder params
+		linedata = params[:parse_linedata]
+		if linedata["screen_strorder"] and linedata["screen_strorder"] != ""
+			ary_select_fields = linedata.keys
+			sort_info = {}
+			sort_info[:default] = linedata["screen_strorder"]
+			sort_info = proc_detail_check_strorder sort_info,ary_select_fields
+			if sort_info[:err] 
+				params[:err] =  sort_info[:err] 
+			else
+				params[:err] =  nil
+			end
+		end
+		return params
 	end
+
+	def  proc_detail_check_strorder sort_info,ary_select_fields
+		##fields = sort_info[:default].split(/\s*,\s*/)
+		sort_info[:default].split(/\s*,\s*/).each do |sort_field|
+			ok = false
+			sort_field.split(" ").each do |chk|
+				if(ary_select_fields.include?(chk.gsub(" ","").downcase))
+					ok = true
+				else
+					if ok==true and (chk.gsub(" ","").downcase=="asc" or chk.gsub(" ","").downcase=="desc")
+					else
+						sort_info[:default] = nil
+						sort_info[:err] = "sort option error"
+						break
+					end		
+				end		
+			end	
+		end	
+		return sort_info
+	end	
 
 	def check_qty params
 		linedata = params[:parse_linedata]
@@ -194,30 +279,31 @@ module ControlFields
 			checkstatus = false
 			params[:err] =  "error   --->#{symqty} missing "
 		else
-			if prevTbl[tblname]
-				if prevTbl[tblname] !~ /schs/	
-					strsql = %Q%select qty from #{prevTbl[tblname]}  where sno = '#{sno}' %
-					prev_qty = ActiveRecord::Base.connection.select_value(strsql)	
-					strsql = %Q%select sum(qty) from #{tblname}  where sno_#{statusTbl[prevTbl[tblname]]} = '#{sno}' 
-								#{if linedata["id"] == "" then "" else " and id != #{linedata["id"]} " end}
-								group by sno_#{statusTbl[prevTbl[tblname]]}  %
-					curr_qty = ActiveRecord::Base.connection.select_value(strsql)
-					curr_qty ||= 0.0
-					debugger
-					if linedata[symqty].to_f + curr_qty.to_f <= prev_qty.to_f   ### オーダ以上を許可するルール未設定
+			currtblnamechop = ""
+			tblnamechop = "" 
+			linedata.each do |key,val|
+				if key.to_s =~ /_sno_/  and !val.nil? and val != ""
+					currtblnamechop,tblnamechop = key.to_s.split("_sno_")
+					strsql = %Q%select id from #{tblnamechop}s  where sno = '#{sno}' %
+				end
+				tblid = ActiveRecord::Base.connection.select_value(strsql)	
+				strsql = %Q%select sum(qty) qty from trngantts where tblname = '#{tblnamechop}s'
+								and tblid = #{tblid} group by  tblname,tblid
+				%
+				prev_qty = ActiveRecord::Base.connection.select_value(strsql)	
+				if linedata[symqty].to_f  <= prev_qty.to_f   ### オーダ以上を許可するルール未設定
 						checkstatus = true
-					else
+				else
 						checkstatus = false
 						params[:err] =  "error   --->  #{prev_qty} <　#{curr_qty}  + input qty:#{linedata[symqty]} "
-					end	
-				end
-			else
+				end	
 				checkstatus = true
 			end
 			if linedata["id"] != "" and checkstatus == true ###更新の時のみ　ords-->insts  insts -->actsに既にどれだけ変化しているか？
-				strsql = %Q%select sum(qty) from #{nextTbl[tblname]}  where sno_#{statusTbl[tblname]} = '#{sno}' 
-						 group by sno %
-				chng_qty = ActiveRecord::Base.connection.select_value(strsql)
+				strsql = %Q%select sum(qty) qty from trngantts where tblname = '#{currtblnamechop}s'
+								and tblid = #{linedata["id"]} group by  tblname,tblid
+				%
+				chng_qty = ActiveRecord::Base.connection.select_value(strsql)	
 				chng_qty ||= 0.0  ###すでに次の状態に変化した数値
 				if chng_qty.to_f <= linedata[symqty].to_f
 					checkstatus = true
@@ -235,14 +321,11 @@ module ControlFields
 		tblname =  params[:screenCode].split("_")[1]
 		id = linedata["#{tblname.chop}_id"]
 		if id != ""  ###更新の時のみ　ords-->insts  insts -->actsに既にどれだけ変化しているか？
-			sym = tblname.chop + "_loca_code_to"
+			sym = "loca_code_to"
 			if linedata[sym] == ""
 				checkstatus = false
 				params[:err] =  "error   --->#{sym} missing "
-			else	
-				strsql = %Q%select sum(qty) from alloctbls where srctblname ='#{tblname}' and srctblid = #{id} 
-						 and  (destblid = #{id} or destblname = '#{tblname}') group by srctblname,srctblid %
-				chng_qty = ActiveRecord::Base.connection.select_value(strsql)
+			else
 				strsql = %Q%select sum(qty) from trngantts where orgtblname ='#{tblname}' and orgtblid = #{id} 
 						 and  tblid = #{id} and tblname = '#{tblname}' group by orgtblname,orgtblid,tblname,tblid %
 				trn_qty = ActiveRecord::Base.connection.select_value(strsql)
@@ -288,63 +371,51 @@ module ControlFields
 		return params
 	end	
 
-	def check_snocopy params
-		linedata = params[:parse_linedata]
-		orgtblnamechop = prevTbl[params[:screenCode].split("_")[1]].chop
-		tblname = params[:screenCode].split("_")[1]
-		flg = prevStatus[tblname]
-		orgSno = linedata[(tblname.chop+"_sno_"+flg)]
-		strsql = %Q% select * from r_#{orgtblnamechop}s where #{orgtblnamechop}_sno = '#{orgSno}'
-		%
-		orgtbldata = ActiveRecord::Base.connection.select_one(strsql)
-		if orgtbldata
-			orgtbldata.each do |key,val|
-				next if ["id", "#{orgtblnamechop}_id","#{orgtblnamechop}_sno",
-								"#{orgtblnamechop}_cno","#{orgtblnamechop}_gno"].find{|n| n== key}
-				newkey =  tblname.chop + "_" + key.split("_",2)[1] 
-				if linedata[newkey] ==  "" and (!val.nil? and val != "")
-					linedata[newkey] = val
-				end
-				if 	linedata[key] ==  "" and (!val.nil? and val != "")
-					linedata[key] = val
-				end
-			end
-			params[:linedata] =  linedata
-		else
-			checkstatus = false
-			params[:err] =  "error   --->  not exists sno :#{orgSno} "
-		end
-		return params
-	end
 	def prevTbl
 		{"purords"=>"purschs","purinsts"=>"purords","purdlvs"=>"purinsts","puracts"=>"purdlvs",
+			"inspords"=>"inspschs","inspinsts"=>"inspords","inspacts"=>"inspinsts",
 			"prdords"=>"prdschs","prdinsts"=>"prdords","prdacts"=>"prdinsts",
+			"payords"=>"payschs","payinsts"=>"payords","payacts"=>"payinsts",
+			"billords"=>"billschs","billinsts"=>"billords","billacts"=>"billinsts",
 			"shpords"=>"shpschs","shpinsts"=>"shpords","shpacts"=>"shpinsts"}
 	end
 	def prevStatus
-		{"purords"=>"sch","purinsts"=>"ord","puracts"=>"inst",
-			"prdords"=>"sch","prdinsts"=>"ord","prdacts"=>"inst",
-			"shpords"=>"sch","shpinsts"=>"ord","shpacts"=>"inst"}
-	end
-	def nextTbl
-		{"purschs"=>"purords","purords"=>"purinsts","purinsts"=>"purdlvs","purdlvs"=>"puracts",
-			"prdschs"=>"prdords","prdords"=>"prdinsts","prdinsts"=>"prdacts",
-			"shpschs"=>"shpords","shpords"=>"shpinsts","shpinsts"=>"shpacts"}
-	end
-	def statusTbl
-		{"purschs"=>"sch","purords"=>"ord","purinsts"=>"inst","purdlvs"=>"dlv","puracts"=>"act",
-			"prdords"=>"ord","prdinsts"=>"inst","prdacts"=>"act",
-			"shpords"=>"ord","shpinsts"=>"inst","shpacts"=>"act"}
-	end
-	
-	def snolist   ###reqparams["segment"] = ["trn_org"]の対象でもある。
-		{"purschs"=>"PS","purords"=>"PO","purinsts"=>"PI","purdlvs"=>"PV","puracts"=>"PA","purrets"=>"PR",
-			"prdschs"=>"MS","prdords"=>"MO","prdinsts"=>"MI","prdacts"=>"MA","prdrets"=>"MR",
-			"shpschs"=>"SS","shpords"=>"SO","shpinsts"=>"SR","shpacts"=>"SA","shprets"=>"SR"}
+		{"purords"=>"pursch","purinsts"=>"purord","purdlvs"=>"purinsts","puracts"=>"purdlvs",
+			"prdords"=>"prdsch","prdinsts"=>"prdord","prdacts"=>"prdinst",
+			"payords"=>"paysch","payinsts"=>"payord","payacts"=>"payinst",
+			"billords"=>"billsch","billinsts"=>"billord","billacts"=>"billinst",
+			"shpords"=>"shpsch","shpinsts"=>"shpord","shpacts"=>"shpinst"}
 	end
 
-	def mkTblList   ###例:指示テーブル等を使用せずordsから直接snoを入力してpuractsを作成
-		{"purmk1s"=>["purords","purinsts","purdlvs"]}
+	def nextTbl
+		{"purschs"=>"purords","purords"=>"purinsts","purinsts"=>"purdlvs","purdlvs"=>"puracts",
+			"inspschs"=>"inspords","inspords"=>"inspinsts","inspinsts"=>"inspacts",
+			"prdschs"=>"prdords","prdords"=>"prdinsts","prdinsts"=>"prdacts",
+			"payschs"=>"payords","payords"=>"payinsts","payinsts"=>"payacts",
+			"billschs"=>"billords","billords"=>"billinsts","billinsts"=>"billacts",
+			"shpschs"=>"shpords","shpords"=>"shpinsts","shpinsts"=>"shpacts"}
+	end
+
+	def snolist   ###reqparams["segment"] = ["trn_org"]の対象でもある。
+		{"purschs"=>"PS","purords"=>"PE","purinsts"=>"PH","purdlvs"=>"PV","puracts"=>"PA","purrets"=>"PR",
+			"inspschs"=>"IS","inspords"=>"IE","inspinsts"=>"IH","inspacts"=>"IA","insprets"=>"IR",
+			"prdschs"=>"MS","prdords"=>"ME","prdinsts"=>"MH","prdacts"=>"MA","prdrets"=>"MR",
+			"billschs"=>"BS","billords"=>"BE","billinsts"=>"BH","billacts"=>"BA","billrets"=>"BR",
+			"payschs"=>"YS","payords"=>"YE","payinsts"=>"YH","payacts"=>"YA","payrets"=>"YR",
+			"custschs"=>"CS","custords"=>"CE","custinsts"=>"YH","custacts"=>"YA","custrets"=>"YR",
+			"shpschs"=>"SS","shpords"=>"SE","shpinsts"=>"SH","shpacts"=>"SA","shprets"=>"SR"}
+	end
+
+	def mkTblListByTbl   ###例:指示テーブル等を使用せずordsから直接snoを入力してpuractsを作成
+		{"purmk1s"=>["purords","purinsts","purdlvs"],
+			"purords"=>["inspords"],	
+			"puracts"=>["inspinsps"]
+		}
 	end 
+
+	def mkTblListByOpeitms   ##
+		{"opeitm_acceptance_proc"=>{"purords"=>["payschs"],"puracts"=>["payords"],"custords"=>["billschs"],"custacts"=>["billords"]}}
+	end 
+ 
  
 end   ##module

@@ -24,8 +24,8 @@ tblfield.persons_id_upd   tblfield_person_id_upd,
   fieldcode.pobject_objecttype_fld  pobject_objecttype_fld ,
 tblfield.update_ip  tblfield_update_ip,
 tblfield.seqno  tblfield_seqno,
-  person_upd.person_name  person_name_upd ,
-  person_upd.person_code  person_code_upd ,
+  person_upd.person_name_upd  person_name_upd ,
+  person_upd.person_code_upd  person_code_upd ,
   blktb.blktb_seltbls  blktb_seltbls ,
   fieldcode.fieldcode_contents  fieldcode_contents ,
 tblfield.viewflmk  tblfield_viewflmk,
@@ -37,7 +37,7 @@ tblfield.id id,
 tblfield.created_at  tblfield_created_at,
 tblfield.updated_at  tblfield_updated_at
  from tblfields   tblfield,
-  r_blktbs  blktb ,  r_fieldcodes  fieldcode ,  r_persons  person_upd 
+  r_blktbs  blktb ,  r_fieldcodes  fieldcode ,  upd_persons  person_upd 
   where       tblfield.blktbs_id = blktb.id      and tblfield.fieldcodes_id = fieldcode.id      and tblfield.persons_id_upd = person_upd.id     ;
  DROP TABLE IF EXISTS sio.sio_r_tblfields;
  CREATE TABLE sio.sio_r_tblfields (

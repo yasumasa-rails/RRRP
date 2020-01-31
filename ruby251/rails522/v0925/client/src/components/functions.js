@@ -210,7 +210,7 @@ export function  contentEditablefunc (cellInfo){
                 response["val"] = { __html: cellInfo.value?cellInfo.value:"2099-12-31"};
                 cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value.length>3?cellInfo.value:"2099-12-31":"2099-12-31"
             break
-        case /_isudate/.test(cellInfo.column.id):   
+        case /_isudate|_rcptdate/.test(cellInfo.column.id):   
                 response["val"] = { __html: cellInfo.value?cellInfo.value:today.getFullYear() + "-" + (today.getMonth() + 1) + "-" +  today.getDate()};
                 cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:today.getFullYear() + "-" + (today.getMonth() + 1) + "-" +  today.getDate();
             break

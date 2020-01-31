@@ -47,7 +47,7 @@ export function* ScreenSaga({ payload: {params}  }) {
             screenState.data[params.index] = response.data.linedata
             return yield put({ type: SCREEN_LINEEDIT, payload:{data:screenState.data} })   
 
-        case "fetch_request":
+        case "fetch_request":  //viewによる存在チェック　内容表示
             let tmp 
             screenState.data[params.index].confirm_gridmessage =  ""
             if(response.data.params.err){
@@ -71,7 +71,7 @@ export function* ScreenSaga({ payload: {params}  }) {
                 })
               return  yield put({ type: FETCH_RESULT, payload: {data:screenState.data} })   
               }    
-        case "check_request":   //帰りはfetchと同じ
+        case "check_request":   //　項目毎のチェック　帰りはfetchと同じ
                   screenState.data[params.index].confirm_gridmessage =  ""
                   if(response.data.params.err){
                       tmp =  JSON.parse(response.data.params.yupcheckcode)

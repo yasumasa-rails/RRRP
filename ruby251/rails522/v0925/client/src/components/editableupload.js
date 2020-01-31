@@ -1,29 +1,39 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import ActiveStorageProvider from 'react-activestorage-provider'
+import {SetResultsRequest} from '../actions'
 
-const EditableUpload = ({token,client,uid,message,}) =>{
+const EditableUpload = ({setResults,token,client,uid,message,}) =>{
+//const body = JSON.stringify({ POST: { title:screenCode}})
+  let filename 
     return( 
     <React.Fragment>
            <div className="form-group">
-            <p>excelデータの upload (titleとコメントを付加)</p>
             <ActiveStorageProvider
               endpoint={{
                           path: 'http://localhost:3001/api/uploads',
                           model: 'Upload',
                           attribute: 'excel',
-                          method: 'POST',
+                          method: 'post',
                           host: 'localhost',
                           port: '9292',
                           }}
-              headers={{"access-token":token,client:client,uid:uid}}     
+              headers={{"access-token":token,client:client,uid:uid}}
+              onSubmit={e =>setResults(e)}
               render={({ uploads, ready,handleUpload }) => (
                 <div>
-                  <input
-                    type="file"
-                    disabled={!ready}
-                    onChange={ev =>handleUpload(ev.currentTarget.files)}
-                  />
+                <input
+                        type="file" id="inputJson" 
+                        /* disabled={!ready} */
+                        placeholder="Json File"  disabled={ready?false:true}
+                        onChange={ev => {filename =  ev.currentTarget.files[0].name
+                          if(filename.search(/\.json$|\.JSON$/)>1)
+                              {handleUpload(ev.currentTarget.files)
+                              }
+                          else{alert("please input JSON File")
+                              }
+                        }}
+                 />
 
                 {uploads.map(file => {
                   switch (file.state) {
@@ -51,6 +61,7 @@ const EditableUpload = ({token,client,uid,message,}) =>{
                 </div>  
               )}
             />
+
           </div>  
           {message}
        
@@ -66,6 +77,15 @@ const mapStateToProps = (state,ownProps)  =>({
   client:(state.login.auth?state.login.auth.client:""),
   uid:(state.login.auth?state.login.auth.uid:"") ,
   upload:state.upload,
+  screenCode:state.screen.params?state.screen.params.screenCode:"",
 })
 
-export  default   connect(mapStateToProps,null)(EditableUpload)
+
+const mapDispatchToProps = dispatch => ({
+   setResults: (e)=>{
+    dispatch(SetResultsRequest(e))
+    }, 
+  })
+  
+
+export  default   connect(mapStateToProps,mapDispatchToProps)(EditableUpload)

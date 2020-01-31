@@ -34,11 +34,10 @@ module RorBlkctl
 	end
 
 	def proc_update_table command_c,r_cnt0  ##rec = command_c command_rとの混乱を避けるためrecにした。
-
-      		begin
+		begin
 				ActiveRecord::Base.connection.begin_db_transaction()
-				command_r,processreqs_ids = private_aud_rec(command_c,r_cnt0,nil) 
-			  rescue
+				command_r,processreqs_ids = proc_private_aud_rec(command_c,r_cnt0,nil) 
+		rescue
         		ActiveRecord::Base.connection.rollback_db_transaction()
 				command_r = command_c.dup
             	command_r[:sio_result_f] =   "9"  ##9:error
@@ -47,7 +46,7 @@ module RorBlkctl
             	Rails.logger.debug"error class #{self} : #{Time.now}: #{$@} "
           		Rails.logger.debug"error class #{self} : $!: #{$!} "
           		Rails.logger.debug"  command_r: #{command_r} "
-      		else
+      	else
         		command_r[:sio_result_f] =  "1"   ## 1 normal end
 				command_r[:sio_message_contents] = nil
 				tblname = command_r[:sio_viewname].split("_")[1]
@@ -59,12 +58,12 @@ module RorBlkctl
 						CreateOtherTableRecordJob.perform_later(processreqs_ids)
 					end	
 				end	
-      		ensure
-	  		end ##begin
-			return command_r
+      	ensure
+	  	end ##begin
+		return command_r
 	end
 
-	def private_aud_rec  command_r,r_cnt0,reqparams
+	def proc_private_aud_rec  command_r,r_cnt0,reqparams
 		tmp_key = {}
 		tblname = command_r[:sio_viewname].split("_")[1]
 		if  command_r[:sio_message_contents].nil? 
@@ -77,7 +76,7 @@ module RorBlkctl
 		when /_edit_/
 				proc_tbl_edit_arel(tblname,@src_tbl," id = #{@src_tbl[:id]}")
 		when  /_delete_/
-				if tblname =~ /schs$|ords$|insts$|acts$/  ##alloctblにかかわるtrnは削除なし
+				if tblname =~ /schs$|ords$|insts$|dlvs$|acts$/  ##削除なし
 					@src_tbl[:qty] = 0 if @src_tbl[:qty]
 					@src_tbl[:qty_stk] = 0 if @src_tbl[:qty_stk]
 					@src_tbl[:amt] = 0 if @src_tbl[:amt]
@@ -87,18 +86,36 @@ module RorBlkctl
 					proc_tbl_delete_arel(tblname," id = #{@src_tbl[:id]}")
 				end
 		end ##
-		##command_r["id"] =  @src_tbl[:id]    ##trngantts,alloctblsはここにはない。
-		if ControlFields.snolist[tblname] 
+		if tblname =~ /^pur|^prd|^cust/ and  tblname =~ /schs$|ords$|insts$|dlvs$|acts$/
 			if reqparams.nil?
 				 reqparams = {}
 				 reqparams["orgtblname"] = tblname
 				 reqparams["orgtblid"] = @src_tbl[:id]	
 				 reqparams["paretblname"] = tblname
 				 reqparams["paretblid"] = @src_tbl[:id]	
+				 reqparams["segment"] =[]
 			end
-			reqparams["tbldata"] = @src_tbl.stringify_keys
+			reqparams["tbldata"] = @src_tbl.stringify_keys  
+			command_r.each do |key,val|   ###procの処理を実行
+				if key =~ /^opeitm_/ and key =~ /_proc$/ and val == "1"
+					reqparams["segment"] << key
+				end
+			end  
 			processreqs_ids = Operation.proc_trngantts(tblname,@src_tbl[:id],reqparams)
-			Operation.proc_inouts(tblname,@src_tbl[:id],command_r,reqparams["trngantts_id"])
+			@src_tbl.each do |key,val|   ###前の状態のtrn変更
+				if key.to_s =~ /^sno_|^gno_|^cno_/ and val
+					if val.size > 0
+						xno = key.to_s.split("_")[0] 
+						prevtbl = key.to_s.split("_")[1] + "s"
+						qty = @src_tbl[:qty]
+						qty ||= 0
+						qty_stk = @src_tbl[:qty_stk]
+						qty_stk ||= 0
+						Operation.proc_prev_trngantts_update(xno,prevtbl,val,qty,qty_stk,command_r["opeitm_stktaking_proc"])
+						break
+					end	
+				end	
+			end	
 		else
 			processreqs_ids = nil
 		end
@@ -132,7 +149,7 @@ module RorBlkctl
       		compare_date - 1 + num
 	end
 
-	def create_filteredstr filtered,where_info
+	def proc_create_filteredstr filtered,where_info
 			if (where_info[:filtered]||="").size > 0
 				 where_str =   "  where " +	 where_info[:filtered] + "    and "
 			else
@@ -142,6 +159,7 @@ module RorBlkctl
 				ff = JSON.parse(strjson)
 				next if ff["value"].nil?
 				next if ff["value"] == ""
+				next if ff["value"] =~ /'/
 	      		case where_info[ff["id"].to_sym]
 				when nil
 					next
@@ -176,7 +194,7 @@ module RorBlkctl
                 	when 9
 									where_str << " to_char( #{ff["id"]},'yyyy/mm')  #{ff["value"][0..1]} '#{ff["value"][2..-1]}'      AND "  if Date.valid_date?(ff["value"][1..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,01)   and (ff["value"] =~ /^<=/  or ff["value"]=~ /^>=/ )
 			        when 10
-									where_str << " to_char( #{ff["id"]},'yyyy/mm/dd') = '#{ff["value"]}'       AND "  if Date.valid_date?(j.split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2].to_i)
+									where_str << " to_char( #{ff["id"]},'yyyy/mm/dd') = '#{ff["value"]}'       AND "  if Date.valid_date?(ff["value"].split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2].to_i)
 			        when 11
 									where_str << " to_char( #{ff["id"]},'yyyy/mm/dd') #{ff["ivalue"][0]} '#{ff["value"][1..-1]}'      AND "  if Date.valid_date?(ff["value"][1..-1].split("/")[0].to_i,ff["value"].split("/")[1].to_i,ff["value"].split("/")[2].to_i)  and ( ff["value"] =~ /^</   or  ff["value"] =~ /^>/ )
                 	when 12
@@ -232,7 +250,7 @@ module RorBlkctl
     		return where_str[0..-7]
 	end	
 
-	def fetch_data_blk id,select_fields,page_info,strwhere,sort_info
+	def proc_search_blk id,select_fields,page_info,strwhere,sort_info
 				strsorting = ""
 				if sort_info[:option] and  sort_info[:option] != ""
 					strsorting << "order by #{sort_info[:option]}"
@@ -262,7 +280,7 @@ module RorBlkctl
 				pagedata = "[["
 				recs.each do |rec|
 					rec.each do |key,val|  ## nl 改行は使用できない。
-						pagedata << %Q%{"value":"#{if val then val.gsub(/"/,"'").gsub(/\n/," ") end}","style":{"fill":{"patternType": "solid", "fgColor": {"rgb": "#{columns_color[key.to_sym]}"}}}}\n,%
+						pagedata << %Q%{"value":"#{if val then val.gsub(/"/,"'").gsub(/\n/," ").gsub(/\x09/," ") end}","style":{"fill":{"patternType": "solid", "fgColor": {"rgb": "#{columns_color[key.to_sym]}"}}}}\n,%
 					end
 					pagedata = pagedata.chop +  "],["
 					cnt += 1	
@@ -353,13 +371,14 @@ module RorBlkctl
 	    return locas_id
 	end
 
- 	def proc_set_src_tbl rec  ##rec["xxxxx"]
+	 def proc_set_src_tbl rec  ##rec["xxxxx"]
   		@src_tbl = {}   ###テーブル更新
 		tblnamechop = rec[:sio_viewname].split("_",2)[1].chop
 		if rec[:sio_classname] =~ /_add_/
 			@src_tbl[:created_at] =  rec["#{tblnamechop}_created_at"] = Time.now
 			if  rec["id"] == "" or rec["id"].nil?
 				rec["id"] = @src_tbl[:id] = proc_get_nextval("#{tblnamechop}s_seq")
+				rec[tblnamechop+"_id"] = rec["id"] 
 			else
 				@src_tbl[:id] = rec["id"]  ###fields_updateでセット
 			end
@@ -438,7 +457,7 @@ module RorBlkctl
 			end
 	end
 	
-	def create_grid_editable_columns_info screen_code,email,req
+	def proc_create_grid_editable_columns_info screen_code,email,req
 		grid_columns_info = Rails.cache.fetch('screenfield'+grp_code(email)+screen_code) do
 				###  ダブルコーティション　「"」は使用できない。 
 			sqlstr = "select * from  func_get_screenfield_grpname('#{email}','#{screen_code}')"
@@ -470,9 +489,15 @@ module RorBlkctl
 									}
 			end		
 			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|		
-				if i["screenfield_hideflg"] == "0" or i["pobject_code_sfd"] == "id" or i["pobject_code_sfd"] =~ /_id/ 			
+				##if i["screenfield_selection"] == "0" or i["pobject_code_sfd"] == "id" or i["pobject_code_sfd"] =~ /_id/ 		
 					select_fields = 	select_fields + 	i["pobject_code_sfd"] + ','
-					nameToCode[i["screenfield_name"]] = i["pobject_code_sfd"]
+					if 	nameToCode[i["screenfield_name"]].nil?   ###nameToCode excelから取り込むときの表示文字からテーブル項目名への変換テーブル
+						nameToCode[i["screenfield_name"]] = i["pobject_code_sfd"]
+					else
+						if i["pobject_code_sfd"].split("_")[0] == screen_code.split("_")[1].chop
+							nameToCode[i["screenfield_name"]] = i["pobject_code_sfd"]  ###nameがテーブル項目しか登録されてない。
+						end
+					end
 					columns_info << {:Header=>"#{i["screenfield_name"]}",
 									:accessor=>"#{i["pobject_code_sfd"]}",
 									:show=>if  i["screenfield_hideflg"] == "0" then true else false end,
@@ -541,7 +566,7 @@ module RorBlkctl
 					if   i["screenfield_hideflg"] == "0" 
 						screenwidth = screenwidth +  i["screenfield_width"].to_i
 					end
-				end
+				##end
 			end	
 			if (req==="inlineaddreq")
 				columns_info << {:Header=>"confirm",
@@ -567,22 +592,7 @@ module RorBlkctl
 			end	
 			if sort_info[:default]
 				ary_select_fields = select_fields.split(',')
-				sort_info[:default].split(/\s*,\s*/).each do |sort_field|
-					ok = false
-					sort_field.split(" ").each do |chk|
-						if(ary_select_fields.include?(chk.gsub(" ","").downcase))
-							ok = true
-						else
-							if ok==true and (chk.gsub(" ","").downcase=="asc" or chk.gsub(" ","").downcase=="desc")
-							else
-								sort_info[:default] = nil
-								sort_info[:err] = "sort option error"
-								break
-							end		
-						end		
-					end	
-					break if sort_info[:default].nil?
-				end	
+				sort_info = ControlFields.proc_detail_check_strorder sort_info,ary_select_fields
 			end	 
 			page_info[:screenwidth] = screenwidth	
 			if gridmessages_fields.size > 1
@@ -643,50 +653,6 @@ module RorBlkctl
 		end
 	end
 
-	def proc_get_trg_rec_fm_tblname_tblid tblname,srctblname,srctblid  ##レコードが見つからなかったときの処理は親ですること。
-			ActiveRecord::Base.connection.select_one(%Q% select * from #{tblname} where tblname = '#{srctblname}' and tblid = #{srctblid} #{if block_given? then yield else "" end}%)
-	end
-
-	def proc_get_trg_rec_id_fm_tblname_tblid tblname,srctblname,srctblid
-			rec = proc_get_trg_rec_fm_tblname_tblid(tblname,srctblname,srctblid)
-			if rec
-				rec["id"]
-			else
-				nil
-			end
-	end
-
-	def proc_get_rec_fm_tblname_sno tblname,sno　 ##レコードが見つからなかったときの処理は親ですること。
-		rec = {}
-		rec = ActiveRecord::Base.connection.select_one("select * from #{tblname} where sno = #{sno}")
-		if rec
-		else
-			rec["id"] = nil
-		     ###snoはテーブル毎に必ずユニーク
-			 return
-		end
-		rec.with_indifferent_access if rec
-	end
-
-	def proc_get_rec_fm_tblname_yield tblname  ##proc_fld_xxxxの中の項目を求める。　 ##レコードが見つからなかったときの処理は親ですること。
-		rec = ActiveRecord::Base.connection.select_one("select * from #{tblname} where expiredate > current_date and #{yield}")
-		rec.with_indifferent_access if rec
-	end
-
-	def proc_get_rec_fm_viewname_yield viewname  ##proc_fld_xxxxの中の項目を求める。　 ##レコードが見つからなかったときの処理は親ですること。
-		rec = ActiveRecord::Base.connection.select_one("select * from #{viewname} where #{viewname.split("_")[1].chop}_expiredate > current_date and #{yield}")
-		if rec
-		  rec.with_indifferent_access
-		else
-			nil
-		end
-	end
-
-	def proc_get_tblrec_from_id tblname,id  ##  ##レコードが見つからなかったときの処理は親ですること。
-		rec = ActiveRecord::Base.connection.select_one("select * from #{tblname} where id = #{id}")
-		return rec.with_indifferent_access if rec
-	end
-
 	def proc_tbl_add_arel  tblname,tblarel ##
 		fields = ""
 		values = ""
@@ -723,6 +689,7 @@ module RorBlkctl
 							if val == true then "1," else "0," end	
 						else
 							Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
+							p " line #{__LINE__} : error val.class #{val.class.to_s}  key #{key.to_s} "
 						end
 		end
 		case tblname.downcase
@@ -767,7 +734,8 @@ module RorBlkctl
 		ActiveRecord::Base.connection.delete("delete from  #{tblname}  where #{strwhere} ")
 	end
 
-	def proc_processreqs_add tblname,tblid,reqparams
+	def proc_processreqs_add tblname,tblid,reqparams,segment
+		reqparams["segment"] = segment
 		processreqs_id = proc_get_nextval("processreqs_seq")
 		strsql = %Q%
 		insert into processreqs(tblname,tblid,paretblname,paretblid,
