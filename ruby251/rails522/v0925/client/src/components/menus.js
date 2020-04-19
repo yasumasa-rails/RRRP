@@ -3,7 +3,7 @@
 //import axios from 'axios'
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link,BrowserRouter,Route,} from 'react-router-dom'
+import { BrowserRouter,Route,} from 'react-router-dom'
 import { Tab, Tabs, TabList, TabPanel, } from 'react-tabs'
 import "react-tabs/style/react-tabs.css"
 import {Button} from '../styles/button'
@@ -75,7 +75,6 @@ import ScreenGrid from './screengrid'
       <div>
         <Login/>
         <Route path='/signup' component={Signup} />
-        <Link to="/signup" color="primary" >Signup</Link>
       </div>
       </BrowserRouter>
     )

@@ -3,6 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux'
 import ReactTable from 'react-table'
 import {ScreenRequest,FetchRequest, YupErrSet,ScreenOnblur} from '../actions'
+//import {ScreenOnKeyUp} from '../actions'
 import "react-table/react-table.css"
 import ButtonList from './buttonlist'
 import DropDown from './dropdown'
@@ -111,7 +112,7 @@ const  renderFilter = ({column,onChange,filter})=> {
 }
 
 const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
-// sorted,handleErrorMsg,handleErrorset,handleScreenLineEditRequest,
+// sorted,handleErrorMsg,handleErrorset,handleScreenLineEditRequest, handleScreenOnKeyUp,
             columns,data,pages,params,  //params railsに渡すパラメータを兼ねている。
             handleScreenRequest,handleValite, handleFetchRequest,handleConfirmRequest,
             buttonflg,dropDownList,uid,handleScreenOnblur,
@@ -241,16 +242,19 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
               /* //規定値をセットしようとしたが画面がプロテクトされた
             */
           } , 
-          onKeyPress:(e) =>
-            {  
-              data[rowInfo.index][`${column.id}_gridmessage`] = "in" //
-            //  rowInfo.row[`${column.id}_gridmessage`] = "in"
+          onKeyUp:(e) =>
+            {
+            //  if(data[rowInfo.index][`${column.id}_gridmessage`]!=="in" ){  
+            //  data[rowInfo.index][`${column.id}_gridmessage`] = "in" //
+              //rowInfo.row[`${column.id}_gridmessage`] = "in"
+            //  handleScreenOnKeyUp(data)}
           } ,
           onClick:(e) =>
              { 
              if(e.target.checked&&column.id==="confirm")
                   { params["uid"] = uid
                     params["index"] = rowInfo.index
+                    params["buttonflg"] = buttonflg       
                     data[rowInfo.index].confirm_gridmessage = "*"
                     Object.keys(rowInfo.row).map((field)=>{
                       if(data[rowInfo.index][field]===""){data[rowInfo.index][field] = rowInfo.row[field]}
@@ -263,14 +267,15 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
             { let inputval 
             let rval
             let linedata = {}
-            if(data[rowInfo.index][`${column.id}_gridmessage`] === "in" ||/err|Invalid/.test(data[rowInfo.index][`${column.id}_gridmessage`]) ||
-                  data[rowInfo.index][column.id]!== e.target.textContent){
+            if(data[rowInfo.index][`${column.id}_gridmessage`]==="in"||
+                /err|Invalid/.test(data[rowInfo.index][`${column.id}_gridmessage`]) ||data[rowInfo.index][column.id]!== e.target.textContent){
               if(e.target.tagName==="SELECT"){inputval= e.target.value}else{if(e.target.tagName==="DIV"){inputval= e.target.textContent}} 
               if(column.id!=="confirm"){
         　            rowInfo.row[column.id] = inputval
                       data[rowInfo.index][column.id]=inputval
                       //params["linedata"] =  JSON.stringify(data[rowInfo.index])
                       params["index"] = rowInfo.index
+                                        params["buttonflg"] = buttonflg       
                       onFieldValite (column.id,params,data,error)
                       }
               if(data[rowInfo.index][`${column.id}_gridmessage`]==="ok"){
@@ -296,7 +301,8 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
                                         params["linedata"] =  JSON.stringify(linedata)
                                         params["index"] = rowInfo.index 
                                         params["uid"] = uid
-                                        params["req"] = "check_request"                                      
+                                        params["req"] = "check_request" 
+                                        params["buttonflg"] = buttonflg                                          
                                         handleFetchRequest(params)}}
               if(yup.yupfetchcode[column.id]&&(data[rowInfo.index][`${column.id}_gridmessage`]==="ok"||data[rowInfo.index][`${column.id}_gridmessage`]==="ok on the way")){// 
                                         //rowInfo.row[column.id]=inputval
@@ -331,7 +337,7 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
 
       getTheadFilterProps={(reacttablestate) => {      //  fillterの時もイベントが発生する。
           return {
-            onKeyPress:(e) =>{
+            onKeyUp:(e) =>{
                             if(e.key==="Enter"&& params["req"]==="viewtablereq"){
                               handleScreenRequest(params,page,pageSize)
                             }},
@@ -421,6 +427,7 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
                           let error 
                           if(errmsg==="ok"||errmsg==="done"){ error=false}else{error=true} 
                            dispatch(YupErrSet(data,error))},
-    handleScreenOnblur: (data) =>{dispatch(ScreenOnblur(data))}
-                      })   
+    handleScreenOnblur: (data) =>{dispatch(ScreenOnblur(data))},
+    //handleScreenOnKeyUp: (data) =>{dispatch(ScreenOnKeyUp(data))},
+  })   
 export default connect(mapStateToProps,mapDispatchToProps)(ScreenGrid)

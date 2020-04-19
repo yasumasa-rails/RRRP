@@ -2,6 +2,7 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import {connect} from 'react-redux'
 import {authorize} from 'actions'
+import { Link,} from 'react-router-dom'
 
 // LOGIN FORM
 // @NOTE For forms that can be reused for both create/update you would move this form to its own
@@ -23,6 +24,7 @@ const LoginForm = ({isSubmitting,errors,values,}) => (
     Submit
     </button>
   </Form>
+  <Link to="/signup" color="primary" >Signup</Link>
   </div>
 )
 
@@ -34,6 +36,20 @@ const initialValues = {
   email: '',
   password: '',
 }
+
+
+const validate = values => {
+  const errors = {};
+  if (!values.email) {
+    errors.email = 'Required';
+  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+    errors.email = 'Invalid email address';
+  }
+  if (!values.password) {
+    errors.password = 'Required';
+  } 
+  return errors;
+};
 
 const mapDispatchToProps = dispatch => ({
   onSubmit: (values) => dispatch(authorize(values.email, values.password))
@@ -50,6 +66,7 @@ const mapStateToProps = state =>({
 const Container = ({onSubmit}) => (
       <Formik 
         initialValues={initialValues}
+        validate={validate}
         validateOnBlur={false}
         validateOnChange={false}
         onSubmit={onSubmit}

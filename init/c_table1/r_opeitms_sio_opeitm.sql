@@ -1,5 +1,5 @@
 ﻿
- --- drop view r_opeitms cascade  
+--- drop view r_opeitms cascade  
  create or replace view r_opeitms as select  
 opeitm.boxes_id   opeitm_boxe_id,
 opeitm.shelfnos_id   opeitm_shelfno_id,
@@ -22,36 +22,16 @@ opeitm.autoinst_p  opeitm_autoinst_p,
   itm.unit_name  unit_name ,
   unit_prdpurshp.unit_name  unit_name_prdpurshp ,
   itm.itm_std  itm_std ,
-  itm.itm_model  itm_model ,
-  itm.itm_material  itm_material ,
-  itm.itm_design  itm_design ,
-  itm.itm_weight  itm_weight ,
-  itm.itm_length  itm_length ,
-  itm.itm_wide  itm_wide ,
-  itm.itm_deth  itm_deth ,
   itm.itm_code  itm_code ,
   itm.itm_name  itm_name ,
 opeitm.autoact_p  opeitm_autoact_p,
 opeitm.autoord_p  opeitm_autoord_p,
 opeitm.id  opeitm_id,
-  shelfno.loca_abbr_shelfno  loca_abbr_shelfno ,
   loca.loca_abbr  loca_abbr ,
-  shelfno.loca_zip_shelfno  loca_zip_shelfno ,
   loca.loca_zip  loca_zip ,
-  shelfno.loca_country_shelfno  loca_country_shelfno ,
-  loca.loca_country  loca_country ,
-  shelfno.loca_prfct_shelfno  loca_prfct_shelfno ,
   loca.loca_prfct  loca_prfct ,
-  shelfno.loca_addr1_shelfno  loca_addr1_shelfno ,
   loca.loca_addr1  loca_addr1 ,
-  shelfno.loca_addr2_shelfno  loca_addr2_shelfno ,
   loca.loca_addr2  loca_addr2 ,
-  shelfno.loca_tel_shelfno  loca_tel_shelfno ,
-  loca.loca_tel  loca_tel ,
-  shelfno.loca_fax_shelfno  loca_fax_shelfno ,
-  loca.loca_fax  loca_fax ,
-  shelfno.loca_mail_shelfno  loca_mail_shelfno ,
-  loca.loca_mail  loca_mail ,
 opeitm.remark  opeitm_remark,
 opeitm.duration  opeitm_duration,
 opeitm.units_lttime  opeitm_units_lttime,
@@ -75,7 +55,6 @@ opeitm.id id,
 opeitm.operation  opeitm_operation,
 opeitm.opt_fixoterm  opeitm_opt_fixoterm,
   itm.itm_classlist_id  itm_classlist_id ,
-  itm.itm_datascale  itm_datascale ,
 opeitm.safestkqty  opeitm_safestkqty,
 opeitm.packqty  opeitm_packqty,
 opeitm.units_id_case   opeitm_unit_id_case,
@@ -83,9 +62,6 @@ opeitm.shuffle_flg  opeitm_shuffle_flg,
 opeitm.chkord_prc  opeitm_chkord_prc,
 opeitm.chkord  opeitm_chkord,
 opeitm.autocreate_act  opeitm_autocreate_act,
-  unit_case.unit_contents  unit_contents_case ,
-  itm.unit_contents  unit_contents ,
-  unit_prdpurshp.unit_contents  unit_contents_prdpurshp ,
 opeitm.shuffle_loca  opeitm_shuffle_loca,
 opeitm.esttosch  opeitm_esttosch,
 opeitm.stktaking_proc  opeitm_stktaking_proc,
@@ -98,20 +74,12 @@ opeitm.packno_flg  opeitm_packno_flg,
 opeitm.processseq  opeitm_processseq,
 opeitm.priority  opeitm_priority,
 opeitm.contents  opeitm_contents,
-  shelfno.shelfno_contents  shelfno_contents ,
 opeitm.acceptance_proc  opeitm_acceptance_proc,
 opeitm.units_id_prdpurshp   opeitm_unit_id_prdpurshp,
 opeitm.chkinst  opeitm_chkinst,
   boxe.boxe_boxtype  boxe_boxtype ,
-  boxe.boxe_depth  boxe_depth ,
-  boxe.boxe_wide  boxe_wide ,
-  boxe.boxe_height  boxe_height ,
   boxe.boxe_unit_id_box  boxe_unit_id_box ,
-  boxe.boxe_outdepth  boxe_outdepth ,
-  boxe.boxe_outwide  boxe_outwide ,
-  boxe.boxe_outheight  boxe_outheight ,
   boxe.boxe_unit_id_outbox  boxe_unit_id_outbox ,
-  boxe.boxe_contents  boxe_contents ,
 opeitm.maxqty  opeitm_maxqty,
 opeitm.prjalloc_flg  opeitm_prjalloc_flg
  from opeitms   opeitm,
@@ -135,27 +103,37 @@ opeitm.prjalloc_flg  opeitm_prjalloc_flg
           ,sio_sord varchar(256)
           ,sio_search varchar(10)
           ,sio_sidx varchar(256)
+,itm_code  varchar (50) 
+,opeitm_processseq  numeric (3,0)
+,opeitm_priority  numeric (3,0)
+,itm_name  varchar (100) 
 ,loca_code  varchar (50) 
 ,loca_name  varchar (100) 
 ,opeitm_prdpurshp  varchar (20) 
 ,opeitm_operation  varchar (20) 
-,itm_code  varchar (50) 
-,opeitm_processseq  numeric (3,0)
-,classlist_name  varchar (100) 
 ,unit_code  varchar (50) 
-,classlist_code  varchar (50) 
 ,unit_name  varchar (100) 
-,unit_name_prdpurshp  varchar (100) 
-,itm_name  varchar (100) 
-,opeitm_priority  numeric (3,0)
 ,unit_code_case  varchar (50) 
 ,unit_name_case  varchar (100) 
 ,unit_code_prdpurshp  varchar (50) 
+,unit_name_prdpurshp  varchar (100) 
+,boxe_code  varchar (50) 
+,boxe_name  varchar (100) 
+,unit_code_box  varchar (50) 
+,unit_name_box  varchar (100) 
+,unit_code_outbox  varchar (50) 
+,unit_name_outbox  varchar (100) 
+,shelfno_code  varchar (50) 
+,shelfno_name  varchar (100) 
+,loca_code_shelfno  varchar (50) 
+,loca_name_shelfno  varchar (100) 
+,classlist_code  varchar (50) 
+,classlist_name  varchar (100) 
 ,opeitm_duration  numeric (38,2)
+,opeitm_autocreate_ord  varchar (1) 
+,opeitm_acceptance_proc  varchar (1) 
 ,opeitm_opt_fixoterm  numeric (5,2)
 ,opeitm_stktaking_proc  varchar (1) 
-,opeitm_acceptance_proc  varchar (1) 
-,opeitm_autocreate_ord  varchar (1) 
 ,opeitm_autoinst_p  numeric (3,0)
 ,opeitm_rule_price  varchar (1) 
 ,opeitm_autocreate_act  varchar (1) 
@@ -170,77 +148,45 @@ opeitm.prjalloc_flg  opeitm_prjalloc_flg
 ,opeitm_units_lttime  varchar (4) 
 ,opeitm_chkord  varchar (1) 
 ,opeitm_chkord_prc  numeric (3,0)
-,itm_design  varchar (50) 
-,unit_contents  varchar (4000) 
-,itm_weight  numeric (22,0)
 ,opeitm_esttosch  numeric (22,0)
 ,itm_std  varchar (50) 
 ,itm_model  varchar (50) 
 ,itm_material  varchar (50) 
-,itm_datascale  numeric (22,0)
-,itm_deth  numeric (22,0)
-,itm_wide  numeric (22,0)
+,itm_design  varchar (50) 
+,itm_weight  numeric (22,0)
 ,itm_length  numeric (22,0)
+,itm_wide  numeric (22,0)
+,itm_deth  numeric (22,0)
+,itm_datascale  numeric (22,0)
+,unit_contents  varchar (4000) 
+,unit_dataprecision_prdpurshp  numeric (38,0)
+,unit_dataprecision_case  numeric (38,0)
 ,opeitm_chkinst  varchar (1) 
 ,opeitm_mold  varchar (1) 
 ,opeitm_prjalloc_flg  numeric (22,0)
 ,opeitm_autoord_p  numeric (3,0)
 ,opeitm_autoact_p  numeric (3,0)
 ,opeitm_opt_fix_flg  varchar (1) 
-,loca_code_shelfno  varchar (50) 
-,loca_name_shelfno  varchar (100) 
-,shelfno_code  varchar (50) 
-,shelfno_name  varchar (100) 
 ,unit_contents_prdpurshp  varchar (4000) 
 ,unit_contents_case  varchar (4000) 
-,unit_code_box  varchar (50) 
-,unit_name_outbox  varchar (100) 
-,unit_code_outbox  varchar (50) 
-,unit_name_box  varchar (100) 
-,boxe_code  varchar (50) 
-,boxe_name  varchar (100) 
 ,opeitm_expiredate   date 
 ,boxe_boxtype  varchar (20) 
 ,opeitm_contents  varchar (4000) 
 ,opeitm_remark  varchar (4000) 
-,opeitm_itm_id  numeric (38,0)
-,opeitm_loca_id  numeric (38,0)
-,opeitm_update_ip  varchar (40) 
 ,opeitm_created_at   timestamp(6) 
-,opeitm_person_id_upd  numeric (38,0)
-,opeitm_unit_id_prdpurshp  numeric (38,0)
+,opeitm_loca_id  numeric (38,0)
 ,opeitm_id  numeric (38,0)
-,boxe_unit_id_outbox  numeric (22,0)
-,itm_classlist_id  numeric (38,0)
-,boxe_unit_id_box  numeric (22,0)
+,opeitm_person_id_upd  numeric (38,0)
+,opeitm_update_ip  varchar (40) 
+,opeitm_unit_id_prdpurshp  numeric (38,0)
+,opeitm_itm_id  numeric (38,0)
+,boxe_unit_id_outbox  numeric (38,0)
+,boxe_unit_id_box  numeric (38,0)
 ,itm_unit_id  numeric (22,0)
-,boxe_outheight  numeric (7,2)
-,boxe_contents  varchar (4000) 
-,opeitm_shelfno_id  numeric (22,0)
-,loca_mail_shelfno  varchar (20) 
-,opeitm_boxe_id  numeric (22,0)
-,loca_mail  varchar (20) 
-,loca_fax  varchar (20) 
-,loca_fax_shelfno  varchar (20) 
-,opeitm_updated_at   timestamp 
-,loca_tel  varchar (20) 
-,loca_tel_shelfno  varchar (20) 
-,loca_addr2  varchar (50) 
-,person_code_upd  varchar (50) 
-,person_name_upd  varchar (100) 
-,shelfno_loca_id_shelfno  numeric (38,0)
-,id  numeric (22,0)
-,loca_addr2_shelfno  varchar (50) 
-,loca_addr1  varchar (50) 
-,loca_addr1_shelfno  varchar (50) 
-,loca_prfct  varchar (20) 
-,loca_prfct_shelfno  varchar (20) 
-,opeitm_unit_id_case  numeric (38,0)
-,loca_country  varchar (20) 
-,loca_country_shelfno  varchar (20) 
-,loca_zip  varchar (10) 
+,itm_classlist_id  numeric (38,0)
 ,loca_zip_shelfno  varchar (10) 
-,loca_abbr  varchar (50) 
+,opeitm_shelfno_id  numeric (22,0)
+,opeitm_updated_at   timestamp 
 ,loca_abbr_shelfno  varchar (50) 
 ,shelfno_contents  varchar (4000) 
 ,boxe_depth  numeric (7,2)
@@ -248,6 +194,30 @@ opeitm.prjalloc_flg  opeitm_prjalloc_flg
 ,boxe_height  numeric (7,2)
 ,boxe_outdepth  numeric (7,2)
 ,boxe_outwide  numeric (7,2)
+,boxe_outheight  numeric (7,2)
+,loca_abbr  varchar (50) 
+,loca_mail  varchar (20) 
+,loca_mail_shelfno  varchar (20) 
+,loca_fax  varchar (20) 
+,loca_fax_shelfno  varchar (20) 
+,person_code_upd  varchar (50) 
+,person_name_upd  varchar (100) 
+,shelfno_loca_id_shelfno  numeric (38,0)
+,id  numeric (22,0)
+,loca_tel  varchar (20) 
+,loca_tel_shelfno  varchar (20) 
+,loca_addr2  varchar (50) 
+,loca_addr2_shelfno  varchar (50) 
+,opeitm_unit_id_case  numeric (38,0)
+,loca_addr1  varchar (50) 
+,loca_addr1_shelfno  varchar (50) 
+,loca_prfct  varchar (20) 
+,loca_prfct_shelfno  varchar (20) 
+,boxe_contents  varchar (4000) 
+,loca_country  varchar (20) 
+,opeitm_boxe_id  numeric (22,0)
+,loca_country_shelfno  varchar (20) 
+,loca_zip  varchar (10) 
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(38,0)

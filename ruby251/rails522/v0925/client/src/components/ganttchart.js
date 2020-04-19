@@ -12,7 +12,7 @@ const GanttChart = ({ ganttChartData,loading,message}) => {
     { type: "date", label: "End Date" },
     { type: "number", label: "Duration" },
     { type: "number", label: "Percent Complete" },
-    { type: "string", label: "Dependencies" }
+    { type: "string", label: "Dependencies" },
   ]
 
   return(     
@@ -31,11 +31,11 @@ const GanttChart = ({ ganttChartData,loading,message}) => {
               height: 1000,
               gantt: {
                       defaultStartDateMillis: new Date(2019,6,1),
-                      arrow:{spaceAfter:10,
-                              color:"#58f",
-                              width:3,
+                      arrow:{spaceAfter:5,
+                              //color:"#58f",
+                              width:1,
                               angle:45,
-                              radius:90,
+                              radius:180,
                       }
                     },
                 }}

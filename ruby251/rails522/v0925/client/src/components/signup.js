@@ -2,6 +2,7 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import {connect} from 'react-redux'
 import {SignupRequest} from 'actions'
+import { Link,} from 'react-router-dom'
 
 // LOGIN FORM
 // @NOTE For forms that can be reused for both create/update you would move this form to its own
@@ -34,6 +35,7 @@ const SignupForm = ({isSubmitting,errors, touched }) => (
     Submit
     </button>
   </Form>
+  <Link to="/login" color="primary" >Login</Link>
   </div>
 )
 

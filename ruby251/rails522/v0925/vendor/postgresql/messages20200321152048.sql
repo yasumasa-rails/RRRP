@@ -1,0 +1,5 @@
+ --- create view script   r_inamts 
+ --- create view script   r_incustwhs 
+ --- create view script   r_instks 
+ --- create view script   r_outamts 
+ --- create view script   r_outstks 

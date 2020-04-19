@@ -3,7 +3,7 @@ module ControlFields
 ### 個別項目　チェック
 	extend self	
 		
-	def  chk_fetch_rec params  
+	def  proc_chk_fetch_rec params  
 		fetch_data,mainviewflg,keys,findstatus,screendata,missing = get_fetch_rec params
 	  	if findstatus
 			if mainviewflg 
@@ -64,7 +64,7 @@ module ControlFields
 			fetcfieldgetsql = "select pobject_code_sfd from r_screenfields
 								 where pobject_code_scr =  '#{params[:screenCode]}' 
 								 and screenfield_paragraph = '#{params[:fetchview]}'"	
-			delm = (params[:fetchview].split(":")[1]||="")
+			delm = ""
 			missing = false   ###missing:true パラメータが未だ未設定　　false:チェックok
 			strsql = " select * from #{fetchview}  where "
 			ActiveRecord::Base.connection.select_all(fetcfieldgetsql).each do |rec|
@@ -77,6 +77,7 @@ module ControlFields
 						tblnamechop,xno,orgtblnamechop = rec["pobject_code_sfd"].split("_")
 						strsql << " #{orgtblnamechop}_#{xno} = '#{screendata[rec["pobject_code_sfd"]]}'       and"
 					else
+						delm = (params[:fetchview].split(":")[1]||="")  ###/_sno_|_cno_|_gno_/の時はdelm意味なし
 						if delm == ""
 							strsql << "  #{rec["pobject_code_sfd"]} = '#{screendata[rec["pobject_code_sfd"]]}'        and"
 						else
@@ -101,28 +102,40 @@ module ControlFields
 						field = items.join("_")
 					end	
 					if rec[field] and key !="id" and key !~ /person.*upd/ and field !~ /^#{params[:screenCode].split("_")[1].chop}/ 
-						fetch_data[field+delm] =  rec[field]
+							fetch_data[field+delm] =  rec[field]
+							case params[:screenCode]
+								when /opeitms$/
+									if screendata["opeitm_stktaking_proc"] == "" or screendata["opeitm_stktaking_proc"].nil?
+										if screendata["classlist_code"] == "ship"
+											fetch_data["opeitm_stktaking_proc"] = 0
+										else
+											fetch_data["opeitm_stktaking_proc"] = 1  ###在庫管理有
+										end
+									end
+							end	
 					else
 						if 	field =~ /^#{tblnamechop}/ and  rec[field.gsub(tblnamechop,orgtblnamechop)] and
-								field !~ /_isudate$|_sno$|_gno$|_cno$/ and field != "#{tblnamechop}_id"
+								field !~ /_isudate$|_sno$|_gno$|_cno$/ and field != "#{tblnamechop}_id" 
 							fetch_data[field] =  rec[field.gsub(tblnamechop,orgtblnamechop)]
 						else
-							if  field =~ /^#{tblnamechop}_qty_stk/ and rec["#{orgtblnamechop}_qty"] 
+							if  key	=~ /_sno_/ and field =~ /^#{tblnamechop}/
 								strsql = %Q% select sum(qty) qty,sum(qty_stk) qty_stk from trngantts
-												where tblname = '#{orgtblnamechop}s' and tblid = #{rec["id"]}
+												where paretblname = '#{orgtblnamechop}s' and paretblid = #{rec["id"]}
 								%  ###次のステータスに移行していないqty
 								org =  ActiveRecord::Base.connection.select_one(strsql)
-								if tblnamechop =~ /act$/
-									if  orgtblnamechop =~ /act$/
-										fetch_data["#{tblnamechop}_qty_stk"] = org["qty_stk"] 
+								if org
+									if tblnamechop =~ /act$/
+										if  orgtblnamechop =~ /act$/
+											fetch_data["#{tblnamechop}_qty_stk"] = org["qty_stk"] 
+										else
+											fetch_data["#{tblnamechop}_qty_stk"] = org["qty"]
+										end
 									else
-										fetch_data["#{tblnamechop}_qty_stk"] = org["qty"]
-									end
-								else
-									if  orgtblnamechop =~ /act$/
-										fetch_data["#{tblnamechop}_qty"] = org["qty_stk"] 
-									else
-										fetch_data["#{tblnamechop}_qty"] = org["qty"]
+										if  orgtblnamechop =~ /act$/
+											fetch_data["#{tblnamechop}_qty"] = org["qty_stk"] 
+										else
+											fetch_data["#{tblnamechop}_qty"] = org["qty"]
+										end
 									end
 								end
 							else
@@ -181,7 +194,7 @@ module ControlFields
 		return err
 	end
 
-	def judge_check_code params
+	def proc_judge_check_code params
 		if params[:yupcheckcode]
 			judge_code = JSON.parse(params[:yupcheckcode])
 			checkstatus = true
@@ -273,31 +286,52 @@ module ControlFields
 	def check_qty params
 		linedata = params[:parse_linedata]
 		tblname =  params[:screenCode].split("_")[1]
-		sno = linedata["#{tblname.chop}_sno_#{prevStatus[tblname]}"]
 		symqty = tblname.chop + "_qty"
+		if linedata[tblname.chop + "_qty"]
+			symqty = tblname.chop + "_qty"
+		else
+			symqty = tblname.chop + "_qty_stk"
+		end
+
 		if linedata[symqty] == ""
 			checkstatus = false
 			params[:err] =  "error   --->#{symqty} missing "
 		else
 			currtblnamechop = ""
 			tblnamechop = "" 
+			strsql = ""
 			linedata.each do |key,val|
-				if key.to_s =~ /_sno_/  and !val.nil? and val != ""
-					currtblnamechop,tblnamechop = key.to_s.split("_sno_")
-					strsql = %Q%select id from #{tblnamechop}s  where sno = '#{sno}' %
+				case key.to_s
+					when  /_sno_/ ### ordからいきなり　actでの入力を認めている。
+						if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
+							currtblnamechop,tblnamechop = key.to_s.split("_sno_")
+							strsql = %Q%select id from #{tblnamechop}s  where sno = '#{val}' %
+						end
+					when  /_cno_/  
+						if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
+							currtblnamechop,tblnamechop = key.to_s.split("_cno_")
+							strsql = %Q%select id from #{tblnamechop}s  where cno = '#{val}' %
+						end
+					when  /_gno_/  
+						if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
+							currtblnamechop,tblnamechop = key.to_s.split("_gno_")
+							strsql = %Q%select id from #{tblnamechop}s  where gno = '#{val}' %
+						end
 				end
-				tblid = ActiveRecord::Base.connection.select_value(strsql)	
-				strsql = %Q%select sum(qty) qty from trngantts where tblname = '#{tblnamechop}s'
-								and tblid = #{tblid} group by  tblname,tblid
-				%
-				prev_qty = ActiveRecord::Base.connection.select_value(strsql)	
-				if linedata[symqty].to_f  <= prev_qty.to_f   ### オーダ以上を許可するルール未設定
+			end
+			if 	strsql.size > 0
+					tblids = ActiveRecord::Base.connection.select_values(strsql)	
+					strsql = %Q%select sum(qty_pare) qty from trngantts where paretblname = '#{tblnamechop}s'
+								and paretblid in(#{tblids.join(",")})
+								and orgtblid = paretblid and paretblid = tblid
+					%
+					prev_qty = ActiveRecord::Base.connection.select_value(strsql)	
+					if linedata[symqty].to_f  <= prev_qty.to_f   ### オーダ以上を許可するルール未設定
 						checkstatus = true
-				else
+					else
 						checkstatus = false
-						params[:err] =  "error   --->  #{prev_qty} <　#{curr_qty}  + input qty:#{linedata[symqty]} "
-				end	
-				checkstatus = true
+						params[:err] =  "error ---> #{prev_qty} <　input qty:#{linedata[symqty]} "
+					end
 			end
 			if linedata["id"] != "" and checkstatus == true ###更新の時のみ　ords-->insts  insts -->actsに既にどれだけ変化しているか？
 				strsql = %Q%select sum(qty) qty from trngantts where tblname = '#{currtblnamechop}s'
@@ -396,7 +430,7 @@ module ControlFields
 			"shpschs"=>"shpords","shpords"=>"shpinsts","shpinsts"=>"shpacts"}
 	end
 
-	def snolist   ###reqparams["segment"] = ["trn_org"]の対象でもある。
+	def proc_snolist   ###reqparams["segment"] = ["trn_org"]の対象でもある。
 		{"purschs"=>"PS","purords"=>"PE","purinsts"=>"PH","purdlvs"=>"PV","puracts"=>"PA","purrets"=>"PR",
 			"inspschs"=>"IS","inspords"=>"IE","inspinsts"=>"IH","inspacts"=>"IA","insprets"=>"IR",
 			"prdschs"=>"MS","prdords"=>"ME","prdinsts"=>"MH","prdacts"=>"MA","prdrets"=>"MR",

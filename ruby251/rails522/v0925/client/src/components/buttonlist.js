@@ -92,7 +92,7 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
         dispatch(ButtonFlgRequest(buttonflg,params)) // import export 画面用
         switch (buttonflg) {
           case "inlineedit":
-            params= { ...params, page: page,sorted:sorted,   req:"editabletablereq"}
+            params= { ...params, page: page,sorted:sorted,req:"editabletablereq"}
           //editableflg = true
             return dispatch(ScreenRequest(params)) //
         

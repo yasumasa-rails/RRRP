@@ -70,5 +70,6 @@ Rails.application.configure do
   config.action_controller.forgery_protection_origin_check = false
   config.consider_all_requests_local = false
 
-  config.logger = Logger.new(STDOUT)
+  ##config.logger = Logger.new(STDOUT)
+  config.logger = Logger.new('log/development.log', 'daily')
 end

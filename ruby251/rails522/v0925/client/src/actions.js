@@ -27,6 +27,7 @@ export const SCREEN_PARAMS_SET = 'SCREEN_PARAMS_SET'
 export const SCREEN_FAILURE = 'SCREEN_FAILURE'
 export const SCREEN_ERR_CHECK_RESULT = 'SCREEN_ERR_CHECK_RESULT'
 export const SCREEN_ONBLUR = 'SCREEN_ONBLUR'
+//export const SCREEN_ONKEYUP = 'SCREEN_ONKEYUP'
 
 export const BUTTONLIST_REQUEST = 'BUTTONLIST_REQUEST'
 export const BUTTONLIST_SUCCESS = 'BUTTONLIST_SUCCESS'
@@ -122,6 +123,12 @@ export const ScreenOnblur = (data) => ({
   type:  SCREEN_ONBLUR,
   payload: {data}  //
 })
+
+//export const ScreenOnKeyUp = (data) => ({
+//  type:  SCREEN_ONKEYUP,
+//  payload: {data}  //
+//})
+
 
 export const YupErrSet = (data,error) => ({
   type:  YUP_ERR_SET,

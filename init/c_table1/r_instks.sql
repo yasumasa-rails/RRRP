@@ -1,7 +1,6 @@
 ﻿
  --- drop view r_instks cascade  
  create or replace view r_instks as select  
-  trngantt.trngantt_consumauto  trngantt_consumauto ,
 instk.qty  instk_qty,
   trngantt.shelfno_code_fm  shelfno_code_fm ,
   shelfno_in.shelfno_code  shelfno_code_in ,
@@ -9,24 +8,15 @@ instk.qty  instk_qty,
   trngantt.shelfno_name_fm  shelfno_name_fm ,
   shelfno_in.shelfno_name  shelfno_name_in ,
   trngantt.prjno_name  prjno_name ,
-  trngantt.trngantt_starttime  trngantt_starttime ,
   trngantt.unit_code_pare  unit_code_pare ,
   trngantt.unit_code  unit_code ,
   trngantt.unit_name_pare  unit_name_pare ,
   trngantt.unit_name  unit_name ,
-  trngantt.trngantt_consumunitqty  trngantt_consumunitqty ,
-  trngantt.trngantt_consumminqty  trngantt_consumminqty ,
   trngantt.trngantt_itm_id  trngantt_itm_id ,
-  trngantt.trngantt_shuffle_flg  trngantt_shuffle_flg ,
   trngantt.itm_code_pare  itm_code_pare ,
   trngantt.itm_code  itm_code ,
   trngantt.itm_name_pare  itm_name_pare ,
   trngantt.itm_name  itm_name ,
-  trngantt.trngantt_consumchgoverqty  trngantt_consumchgoverqty ,
-  trngantt.trngantt_qty_stk  trngantt_qty_stk ,
-  trngantt.trngantt_tblname  trngantt_tblname ,
-  trngantt.trngantt_tblid  trngantt_tblid ,
-  trngantt.loca_tel_pare  loca_tel_pare ,
   trngantt.loca_code_shelfno_fm  loca_code_shelfno_fm ,
   shelfno_in.loca_code_shelfno  loca_code_shelfno_in ,
   trngantt.loca_code_pare  loca_code_pare ,
@@ -37,14 +27,7 @@ instk.qty  instk_qty,
   trngantt.itm_unit_id  itm_unit_id ,
   trngantt.itm_classlist_id_pare  itm_classlist_id_pare ,
   trngantt.itm_classlist_id  itm_classlist_id ,
-  trngantt.trngantt_parenum  trngantt_parenum ,
-  trngantt.trngantt_chilnum  trngantt_chilnum ,
   trngantt.trngantt_duedate  trngantt_duedate ,
-  trngantt.trngantt_qty  trngantt_qty ,
-  trngantt.trngantt_mlevel  trngantt_mlevel ,
-  trngantt.trngantt_orgtblname  trngantt_orgtblname ,
-  trngantt.trngantt_key  trngantt_key ,
-  trngantt.trngantt_shelfno_id_fm  trngantt_shelfno_id_fm ,
 instk.id  instk_id,
 instk.id id,
 instk.starttime  instk_starttime,
@@ -53,30 +36,23 @@ instk.lotno  instk_lotno,
 instk.packno  instk_packno,
 instk.inoutflg  instk_inoutflg,
 instk.expiredate  instk_expiredate,
-instk.remark  instk_remark,
 instk.persons_id_upd   instk_person_id_upd,
 instk.created_at  instk_created_at,
 instk.updated_at  instk_updated_at,
 instk.update_ip  instk_update_ip,
+  trngantt.trngantt_shelfno_id_fm  trngantt_shelfno_id_fm ,
   trngantt.trngantt_itm_id_pare  trngantt_itm_id_pare ,
-  trngantt.trngantt_processseq_pare  trngantt_processseq_pare ,
   trngantt.trngantt_loca_id_pare  trngantt_loca_id_pare ,
 instk.trngantts_id   instk_trngantt_id,
-  trngantt.trngantt_qty_pare  trngantt_qty_pare ,
-  trngantt.trngantt_qty_stk_pare  trngantt_qty_stk_pare ,
 instk.shelfnos_id_in   instk_shelfno_id_in,
   trngantt.classlist_code_pare  classlist_code_pare ,
   trngantt.classlist_code  classlist_code ,
   trngantt.classlist_name_pare  classlist_name_pare ,
   trngantt.classlist_name  classlist_name ,
-  trngantt.trngantt_paretblname  trngantt_paretblname ,
-  trngantt.trngantt_paretblid  trngantt_paretblid ,
   trngantt.prjno_code_chil  prjno_code_chil ,
-  trngantt.trngantt_orgtblid  trngantt_orgtblid ,
   trngantt.prjno_code  prjno_code ,
   trngantt.shelfno_loca_id_shelfno_fm  shelfno_loca_id_shelfno_fm ,
   shelfno_in.shelfno_loca_id_shelfno  shelfno_loca_id_shelfno_in ,
-  shelfno_in.shelfno_contents  shelfno_contents_in ,
   trngantt.trngantt_prjno_id  trngantt_prjno_id 
  from instks   instk,
   r_persons  person_upd ,  r_trngantts  trngantt ,  r_shelfnos  shelfno_in 
@@ -124,10 +100,10 @@ instk.shelfnos_id_in   instk_shelfno_id_in,
 ,loca_name_shelfno_in  varchar (100) 
 ,loca_name_shelfno_fm  varchar (100) 
 ,loca_code_pare  varchar (50) 
-,instk_qty_stk  numeric (38,4)
+,instk_lotno  varchar (50) 
 ,instk_qty  numeric (18,4)
 ,instk_starttime   timestamp(6) 
-,instk_lotno  varchar (50) 
+,instk_qty_stk  numeric (38,4)
 ,instk_packno  varchar (10) 
 ,instk_inoutflg  varchar (3) 
 ,instk_expiredate   date 
@@ -138,8 +114,8 @@ instk.shelfnos_id_in   instk_shelfno_id_in,
 ,trngantt_consumauto  varchar (1) 
 ,shelfno_contents_in  varchar (4000) 
 ,trngantt_processseq_pare  numeric (38,0)
-,trngantt_qty_pare  numeric (22,0)
-,trngantt_qty_stk_pare  numeric (22,0)
+,trngantt_qty_pare  numeric (22,6)
+,trngantt_qty_stk_pare  numeric (22,6)
 ,trngantt_shuffle_flg  varchar (1) 
 ,trngantt_consumminqty  numeric (22,6)
 ,trngantt_consumunitqty  numeric (22,6)
@@ -157,25 +133,25 @@ instk.shelfnos_id_in   instk_shelfno_id_in,
 ,trngantt_duedate   timestamp(6) 
 ,trngantt_qty  numeric (18,4)
 ,instk_remark  varchar (4000) 
-,id  numeric (38,0)
 ,instk_person_id_upd  numeric (38,0)
-,instk_trngantt_id  numeric (38,0)
-,instk_id  numeric (38,0)
-,instk_updated_at   timestamp(6) 
-,instk_shelfno_id_in  numeric (38,0)
-,instk_update_ip  varchar (40) 
 ,instk_created_at   timestamp(6) 
-,shelfno_loca_id_shelfno_in  numeric (38,0)
-,trngantt_prjno_id  numeric (38,0)
-,trngantt_shelfno_id_fm  numeric (22,0)
-,itm_classlist_id_pare  numeric (38,0)
-,itm_classlist_id  numeric (38,0)
-,trngantt_itm_id_pare  numeric (38,0)
-,trngantt_itm_id  numeric (38,0)
+,instk_updated_at   timestamp(6) 
+,instk_update_ip  varchar (40) 
+,instk_id  numeric (38,0)
+,id  numeric (38,0)
+,instk_trngantt_id  numeric (38,0)
+,instk_shelfno_id_in  numeric (38,0)
 ,itm_unit_id_pare  numeric (22,0)
 ,itm_unit_id  numeric (22,0)
+,trngantt_prjno_id  numeric (38,0)
 ,trngantt_loca_id_pare  numeric (38,0)
+,itm_classlist_id  numeric (38,0)
 ,shelfno_loca_id_shelfno_fm  numeric (38,0)
+,itm_classlist_id_pare  numeric (38,0)
+,shelfno_loca_id_shelfno_in  numeric (38,0)
+,trngantt_shelfno_id_fm  numeric (22,0)
+,trngantt_itm_id_pare  numeric (38,0)
+,trngantt_itm_id  numeric (38,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(38,0)

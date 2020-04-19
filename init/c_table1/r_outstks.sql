@@ -1,7 +1,6 @@
 ﻿
  --- drop view r_outstks cascade  
  create or replace view r_outstks as select  
-  trngantt.trngantt_consumauto  trngantt_consumauto ,
 outstk.qty  outstk_qty,
   shelfno_out.shelfno_code  shelfno_code_out ,
   trngantt.shelfno_code_fm  shelfno_code_fm ,
@@ -9,24 +8,15 @@ outstk.qty  outstk_qty,
   shelfno_out.shelfno_name  shelfno_name_out ,
   trngantt.shelfno_name_fm  shelfno_name_fm ,
   trngantt.prjno_name  prjno_name ,
-  trngantt.trngantt_starttime  trngantt_starttime ,
   trngantt.unit_code_pare  unit_code_pare ,
   trngantt.unit_code  unit_code ,
   trngantt.unit_name_pare  unit_name_pare ,
   trngantt.unit_name  unit_name ,
-  trngantt.trngantt_consumunitqty  trngantt_consumunitqty ,
-  trngantt.trngantt_consumminqty  trngantt_consumminqty ,
   trngantt.trngantt_itm_id  trngantt_itm_id ,
-  trngantt.trngantt_shuffle_flg  trngantt_shuffle_flg ,
   trngantt.itm_code_pare  itm_code_pare ,
   trngantt.itm_code  itm_code ,
   trngantt.itm_name_pare  itm_name_pare ,
   trngantt.itm_name  itm_name ,
-  trngantt.trngantt_consumchgoverqty  trngantt_consumchgoverqty ,
-  trngantt.trngantt_qty_stk  trngantt_qty_stk ,
-  trngantt.trngantt_tblname  trngantt_tblname ,
-  trngantt.trngantt_tblid  trngantt_tblid ,
-  trngantt.loca_tel_pare  loca_tel_pare ,
   shelfno_out.loca_code_shelfno  loca_code_shelfno_out ,
   trngantt.loca_code_shelfno_fm  loca_code_shelfno_fm ,
   trngantt.loca_code_pare  loca_code_pare ,
@@ -37,16 +27,9 @@ outstk.qty  outstk_qty,
   trngantt.itm_unit_id  itm_unit_id ,
   trngantt.itm_classlist_id_pare  itm_classlist_id_pare ,
   trngantt.itm_classlist_id  itm_classlist_id ,
-  trngantt.trngantt_parenum  trngantt_parenum ,
-  trngantt.trngantt_chilnum  trngantt_chilnum ,
   trngantt.trngantt_duedate  trngantt_duedate ,
-  trngantt.trngantt_qty  trngantt_qty ,
-  trngantt.trngantt_mlevel  trngantt_mlevel ,
-  trngantt.trngantt_orgtblname  trngantt_orgtblname ,
-  trngantt.trngantt_key  trngantt_key ,
   trngantt.trngantt_shelfno_id_fm  trngantt_shelfno_id_fm ,
   trngantt.trngantt_itm_id_pare  trngantt_itm_id_pare ,
-  trngantt.trngantt_processseq_pare  trngantt_processseq_pare ,
   trngantt.trngantt_loca_id_pare  trngantt_loca_id_pare ,
 outstk.id  outstk_id,
 outstk.id id,
@@ -62,21 +45,15 @@ outstk.created_at  outstk_created_at,
 outstk.updated_at  outstk_updated_at,
 outstk.update_ip  outstk_update_ip,
 outstk.trngantts_id   outstk_trngantt_id,
-  trngantt.trngantt_qty_pare  trngantt_qty_pare ,
-  trngantt.trngantt_qty_stk_pare  trngantt_qty_stk_pare ,
 outstk.shelfnos_id_out   outstk_shelfno_id_out,
   trngantt.classlist_code_pare  classlist_code_pare ,
   trngantt.classlist_code  classlist_code ,
   trngantt.classlist_name_pare  classlist_name_pare ,
   trngantt.classlist_name  classlist_name ,
-  trngantt.trngantt_paretblname  trngantt_paretblname ,
-  trngantt.trngantt_paretblid  trngantt_paretblid ,
   trngantt.prjno_code_chil  prjno_code_chil ,
-  trngantt.trngantt_orgtblid  trngantt_orgtblid ,
   trngantt.prjno_code  prjno_code ,
   shelfno_out.shelfno_loca_id_shelfno  shelfno_loca_id_shelfno_out ,
   trngantt.shelfno_loca_id_shelfno_fm  shelfno_loca_id_shelfno_fm ,
-  shelfno_out.shelfno_contents  shelfno_contents_out ,
   trngantt.trngantt_prjno_id  trngantt_prjno_id 
  from outstks   outstk,
   r_persons  person_upd ,  r_trngantts  trngantt ,  r_shelfnos  shelfno_out 
@@ -150,8 +127,8 @@ outstk.shelfnos_id_out   outstk_shelfno_id_out,
 ,trngantt_orgtblname  varchar (30) 
 ,trngantt_key  varchar (250) 
 ,trngantt_processseq_pare  numeric (38,0)
-,trngantt_qty_pare  numeric (22,0)
-,trngantt_qty_stk_pare  numeric (22,0)
+,trngantt_qty_pare  numeric (22,6)
+,trngantt_qty_stk_pare  numeric (22,6)
 ,trngantt_paretblname  varchar (30) 
 ,trngantt_paretblid  numeric (38,0)
 ,trngantt_orgtblid  numeric (22,0)

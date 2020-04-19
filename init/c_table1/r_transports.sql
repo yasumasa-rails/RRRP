@@ -3,15 +3,15 @@
  create or replace view r_transports as select  
 transport.code  transport_code,
 transport.name  transport_name,
+transport.contents  transport_contents,
 transport.remark  transport_remark,
-transport.created_at  transport_created_at,
-transport.update_ip  transport_update_ip,
 transport.expiredate  transport_expiredate,
-transport.updated_at  transport_updated_at,
-transport.id id,
-transport.id  transport_id,
 transport.persons_id_upd   transport_person_id_upd,
-transport.contents  transport_contents
+transport.update_ip  transport_update_ip,
+transport.created_at  transport_created_at,
+transport.updated_at  transport_updated_at,
+transport.id  transport_id,
+transport.id id
  from transports   transport,
   r_persons  person_upd 
   where       transport.persons_id_upd = person_upd.id     ;
@@ -36,14 +36,14 @@ transport.contents  transport_contents
 ,transport_code  varchar (50) 
 ,transport_name  varchar (100) 
 ,transport_expiredate   date 
-,transport_remark  varchar (4000) 
 ,transport_contents  varchar (4000) 
-,transport_updated_at   timestamp(6) 
-,transport_created_at   timestamp(6) 
+,transport_remark  varchar (4000) 
 ,transport_id  numeric (38,0)
-,transport_person_id_upd  numeric (38,0)
 ,id  numeric (38,0)
+,transport_person_id_upd  numeric (38,0)
 ,transport_update_ip  varchar (40) 
+,transport_created_at   timestamp(6) 
+,transport_updated_at   timestamp(6) 
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(38,0)

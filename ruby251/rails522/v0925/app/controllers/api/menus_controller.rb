@@ -48,13 +48,13 @@ module Api
             when "fetch_request"
                 xparams = params.dup  
                 xparams[:parse_linedata] = JSON.parse(params["linedata"])
-                xparams = ControlFields.chk_fetch_rec xparams
+                xparams = ControlFields.proc_chk_fetch_rec xparams
                 render json: {:params=>xparams}   
 
             when "check_request"  
                   xparams = params.dup  
                   xparams[:parse_linedata] =  JSON.parse(xparams[:linedata])
-                  rparams = ControlFields.judge_check_code xparams
+                  rparams = ControlFields.proc_judge_check_code xparams
                   render json: {:params=>rparams}   
 
             when "confirm"
@@ -69,12 +69,12 @@ module Api
               parse_linedata.each do |field,val|
                 if yup_fetch_code[field] 
                     ##rparams["fetchcode"] = %Q%{"#{field}":"#{val}"}%  ###clientのreq='fetch_request'で利用
-                    if rparams[:parse_linedata]["id"].nil?
+                    if rparams[:parse_linedata]["id"] == ""
                         rparams[:parse_linedata]["aud"]= "add" 
                     end  
                     rparams["fetchview"] = yup_fetch_code[field]
-                    rparams = ControlFields.chk_fetch_rec rparams  
-                    if rparams[:err] != ""
+                    rparams = ControlFields.proc_chk_fetch_rec rparams  
+                    if rparams[:err] != ""  
                       rparams[:parse_linedata][:confirm_gridmessage] = rparams[:err] 
                       rparams[:parse_linedata][(field+"_gridmessage").to_sym] = rparams[:err] 
                       break
@@ -82,7 +82,7 @@ module Api
                 end
                 if rparams[:err] == ""
                   if yup_check_code[field] 
-                    rparams = ControlFields.judge_check_code rparams  
+                    rparams = ControlFields.proc_judge_check_code rparams  
                     if rparams[:err] != ""
                       rparams[:parse_linedata][:confirm_gridmessage] = rparams[:err] 
                       rparams[:parse_linedata][(field+"_gridmessage").to_sym] = rparams[:err] 

@@ -67,7 +67,7 @@ module RorBlkctl
 		tmp_key = {}
 		tblname = command_r[:sio_viewname].split("_")[1]
 		if  command_r[:sio_message_contents].nil? 
-			command_r = proc_set_src_tbl(command_r) ### @src_tblの項目作成
+			command_r = set_src_tbl(command_r) ### @src_tblの項目作成
 		end
 		command_r[:sio_recordcount] = r_cnt0
 		case command_r[:sio_classname]
@@ -86,36 +86,36 @@ module RorBlkctl
 					proc_tbl_delete_arel(tblname," id = #{@src_tbl[:id]}")
 				end
 		end ##
-		if tblname =~ /^pur|^prd|^cust/ and  tblname =~ /schs$|ords$|insts$|dlvs$|acts$/
+		if tblname =~ /^pur|^prd|^cust/ 
 			if reqparams.nil?
 				 reqparams = {}
 				 reqparams["orgtblname"] = tblname
 				 reqparams["orgtblid"] = @src_tbl[:id]	
 				 reqparams["paretblname"] = tblname
 				 reqparams["paretblid"] = @src_tbl[:id]	
-				 reqparams["segment"] =[]
+				 reqparams["sio_classname"] = command_r[:sio_classname]
 			end
+			reqparams["segment"] =[]
 			reqparams["tbldata"] = @src_tbl.stringify_keys  
-			command_r.each do |key,val|   ###procの処理を実行
-				if key =~ /^opeitm_/ and key =~ /_proc$/ and val == "1"
-					reqparams["segment"] << key
+			case tblname
+			when /schs$|ords$|insts$|dlvs$|acts$/
+				command_r.each do |key,val|   ###procの処理を実行
+					if key =~ /^opeitm_/ and key =~ /_proc$/ and val == "1"
+						reqparams["segment"] << key
+					end
+				end  
+				processreqs_ids = Operation.proc_trngantts(tblname,@src_tbl[:id],reqparams)
+				case tblname
+				when /prdord|purord/
+					reqparams["segment"] << "mkshpschs"
 				end
-			end  
-			processreqs_ids = Operation.proc_trngantts(tblname,@src_tbl[:id],reqparams)
-			@src_tbl.each do |key,val|   ###前の状態のtrn変更
-				if key.to_s =~ /^sno_|^gno_|^cno_/ and val
-					if val.size > 0
-						xno = key.to_s.split("_")[0] 
-						prevtbl = key.to_s.split("_")[1] + "s"
-						qty = @src_tbl[:qty]
-						qty ||= 0
-						qty_stk = @src_tbl[:qty_stk]
-						qty_stk ||= 0
-						Operation.proc_prev_trngantts_update(xno,prevtbl,val,qty,qty_stk,command_r["opeitm_stktaking_proc"])
-						break
-					end	
-				end	
-			end	
+			when /custs/
+				reqparams["segment"] = []
+				reqparams["segment"] << "createtable"
+				processreqs_id = Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+				processreqs_ids = []
+				processreqs_ids << processreqs_id
+			end
 		else
 			processreqs_ids = nil
 		end
@@ -371,7 +371,7 @@ module RorBlkctl
 	    return locas_id
 	end
 
-	 def proc_set_src_tbl rec  ##rec["xxxxx"]
+	def set_src_tbl rec  ##rec["xxxxx"]
   		@src_tbl = {}   ###テーブル更新
 		tblnamechop = rec[:sio_viewname].split("_",2)[1].chop
 		if rec[:sio_classname] =~ /_add_/
@@ -395,11 +395,11 @@ module RorBlkctl
 					if k == ""
 						case 	  j_to_sfld
 						when 'sno'
-							@src_tbl[:sno] = Operation.field_sno(tblnamechop,rec["id"])
+							@src_tbl[:sno] = Operation.proc_field_sno(tblnamechop,rec["id"])
 						when 'cno'
-							@src_tbl[:cno] = Operation.field_cno(rec["id"])
+							@src_tbl[:cno] = Operation.proc_field_cno(rec["id"])
 						when 'gno'
-							@src_tbl[:gno] = Operation.field_gno(rec["id"])
+							@src_tbl[:gno] = Operation.proc_field_gno(rec["id"])
 						end
 					end
 				end
@@ -734,25 +734,6 @@ module RorBlkctl
 		ActiveRecord::Base.connection.delete("delete from  #{tblname}  where #{strwhere} ")
 	end
 
-	def proc_processreqs_add tblname,tblid,reqparams,segment
-		reqparams["segment"] = segment
-		processreqs_id = proc_get_nextval("processreqs_seq")
-		strsql = %Q%
-		insert into processreqs(tblname,tblid,paretblname,paretblid,
-								contents,remark,
-								created_at,updated_at,
-								update_ip,persons_id_upd,reqparams,
-								id,result_f)
-								values('#{tblname}',#{tblid},'#{reqparams["paretblname"]}',#{reqparams["paretblid"]},
-								'','',
-								to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
-								to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
-								'',#{@sio_user_code||=0},'#{JSON.generate(reqparams)}',
-								#{processreqs_id},'0')
-		%
-		ActiveRecord::Base.connection.insert(strsql)  ## @sio_user_code||=0 ==>operationから呼ばれたときは@sio_user_code=nil
-		return processreqs_id
-	end
 
 	# Float()で変換できれば数値、例外発生したら違う
 	def float_string?(str)

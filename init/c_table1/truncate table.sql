@@ -1,4 +1,5 @@
-﻿truncate table purschs;
+﻿
+truncate table purschs;
 truncate table purords;
 truncate table purinsts;
 truncate table purdlvs;
@@ -9,6 +10,7 @@ truncate table inamts;
 truncate table outamts;
 truncate table lotstkhists;
 
+truncate table alloctbls cascade;
 
 truncate table prdschs;
 truncate table prdords;
@@ -17,7 +19,7 @@ truncate table prdacts;
 
 
 truncate table custschs;
----truncate table custords;
+truncate table custords;
 ---truncate table custinsts;
 ---truncate table custacts;
 
@@ -31,4 +33,7 @@ truncate table payords;
 truncate table payinsts;
 ----truncate table payacts;
 
-truncate table processseqs;
+truncate table processreqs;
+
+truncate table shpschs;
+

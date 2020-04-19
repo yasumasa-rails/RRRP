@@ -51,14 +51,14 @@ module Api
                   if yupfetchcode[field] 
                     jparams[:fetchcode] = %Q%{"#{field}":"#{val}"}%
                     jparams[:fetchview] = yupfetchcode[field]
-                    jparams = ControlFields.chk_fetch_rec jparams  
+                    jparams = ControlFields.proc_chk_fetch_rec jparams  
                     if jparams[:err] == ""
                         jparams[:fetch_data].each do |fd,vl|
                             jparams[:parse_linedata][fd] = vl
                         end  
                         if yupcheckcode[field] and val != ""
                             jparams["yupcheckcode"] = %Q%{"#{field}":"#{val}"}%
-                            jparams = ControlFields.judge_check_code jparams
+                            jparams = ControlFields.proc_judge_check_code jparams
                             if jparams[:err] != ""
                                 jparams[:parse_linedata]["confirm"] = jparams[:err]
                                 status = false    
@@ -106,7 +106,7 @@ module Api
             end
             if status == true and parse_linedata["confirm"] == "レ" 
                 parse_linedata.each do |key,value|
-                    command_c[key] = value
+                    command_c[key] = (value||="")
                 end
                 case command_c["aud"] 
                 when "add" 

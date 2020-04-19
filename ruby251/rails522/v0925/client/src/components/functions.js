@@ -7,7 +7,7 @@ export function  contentEditablefunc (cellInfo){
         if(cellInfo.row.fieldcode_ftype){type = cellInfo.row.fieldcode_ftype}
         else{response["type"] = true 　//  response["type"] = true 　画面からの修正可能
                       response["val"] = { __html: cellInfo.value}}}
-//ダイナミックに入力・可・不可    
+//ダイナミックに入力を可・不可にする。    
     if(type){ //type 入力の可否
         switch (cellInfo.column.id) {
         case "fieldcode_dataprecision":
@@ -217,6 +217,10 @@ export function  contentEditablefunc (cellInfo){
         case /pobject_objecttype_tbl/.test(cellInfo.column.id):
                     response["val"] = { __html: cellInfo.value?cellInfo.value:"tbl"};
                     cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"tbl";
+            break
+        case /prjno_code/.test(cellInfo.column.id):
+                        response["val"] = { __html: cellInfo.value?cellInfo.value:"0"};
+                        cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"0";
             break
         default: break    
         }

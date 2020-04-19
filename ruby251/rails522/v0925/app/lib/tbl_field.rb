@@ -554,11 +554,11 @@ extend self
 		command_r["screenfield_remark"] = "auto add otherview  screenfield --->r_#{tbl} #{rec["pobject_code_sfd"]}"
 		command_r["screenfield_expiredate"] = rec["screenfield_expiredate"]
 		command_r["screenfield_screen_id"] = screens_id
-		command_r["screenfield_selection"] = if rec["pobject_code_sfd"] =~ /_code|_name|_id/  
+		command_r["screenfield_selection"] = if rec["pobject_code_sfd"] =~ /_code|_name|_id|opeitm_packqty/  
 													'1'
 												else
 													'0'  
-												end
+												end  ###screenfield_selection 包装単位数の計算で使用
 		command_r["screenfield_hideflg"] = if rec["pobject_code_sfd"] =~ /_id/ or rec["screenfield_hideflg"] != '0' or 
 												rec["pobject_code_sfd"] =~ /_remark/ then "1" else "0" end
 		command_r["screenfield_seqno"]   =	if rec["pobject_code_sfd"] =~ /_code/ or rec["pobject_code_sfd"] =~ /_name/ 
@@ -601,6 +601,7 @@ extend self
 	end	
 	def create_viewfield view
 		strsql = "select pobject_code_sfd,screenfield_crtfield from r_screenfields where pobject_code_scr = '#{view}' and
+					 screenfield_selection = '1' and
 					 screenfield_expiredate > current_date "   ####   and screenfield_selection = 1 
 		selectfields = ActiveRecord::Base.connection.select_all(strsql)
 		createviewscript = "\n --- drop view #{view} cascade  "

@@ -34,7 +34,8 @@ module Api
                       gantt << [level,ganttdata["itm_code"],
                                 "Date(#{ganttdata["start"].year},#{ganttdata["start"].month-1},#{ganttdata["start"].day})",
                                 "Date(#{ganttdata["end"].year},#{ganttdata["end"].month-1},#{ganttdata["end"].day})",
-                                  nil, "0",ganttdata["depend"]]
+                                  nil, "0",ganttdata["depend"]
+                                ]
                     end    
                 end
             end

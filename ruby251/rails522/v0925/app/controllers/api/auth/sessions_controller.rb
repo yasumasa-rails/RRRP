@@ -1,4 +1,5 @@
 ##https://github.com/lynndylanhurley/devise_token_auth
+###https://github.com/heartcombo/devise
 module Api
   module Auth
     class SessionsController < DeviseTokenAuth::SessionsController

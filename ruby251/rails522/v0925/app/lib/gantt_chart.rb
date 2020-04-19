@@ -237,7 +237,7 @@ module GanttChart
 				command_r[:nditm_parenum] = value[:parenum]
 				command_r[:nditm_chilnum] = value[:chilnum]
 				command_r[:nditm_duration] = value[:duration]
-				## command_r[:nditm_person_id_upd] = command_r[:sio_user_code]   ##proc_set_src_tblでセットしている
+				## command_r[:nditm_person_id_upd] = command_r[:sio_user_code]   ##RorBlkctl.set_src_tblでセットしている
 				command_r[:nditm_expiredate] = Time.parse("2099/12/31")
 				chk_alreadt_exists_nditm(command_r) if command_r[:sio_classname] =~ /_add_/
 				proc_simple_sio_insert command_r  if @err == "no"
