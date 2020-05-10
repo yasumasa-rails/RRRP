@@ -37,7 +37,7 @@
     "react-table": "^6.10.0",
     "react-tabs": "^3.0.0",
     "react-tooltip-lite": "^1.9.5",
-    "read-excel-file": "^4.0.3",
+    "read-excel-file": "^4.0.6",
     "redux": "^3.7.2",
     "redux-actions": "^2.2.1",
     "redux-data-structures": "^0.1.6",

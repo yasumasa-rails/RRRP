@@ -8,7 +8,7 @@ export function  onBlurFunc(screenCode,linedata,id){
     //let crr_code_pur
     let toduedate
     let qty_case
-    let rLineData ={}
+    let rLineData =　Object.create(linedata)
     let sw = true
     let rval = {}
     switch( true ){
@@ -23,7 +23,7 @@ export function  onBlurFunc(screenCode,linedata,id){
                     rLineData["opeitm_priority_gridmessage"] = "in"
                 }
             }
-                break
+            break
         case /_duedate/.test(id):
                 starttime = id.split("_")[0] + "_starttime" 
                 if(linedata[starttime]===""){
@@ -43,7 +43,7 @@ export function  onBlurFunc(screenCode,linedata,id){
                 if(/purords$/.test(screenCode)){
                     if(linedata["opeitm_priority"] === "999")
                             {
-                                rLineData["loca_code_supplier"] = linedata["loca_code"]
+                                rLineData["loca_code_supplier"] = linedata["loca_code"]  //linedata["loca_code"] -->opeitmsのlocas_id
                                 rLineData["shelfno_code_to"] = linedata["shelfno_code"]
                                 rLineData["loca_code_supplier_gridmessage"] = "in"
                                 rLineData["shelfno_code_to_gridmessage"] = "in"
@@ -52,9 +52,9 @@ export function  onBlurFunc(screenCode,linedata,id){
                  if(/prdords$/.test(screenCode)){
                      if(linedata["opeitm_priority"] === "999")
                              {
-                                 rLineData["loca_code_shelfno_to"] = linedata["loca_code_shelfno"]
+                                 rLineData["loca_code_workplace"] = linedata["loca_code"]   //linedata["loca_code"] -->opeitmsのlocas_id
                                  rLineData["shelfno_code_to"] = linedata["shelfno_code"]
-                                 rLineData["loca_code_supplier_gridmessage"] = "in"
+                                 rLineData["loca_code_workplace_gridmessage"] = "in"
                                  rLineData["shelfno_code_to_gridmessage"] = "in"
                       }
                   }
@@ -78,9 +78,11 @@ export function  onBlurFunc(screenCode,linedata,id){
                     }else{
                         rLineData[id]  = String(Math.ceil(linedata[id]/linedata["opeitm_packqty"])*linedata["opeitm_packqty"])
                         rLineData[qty_case] =  String(Math.ceil(linedata[id]/linedata["opeitm_packqty"]))}
-                //        
-                rLineData["crr_code_pur"] = linedata["crr_code_supplier"] 
-                rLineData["crr_code_pur_gridmessage"] = "in"
+                //
+                if( rLineData["crr_code_pur"] ){}
+                else{        
+                    rLineData["crr_code_pur"] = linedata["crr_code_supplier"] 
+                    rLineData["crr_code_pur_gridmessage"] = "in"}
                 break 
             case /_prd/.test(screenCode):
                 qty_case = id.split("_")[0] + "_qty_case" 
@@ -91,8 +93,9 @@ export function  onBlurFunc(screenCode,linedata,id){
                         rLineData[qty_case] =  String(Math.ceil(linedata[id]/linedata["opeitm_packqty"]))}
                 break 
             default:
+                sw = false
                  break    
-            }                   
+            }        
             break
         default:
              sw = false

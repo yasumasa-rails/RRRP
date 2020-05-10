@@ -14,7 +14,5 @@ class ActiveStorage::BlobsController < ActiveStorage::BaseController
   private
   def access_allowed?(blob)
     # サービスに応じたアクセス処理を記述する。
-
-    ...
   end
 end

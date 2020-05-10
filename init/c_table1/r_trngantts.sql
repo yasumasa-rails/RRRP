@@ -1,5 +1,6 @@
 
- --- drop view r_trngantts cascade  
+
+--- drop view r_trngantts cascade  
  create or replace view r_trngantts as select  
 trngantt.consumauto  trngantt_consumauto,
   shelfno_fm.shelfno_code  shelfno_code_fm ,
@@ -11,10 +12,11 @@ trngantt.starttime  trngantt_starttime,
   itm.unit_code  unit_code ,
   itm_pare.unit_name  unit_name_pare ,
   itm.unit_name  unit_name ,
-trngantt.consumunitqty  trngantt_consumunitqty,
-trngantt.consumminqty  trngantt_consumminqty,
 trngantt.itms_id   trngantt_itm_id,
 trngantt.shuffle_flg  trngantt_shuffle_flg,
+trngantt.locas_id   trngantt_loca_id,
+trngantt.consumminqty  trngantt_consumminqty,
+trngantt.consumunitqty  trngantt_consumunitqty,
   itm_pare.itm_code  itm_code_pare ,
   itm.itm_code  itm_code ,
   itm_pare.itm_name  itm_name_pare ,
@@ -26,8 +28,10 @@ trngantt.tblid  trngantt_tblid,
   loca_pare.loca_tel  loca_tel_pare ,
   shelfno_fm.loca_code_shelfno  loca_code_shelfno_fm ,
   loca_pare.loca_code  loca_code_pare ,
+  loca.loca_code  loca_code ,
   shelfno_fm.loca_name_shelfno  loca_name_shelfno_fm ,
   loca_pare.loca_name  loca_name_pare ,
+  loca.loca_name  loca_name ,
   person_upd.person_code  person_code_upd ,
   person_upd.person_name  person_name_upd ,
   itm_pare.itm_unit_id  itm_unit_id_pare ,
@@ -63,6 +67,7 @@ trngantt.qty_linkto_alloctbl  trngantt_qty_linkto_alloctbl,
 trngantt.qty  trngantt_qty,
   itm_pare.classlist_name  classlist_name_pare ,
   itm.classlist_name  classlist_name ,
+trngantt.consumtype  trngantt_consumtype,
 trngantt.paretblname  trngantt_paretblname,
 trngantt.paretblid  trngantt_paretblid,
   prjno.prjno_code_chil  prjno_code_chil ,
@@ -71,8 +76,8 @@ trngantt.orgtblid  trngantt_orgtblid,
   shelfno_fm.shelfno_loca_id_shelfno  shelfno_loca_id_shelfno_fm ,
 trngantt.prjnos_id   trngantt_prjno_id
  from trngantts   trngantt,
-  r_itms  itm ,  r_persons  person_upd ,  r_shelfnos  shelfno_fm ,  r_itms  itm_pare ,  r_locas  loca_pare ,  r_prjnos  prjno 
-  where       trngantt.itms_id = itm.id      and trngantt.persons_id_upd = person_upd.id      and trngantt.shelfnos_id_fm = shelfno_fm.id      and trngantt.itms_id_pare = itm_pare.id      and trngantt.locas_id_pare = loca_pare.id      and trngantt.prjnos_id = prjno.id     ;
+  r_itms  itm ,  r_locas  loca ,  r_persons  person_upd ,  r_shelfnos  shelfno_fm ,  r_itms  itm_pare ,  r_locas  loca_pare ,  r_prjnos  prjno 
+  where       trngantt.itms_id = itm.id      and trngantt.locas_id = loca.id      and trngantt.persons_id_upd = person_upd.id      and trngantt.shelfnos_id_fm = shelfno_fm.id      and trngantt.itms_id_pare = itm_pare.id      and trngantt.locas_id_pare = loca_pare.id      and trngantt.prjnos_id = prjno.id     ;
  DROP TABLE IF EXISTS sio.sio_r_trngantts;
  CREATE TABLE sio.sio_r_trngantts (
           sio_id numeric(38,0)  CONSTRAINT SIO_r_trngantts_id_pk PRIMARY KEY           ,sio_user_code numeric(38,0)
@@ -97,42 +102,45 @@ trngantt.prjnos_id   trngantt_prjno_id
 ,trngantt_paretblid  numeric (38,0)
 ,trngantt_tblname  varchar (30) 
 ,trngantt_tblid  numeric (38,0)
+,itm_code  varchar (50) 
+,itm_name  varchar (100) 
+,trngantt_processseq  numeric (38,0)
+,trngantt_duedate   timestamp(6) 
 ,trngantt_qty  numeric (18,4)
 ,trngantt_qty_stk  numeric (22,0)
 ,trngantt_qty_alloc  numeric (22,6)
+,trngantt_qty_linkto_alloctbl  numeric (22,0)
 ,trngantt_qty_pare  numeric (22,6)
 ,trngantt_qty_stk_pare  numeric (22,6)
 ,trngantt_qty_pare_alloc  numeric (22,6)
-,itm_code_pare  varchar (50) 
-,unit_code  varchar (50) 
-,unit_name_pare  varchar (100) 
+,classlist_code  varchar (50) 
 ,unit_name  varchar (100) 
+,shelfno_code_fm  varchar (50) 
+,itm_code_pare  varchar (50) 
+,itm_name_pare  varchar (100) 
 ,loca_code_shelfno_fm  varchar (50) 
 ,loca_code_pare  varchar (50) 
+,loca_code  varchar (50) 
 ,loca_name_shelfno_fm  varchar (100) 
 ,loca_name_pare  varchar (100) 
+,loca_name  varchar (100) 
+,classlist_name  varchar (100) 
 ,classlist_name_pare  varchar (100) 
-,classlist_code  varchar (50) 
+,unit_name_pare  varchar (100) 
 ,classlist_code_pare  varchar (50) 
-,shelfno_code_fm  varchar (50) 
 ,shelfno_name_fm  varchar (100) 
 ,unit_code_pare  varchar (50) 
-,itm_code  varchar (50) 
-,itm_name_pare  varchar (100) 
-,itm_name  varchar (100) 
-,classlist_name  varchar (100) 
+,unit_code  varchar (50) 
+,trngantt_consumchgoverqty  numeric (22,6)
 ,trngantt_duedate_org   timestamp(6) 
+,trngantt_consumunitqty  numeric (22,6)
 ,trngantt_consumminqty  numeric (22,6)
 ,trngantt_starttime   timestamp(6) 
-,trngantt_consumunitqty  numeric (22,6)
-,trngantt_processseq  numeric (38,0)
-,trngantt_qty_linkto_alloctbl  numeric (22,0)
+,trngantt_consumtype  varchar (3) 
 ,trngantt_processseq_pare  numeric (38,0)
-,trngantt_duedate   timestamp(6) 
-,trngantt_consumchgoverqty  numeric (22,6)
 ,trngantt_key  varchar (250) 
 ,trngantt_mlevel  numeric (3,0)
-,loca_abbr_pare  varchar (50) 
+,itm_datascale  numeric (22,0)
 ,itm_std_pare  varchar (50) 
 ,itm_std  varchar (50) 
 ,itm_model_pare  varchar (50) 
@@ -149,16 +157,25 @@ trngantt.prjnos_id   trngantt_prjno_id
 ,itm_wide  numeric (22,0)
 ,itm_deth_pare  numeric (22,0)
 ,itm_deth  numeric (22,0)
+,loca_abbr_pare  varchar (50) 
+,loca_abbr  varchar (50) 
 ,loca_zip_pare  varchar (10) 
+,loca_zip  varchar (10) 
 ,loca_country_pare  varchar (20) 
+,loca_country  varchar (20) 
 ,loca_prfct_pare  varchar (20) 
+,loca_prfct  varchar (20) 
 ,loca_addr1_pare  varchar (50) 
+,loca_addr1  varchar (50) 
 ,loca_addr2_pare  varchar (50) 
+,loca_addr2  varchar (50) 
 ,loca_tel_pare  varchar (20) 
+,loca_tel  varchar (20) 
 ,loca_fax_pare  varchar (20) 
+,loca_fax  varchar (20) 
 ,loca_mail_pare  varchar (20) 
+,loca_mail  varchar (20) 
 ,itm_datascale_pare  numeric (22,0)
-,itm_datascale  numeric (22,0)
 ,unit_contents_pare  varchar (4000) 
 ,unit_contents  varchar (4000) 
 ,shelfno_contents_fm  varchar (4000) 
@@ -178,19 +195,20 @@ trngantt.prjnos_id   trngantt_prjno_id
 ,trngantt_loca_id_pare  numeric (38,0)
 ,trngantt_prjno_id  numeric (38,0)
 ,trngantt_id  numeric (38,0)
+,trngantt_loca_id  numeric (38,0)
 ,trngantt_itm_id  numeric (38,0)
-,shelfno_loca_id_shelfno_fm  numeric (38,0)
-,itm_classlist_id  numeric (38,0)
-,itm_unit_id_pare  numeric (22,0)
 ,itm_unit_id  numeric (22,0)
+,itm_classlist_id  numeric (38,0)
+,shelfno_loca_id_shelfno_fm  numeric (38,0)
+,itm_unit_id_pare  numeric (22,0)
 ,itm_classlist_id_pare  numeric (38,0)
-,id  numeric (38,0)
+,trngantt_created_at  numeric (22,0)
 ,person_code_upd  varchar (50) 
 ,person_name_upd  varchar (100) 
+,id  numeric (38,0)
 ,prjno_code_chil  varchar (50) 
 ,prjno_expiredate   date 
 ,prjno_id  numeric (22,0)
-,trngantt_created_at  numeric (22,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(38,0)

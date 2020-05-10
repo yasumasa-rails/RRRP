@@ -44,10 +44,10 @@ export  function yupErrCheck (schema,field,params,data) {
   }
 }  
 
-//未実施　yupでは数値　スペース999 がエラーにならない。
+//未実施　yupでは数値項目で　"スペース999" がエラーにならない。
 
 // yupでは　2019/12/32等がエラーにならない。　2020/01/01になってしまう
-function datacheck(schema,field,linedata){ 
+export function datacheck(schema,field,linedata){ 
   if(schema.fields[field]){
     switch(schema.fields[field]["_type"]){
       case "date" :

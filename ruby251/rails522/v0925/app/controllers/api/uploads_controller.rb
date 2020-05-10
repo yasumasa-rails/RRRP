@@ -147,14 +147,12 @@ module Api
       end
       def update_table_json command_all,r_cnt0,results  ##rec = command_c command_rとの混乱を避けるためrecにした。          
               acommand =[]
-              aprocessreqs_id = []
               idx = 0
               begin
                   ActiveRecord::Base.connection.begin_db_transaction()
                   command_all.each do |command_cn|
-                      command_rn,processreqs_ids = RorBlkctl.proc_private_aud_rec(command_cn,r_cnt0,nil) ###最後のパラメータはreqparams
+                      command_rn,reqparams = RorBlkctl.proc_private_aud_rec(command_cn,r_cnt0,nil) ###最後のパラメータはreqparams
                       acommand << command_rn
-                      aprocessreqs_id  << processreqs_ids if processreqs_ids
                       results[idx+1]["confirm"] = "OK" 
                       idx += 1
                   end
@@ -175,7 +173,7 @@ module Api
                       command[:sio_message_contents] = nil
                       ##tblname = command[:sio_viewname].split("_")[1]
                       RorBlkctl.proc_insert_sio_r( command) #### if @pare_class != "batch"    ## 結果のsio書き込み
-                      CreateOtherTableRecordJob.perform_later aprocessreqs_id[idx]
+                      CreateOtherTableRecordJob.perform_later reqparams["seqno"]
                       idx += 1
                   end	
               ensure

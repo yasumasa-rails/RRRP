@@ -3,14 +3,13 @@ import React from 'react';
 import { connect } from 'react-redux'
 import ReactTable from 'react-table'
 import {ScreenRequest,FetchRequest, YupErrSet,ScreenOnblur} from '../actions'
-//import {ScreenOnKeyUp} from '../actions'
 import "react-table/react-table.css"
 import ButtonList from './buttonlist'
 import DropDown from './dropdown'
 import   '../index.css' 
 import {yupschema} from '../yupschema'
 import Tooltip from 'react-tooltip-lite'
-import {contentEditablefunc} from './functions'
+import {contentEditablefunc,contentNonEditablefunc} from './functions'
 import {onBlurFunc} from './onblurfunc'
 import {yupErrCheck} from './yuperrcheck'
 
@@ -22,7 +21,7 @@ const renderEditable = (cellInfo)=> {
   let contentEditablechk = contentEditablefunc(cellInfo)
 
     return (
-    <Tooltip  content={data[cellInfo.index][cellInfo.column.id+"_gridmessage"]}
+    <Tooltip  content={data[cellInfo.index][cellInfo.column.id+"_gridmessage"]?data[cellInfo.index][cellInfo.column.id+"_gridmessage"]:" "}
                       border={true} 
        tagName="span" arrowSize={2}>
     <div 
@@ -36,10 +35,11 @@ const renderEditable = (cellInfo)=> {
 }
 
 const renderNonEditable = (cellInfo)=> {
+  let contentNonEditablechk = contentNonEditablefunc(cellInfo)
   return (
     <div
       contentEditable={false}
-      dangerouslySetInnerHTML={{ __html: cellInfo.value  }}
+      dangerouslySetInnerHTML={contentNonEditablechk.val}
     />
   );
 }
@@ -73,6 +73,7 @@ function editableColumns(columns){
                     break
                 default:    
                     val["Cell"] = renderNonEditable
+                    break
                  }
         }   
      // val["style"] = JSON.parse(val["style"])  
@@ -111,7 +112,7 @@ const  renderFilter = ({column,onChange,filter})=> {
   }　
 }
 
-const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
+const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,hostError,error,
 // sorted,handleErrorMsg,handleErrorset,handleScreenLineEditRequest, handleScreenOnKeyUp,
             columns,data,pages,params,  //params railsに渡すパラメータを兼ねている。
             handleScreenRequest,handleValite, handleFetchRequest,handleConfirmRequest,
@@ -371,7 +372,7 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,error,
         );
       }}
       </ReactTable>
-        :<h2>please select</h2>
+        :<h2>{hostError?hostError:"please select"}</h2>
       }
       </div>
        )
@@ -398,7 +399,7 @@ const  mapStateToProps = (state) => {
             dropDownValues:state.screen.dropDownValues?state.screen.dropDownValues:{},
             originalreq:state.screen.originalreq,
             pageText:state.screen.pageText,
-            error: state.screen.error,
+            hostError: state.screen.hostError,
             }
 }
    

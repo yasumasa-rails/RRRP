@@ -87,7 +87,7 @@ module ControlFields
 				end
 				fetch_data[rec["pobject_code_sfd"]] = screendata[rec["pobject_code_sfd"]]	
 			end
-			if missing == false
+			if missing == false  ###検索のための入力項目はすべて入力されている。
 				rec =  ActiveRecord::Base.connection.select_one(strsql[0..-8] + " limit 1")
 			else
 				rec = nil

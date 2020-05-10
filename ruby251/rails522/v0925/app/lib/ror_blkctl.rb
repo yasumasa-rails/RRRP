@@ -36,7 +36,7 @@ module RorBlkctl
 	def proc_update_table command_c,r_cnt0  ##rec = command_c command_rとの混乱を避けるためrecにした。
 		begin
 				ActiveRecord::Base.connection.begin_db_transaction()
-				command_r,processreqs_ids = proc_private_aud_rec(command_c,r_cnt0,nil) 
+				command_r,reqparams = proc_private_aud_rec(command_c,r_cnt0,nil) 
 		rescue
         		ActiveRecord::Base.connection.rollback_db_transaction()
 				command_r = command_c.dup
@@ -53,10 +53,12 @@ module RorBlkctl
           		command_r[(tblname.chop + "_id")] =  command_r["id"] = @src_tbl[:id]
 				proc_insert_sio_r( command_r) #### if @pare_class != "batch"    ## 結果のsio書き込み
 				ActiveRecord::Base.connection.commit_db_transaction()
-				if processreqs_ids
-					if !processreqs_ids.empty?
-						CreateOtherTableRecordJob.perform_later(processreqs_ids)
-					end	
+				if reqparams
+					if command_r["mkord_runtime"]
+						CreateOtherTableRecordJob.set(wait: command_r["mkord_runtime"].to_f.hours).perform_later(reqparams["seqno"])
+					else	
+						CreateOtherTableRecordJob.perform_later(reqparams["seqno"])
+					end
 				end	
       	ensure
 	  	end ##begin
@@ -86,40 +88,136 @@ module RorBlkctl
 					proc_tbl_delete_arel(tblname," id = #{@src_tbl[:id]}")
 				end
 		end ##
-		if tblname =~ /^pur|^prd|^cust/ 
-			if reqparams.nil?
-				 reqparams = {}
-				 reqparams["orgtblname"] = tblname
-				 reqparams["orgtblid"] = @src_tbl[:id]	
-				 reqparams["paretblname"] = tblname
-				 reqparams["paretblid"] = @src_tbl[:id]	
-				 reqparams["sio_classname"] = command_r[:sio_classname]
-			end
-			reqparams["segment"] =[]
-			reqparams["tbldata"] = @src_tbl.stringify_keys  
-			case tblname
-			when /schs$|ords$|insts$|dlvs$|acts$/
+		## /^shpschs/
+		###shpschsはpurordsかprdordsで自動で作成される。
+		### /^shpords/
+		### Operation.shpords_aud_recで対応
+		### /^shpacts/
+		###	reqparams["segment"] << "shpact_stk_move" 
+		if reqparams.nil?
+			reqparams = {}
+			reqparams["orgtblname"] = tblname
+			reqparams["orgtblid"] = @src_tbl[:id]	
+			reqparams["paretblname"] = tblname
+			reqparams["paretblid"] = @src_tbl[:id]	
+			reqparams["sio_classname"] = command_r[:sio_classname]
+		end
+		reqparams["tbldata"] = @src_tbl.stringify_keys  
+		case  tblname
+			when /prdschs/  
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+				if reqparams["orgtblname"] =~ /ords$/ 
+					reqparams["segment"]  = "mkschs"   ###構成展開
+					processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+					if (reqparams["paretblid"] != @src_tbl[:id] or reqparams["paretblname"] != tblname)  and reqparams["paretblname"] !~ /custords/ 
+						reqparams["segment"]  = "consume_sch_self_parts_by_parent"
+						processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams
+					end
+				end
+
+			when /prdords/  
 				command_r.each do |key,val|   ###procの処理を実行
 					if key =~ /^opeitm_/ and key =~ /_proc$/ and val == "1"
-						reqparams["segment"] << key
+						reqparams["segment"] = key
+						processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
 					end
 				end  
-				processreqs_ids = Operation.proc_trngantts(tblname,@src_tbl[:id],reqparams)
-				case tblname
-				when /prdord|purord/
-					reqparams["segment"] << "mkshpschs"
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+				reqparams["segment"]  = "mkschs"   ###構成展開
+				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+
+				reqparams["segment"] = "mkshpschs" ###子部品出庫
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+
+				if reqparams["paretblid"] != @src_tbl[:id] or reqparams["paretblname"] != tblname 
+					reqparams["segment"]  = "consume_ord_self_parts_by_parent"
+					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams
+				end	
+
+			when /prdinsts/ 
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	 
+
+			when /prdacts/ 
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+				if reqparams["paretblid"] != @src_tbl[:id] or reqparams["paretblname"] != tblname 
+					reqparams["segment"]  = "consume_child_parts"
+					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams		
 				end
-			when /custs/
-				reqparams["segment"] = []
-				reqparams["segment"] << "createtable"
-				processreqs_id = Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
-				processreqs_ids = []
-				processreqs_ids << processreqs_id
-			end
-		else
-			processreqs_ids = nil
+
+			when /purschs/  
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+				if reqparams["orgtblname"] =~ /ords$/ 
+					reqparams["segment"]  = "mkschs"   ###構成展開
+					processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+					if (reqparams["paretblid"] != @src_tbl[:id] or reqparams["paretblname"] != tblname)  and reqparams["orgtblname"] !~ /custords/ 
+						reqparams["segment"]  = "consume_sch_self_parts_by_parent"
+						processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams
+					end
+				end
+
+			when /purords/  
+				command_r.each do |key,val|   ###procの処理を実行
+					if key =~ /^opeitm_/ and key =~ /_proc$/ and val == "1"
+						reqparams["segment"] = key
+						processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+					end
+				end  
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+
+				reqparams["segment"]  = "mkschs"   ###構成展開
+				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+
+				reqparams["segment"] = "mkshpschs"  ###子部品出庫
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+				
+				if reqparams["paretblid"] != @src_tbl[:id] or reqparams["paretblname"] != tblname 
+					reqparams["segment"]  = "consume_ord_self_parts_by_parent"
+					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams
+				end	
+
+			when /purinsts/  
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+
+			when /puracts/   
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+			
+				if reqparams["paretblid"] != @src_tbl[:id] or reqparams["paretblname"] != tblname 
+					reqparams["segment"]  = "consume_child_parts"
+					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+				end
+
+			when /custschs/  
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+			when /custords/  
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+				reqparams["segment"]  = "mkschs"   ###構成展開
+				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+			when /custinsts/  
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+			when /custacts/   
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+			when /custs|suppliers|workplaces/
+				reqparams["segment"] = "createtable"
+				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+			when /mkords/
+				reqparams["segment"] = "mkords"
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
+			else
+				reqparams = nil
 		end
-		return command_r,processreqs_ids
+		return command_r,reqparams
 	end
 	  
 	def proc_insert_sio_r  command_c ####レスポンス
@@ -231,13 +329,13 @@ module RorBlkctl
                 	end ## ff["value"].size
 				when /char|text|select/
 					if  (ff["value"] =~ /^%/ or ff["value"] =~ /%$/ ) then 
-						where_str << " #{ff["id"]} like '#{ff["value"]}'     AND "
+						where_str << " #{ff["id"]} like '#{ff["value"]}'     AND " if  ff["value"] != ""
 					elsif ff["value"] =~ /^<=/  or ff["value"] =~ /^>=/ then 
-						where_str << " #{ff["id"]} #{ff["id"][0..1]} '#{ff["id"][2..-1]}'     AND "
+						where_str << " #{ff["id"]} #{ff["id"][0..1]} '#{ff["id"][2..-1]}'     AND " if  ff["value"] != ""
 					elsif 	ff["value"] =~ /^</   or  ff["value"] =~ /^>/
-						where_str << " #{ff["id"]}   #{ff["value"][0]}  '#{ff["value"][1..-1]}'         AND " 
+						where_str << " #{ff["id"]}   #{ff["value"][0]}  '#{ff["value"][1..-1]}'         AND "  if  ff["value"] != ""
 					elsif 	ff["value"] =~ /^!=/   
-						where_str << " #{ff["id"]}   #{ff["value"][0..1]}  '#{ff["value"][2..-1]}'         AND " 
+						where_str << " #{ff["id"]}   #{ff["value"][0..1]}  '#{ff["value"][2..-1]}'         AND "  if  ff["value"] != ""
 					else
 						where_str << " #{ff["id"]} = '#{ff["value"]}'         AND "
 					end
@@ -395,18 +493,18 @@ module RorBlkctl
 					if k == ""
 						case 	  j_to_sfld
 						when 'sno'
-							@src_tbl[:sno] = Operation.proc_field_sno(tblnamechop,rec["id"])
+							rec[tblnamechop+"_sno"] = @src_tbl[:sno] = Operation.proc_field_sno(tblnamechop,rec["id"])
 						when 'cno'
-							@src_tbl[:cno] = Operation.proc_field_cno(rec["id"])
+							rec[tblnamechop+"_cno"] = @src_tbl[:cno] = Operation.proc_field_cno(rec["id"])
 						when 'gno'
-							@src_tbl[:gno] = Operation.proc_field_gno(rec["id"])
+							rec[tblnamechop+"_gno"] = @src_tbl[:gno] = Operation.proc_field_gno(rec["id"])
 						end
 					end
 				end
             end   ## if j_to_s.
 		end ## rec.each
         @src_tbl[:persons_id_upd] = rec["#{tblnamechop}_person_id_upd"] = (@sio_user_code||=0) ###performでの処理では@sio_user_code=nil
-        @src_tbl[:updated_at] = rec["#{tblnamechop}_updated_at"] = Time.now
+		@src_tbl[:updated_at] = rec["#{tblnamechop}_updated_at"] = Time.now
 		return rec
 	end
 

@@ -92,7 +92,7 @@ case  DROPDOWNVALUE_SET:
 // set the success and requesting flags to false
 case SCREEN_FAILURE:
 return {
-message: action.errors.message,
+hostError: action.errors,
 }
 
 case FETCH_REQUEST:

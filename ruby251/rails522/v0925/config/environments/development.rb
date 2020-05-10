@@ -9,7 +9,7 @@ Rails.application.configure do
   config.cache_classes = false
 
   # Do not eager load code on boot.
-  config.eager_load = false
+  config.eager_load = true
 
   # Show full error reports.
   config.consider_all_requests_local = true
@@ -66,10 +66,11 @@ Rails.application.configure do
   config.action_mailer.logger.level = Logger::INFO
 
   config.action_controller.asset_host = 'http://localhost:3001'
+  ###config.action_controller.asset_host = 'http://192.168.1.10:3001'
   
   config.action_controller.forgery_protection_origin_check = false
   config.consider_all_requests_local = false
 
-  ##config.logger = Logger.new(STDOUT)
-  config.logger = Logger.new('log/development.log', 'daily')
+  config.logger = Logger.new(STDOUT)
+  ###config.logger = Logger.new('log/development.log', 'daily')
 end

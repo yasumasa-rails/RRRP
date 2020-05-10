@@ -215,14 +215,66 @@ export function  contentEditablefunc (cellInfo){
                 cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:today.getFullYear() + "-" + (today.getMonth() + 1) + "-" +  today.getDate();
             break
         case /pobject_objecttype_tbl/.test(cellInfo.column.id):
-                    response["val"] = { __html: cellInfo.value?cellInfo.value:"tbl"};
-                    cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"tbl";
+                response["val"] = { __html: cellInfo.value?cellInfo.value:"tbl"};
+                cellInfo.row[cellInfo.id] = cellInfo.value?cellInfo.value:"tbl";
             break
         case /prjno_code/.test(cellInfo.column.id):
-                        response["val"] = { __html: cellInfo.value?cellInfo.value:"0"};
-                        cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"0";
+                response["val"] = { __html: cellInfo.value?cellInfo.value:"0"};
+                cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"0";
             break
+        case /mkord_starttime_/.test(cellInfo.column.id):
+                response["val"] = { __html: cellInfo.value?cellInfo.value:"2000/01/01"};
+                cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"2000/01/01";
+                break
+        case /mkord_duedate_/.test(cellInfo.column.id):
+                response["val"] = { __html: cellInfo.value?cellInfo.value:"2099/12/31"};
+                cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"2099/12/31";
+                break
         default: break    
         }
+    return response    
+}
+
+
+export function  contentNonEditablefunc (cellInfo){
+    let response ={}
+    //let brekName = cellInfo.column.id
+    switch( true ){ //初期値
+        case /mkord_loca_id_/.test(cellInfo.column.id):  //show=falseでは値をセットできない。
+                response["val"] = { __html: cellInfo.value?cellInfo.value:"0"};
+                cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"0";
+            break
+        case /mkord_itm_id_/.test(cellInfo.column.id):
+                response["val"] = { __html: cellInfo.value?cellInfo.value:"0"};
+                cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"0";
+                break
+        case /mkord_chrg_id_/.test(cellInfo.column.id):
+                response["val"] = { __html: cellInfo.value?cellInfo.value:"0"};
+                cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"0";
+                break
+        case /mkord_.*qty/.test(cellInfo.column.id):
+                response["val"] = { __html: cellInfo.value?cellInfo.value:"0"};
+                cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"0";
+                break
+        case /mkord_.*amt/.test(cellInfo.column.id):
+                response["val"] = { __html: cellInfo.value?cellInfo.value:"0"};
+                cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"0";
+                break
+        case /mkord_.*cnt/.test(cellInfo.column.id):
+                response["val"] = { __html: cellInfo.value?cellInfo.value:"0"};
+                cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"0";
+                break
+        case /mkord_cmpldate/.test(cellInfo.column.id):
+                response["val"] = { __html: cellInfo.value?cellInfo.value:"2099/12/31"};
+                cellInfo.row[cellInfo.column.id] = cellInfo.value?cellInfo.value:"2099/12/31";
+                break
+        default: 
+            response["val"] = { __html: cellInfo.value};
+            cellInfo.row[cellInfo.column.id] = cellInfo.value;
+        break    
+        }
+    if(cellInfo.styles.textAlign === "right"){  // 数字判断
+        response["val"] = { __html: cellInfo.value?cellInfo.value:"0"};
+        }  
     return response    
 }

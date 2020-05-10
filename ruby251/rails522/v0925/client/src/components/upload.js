@@ -17,7 +17,7 @@ function batchcheck(sheet,screenCode,nameToCode) {
   header.push("confirm")
   orgheader.push("confirm")
   nameToCode["aud"] = "aud"
-  sheet.map((row,index)=>{
+    sheet.map((row,index)=>{
           linedata = {}
           if(index===0){
               row.map((colunm,idx)=>{
@@ -47,12 +47,12 @@ function batchcheck(sheet,screenCode,nameToCode) {
           lines.push(linedata)
           return lines
         })
-          if(errorheader){
-            lines[0]["confirm"] = "field error"
-            importdata = Array.from(lines)
-          }else{
-            importdata =  yupErrCheckBatch(lines,screenCode)
-          } 
+    if(errorheader){
+        lines[0]["confirm"] = "field error"
+        importdata = Array.from(lines)
+        }else{
+        importdata =  yupErrCheckBatch(lines,screenCode)
+        } 
   return JSON.stringify(importdata)
   //finally{fileDownload(JSON.stringify(rimportdata), files[0].name+".json")}
 }

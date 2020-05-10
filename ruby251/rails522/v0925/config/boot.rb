@@ -13,3 +13,4 @@ Bootsnap.setup(
   compile_cache_yaml:   true                  # YAMLのコンパイル結果をキャッシュする
 )
 
+

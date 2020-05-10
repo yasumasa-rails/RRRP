@@ -1,0 +1,2 @@
+ --- create view script   r_instks 
+ --- create view script   r_outstks 

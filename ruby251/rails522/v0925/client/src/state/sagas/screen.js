@@ -100,13 +100,16 @@ export function* ScreenSaga({ payload: {params}  }) {
         default:
           return {}
       }
-  }catch(e)
-     {  
+  }catch(error)   // status401が拾えない。 
+      {  
       let message;
-      switch (e.status) {
-              case 500: message = 'Internal Server Error'; break;
-              case 401: message = 'Invalid credentials'; break;
-              default: message = `Something went wrong ${e.error}` ;}
+      if(error){ 
+          switch (error.status) {
+            case 500: message = 'Internal Server Error'; break;
+            case 401: message = 'Invalid credentials'; break;
+            default: message = `Something went wrong ${error.status} 401 (Unauthorized) or host abort or ???` ;}}
+      else{ message = "401 (Unauthorized) ???"
+          }        
       yield put({ type: SCREEN_FAILURE, errors: message })
   }
  }      

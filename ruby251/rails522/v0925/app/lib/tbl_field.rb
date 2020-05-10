@@ -454,7 +454,7 @@ extend self
 		command_r["pobject_expiredate"] = '2099/12/31'
 		###screenfield_screen_id = 1201 and  screenfield_pobject_id_sfd = 13952
 		p command_r if command_r["screenfield_pobject_id_sfd"].to_s == "13952"
-		command_r,processreqs_id = RorBlkctl.proc_private_aud_rec(command_r,1,nil) 
+		command_r,reqparams = RorBlkctl.proc_private_aud_rec(command_r,1,nil) 
 		if @sio_result_f ==   "9"
 		 	@messages <<  "error  add_pobject_record #{screenfield}"
 		end  
@@ -534,7 +534,7 @@ extend self
 			command_r["screenfield_paragraph"] =""
 			command_r["screenfield_formatter"] =""
 			p command_r if command_r["screenfield_pobject_id_sfd"].to_s == "13952"
-			command_r,processreqs_id = RorBlkctl.proc_private_aud_rec(command_r,1,nil) 
+			command_r,reqparams = RorBlkctl.proc_private_aud_rec(command_r,1,nil) 
 			if @sio_result_f ==   "9"
 		 		@messages <<  "error  add_screenfield_record #{field["pobject_code_tbl"].chop}_#{field["pobject_code_fld"]}"
 			else  
@@ -592,7 +592,7 @@ extend self
 		command_r["screenfield_formatter"] =rec["screenfield_formatter"]
 		command_r["screenfield_crtfield"] = rec["screenfield_crtfield"]  ###create viewのview
 		p command_r if command_r["screenfield_pobject_id_sfd"].to_s == "13952"
-		command_r,processreqs_id = RorBlkctl.proc_private_aud_rec(command_r,1,nil) 
+		command_r,reqparams = RorBlkctl.proc_private_aud_rec(command_r,1,nil) 
 		if @sio_result_f ==   "9"
 		 	@messages <<  "error  add_screenfield_record: r_#{tbl} -->#{rec["pobject_code_sfd"]}"
 		else  
