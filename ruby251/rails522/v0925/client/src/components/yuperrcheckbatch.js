@@ -7,8 +7,8 @@ export  function yupErrCheckBatch(lines,screenCode)
     let Yup = require('yup')
     let screenSchema = Yup.object().shape(yupschema[screenCode])
     let importdata = []
+    let importError = false
     let tblnamechop = screenCode.split("_")[1].slice(0, -1)
-    let rval = {}
     lines.map((line,inx) => {
         if(["add","update","delete"].includes(line["aud"])){
             try{screenSchema.validateSync(line)
@@ -19,26 +19,35 @@ export  function yupErrCheckBatch(lines,screenCode)
                         if(line[`${fd}_gridmessage`] !== "ok"){
                           line[`${fd}_confirm`] = `err ${fd}`
                           line[`${tblnamechop}_confirm_gridmessage`] = `err ${fd}`　
+                          importError = true
                         }else{
-                            rval = onBlurFunc(screenCode,line,fd)
+                            let rval = onBlurFunc(screenCode,line,fd)
+                            line[fd] = rval["linedata"][fd] 
                         }
                     }
-                   return rval["linedata"]
+                   return line
                   }
                 )
             }      
             catch(err){  //jsonにはxxxx_gridmessageはない。
                 line[`${tblnamechop}_ confirm_gridmessage`] = `err ${err}`
                 line[`confirm`] = false
+                importError = true
             }
         }else{
             if(line["aud"]==="aud"){
                 }else{
                     line[`confirm`] = "missing aud--> add OR update OR delete "
+                    importError = true
             }   
         }  
         importdata.push(line) 
-        return importdata
+        return {importdata,importError}
     })
-    return importdata
+    return {importdata,importError}
 }  
+
+
+
+
+  

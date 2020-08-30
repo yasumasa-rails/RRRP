@@ -1,0 +1,7 @@
+ table:opeitms already exist :opeitms_uky1 
+ Therefore drop  CONSTRAINT  :opeitms_uky1
+	    and  create TABLE_CONSTRAINTS :opeitms_uky1 
+ table:opeitms already exist :opeitms_uky2 
+ Therefore drop  CONSTRAINT  :opeitms_uky2
+	    and  create TABLE_CONSTRAINTS :opeitms_uky2 
+ create TABLE_CONSTRAINTS :opeitms_uky3 

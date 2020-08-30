@@ -1,9 +1,9 @@
   
 import React from 'react';
 import { connect } from 'react-redux'
-import ReactTable from 'react-table'
+import ReactTable from 'react-table-6'
 import {ScreenRequest,FetchRequest, YupErrSet,ScreenOnblur} from '../actions'
-import "react-table/react-table.css"
+import "react-table-6/react-table.css"
 import ButtonList from './buttonlist'
 import DropDown from './dropdown'
 import   '../index.css' 
@@ -112,7 +112,8 @@ const  renderFilter = ({column,onChange,filter})=> {
   }　
 }
 
-const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,hostError,error,
+const {isAuthenticated, 
+            screenCode, pageSize,filterable,loading,handleScreenParamsSet,hostError,error,
 // sorted,handleErrorMsg,handleErrorset,handleScreenLineEditRequest, handleScreenOnKeyUp,
             columns,data,pages,params,  //params railsに渡すパラメータを兼ねている。
             handleScreenRequest,handleValite, handleFetchRequest,handleConfirmRequest,
@@ -179,7 +180,7 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,hostError,e
                                     }      
     return(
     <div>
-    {screenCode?
+    {screenCode&&isAuthenticated?
       <ReactTable
       page={page}
       pages={pages}  //
@@ -276,7 +277,7 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,hostError,e
                       data[rowInfo.index][column.id]=inputval
                       //params["linedata"] =  JSON.stringify(data[rowInfo.index])
                       params["index"] = rowInfo.index
-                                        params["buttonflg"] = buttonflg       
+                      params["buttonflg"] = buttonflg    //buttonflg=~/add|edit|reset|import|export|yup|.../       
                       onFieldValite (column.id,params,data,error)
                       }
               if(data[rowInfo.index][`${column.id}_gridmessage`]==="ok"){
@@ -303,7 +304,7 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,hostError,e
                                         params["index"] = rowInfo.index 
                                         params["uid"] = uid
                                         params["req"] = "check_request" 
-                                        params["buttonflg"] = buttonflg                                          
+                                        params["buttonflg"] = buttonflg        //buttonflg=~/add|edit|reset|import|export|yup|.../                                           
                                         handleFetchRequest(params)}}
               if(yup.yupfetchcode[column.id]&&(data[rowInfo.index][`${column.id}_gridmessage`]==="ok"||data[rowInfo.index][`${column.id}_gridmessage`]==="ok on the way")){// 
                                         //rowInfo.row[column.id]=inputval
@@ -319,7 +320,7 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,hostError,e
                                         params["fetchview"] = yup.yupfetchcode[column.id]
                                         params["uid"] = uid
                                         params["req"] = "fetch_request"    
-                                        params["buttonflg"] = buttonflg                                 
+                                        params["buttonflg"] = buttonflg           //buttonflg=~/add|edit|reset|import|export|yup|.../                               
                                         handleFetchRequest(params)
                                                          }
             }                                         
@@ -372,14 +373,15 @@ const {screenCode, pageSize,filterable,loading,handleScreenParamsSet,hostError,e
         );
       }}
       </ReactTable>
-        :<h2>{hostError?hostError:"please select"}</h2>
+        :<h2>{hostError?hostError:"please select or logout &login"}</h2>
       }
       </div>
        )
     }
   }
 const  mapStateToProps = (state) => {
-  return {  uid:state.login.auth?state.login.auth.uid:"",
+  return {  uid:state.auth.uid,
+            isAuthenticated:state.auth.isAuthenticated ,
             buttonflg:state.button?state.button.buttonflg:"",  
             screenCode:state.screen.params?state.screen.params.screenCode:"",
             screenName:state.screen.params?state.screen.params.screenName:"",
@@ -422,7 +424,8 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
     handleConfirmRequest:  (params) =>{ params["req"] = "confirm"
                                       dispatch(ScreenRequest(params))
                                     },
-    handleFetchRequest:  (params) =>{dispatch(FetchRequest(params))},
+    handleFetchRequest:  (params) =>{
+                              dispatch(FetchRequest(params))},
     
     handleValite:  (data,errmsg) =>{ 
                           let error 

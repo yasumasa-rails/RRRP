@@ -1,5 +1,5 @@
-import { SCREEN_REQUEST,SCREEN_SUCCESS,SCREEN_FAILURE,
-  LOGOUT_REQUEST,SCREEN_PARAMS_SET,
+import { SCREEN_REQUEST,SCREEN_SUCCESS,SCREEN_SUCCESS7,
+  SCREEN_FAILURE,LOGOUT_REQUEST,SCREEN_PARAMS_SET,
   SCREEN_LINEEDIT,SCREEN_ERR_CHECK_RESULT,SCREEN_ONBLUR,
   //SCREEN_ONKEYUP,
   FETCH_REQUEST,FETCH_RESULT,FETCH_FAILURE,
@@ -9,17 +9,22 @@ import { SCREEN_REQUEST,SCREEN_SUCCESS,SCREEN_FAILURE,
   from '../../actions'
 
 export let getScreenState = state => state.screen
-const screenreducer =  (state= {} , action) =>{
+
+const initialValues = {
+  params:{screenCode:""},
+}
+
+const screenreducer =  ( state= initialValues , action) =>{
 switch (action.type) {
 // Set the requesting flag and append a message to be shown
 case SCREEN_REQUEST:
-return {...state,
-screenCode:action.payload.params.screenCode, 
-pageSize:action.payload.params.pageSize, 
-screenName:action.payload.params.screenName, 
-loading:true,
-message: [{ body: 'screen loading ...', time: new Date() }],
-// editableflg:action.payload.editableflg
+  return {...state,
+          screenCode:action.payload.params.screenCode, 
+          pageSize:action.payload.params.pageSize, 
+          screenName:action.payload.params.screenName, 
+          loading:true,
+          message: [{ body: 'screen loading ...', time: new Date() }],
+          // editableflg:action.payload.editableflg
 }
 
 case SCREEN_PARAMS_SET:
@@ -56,7 +61,7 @@ return {...state,
 case SCREEN_SUCCESS:
 return {...state,
 message: [],
-columns: action.action.data.columns,　　/// payloadに統一
+columns: action.action.data.columns,  /// payloadに統一
 data: action.action.data.data,
 params: action.action.data.params,
 pages: action.action.data.pageInfo.totalPage,
@@ -66,11 +71,24 @@ yup:action.action.data.yup,
 dropDownList:action.action.data.dropdownlist,
 status: action.action.data.status,
 loading:false,
-filterable:action.action.data.params.req==="viewtablereq"?true:false,
+//filterable:action.action.data.params.req==="viewtablereq"?true:false,
+filterable:true,
 originalreq: action.action.data.params.req,
-pageText: 'total count xx,xxx,xxx   Page',
 nameToCode:action.action.data.nameToCode,
 }
+
+case SCREEN_SUCCESS7: // payloadに統一
+return {...state,
+  loading:false,
+  message: [],
+  data: action.action.data.data,
+  params: action.action.data.params,
+  status: action.action.data.status,
+  //filterable:action.action.data.params.req==="viewtablereq"?true:false,
+  filterable:true,
+  grid_columns_info:action.action.data.grid_columns_info,
+}
+
 
 
 case SCREEN_LINEEDIT:
@@ -81,18 +99,18 @@ return {...state,
 }  
 
 case  DROPDOWNVALUE_SET:
-   let {index,field,val} = {...action.payload.dropDownValue}
-   state.data[index][field] = val
-  return {...state,
-    data:state.data
+    let {index,field,val} = {...action.payload.dropDownValue}
+    state.data[index][field] = val
+    return {...state,
+      data:state.data
   }  
 
 
 // Append the error returned from our api
 // set the success and requesting flags to false
 case SCREEN_FAILURE:
-return {
-hostError: action.errors,
+  return {
+  hostError: action.errors,
 }
 
 case FETCH_REQUEST:

@@ -1,4 +1,5 @@
 
+
  --- drop view r_purschs cascade  
  create or replace view r_purschs as select  
   opeitm.opeitm_boxe_id  opeitm_boxe_id ,
@@ -17,6 +18,7 @@
   opeitm.itm_name  itm_name ,
   supplier.scrlv_code_chrg_payment  scrlv_code_chrg_payment ,
   supplier.scrlv_code_chrg_supplier  scrlv_code_chrg_supplier ,
+  chrg.scrlv_code_chrg  scrlv_code_chrg ,
   supplier.payment_chrg_id_payment  payment_chrg_id_payment ,
   shelfno_to.loca_code_shelfno  loca_code_shelfno_to ,
   supplier.loca_code_sect_chrg_payment  loca_code_sect_chrg_payment ,
@@ -24,6 +26,7 @@
   supplier.loca_code_supplier  loca_code_supplier ,
   supplier.loca_code_payment  loca_code_payment ,
   opeitm.loca_code_shelfno  loca_code_shelfno ,
+  chrg.loca_code_sect_chrg  loca_code_sect_chrg ,
   opeitm.loca_code  loca_code ,
   shelfno_to.loca_name_shelfno  loca_name_shelfno_to ,
   supplier.loca_name_sect_chrg_payment  loca_name_sect_chrg_payment ,
@@ -31,13 +34,16 @@
   supplier.loca_name_supplier  loca_name_supplier ,
   supplier.loca_name_payment  loca_name_payment ,
   opeitm.loca_name_shelfno  loca_name_shelfno ,
+  chrg.loca_name_sect_chrg  loca_name_sect_chrg ,
   opeitm.loca_name  loca_name ,
   opeitm.opeitm_itm_id  opeitm_itm_id ,
   opeitm.opeitm_loca_id  opeitm_loca_id ,
   supplier.person_code_chrg_supplier  person_code_chrg_supplier ,
   supplier.person_code_chrg_payment  person_code_chrg_payment ,
+  chrg.person_code_chrg  person_code_chrg ,
   supplier.person_name_chrg_supplier  person_name_chrg_supplier ,
   supplier.person_name_chrg_payment  person_name_chrg_payment ,
+  chrg.person_name_chrg  person_name_chrg ,
   opeitm.shelfno_loca_id_shelfno  shelfno_loca_id_shelfno ,
   opeitm.itm_unit_id  itm_unit_id ,
 pursch.price  pursch_price,
@@ -68,16 +74,20 @@ pursch.opeitms_id   pursch_opeitm_id,
   supplier.supplier_crr_id_supplier  supplier_crr_id_supplier ,
 pursch.gno  pursch_gno,
   opeitm.opeitm_unit_id_case  opeitm_unit_id_case ,
+pursch.qty_case  pursch_qty_case,
 pursch.suppliers_id   pursch_supplier_id,
   supplier.usrgrp_name_chrg_supplier  usrgrp_name_chrg_supplier ,
   supplier.usrgrp_name_chrg_payment  usrgrp_name_chrg_payment ,
+  chrg.usrgrp_name_chrg  usrgrp_name_chrg ,
   opeitm.classlist_code  classlist_code ,
   supplier.crr_code_supplier  crr_code_supplier ,
   supplier.crr_name_supplier  crr_name_supplier ,
   supplier.person_sect_id_chrg_payment  person_sect_id_chrg_payment ,
   supplier.person_sect_id_chrg_supplier  person_sect_id_chrg_supplier ,
+  chrg.person_sect_id_chrg  person_sect_id_chrg ,
   supplier.usrgrp_code_chrg_supplier  usrgrp_code_chrg_supplier ,
   supplier.usrgrp_code_chrg_payment  usrgrp_code_chrg_payment ,
+  chrg.usrgrp_code_chrg  usrgrp_code_chrg ,
   opeitm.classlist_name  classlist_name ,
   supplier.payment_loca_id_payment  payment_loca_id_payment ,
   prjno.prjno_code_chil  prjno_code_chil ,
@@ -87,11 +97,13 @@ pursch.suppliers_id   pursch_supplier_id,
   opeitm.opeitm_unit_id_prdpurshp  opeitm_unit_id_prdpurshp ,
   supplier.chrg_person_id_chrg_payment  chrg_person_id_chrg_payment ,
   supplier.chrg_person_id_chrg_supplier  chrg_person_id_chrg_supplier ,
+  chrg.chrg_person_id_chrg  chrg_person_id_chrg ,
+pursch.chrgs_id   pursch_chrg_id,
   opeitm.boxe_unit_id_box  boxe_unit_id_box ,
   opeitm.boxe_unit_id_outbox  boxe_unit_id_outbox 
  from purschs   pursch,
-  r_persons  person_upd ,  r_prjnos  prjno ,  r_shelfnos  shelfno_to ,  r_opeitms  opeitm ,  r_suppliers  supplier 
-  where       pursch.persons_id_upd = person_upd.id      and pursch.prjnos_id = prjno.id      and pursch.shelfnos_id_to = shelfno_to.id      and pursch.opeitms_id = opeitm.id      and pursch.suppliers_id = supplier.id     ;
+  r_persons  person_upd ,  r_prjnos  prjno ,  r_shelfnos  shelfno_to ,  r_opeitms  opeitm ,  r_suppliers  supplier ,  r_chrgs  chrg 
+  where       pursch.persons_id_upd = person_upd.id      and pursch.prjnos_id = prjno.id      and pursch.shelfnos_id_to = shelfno_to.id      and pursch.opeitms_id = opeitm.id      and pursch.suppliers_id = supplier.id      and pursch.chrgs_id = chrg.id     ;
  DROP TABLE IF EXISTS sio.sio_r_purschs;
  CREATE TABLE sio.sio_r_purschs (
           sio_id numeric(38,0)  CONSTRAINT SIO_r_purschs_id_pk PRIMARY KEY           ,sio_user_code numeric(38,0)
@@ -118,14 +130,24 @@ pursch.suppliers_id   pursch_supplier_id,
 ,pursch_tax  numeric (38,4)
 ,opeitm_processseq  numeric (3,0)
 ,pursch_gno  varchar (40) 
+,person_name_chrg_supplier  varchar (100) 
+,person_name_chrg_payment  varchar (100) 
+,person_name_chrg  varchar (100) 
+,unit_name_case  varchar (100) 
+,unit_name  varchar (100) 
+,loca_name_supplier  varchar (100) 
+,loca_name_shelfno  varchar (100) 
+,loca_name_sect_chrg  varchar (100) 
 ,loca_name  varchar (100) 
 ,unit_name_box  varchar (100) 
 ,person_code_chrg_supplier  varchar (50) 
 ,person_code_chrg_payment  varchar (50) 
-,person_name_chrg_supplier  varchar (100) 
-,person_name_chrg_payment  varchar (100) 
-,unit_name_case  varchar (100) 
-,unit_name  varchar (100) 
+,person_code_chrg  varchar (50) 
+,loca_code  varchar (50) 
+,loca_name_shelfno_to  varchar (100) 
+,loca_name_sect_chrg_payment  varchar (100) 
+,loca_name_sect_chrg_supplier  varchar (100) 
+,loca_name_payment  varchar (100) 
 ,unit_name_prdpurshp  varchar (100) 
 ,shelfno_code  varchar (50) 
 ,itm_code  varchar (50) 
@@ -134,43 +156,41 @@ pursch.suppliers_id   pursch_supplier_id,
 ,boxe_name  varchar (100) 
 ,scrlv_code_chrg_payment  varchar (50) 
 ,scrlv_code_chrg_supplier  varchar (50) 
+,scrlv_code_chrg  varchar (50) 
 ,shelfno_name_to  varchar (100) 
 ,prjno_code_chil  varchar (50) 
 ,classlist_name  varchar (100) 
 ,shelfno_name  varchar (100) 
+,usrgrp_code_chrg  varchar (50) 
 ,usrgrp_code_chrg_payment  varchar (50) 
+,prjno_name  varchar (100) 
 ,usrgrp_code_chrg_supplier  varchar (50) 
-,loca_code_shelfno  varchar (50) 
-,crr_name_supplier  varchar (100) 
 ,prjno_code  varchar (50) 
+,crr_name_supplier  varchar (100) 
 ,crr_code_supplier  varchar (50) 
-,classlist_code  varchar (50) 
 ,shelfno_code_to  varchar (50) 
+,classlist_code  varchar (50) 
+,usrgrp_name_chrg  varchar (100) 
+,unit_code_outbox  varchar (50) 
 ,usrgrp_name_chrg_payment  varchar (100) 
 ,usrgrp_name_chrg_supplier  varchar (100) 
-,unit_code_outbox  varchar (50) 
-,prjno_name  varchar (100) 
-,loca_code  varchar (50) 
-,loca_name_shelfno_to  varchar (100) 
-,loca_name_sect_chrg_payment  varchar (100) 
-,loca_name_sect_chrg_supplier  varchar (100) 
-,loca_name_supplier  varchar (100) 
-,loca_name_payment  varchar (100) 
-,loca_name_shelfno  varchar (100) 
-,loca_code_sect_chrg_payment  varchar (50) 
-,loca_code_sect_chrg_supplier  varchar (50) 
-,loca_code_supplier  varchar (50) 
-,loca_code_payment  varchar (50) 
 ,unit_code_box  varchar (50) 
 ,unit_code_case  varchar (50) 
 ,unit_code  varchar (50) 
 ,unit_code_prdpurshp  varchar (50) 
 ,unit_name_outbox  varchar (100) 
 ,loca_code_shelfno_to  varchar (50) 
+,loca_code_sect_chrg_payment  varchar (50) 
+,loca_code_sect_chrg_supplier  varchar (50) 
+,loca_code_supplier  varchar (50) 
+,loca_code_payment  varchar (50) 
+,loca_code_shelfno  varchar (50) 
+,loca_code_sect_chrg  varchar (50) 
 ,pursch_toduedate   timestamp(6) 
-,pursch_isudate   timestamp(6) 
-,pursch_starttime   timestamp(6) 
 ,pursch_expiredate   date 
+,pursch_isudate   timestamp(6) 
+,pursch_qty_case  numeric (22,0)
+,pursch_starttime   timestamp(6) 
 ,opeitm_prjalloc_flg  numeric (22,0)
 ,opeitm_prdpurshp  varchar (20) 
 ,opeitm_opt_fix_flg  varchar (1) 
@@ -191,6 +211,8 @@ pursch.suppliers_id   pursch_supplier_id,
 ,opeitm_duration  numeric (38,2)
 ,opeitm_units_lttime  varchar (4) 
 ,opeitm_minqty  numeric (38,6)
+,person_email_chrg  varchar (50) 
+,scrlv_level1_chrg  varchar (1) 
 ,opeitm_operation  varchar (20) 
 ,opeitm_opt_fixoterm  numeric (5,2)
 ,opeitm_safestkqty  numeric (38,0)
@@ -221,52 +243,55 @@ pursch.suppliers_id   pursch_supplier_id,
 ,boxe_boxtype  varchar (20) 
 ,opeitm_maxqty  numeric (22,0)
 ,pursch_remark  varchar (4000) 
-,pursch_updated_at   timestamp(6) 
-,pursch_update_ip  varchar (40) 
 ,pursch_opeitm_id  numeric (38,0)
+,pursch_created_at   timestamp(6) 
 ,pursch_id  numeric (38,0)
 ,id  numeric (38,0)
 ,pursch_person_id_upd  numeric (38,0)
 ,pursch_prjno_id  numeric (38,0)
 ,pursch_supplier_id  numeric (22,0)
+,pursch_chrg_id  numeric (38,0)
 ,pursch_shelfno_id_to  numeric (38,0)
-,pursch_created_at   timestamp(6) 
-,opeitm_shelfno_id  numeric (22,0)
-,chrg_person_id_chrg_supplier  numeric (38,0)
-,shelfno_loca_id_shelfno_to  numeric (38,0)
-,opeitm_boxe_id  numeric (22,0)
+,pursch_updated_at   timestamp(6) 
+,pursch_update_ip  varchar (40) 
+,loca_addr2  varchar (50) 
+,loca_addr2_shelfno  varchar (50) 
 ,loca_addr1  varchar (50) 
 ,loca_addr1_shelfno  varchar (50) 
+,boxe_unit_id_outbox  numeric (38,0)
+,loca_prfct  varchar (20) 
+,loca_prfct_shelfno  varchar (20) 
 ,itm_unit_id  numeric (22,0)
+,chrg_person_id_chrg_payment  numeric (38,0)
+,person_sect_id_chrg_payment  numeric (22,0)
 ,shelfno_loca_id_shelfno  numeric (38,0)
 ,opeitm_loca_id  numeric (38,0)
 ,opeitm_itm_id  numeric (38,0)
-,loca_prfct  varchar (20) 
-,boxe_unit_id_box  numeric (38,0)
 ,loca_mail_shelfno  varchar (20) 
-,loca_fax_shelfno  varchar (20) 
-,loca_tel_shelfno  varchar (20) 
-,loca_addr2  varchar (50) 
 ,itm_classlist_id  numeric (38,0)
-,loca_prfct_shelfno  varchar (20) 
-,loca_country_shelfno  varchar (20) 
-,opeitm_unit_id_prdpurshp  numeric (38,0)
-,person_sect_id_chrg_payment  numeric (22,0)
 ,person_sect_id_chrg_supplier  numeric (22,0)
-,supplier_loca_id_supplier  numeric (22,0)
+,person_sect_id_chrg  numeric (22,0)
+,loca_country_shelfno  varchar (20) 
 ,loca_zip  varchar (10) 
-,loca_abbr  varchar (50) 
 ,loca_zip_shelfno  varchar (10) 
-,supplier_chrg_id_supplier  numeric (22,0)
+,supplier_loca_id_supplier  numeric (22,0)
+,loca_abbr  varchar (50) 
 ,payment_loca_id_payment  numeric (38,0)
+,chrg_person_id_chrg_supplier  numeric (38,0)
+,supplier_chrg_id_supplier  numeric (22,0)
 ,supplier_payment_id  numeric (38,0)
-,supplier_crr_id_supplier  numeric (22,0)
-,loca_addr2_shelfno  varchar (50) 
-,opeitm_unit_id_case  numeric (38,0)
-,boxe_unit_id_outbox  numeric (38,0)
 ,loca_abbr_shelfno  varchar (50) 
+,supplier_crr_id_supplier  numeric (22,0)
+,loca_fax_shelfno  varchar (20) 
+,opeitm_unit_id_case  numeric (38,0)
+,loca_tel_shelfno  varchar (20) 
 ,payment_chrg_id_payment  numeric (22,0)
-,chrg_person_id_chrg_payment  numeric (38,0)
+,chrg_person_id_chrg  numeric (38,0)
+,opeitm_shelfno_id  numeric (22,0)
+,shelfno_loca_id_shelfno_to  numeric (38,0)
+,opeitm_boxe_id  numeric (22,0)
+,boxe_unit_id_box  numeric (38,0)
+,opeitm_unit_id_prdpurshp  numeric (38,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(38,0)

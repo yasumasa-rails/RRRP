@@ -2,7 +2,7 @@ import { call, put, select } from 'redux-saga/effects'
 import axios         from 'axios'
 import {TBLFIELD_SUCCESS, TBLFIELD_FAILURE,
         }     from '../../actions'
-import {getLoginState} from '../reducers/login'
+import {getLoginState} from '../reducers/auth'
 import {getScreenState} from '../reducers/screen'
 //import { isValidElement } from 'react';
 //import { ReactReduxContext } from 'react-redux';
@@ -26,9 +26,9 @@ function screenApi({params,token,client,uid}) {
 
 export function* TblfieldSaga({ payload: {params}  }) {
   const loginState = yield select(getLoginState) 
-  let token = loginState.auth["access-token"]       
-  let client = loginState.auth.client         
-  let uid = loginState.auth.uid   
+  let token = loginState.token       
+  let client = loginState.client         
+  let uid = loginState.uid   
   const screenState = yield select(getScreenState) //
   let data =[]
   switch(params.req) {

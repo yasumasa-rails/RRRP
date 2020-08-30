@@ -15,59 +15,95 @@ module Api
               render json:  recs , status: :ok 
 
             when 'bottunlistreq'  
-              strsql = "select pobject_code_scr_ub screen_code,button_title,button_code,button_contents
+                strsql = "select pobject_code_scr_ub screen_code,button_code,button_contents,button_title
                         from r_usebuttons u
-                        inner join r_persons p on u.scrlv_code_ub = p.scrlv_code and p.person_email = '#{current_api_user[:email]}' 
+                        inner join r_persons p on u.screen_scrlv_id_ub = p.person_scrlv_id and p.person_email = '#{current_api_user[:email]}' 
                         where usebutton_expiredate > current_date
                         order by pobject_code_scr_ub,button_seqno"
-              recs = ActiveRecord::Base.connection.select_all(strsql)
-              render json:  recs , status: :ok
-
-            when 'viewtablereq','editabletablereq'
-              screenCode = params[:screenCode]
-              column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info,nameToCode = RorBlkctl.proc_create_grid_editable_columns_info screenCode,current_api_user[:email],params[:req]   
-              if params["filtered"]
-                where_str = RorBlkctl.proc_create_filteredstr params["filtered"],where_info
-              else
-                 where_str = (where_info["filtered"]||"")
-              end    
-              page_info[:pageNo] = (params[:page]||=0).to_f 
-              page_info[:pageNo] += 1.0 
-              page_info[:sizePerPage] =params[:pageSize].to_f
-              pagedata,page_info = RorBlkctl.proc_search_blk screenCode,select_fields,page_info,where_str,sort_info
-              render json:{:columns=>column_info,:data=>pagedata,:pageInfo=>page_info,:yup=>yup,:dropdownlist=>dropdownlist,:nameToCode=>nameToCode}       
+                recs = ActiveRecord::Base.connection.select_all(strsql)
+                render json:  recs , status: :ok
             
+            when 'viewtablereq','editabletablereq'
+                screenCode = params[:screenCode]
+                column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info,nameToCode = RorBlkctl.proc_create_grid_editable_columns_info screenCode,current_api_user[:email],params[:req]   
+                if params["filtered"]
+                  where_str = RorBlkctl.proc_create_filteredstr params["filtered"],where_info
+                else
+                  where_str = (where_info["filtered"]||"")
+                end    
+                page_info[:pageNo] = (params[:page]||=0).to_f 
+                page_info[:pageNo] += 1.0 
+                page_info[:sizePerPage] = params[:pageSize].to_f
+                pagedata,page_info = RorBlkctl.proc_search_blk screenCode,select_fields,page_info,where_str,sort_info
+                render json:{:columns=>column_info,:data=>pagedata,:pageInfo=>page_info,:yup=>yup,:dropdownlist=>dropdownlist,:nameToCode=>nameToCode}       
+                        
             when 'inlineaddreq'
-              screenCode = params[:screenCode]
-              column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info,nameToCode = RorBlkctl.proc_create_grid_editable_columns_info screenCode,current_api_user[:email] ,params[:req]  
-              page_info[:pageNo] = 1
-              page_info[:sizePerPage] = params[:pageSize].to_f
-              pagedata,page_info = RorBlkctl.add_empty_data screenCode,column_info,page_info  ### nil filtered sorting
-              render json:{:columns=>column_info,:data=>pagedata,:pageInfo=>page_info,:yup=>yup,:dropdownlist=>dropdownlist,:nameToCode=>nameToCode}      
-              
+                screenCode = params[:screenCode]
+                column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info,nameToCode = RorBlkctl.proc_create_grid_editable_columns_info screenCode,current_api_user[:email] ,params[:req]  
+                page_info[:pageNo] = 1
+                page_info[:sizePerPage] = params[:pageSize].to_f
+                pagedata,page_info = RorBlkctl.add_empty_data screenCode,column_info,page_info  ### nil filtered sorting
+                render json:{:columns=>column_info,:data=>pagedata,:pageInfo=>page_info,:yup=>yup,:dropdownlist=>dropdownlist,:nameToCode=>nameToCode}      
+     
+            when 'viewtablereq7','editabletablereq7'
+                @screenCode = params[:screenCode]
+                ScreenLib.proc_create_grid_editable_columns_info current_api_user[:email],params   
+                if params[:filtered]
+                  @where_str = ScreenLib.proc_create_filteredstr params[:filtered]
+                else
+                  @where_str = (@where_info["filtered"]||="")  ###@where_info["filtered"] screen sort 規定値
+                end    
+                params[:pageIndex]||=0 
+                params[:pageIndex] = params[:pageIndex].to_f + 1.0 
+                params[:pageSize] = params[:pageSize].to_f
+                params[:hiddenColumns] = @hiddenColumns
+                ScreenLib.proc_search_blk params
+                render json:{:columns=>@columns_info,:data=>@pagedata,:pageInfo=>params,:yup=>@yup,:dropdownlist=>@dropdownlist,:nameToCode=>@nameToCode}       
+             
+            when 'inlineaddreq7'
+                @screenCode = params[:screenCode]
+                ScreenLib.proc_create_grid_editable_columns_info current_api_user[:email] ,params
+                params[:pageIndex] = 1
+                ScreenLib.add_empty_data  ### nil filtered sorting
+                params[:hiddenColumns] = @hiddenColumns
+                render json:{:columns=>@columns_info,:data=>pagedata,:pageInfo=>params,:yup=>@yup,:dropdownlist=>@dropdownlist,:nameToCode=>@nameToCode}   
+            
+              when 'download7'
+                @screenCode = params[:screenCode]
+                ScreenLib.proc_create_download_columns_info current_api_user[:email]  
+                if params[:filtered]
+                  ScreenLib.proc_create_filteredstr params[:filtered]
+                else
+                  @where_str = (@where_info["filtered"]||"")
+                end    
+                ScreenLib.proc_download_data_blk  ### nil filtered sorting
+
+                render json:{:excelData=>{:columns=>@column_info,:data=>@pagedata},:totalcnt=>@totalcnt}       
+               
+          
             when "fetch_request"
                 xparams = params.dup  
-                xparams[:parse_linedata] = JSON.parse(params["linedata"])
+                xparams[:parse_linedata] = JSON.parse(params[:linedata])
                 xparams = ControlFields.proc_chk_fetch_rec xparams
                 render json: {:params=>xparams}   
 
             when "check_request"  
-                  xparams = params.dup  
-                  xparams[:parse_linedata] =  JSON.parse(xparams[:linedata])
-                  rparams = ControlFields.proc_judge_check_code xparams
-                  render json: {:params=>rparams}   
+                xparams = params.dup  
+                xparams[:parse_linedata] =  JSON.parse(params[:linedata])
+                rparams = ControlFields.proc_judge_check_code xparams
+                render json: {:params=>rparams}   
 
             when "confirm"
-              rparams = params.dup
-              tblnamechop = params[:screenCode].split("_")[1].chop
-              yup_fetch_code = JSON.parse(params["yupfetchcode"])
-              yup_check_code = JSON.parse(params["yupcheckcode"])
-              rparams[:parse_linedata] = JSON.parse(params["linedata"])
-              parse_linedata = rparams[:parse_linedata].dup
-              addfield = {}
-              rparams[:err] = ""
-              parse_linedata.each do |field,val|
-                if yup_fetch_code[field] 
+                rparams = params.dup
+                tblnamechop = params[:screenCode].split("_")[1].chop
+                yup_fetch_code = JSON.parse(params["yupfetchcode"])
+                yup_check_code = JSON.parse(params["yupcheckcode"])
+                rparams[:parse_linedata] = JSON.parse(params["linedata"])
+                parse_linedata = rparams[:parse_linedata].dup
+                addfield = {}
+                rparams[:err] = ""
+                parse_linedata.each do |field,val|
+                  if yup_fetch_code[field] 
                     ##rparams["fetchcode"] = %Q%{"#{field}":"#{val}"}%  ###clientのreq='fetch_request'で利用
                     if rparams[:parse_linedata]["id"] == ""
                         rparams[:parse_linedata]["aud"]= "add" 
@@ -79,19 +115,19 @@ module Api
                       rparams[:parse_linedata][(field+"_gridmessage").to_sym] = rparams[:err] 
                       break
                     end
-                end
-                if rparams[:err] == ""
-                  if yup_check_code[field] 
-                    rparams = ControlFields.proc_judge_check_code rparams  
-                    if rparams[:err] != ""
-                      rparams[:parse_linedata][:confirm_gridmessage] = rparams[:err] 
-                      rparams[:parse_linedata][(field+"_gridmessage").to_sym] = rparams[:err] 
-                      break
-                    end
                   end
-                end    
-              end	
-              if  rparams[:err] == ""
+                  if rparams[:err] == ""
+                    if yup_check_code[field] 
+                      rparams = ControlFields.proc_judge_check_code rparams  
+                      if rparams[:err] != ""
+                        rparams[:parse_linedata][:confirm_gridmessage] = rparams[:err] 
+                        rparams[:parse_linedata][(field+"_gridmessage").to_sym] = rparams[:err] 
+                        break
+                      end
+                    end
+                  end    
+                end	
+                if  rparams[:err] == ""
                   command_c =  RorBlkctl.init_from_screen rparams[:uid],rparams[:screenCode]
                   parse_linedata.each do |key,val|
                       if key.to_s =~ /_id/ and val == ""   and tblnamechop == key.to_s.split("_")[0] and
@@ -113,8 +149,8 @@ module Api
                         end  
                     end	
                   end	
-              end
-              if  rparams[:err] == "" and rparams[:screenCode] =~ /tblfields/
+                end
+                if  rparams[:err] == "" and rparams[:screenCode] =~ /tblfields/
                               strsql =  %Q%  select screenfield_seqno,pobject_code_sfd from r_screenfields  where screenfield_expiredate > current_date and 
                               id in (select id from r_screenfields where pobject_code_scr = '#{params[:screenCode]}') and
                               pobject_code_sfd in('screenfield_starttime','screenfield_duedate','screenfield_qty','screenfield_qty_case')
@@ -134,8 +170,8 @@ module Api
                         rparams[:parse_linedata][("confirm_gridmessage").to_sym] = rparams[:err] 
                     end
                   end
-              end
-              if  rparams[:err] == ""
+                end
+                if  rparams[:err] == ""
                   if command_c["id"] == ""
                       command_c[:sio_classname] = "_add_update_grid_line_data"
                   else         
@@ -144,21 +180,22 @@ module Api
                   RorBlkctl.proc_update_table(command_c,1)
                   rparams[:parse_linedata][:confirm] = true  
                   rparams[:parse_linedata][("confirm_gridmessage").to_sym] = "done"
-              end 
-              render json: {:linedata=> rparams[:parse_linedata]}
+                end 
+                render json: {:linedata=> rparams[:parse_linedata]}
 
             when 'download'
-              screenCode = params[:screenCode]
-              column_info,where_info,select_fields,columns_color = RorBlkctl.create_download_columns_info screenCode,current_api_user[:email]  
-              if params["filtered"]
-                where_str = RorBlkctl.proc_create_filteredstr params["filtered"],where_info
-              else
-                 where_str = (where_info["filtered"]||"")
-              end    
-              pagedata,totalcnt = RorBlkctl.download_data_blk screenCode,select_fields,where_str,columns_color  ### nil filtered sorting
+                screenCode = params[:screenCode]
+                column_info,where_info,select_fields,columns_color = RorBlkctl.create_download_columns_info screenCode,current_api_user[:email]  
+                if params["filtered"]
+                  where_str = RorBlkctl.proc_create_filteredstr params["filtered"],where_info
+                else
+                  where_str = (where_info["filtered"]||"")
+                end    
+                pagedata,totalcnt = RorBlkctl.download_data_blk screenCode,select_fields,where_str,columns_color  ### nil filtered sorting
 
-              render json:{:excelData=>{:columns=>column_info,:data=>pagedata},:totalcnt=>totalcnt}       
-                
+                render json:{:excelData=>{:columns=>column_info,:data=>pagedata},:totalcnt=>totalcnt}    
+            else
+              p "req not support "    
           end   
       end
       def show

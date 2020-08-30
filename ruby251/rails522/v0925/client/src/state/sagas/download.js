@@ -2,43 +2,51 @@ import { call, put, select } from 'redux-saga/effects'
 import axios         from 'axios'
 import {DOWNLOAD_SUCCESS,DOWNLOAD_FAILURE,}
          from '../../actions'
-import {getLoginState} from '../reducers/login'
+import {getLoginState} from '../reducers/auth'
 //import { ReactReduxContext } from 'react-redux';
 
 
 function screenApi({params,token,client,uid}) {
-  const url = 'http://localhost:3001/api/menus'
+  let url
+  switch(true){
+    case /7$/.test(params.req):
+       url = 'http://localhost:3001/api/menus7'
+       break
+    default:
+      url = 'http://localhost:3001/api/menus'
+  }     
   const headers = {'access-token':token,'client':client,'uid':uid }
 
-  let postApi = (url, params, headers) => {
-    return axios({
-        method: "POST",
-        url: url,
-        contentType: "application/json",
-        params:params,
-        headers:headers,
-    });
-  };
-  return postApi(url, params, headers)
+  const options ={method:'POST',
+  //  data: qs.stringify(data),
+    params: params,
+    headers:headers,
+    url,}
+    return (axios(options)
+      .then((response ) => {
+        return  {response}  ;
+        })
+      .catch(error => (
+        { error }
+    )));
 }
 
 export function* DownloadSaga({ payload: {params}  }) {
   const loginState = yield select(getLoginState) 
-  let token = loginState.auth["access-token"]       
-  let client = loginState.auth.client         
-  let uid = loginState.auth.uid 
-  try{
-      let response  = yield call(screenApi,{params ,token,client,uid} )
-      if(response){
+  let token = loginState.token       
+  let client = loginState.client         
+  let uid = loginState.uid 
+  
+  let {response,error}  = yield call(screenApi,{params ,token,client,uid} )
+      if(response || !error){
           return yield put({ type: DOWNLOAD_SUCCESS, payload: response })   
-      }
-  }catch(e)
+      }else
      {  
-      let message;
-      switch (e.status) {
-              case 500: message = 'Internal Server Error'; break;
-              case 401: message = 'Invalid credentials'; break;
-              default: message = `Something went wrong ${e.error}` ;}
+      let message
+       switch (true) {
+           case /code.*500/.test(error): message = 'Internal Server Error'; break;
+           case /code.*401/.test(error): message = 'Invalid credentials'; break;
+           default: message = `Something went wrong ${error}`;}
       yield put({ type: DOWNLOAD_FAILURE, errors: message })
   }
  } 

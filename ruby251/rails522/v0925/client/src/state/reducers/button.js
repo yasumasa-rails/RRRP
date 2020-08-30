@@ -1,7 +1,5 @@
-import {  BUTTONLIST_REQUEST, BUTTONLIST_SUCCESS, BUTTONFLG_REQUEST,
-  DOWNLOAD_REQUEST,DOWNLOAD_SUCCESS,DOWNLOAD_RESET,GANTT_RESET,
-  TBLFIELD_SUCCESS,SCREEN_SUCCESS,GANTTCHART_SUCCESS,
-  LOGOUT_REQUEST} from 'actions'
+import {  BUTTONLIST_REQUEST, BUTTONLIST_SUCCESS, BUTTONFLG_REQUEST,GANTT_RESET,
+  TBLFIELD_SUCCESS,SCREEN_SUCCESS,GANTTCHART_SUCCESS,LOGOUT_REQUEST,RESET_REQUEST} from 'actions'
 const initialValues = {
 errors:[],
 buttonflg:""
@@ -38,31 +36,6 @@ buttonListData:actions.payload,
 disabled:false,
 }
 
-case DOWNLOAD_REQUEST:
-return {...state,
-excelData:null,
-totalcnt:null,
-params:actions.payload.params,
-downloadloading:"doing",
-disabled:true,
-messages:null,
-message:null,
-}
-case DOWNLOAD_SUCCESS:
-return {...state,
-excelData:actions.payload.data.excelData,
-totalcnt:actions.payload.data.totalcnt,
-downloadloading:"done",
-disabled:false,
-}
-case DOWNLOAD_RESET:
-return {...state,
-excelData:null,
-totalcnt:null,
-buttonflg:null,
-downloadloading:"",
-disabled:false,
-}
 case TBLFIELD_SUCCESS:
 return {...state,
 messages:actions.payload.messages,
@@ -87,6 +60,16 @@ message:null,
 
 case  LOGOUT_REQUEST:
 return {}  
+
+case RESET_REQUEST:
+return {...state,
+  excelData:null,
+  totalcnt:null,
+  buttonflg:null,
+  downloadloading:"",
+  disabled:false,
+}
+
 
 default:
 return state

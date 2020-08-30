@@ -5,7 +5,7 @@ import { MENU_SUCCESS, MENU_FAILURE, } from 'actions';
 import history from 'histrory'
 
 function MenuGetApi({token,client,uid}) {
-  const url = 'http://localhost:3001/api/menus'
+  const url = 'http://localhost:3001/api/menus7'
   const headers =  { 'access-token':token.token, 
                     client:client.client,
                     uid:uid.uid,}
@@ -26,7 +26,7 @@ export function* MenuSaga({ payload: {token,client,uid} }) {
   let response   = yield call(MenuGetApi, ({token,client,uid} ) )
   if(response.data){
       yield put({ type: MENU_SUCCESS, action: response.data })
-      yield call(history.push,'/menus')}
+      yield call(history.push,'/menus7')}
   else{    
       let message = `error ${response}`;
       if(response.error){

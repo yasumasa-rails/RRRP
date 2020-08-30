@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   end
   namespace :api do
     resources :menus 
+    resources :menus7 
     resources :uploads 
     resources :ganttcharts 
     resources :jsons

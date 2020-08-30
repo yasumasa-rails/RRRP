@@ -14,15 +14,15 @@ module Api
       def create
         upload = Upload.create!(upload_params)
         blob_path = Rails.application.routes.url_helpers.rails_blob_path(upload.excel, only_path: true)
-        screenCode = blob_path.split("/")[-1].split("@")[1]
-
-        column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info,nameToCode = RorBlkctl.proc_create_grid_editable_columns_info screenCode,current_api_user[:email],"inlineaddreq" 
+        tmp1,defCode,screenCode,tmp2 = blob_path.split("@")
+        column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info,nameToCode = 
+                  RorBlkctl.proc_create_grid_editable_columns_info screenCode,current_api_user[:email],"inlineaddreq" 
         
         strsql = "select	column_name from 	information_schema.columns 
                   where 	table_catalog='#{ActiveRecord::Base.configurations["development"]["database"]}' 
-                  and table_name='#{screenCode}'
-                  and column_name like '%_id%' and  column_name not like  '%person_id_upd'
-                  and split_part(column_name,'_',1) = '#{screenCode.split("_",2)[1].chop}'"
+                  and table_name='#{screenCode}' and  column_name not like  '%person_id_upd' "
+                ###  and column_name like '%_id%'
+                ###  and split_part(column_name,'_',1) = '#{screenCode.split("_",2)[1].chop}'"
         keyids = ActiveRecord::Base.connection.select_values(strsql)
         
         command_all = []
@@ -30,15 +30,15 @@ module Api
         status = true
         command_init =  RorBlkctl.init_from_screen current_api_user[:uid],screenCode
         jparams = {}
-      
-  			yupfetchcode = YupSchema.create_yupfetchcode screenCode   
+
+  		yupfetchcode = YupSchema.create_yupfetchcode screenCode   
         yupcheckcode  = YupSchema.create_yupcheckcode screenCode   
         tblid = screenCode.split("_")[1].chop + "_id"
-
+        
         lines = JSON.parse(upload.excel.download)
         lines.each do |linedata|
             jparams[:parse_linedata] = linedata.dup
-            keyids.each do |idkey|
+            keyids.each do |idkey|   ###keyids--->view項目
                 if jparams[:parse_linedata][idkey].nil?
                     jparams[:parse_linedata][idkey] = ""
                 end    
@@ -46,7 +46,8 @@ module Api
             jparams[:screenCode] = screenCode
             jparams[:err] = ""  
             linedata.each do |field,val| 
-                if linedata["confirm"] == ""   ##エラー、最初のレコード(confirm="confirm")のname項目行を除く
+                if linedata["confirm"] == ""  or linedata["confirm"].nil?
+                  ##エラーと最初のレコード(confirm="confirm")のname項目行を除く
                   jparams[:parse_linedata]["confirm"] = "レ"
                   if yupfetchcode[field] 
                     jparams[:fetchcode] = %Q%{"#{field}":"#{val}"}%
@@ -67,7 +68,7 @@ module Api
                     else   
                         status = false    
                     end  
-                  end  
+                  end
                 end 
             end 
             if status == false    
@@ -104,7 +105,7 @@ module Api
                     end  
                 end
             end
-            if status == true and parse_linedata["confirm"] == "レ" 
+            if status == true and parse_linedata["confirm"] == "レ" and defCode == "add_update"
                 parse_linedata.each do |key,value|
                     command_c[key] = (value||="")
                 end
@@ -120,7 +121,7 @@ module Api
                 command_all << command_c
             end
         end
-        if status == true 
+        if status == true  and defCode == "add_update"
           results = update_table_json(command_all,command_all.size,results)
         end
         render json: {:results=>results}
@@ -146,39 +147,47 @@ module Api
         params.permit(:excel)
       end
       def update_table_json command_all,r_cnt0,results  ##rec = command_c command_rとの混乱を避けるためrecにした。          
-              acommand =[]
-              idx = 0
-              begin
-                  ActiveRecord::Base.connection.begin_db_transaction()
+          acommand =[]
+          idx = 0
+          reqparams = nil
+          begin
+              ActiveRecord::Base.connection.begin_db_transaction()
                   command_all.each do |command_cn|
-                      command_rn,reqparams = RorBlkctl.proc_private_aud_rec(command_cn,r_cnt0,nil) ###最後のパラメータはreqparams
+                      command_rn,tmpreqparams = RorBlkctl.proc_private_aud_rec(command_cn,r_cnt0,nil,nil,nil) ###nil:parenttblname,paretblid,reqparams
                       acommand << command_rn
                       results[idx+1]["confirm"] = "OK" 
-                      idx += 1
+                      if reqparams.nil?
+                          reqparams = tmpreqparams.dup
+                      else
+                        if  tmpreqparams["seqno"][0].nil?  ####performなし
+                        else
+                            reqparams["seqno"][idx] =  tmpreqparams["seqno"][0]  
+                            idx += 1
+                        end
+                      end     
                   end
-              rescue
-                   ActiveRecord::Base.connection.rollback_db_transaction()
+          rescue
+              ActiveRecord::Base.connection.rollback_db_transaction()
                   command_all[idx][:sio_result_f] =   "9"  ##9:error
-                  command_all[idx][:sio_message_contents] =  "class #{self} : LINE #{__LINE__} $!: #{$!} "    ###evar not defined
+                  command_all[idx][:sio_message_contents] =  "error class #{self} : LINE #{__LINE__} $!: #{$!} "    ###evar not defined
                   command_all[idx][:sio_errline] =  "class #{self} : LINE #{__LINE__} $@: #{$@} "[0..3999]
                   Rails.logger.debug"error class #{self} : #{Time.now}: #{$@} "
                   Rails.logger.debug"error class #{self} : $!: #{$!} "
                   Rails.logger.debug"  idx = #{idx} command_r: #{command_all[idx]} "
                   results[idx+1]["confirm"] = command_all[idx][:sio_message_contents].to_s[0..1000] 
-              else
-                  idx = 0
-                  ActiveRecord::Base.connection.commit_db_transaction()
-                  acommand.each do |command|
-                      command[:sio_result_f] =  "1"   ## 1 normal end
-                      command[:sio_message_contents] = nil
-                      ##tblname = command[:sio_viewname].split("_")[1]
-                      RorBlkctl.proc_insert_sio_r( command) #### if @pare_class != "batch"    ## 結果のsio書き込み
-                      CreateOtherTableRecordJob.perform_later reqparams["seqno"]
-                      idx += 1
-                  end	
-              ensure
-              end ##begin
-              return results
+          else
+              acommand.each do |command|
+                  command[:sio_result_f] =  "1"   ### 1 normal end
+                  command[:sio_message_contents] = nil
+                  RorBlkctl.proc_insert_sio_r(command) ### if @pare_class != "batch"    ## 結果のsio書き込み
+              end	
+              ActiveRecord::Base.connection.commit_db_transaction()
+              reqparams["seqno"].each do |idx|
+                CreateOtherTableRecordJob.perform_later idx
+              end
+          ensure
+          end ##begin
+          return results
       end	
   end
 end  

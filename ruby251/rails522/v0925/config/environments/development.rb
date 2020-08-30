@@ -37,7 +37,7 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
-  config.action_mailer.default_url_options = { host: 'localhost', port: 3003 }
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3001 }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
@@ -71,6 +71,6 @@ Rails.application.configure do
   config.action_controller.forgery_protection_origin_check = false
   config.consider_all_requests_local = false
 
-  config.logger = Logger.new(STDOUT)
-  ###config.logger = Logger.new('log/development.log', 'daily')
+  ###config.logger = Logger.new(STDOUT)
+  config.logger = Logger.new('log/development.log', 'daily')
 end

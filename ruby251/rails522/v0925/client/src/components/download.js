@@ -42,12 +42,12 @@ const formikForm = ({isSubmitting,handleSubmit,status, values}) => {
         return(                 
         <div>
           <Form {...values} onSubmit={handleSubmit}>
-           <p>export Table       --->{screenName}</p>
+           <p>export Table       {screenName}</p>
            <p>select condition </p>
            {filtered.length===0?<p>all data selected </p>: filtered.map((val,index) =>{
                                                     return <p key={index}>{val.id} : {val.value}</p>
            })}
-           <p>total record count --->{totalcnt}</p>
+           <p>total record count {totalcnt}</p>
                <ExcelFile filename={screenName+wtime} element={<button disabled={isSubmitting}> Data Download </button>} >
                   <ExcelSheet dataSet={dataset} name="export">
                   </ExcelSheet>

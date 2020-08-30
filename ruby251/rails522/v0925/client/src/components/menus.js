@@ -1,23 +1,27 @@
-//https://github.com/timscott/react-devise/wiki/Accessing-Current-User-Components
 //https://github.com/reactjs/react-tabs
 //import axios from 'axios'
 import React from 'react'
 import { connect } from 'react-redux'
-import { BrowserRouter,Route,} from 'react-router-dom'
 import { Tab, Tabs, TabList, TabPanel, } from 'react-tabs'
 import "react-tabs/style/react-tabs.css"
 import {Button} from '../styles/button'
 import "../index.css"
+//import { Helmet } from 'react-helmet'
 
-import { Signup } from './signup'
-import { Login } from './login'
+import  SignUp  from './signup'
+import  Login  from './login'
 import {ScreenRequest} from '../actions'
 import ScreenGrid from './screengrid'
 
- class Menus extends React.Component {
+const titleNameSet = (screenName) =>{ return (
+  document.title = `${screenName}`
+)
+}
+
+class Menus extends React.Component {
   render() {
     const { isAuthenticated ,menuListData,uid,getScreen, params,
-            pageSize,page,sorted,sizePerPageList} = this.props
+            pageSize,page,sorted,sizePerPageList,isSignUp } = this.props
     
     if (isAuthenticated) {
       if(menuListData){
@@ -63,6 +67,7 @@ import ScreenGrid from './screengrid'
               )}
             </Tabs>
           <ScreenGrid/>
+       {/*   <ScreenGrid/> */}
            </div>    
       )
     }
@@ -70,21 +75,25 @@ import ScreenGrid from './screengrid'
      <div>
       <p> please wait </p>
     </div>)}
-    return (
-      <BrowserRouter>
-      <div>
-        <Login/>
-        <Route path='/signup' component={Signup} />
-      </div>
-      </BrowserRouter>
-    )
+    else{
+      if(isSignUp){
+        return (
+          <SignUp/>
+        )
+      }else{  
+        return (
+          <Login/>
+        )
+        }  
+    }  
   }
 }
 
 const  mapStateToProps = (state,ownProps) =>({
-  isAuthenticated:state.login.isAuthenticated ,
+  isSignUp:state.auth.isSignUp ,
+  isAuthenticated:state.auth.isAuthenticated ,
   menuListData:state.menu.menuListData ,
-  uid:(state.login.auth?state.login.auth.uid:"") ,
+  uid:state.auth.uid ,
 //画面移動前のpageSize,・・・を持ってくるようにする。  
   pageSize:state.screen?state.screen.pageSize:null,
   page:state.screen?state.screen.page:0,
@@ -98,6 +107,7 @@ const  mapStateToProps = (state,ownProps) =>({
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
       getScreen : (screenCode,pageSize, page,sorted,screenName, uid,sizePerPageList,params) =>{
+        titleNameSet(screenName)
         if(params){}else{params={}}
         params["filtered"]=[] 
         if(params["dropdownselect"]){}else{params["dropdownselect"]={}}

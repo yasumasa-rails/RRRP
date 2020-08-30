@@ -1,7 +1,7 @@
 import { call, put, select } from 'redux-saga/effects'
 import axios         from 'axios'
 import { GANTTCHART_SUCCESS,GANTTCHART_FAILURE,}     from '../../actions'
-import {getLoginState} from '../reducers/login'
+import {getLoginState} from '../reducers/auth'
 import {getScreenState} from '../reducers/screen'
 //import { ReactReduxContext } from 'react-redux';
 
@@ -9,28 +9,32 @@ import {getScreenState} from '../reducers/screen'
 function GanttApi({params,token,client,uid}) {
   const url = 'http://localhost:3001/api/ganttcharts'
   const headers = {'access-token':token,'client':client,'uid':uid }
+  axios.defaults.headers.post['Content-Type'] = 'application/json'
 
-  let postApi = (url, params, headers) => {
-    return axios({
-        method: "POST",
-        url: url,
-        contentType: "application/json",
+
+  const options ={method:'POST',
+  //  data: qs.stringify(data),
         params:params,
         headers:headers,
-    });
-  };
-  return postApi(url, params, headers)
+    url,}
+return (axios(options)
+.then((response ) => {
+return  {response}  ;
+})
+.catch(error => (
+{ error }
+)));
 }
 
 export function* GanttChartSaga({ payload: {params}  }) {
   const loginState = yield select(getLoginState) 
-  let token = loginState.auth["access-token"]       
-  let client = loginState.auth.client         
-  let uid = loginState.auth.uid    
+  let token = loginState.token       
+  let client = loginState.client         
+  let uid = loginState.uid    
   const screenState = yield select(getScreenState) //
   params["linedata"] = screenState.data[params.onClickSelect.index]
-  let response  = yield call(GanttApi,{params ,token,client,uid} )
-  if(response){
+  let {response,error} = yield call(GanttApi,{params ,token,client,uid} )
+  if(response || !error){
       switch(params.req) {
         case "ganttchart":  // create yup schema
               return yield put({ type: GANTTCHART_SUCCESS, payload: response.data} )  
@@ -40,10 +44,10 @@ export function* GanttChartSaga({ payload: {params}  }) {
   }else
      {  
       let message;
-      switch (response.status) {
-              case 500: message = 'Internal Server Error'; break;
-              case 401: message = 'Invalid credentials'; break;
-              default: message = `Something went wrong ${response.error}` ;}
+      switch (true) {
+          case /code.*500/.test(error): message = 'Internal Server Error'; break;
+          case /code.*401/.test(error): message = 'Invalid credentials'; break;
+          default: message = `Something went wrong ${error}`;}
       yield put({ type:GANTTCHART_FAILURE, errors: message })
   }
  }      

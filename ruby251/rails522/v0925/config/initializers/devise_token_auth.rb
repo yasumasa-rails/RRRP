@@ -10,7 +10,7 @@ DeviseTokenAuth.setup do |config|
 
   # By default, users will need to re-authenticate after 2 weeks. This setting
   # determines how long tokens will remain valid after they are issued.
-  ###なぜか　2.weeks意外だと　tokenが返ってこない。　2019/4/06
+  ###なぜか　2.weeks以外だと　tokenが返ってこない。　2019/4/06
   config.token_lifespan = 2.weeks
 
   # Sets the max number of concurrent devices per user, which is 10 by default.

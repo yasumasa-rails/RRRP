@@ -7,6 +7,7 @@ module Api
         # Prevent session parameter from being passed
         # Unpermitted parameter: session
         wrap_parameters format: []
+    
     end    
   end
 end

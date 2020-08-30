@@ -1,69 +1,68 @@
 import React from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
 import {connect} from 'react-redux'
-import {SignupRequest} from 'actions'
-import { Link,} from 'react-router-dom'
+import {SignUpRequest} from 'actions'
+import { useForm} from 'react-hook-form'
 
 // LOGIN FORM
 // @NOTE For forms that can be reused for both create/update you would move this form to its own
 // file and import it with different initialValues depending on the use-case. An over-optimization
 // for this simple signup form however.
-const SignupForm = ({isSubmitting,errors, touched }) => (
+const SignUp = ({isSubmitting,onSubmit,error}) => {
+  const { register, handleSubmit, errors, watch, } = useForm()
+  return(
   <div>
-  <Form>
+  <form  onSubmit={handleSubmit(onSubmit)}>
   <ul>
     <li>
-    email:
-    <Field type="email" name="email" />
-    {errors.email && touched.email ? (<div>{errors.email}</div>) : null}
-    <ErrorMessage name="email" component="div" />
+      <label htmlFor="email">
+      email:
+      </label>
+      <input type="email" name="email" placeholder="mail" ref={register({
+            required: 'this is required',
+            pattern: {
+              value: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+              message: 'Invalid email address',
+            },
+          })}/>
+      {errors.email && errors.email.message}
     </li>
     <li>
-    password:
-    <Field type="password" name="password" />
-    {errors.password && touched.password ? (<div>{errors.password}</div>) : null}
-    <ErrorMessage name="password" component="div" />
+      <label htmlFor="password">
+      password:
+      </label>
+      <input type="password" name="password" ref={register({ required: true })}  />
     </li>
     <li>
-    password_confirmation:
-    <Field type="password" name="passwordConfirmation" />
-    {errors.passwordConfirmation && touched.passwordConfirmation ? (<div>{errors.passwordConfirmation}</div>) : null}
-    <ErrorMessage name="passwordConfirmation" component="div" />
+      <label htmlFor="password_confirmation">
+      password_confirmation:
+      </label>
+      <input type="password" name="password_confirmation"
+             ref={register({validate: (value) => value === watch('password') || "Passwords don't match."})}  />
     </li>
   </ul>
     <button type="submit" disabled={isSubmitting}>
     Submit
     </button>
-  </Form>
-  <Link to="/login" color="primary" >Login</Link>
+  </form>
+        <div style={{ color: 'red' }}>
+          {Object.keys(errors).length > 0 &&
+            'There are errors, check your console.'}
+            {error}
+        </div>
   </div>
-)
-
-// FORM CONFIGURATION
-
-const initialValues = {
-  email: '',
-  password: '',
-  passwordConfirmation:'',
-  isAuthenticated:false,
-  isSubmitting:false,
-  errors:[],
+  )
 }
 
-// LOGIN CONTAINER
 const mapDispatchToProps = dispatch => ({
-  onSubmit: (values, actions) => dispatch(SignupRequest({values, actions}))
+  onSubmit: ({email, password,password_confirmation}) => dispatch(SignUpRequest(email, password,password_confirmation))
+})
+
+const mapStateToProps = state =>({
+  isSubmitting:state.auth.isSubmitting ,
+  isSignUp:state.auth.isSignUp ,
+  error:state.auth.error ,
 })
 
 
-const Container = ({onSubmit}) => (
-      <Formik
-        initialValues={initialValues}
-        validateOnBlur={false}
-        validateOnChange={false}
-        onSubmit={onSubmit}
-        render={props => <SignupForm {...props} />}
-      />
-)
 
-export  const  Signup = connect(null,mapDispatchToProps)(Container)
+export  default  connect(mapStateToProps,mapDispatchToProps)(SignUp)

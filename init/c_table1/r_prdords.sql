@@ -1,5 +1,5 @@
 
- --- drop view r_prdords cascade  
+--- drop view r_prdords cascade  
  create or replace view r_prdords as select  
   opeitm.opeitm_boxe_id  opeitm_boxe_id ,
   opeitm.opeitm_prdpurshp  opeitm_prdpurshp ,
@@ -90,7 +90,6 @@ prdord.workplaces_id   prdord_workplace_id,
   chrg.person_sect_id_chrg  person_sect_id_chrg ,
   chrg.usrgrp_code_chrg  usrgrp_code_chrg ,
 prdord.confirm  prdord_confirm,
-prdord.consumtype  prdord_consumtype,
 prdord.autocreate_inst  prdord_autocreate_inst,
 prdord.autoinst_p  prdord_autoinst_p,
 prdord.autocreate_act  prdord_autocreate_act,
@@ -109,8 +108,11 @@ prdord.gno  prdord_gno,
   opeitm.opeitm_chkinst  opeitm_chkinst ,
   workplace.chrg_person_id_chrg_workplace  chrg_person_id_chrg_workplace ,
   chrg.chrg_person_id_chrg  chrg_person_id_chrg ,
+prdord.sno_prdsch  prdord_sno_prdsch,
+prdord.gno_prdsch  prdord_gno_prdsch,
   opeitm.boxe_unit_id_box  boxe_unit_id_box ,
   opeitm.boxe_unit_id_outbox  boxe_unit_id_outbox ,
+prdord.cno  prdord_cno,
   opeitm.opeitm_maxqty  opeitm_maxqty ,
   opeitm.opeitm_prjalloc_flg  opeitm_prjalloc_flg 
  from prdords   prdord,
@@ -157,6 +159,7 @@ prdord.gno  prdord_gno,
 ,person_name_chrg  varchar (100) 
 ,classlist_code  varchar (50) 
 ,classlist_name  varchar (100) 
+,prdord_cno  varchar (40) 
 ,prdord_autoact_p  numeric (3,0)
 ,prdord_consumtype  varchar (3) 
 ,prdord_opt_fixoterm  numeric (5,2)
@@ -173,27 +176,29 @@ prdord.gno  prdord_gno,
 ,prdord_autoinst_p  numeric (3,0)
 ,prdord_gno  varchar (40) 
 ,prdord_expiredate   date 
+,usrgrp_code_chrg_workplace  varchar (50) 
+,usrgrp_name_chrg_workplace  varchar (100) 
+,prjno_code_chil  varchar (50) 
+,scrlv_code_chrg_workplace  varchar (50) 
+,scrlv_code_chrg  varchar (50) 
 ,loca_name_sect_chrg  varchar (100) 
 ,person_code_chrg_workplace  varchar (50) 
 ,loca_code_sect_chrg_workplace  varchar (50) 
-,scrlv_code_chrg  varchar (50) 
-,scrlv_code_chrg_workplace  varchar (50) 
-,usrgrp_name_chrg_workplace  varchar (100) 
 ,loca_code_sect_chrg  varchar (50) 
-,usrgrp_code_chrg_workplace  varchar (50) 
 ,loca_name_sect_chrg_workplace  varchar (100) 
 ,person_name_chrg_workplace  varchar (100) 
-,prjno_code_chil  varchar (50) 
 ,usrgrp_code_chrg  varchar (50) 
 ,usrgrp_name_chrg  varchar (100) 
-,opeitm_stktaking_proc  varchar (1) 
-,boxe_boxtype  varchar (20) 
-,itm_std  varchar (50) 
-,opeitm_acceptance_proc  varchar (1) 
-,shelfno_contents_to  varchar (4000) 
-,person_email_chrg  varchar (50) 
+,prdord_sno_prdsch  varchar (50) 
+,prdord_gno_prdsch  varchar (50) 
 ,scrlv_level1_chrg  varchar (1) 
+,itm_std  varchar (50) 
+,boxe_boxtype  varchar (20) 
+,opeitm_acceptance_proc  varchar (1) 
+,person_email_chrg  varchar (50) 
+,shelfno_contents_to  varchar (4000) 
 ,workplace_contents  varchar (4000) 
+,opeitm_stktaking_proc  varchar (1) 
 ,unit_code  varchar (50) 
 ,unit_name  varchar (100) 
 ,unit_code_case  varchar (50) 
@@ -233,40 +238,40 @@ prdord.gno  prdord_gno,
 ,opeitm_safestkqty  numeric (38,0)
 ,opeitm_autoact_p  numeric (3,0)
 ,prdord_remark  varchar (4000) 
-,prdord_workplace_id  numeric (22,0)
-,prdord_chrg_id  numeric (38,0)
 ,prdord_prjno_id  numeric (38,0)
-,prdord_shelfno_id_to  numeric (38,0)
-,prdord_update_ip  varchar (40) 
 ,prdord_opeitm_id  numeric (38,0)
+,prdord_chrg_id  numeric (38,0)
+,prdord_id  numeric (38,0)
+,id  numeric (38,0)
+,prdord_person_id_upd  numeric (38,0)
 ,prdord_created_at   timestamp(6) 
 ,prdord_updated_at   timestamp(6) 
-,prdord_person_id_upd  numeric (38,0)
-,id  numeric (38,0)
-,prdord_id  numeric (38,0)
-,loca_abbr  varchar (50) 
-,opeitm_unit_id_prdpurshp  numeric (38,0)
-,chrg_person_id_chrg_workplace  numeric (38,0)
-,chrg_person_id_chrg  numeric (38,0)
-,opeitm_shelfno_id  numeric (22,0)
-,boxe_unit_id_box  numeric (38,0)
-,boxe_unit_id_outbox  numeric (38,0)
-,workplace_chrg_id_workplace  numeric (22,0)
-,opeitm_boxe_id  numeric (22,0)
-,workplace_loca_id_workplace  numeric (22,0)
-,opeitm_unit_id_case  numeric (38,0)
-,person_sect_id_chrg_workplace  numeric (22,0)
+,prdord_update_ip  varchar (40) 
+,prdord_shelfno_id_to  numeric (38,0)
+,prdord_workplace_id  numeric (22,0)
 ,person_sect_id_chrg  numeric (22,0)
+,person_sect_id_chrg_workplace  numeric (22,0)
+,workplace_chrg_id_workplace  numeric (22,0)
+,workplace_loca_id_workplace  numeric (22,0)
+,opeitm_boxe_id  numeric (22,0)
+,opeitm_unit_id_case  numeric (38,0)
 ,itm_classlist_id  numeric (38,0)
 ,itm_unit_id  numeric (22,0)
+,shelfno_loca_id_shelfno_to  numeric (38,0)
 ,shelfno_loca_id_shelfno  numeric (38,0)
 ,opeitm_loca_id  numeric (38,0)
+,opeitm_unit_id_prdpurshp  numeric (38,0)
 ,opeitm_itm_id  numeric (38,0)
+,chrg_person_id_chrg_workplace  numeric (38,0)
+,chrg_person_id_chrg  numeric (38,0)
 ,loca_addr2  varchar (50) 
 ,loca_addr1  varchar (50) 
 ,loca_prfct  varchar (20) 
+,boxe_unit_id_box  numeric (38,0)
+,boxe_unit_id_outbox  numeric (38,0)
 ,loca_zip  varchar (10) 
-,shelfno_loca_id_shelfno_to  numeric (38,0)
+,loca_abbr  varchar (50) 
+,opeitm_shelfno_id  numeric (22,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(38,0)

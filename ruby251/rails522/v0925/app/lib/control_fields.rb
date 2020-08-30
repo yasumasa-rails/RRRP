@@ -6,8 +6,8 @@ module ControlFields
 	def  proc_chk_fetch_rec params  
 		fetch_data,mainviewflg,keys,findstatus,screendata,missing = get_fetch_rec params
 	  	if findstatus
-			if mainviewflg 
-				if 	params[:parse_linedata]["aud"] == "add" or params["buttonflg"] =~ /add/  ##mainviewflg = true 自分自身の登録
+			if mainviewflg   ##mainviewflg = true 自分自身の登録
+				if 	params[:parse_linedata]["aud"] == "add" or params["buttonflg"] =~ /add/
 					params[:err] = "error duplicate code #{keys} "
 					params[:keys] = []
 					keys.split(",").each do |key| 
@@ -50,7 +50,7 @@ module ControlFields
 			fetch_data = {}
 			tblnamechop = ""
 			xno = ""
-			orgtblnamechop = ""
+			srctblnamechop = ""
 			fetchview = params[:fetchview].split(":")[0]  ##拡張子の確認
 			tblnamechop = fetchview.split("_")[1].chop
 			screendata = params[:parse_linedata]
@@ -73,9 +73,9 @@ module ControlFields
 				if screendata[rec["pobject_code_sfd"]] == "" or screendata[rec["pobject_code_sfd"]].nil?   ###未入力
 					missing = true
 				else
-					if rec["pobject_code_sfd"] 	=~ /_sno_|_cno_|_gno_/
-						tblnamechop,xno,orgtblnamechop = rec["pobject_code_sfd"].split("_")
-						strsql << " #{orgtblnamechop}_#{xno} = '#{screendata[rec["pobject_code_sfd"]]}'       and"
+					if rec["pobject_code_sfd"] 	=~ /_sno_|_cno_/
+						tblnamechop,xno,srctblnamechop = rec["pobject_code_sfd"].split("_")
+						strsql << " #{srctblnamechop}_#{xno} = '#{screendata[rec["pobject_code_sfd"]]}'       and"
 					else
 						delm = (params[:fetchview].split(":")[1]||="")  ###/_sno_|_cno_|_gno_/の時はdelm意味なし
 						if delm == ""
@@ -92,7 +92,7 @@ module ControlFields
 			else
 				rec = nil
 			end
-			if rec
+			if rec  ###viewレコードあり
 				missing = false
 				screendata.each do |key,val|  ###結果をセット
 					items = key.split("_")
@@ -102,41 +102,45 @@ module ControlFields
 						field = items.join("_")
 					end	
 					if rec[field] and key !="id" and key !~ /person.*upd/ and field !~ /^#{params[:screenCode].split("_")[1].chop}/ 
-							fetch_data[field+delm] =  rec[field]
-							case params[:screenCode]
-								when /opeitms$/
-									if screendata["opeitm_stktaking_proc"] == "" or screendata["opeitm_stktaking_proc"].nil?
-										if screendata["classlist_code"] == "ship"
-											fetch_data["opeitm_stktaking_proc"] = 0
-										else
-											fetch_data["opeitm_stktaking_proc"] = 1  ###在庫管理有
-										end
+						fetch_data[field+delm] =  rec[field]
+						case params[:screenCode]
+							when /opeitms$/
+								if screendata["opeitm_stktaking_proc"] == "" or screendata["opeitm_stktaking_proc"].nil?
+									if screendata["classlist_code"] == "ship"
+										fetch_data["opeitm_stktaking_proc"] = 0
+									else
+										fetch_data["opeitm_stktaking_proc"] = 1  ###在庫管理有
 									end
-							end	
+								end
+						end	
 					else
-						if 	field =~ /^#{tblnamechop}/ and  rec[field.gsub(tblnamechop,orgtblnamechop)] and
+						if 	field =~ /^#{tblnamechop}/ and  rec[field.gsub(tblnamechop,srctblnamechop)] and
 								field !~ /_isudate$|_sno$|_gno$|_cno$/ and field != "#{tblnamechop}_id" 
-							fetch_data[field] =  rec[field.gsub(tblnamechop,orgtblnamechop)]
-						else
-							if  key	=~ /_sno_/ and field =~ /^#{tblnamechop}/
-								strsql = %Q% select sum(qty) qty,sum(qty_stk) qty_stk from trngantts
-												where paretblname = '#{orgtblnamechop}s' and paretblid = #{rec["id"]}
+							fetch_data[field] =  rec[field.gsub(tblnamechop,srctblnamechop)]
+						else ###gnoはまとめkeyのため対象外
+							if  key	=~ /_sno_|_cno_/ and field =~ /^#{tblnamechop}/ and val != "" 
+								strsql = %Q% select sum(qty_src) qty_src 
+												from srctbls  where #{key.split("_")[1]} = '#{val}' 
+												and srctblname = '#{srctblnamechop}s'
 								%  ###次のステータスに移行していないqty
 								org =  ActiveRecord::Base.connection.select_one(strsql)
+								strsql = %Q% select qty from #{srctblnamechop}s where #{key.split("_")[1]} = '#{val}'
+								% 
+								sno_qty = ActiveRecord::Base.connection.select_value(strsql)
 								if org
 									if tblnamechop =~ /act$/
-										if  orgtblnamechop =~ /act$/
-											fetch_data["#{tblnamechop}_qty_stk"] = org["qty_stk"] 
-										else
-											fetch_data["#{tblnamechop}_qty_stk"] = org["qty"]
-										end
+										fetch_data["#{tblnamechop}_qty_stk"] =  sno_qty.to_f - org["qty_src"].to_f
+										if fetch_data["#{tblnamechop}_qty_stk"] <= 0
+											params[:err] =  "error   --->over qty"
+										end	
 									else
-										if  orgtblnamechop =~ /act$/
-											fetch_data["#{tblnamechop}_qty"] = org["qty_stk"] 
-										else
-											fetch_data["#{tblnamechop}_qty"] = org["qty"]
-										end
+										fetch_data["#{tblnamechop}_qty"] = sno_qty.to_f - org["qty_src"].to_f
+										if fetch_data["#{tblnamechop}_qty"] <= 0
+											params[:err] =  "error   --->over qty"
+										end	
 									end
+								else	
+									fetch_data["#{tblnamechop}_qty"] = sno_qty.to_f 
 								end
 							else
 							end
@@ -451,5 +455,252 @@ module ControlFields
 		{"opeitm_acceptance_proc"=>{"purords"=>["payschs"],"puracts"=>["payords"],"custords"=>["billschs"],"custacts"=>["billords"]}}
 	end 
  
+	### prd,pur,shp ・・・schs,ords,insts,acts,retsのレコード作成　	
+	def proc_fields_update parent,paretblname
+		@command_c = {}
+		@para = {}
+		yield @command_c,@para   ###@para 子供自身の員数等
+		parent.each do |key,val|
+			case key
+				when /^opeitm_loca_id/
+					@para["parent_locas_id"] = val
+				when	/opeitm_processseq$/
+					@para["parent_processseq"] = val
+				when /#{paretblname.chop}_starttime/
+					@para["parent_starttime"] = val.to_date
+				when  /#{paretblname.chop}_chrg_id/
+					@para["chrgs_id"] = val
+				when /#{paretblname.chop}_qty$/
+					@para["parent_qty"] = val.to_f
+				when  /#{paretblname.chop}_prjno_id/
+					@para["parent_prjno_id"] = val
+				when  /opeitm_packqty/
+					@para["packqty"] = val.to_f
+			end
+		end	
+		@command_c[:sio_message_contents] = nil
+		@command_c[:sio_recordcount] = 1
+		@command_c[:sio_result_f] =   "0"  
+
+		@tblnamechop = @command_c[:sio_viewname].split("_")[1].chop
+		@command_c[:sio_code] =  @command_c[:sio_viewname] if @command_c[:sio_code].nil?
+
+		strsql =  %Q%select pobject_code_fld from r_tblfields where tblfield_expiredate > current_date and 
+						id in (select id from r_tblfields 
+									where pobject_code_tbl = '#{@command_c[:sio_code].split("_")[1]}')
+						order by tblfield_seqno
+		%
+		ActiveRecord::Base.connection.select_values(strsql).each do |fd|
+			###lotnoはpur,prd項目ではないのでここにはない。
+			case fd
+				when "autocreate_act"
+						field_autocreate_act 
+				when "autocreate_inst"
+						field_autocreate_inst 
+				when "autocreate_ord"
+						field_autocreate_ord_autoord_p 
+				when "chrgs_id"
+						field_chrgs_id 
+				when "cno"  ###画面の時用にror_blkctl.set_src_tblでもsetしてる
+						if @command_c["#{@tblnamechop}_cno"].nil? or @command_c["#{@tblnamechop}_cno"] == ""
+							@command_c["#{@tblnamechop}_cno"]  = proc_field_cno @command_c["id"]
+						end
+				when "confirm"
+						field_confirm
+				when "consumauto"  ###
+						field_consumauto
+				when "consumtype"  ###proc_create_table_from_nditmの時は常にopeitmsから
+						field_consumtype
+				when "duedate"  ###稼働日計算
+						field_duedate
+				when "expiredate"
+						field_expiredate
+				when "gno" ###画面の時用にror_blkctl.set_src_tblでもsetしてる
+					if @command_c["#{@tblnamechop}_gno"].nil? or @command_c["#{@tblnamechop}_gno"]  == ""
+						@command_c["#{@tblnamechop}_gno"]   = proc_field_gno @command_c["id"]
+					end
+				when "id"  ###追加または更新の判断
+						field_tblid
+				when "isudate"
+						if @command_c[:sio_classname] == "_add_update_grid_line_data"
+							field_isudate 
+						end
+				when "locas_id_to"
+						field_locas_id_to
+				when "opeitms_id"
+						field_opeitms_id fd
+				when "price"  ###保留
+						field_price_amt_tax_contract_price 
+				when "processseq_pare"
+						field_processseq_pare
+				when "prjnos_id"
+						field_prjnos_id
+				when "qty"
+						field_qty 
+				when "qty_case"
+						field_qty_case 
+				when "qty_stk"
+						field_qty_stk 
+				when "starttime"  ###稼働日計算
+						field_starttime
+				when "shelfnos_id_to"
+						field_shelfnos_id_to
+				when "sno"  ###tblfield_seqnoはidの後であること。###画面の時用にror_blkctl.set_src_tblでもsetしてる
+						@command_c["#{@tblnamechop}_sno"]  = proc_field_sno(@tblnamechop,@command_c["id"])
+				when "suppliers_id"
+						field_suppliers_id
+				when "workplaces_id"
+						field_workplaces_id
+			end	
+		end		
+		return @command_c
+	end	 
+
+	def	field_tblid
+		if @command_c["id"] == ""
+			@command_c[:sio_classname] = "_add_update_grid_line_data"
+			@command_c["id"] =  RorBlkctl.proc_get_nextval("#{@tblnamechop}s_seq")
+	 	else         
+			@command_c[:sio_classname] = "_edit_update_grid_line_data"
+	 	end   
+		@command_c["#{@tblnamechop}_id"] = @command_c["id"]
+	end	
+
+	def field_confirm
+		@command_c["#{@tblnamechop}_confirm"] = false if @command_c["#{@tblnamechop}_confirm"].nil? or  @command_c["#{@tblnamechop}_confirm"] == ""
+	end	
+
+	def field_opeitms_id fd
+		key = @tblnamechop + "_" + fd.sub("s_id","_id")
+		@command_c[key] = @para["opeitms_id"]  ###  変更はないはず
+	end
+
+	def field_locas_id_to 
+		@command_c["#{@tblnamechop}_loca_id_to"] = @para["locas_id_fm"] ##
+	end 
+
+	def field_suppliers_id 
+		strsql = %Q%select  id from suppliers where locas_id_supplier = #{@para["locas_id"]}
+		%
+		id = ActiveRecord::Base.connection.select_value(strsql)
+		###supplier_code = dummy は必須 id = 0
+		id ||= 0
+		@command_c["#{@tblnamechop}_supplier_id"] = id ##
+	end 
+
+	def field_workplaces_id 
+		strsql = %Q%select  id from workplaces where locas_id_workplace = #{@para["locas_id"]}
+		%
+		id = ActiveRecord::Base.connection.select_value(strsql)
+		###worlplace_code = dummy は必須 id = 0
+		id ||= 0
+		@command_c["#{@tblnamechop}_workplace_id"] = id ##
+	end 
+
+	def field_shelfnos_id_to 
+		@command_c["#{@tblnamechop}_shelfno_id_to"] = @para["shelfnos_id_to"] ##
+	end 
+
+	def field_processseq_pare 
+		@command_c["#{@tblnamechop}_processseq_pare"] = @para["parent_processseq"] 
+	end	
+
+	def field_isudate
+		@command_c["#{@tblnamechop}_isudate"] = Time.now.to_s if @command_c["#{@tblnamechop}_isudate"].nil? or @command_c["#{@tblnamechop}_isudate"] == ""
+	end	 
+
+	def field_duedate 
+		duedate = @para["parent_starttime"].to_date - 1
+		@command_c["#{@tblnamechop}_toduedate"] = @command_c["#{@tblnamechop}_duedate"] = duedate.to_s
+	end
+
+	def field_starttime
+		starttime =  @command_c["#{@tblnamechop}_duedate"].to_date - @para["duration"]
+		@command_c["#{@tblnamechop}_starttime"] = starttime.to_s
+	end
+
+	def field_chrgs_id 
+		@command_c["#{@tblnamechop}_chrg_id"] = @para["chrgs_id"] if @command_c["#{@tblnamechop}_chrg_id"].nil? or  @command_c["#{@tblnamechop}_chrg_id"] == ""
+	end	
+
+	def field_qty 
+		@command_c["#{@tblnamechop}_qty"] = @para["parent_qty"] * @para["chilnum"] / @para["parenum"]
+		#consumunitqty等については親に合わせて計算する。
+		#if @para["consumunitqty"] > 0
+		#	rlst = (@command_c["#{@tblnamechop}_qty"] /  @para["consumunitqty"]).ceil
+		#	@command_c["#{tblnamechop}_qty"] = @para["consumunitqty"] * rlst   ###消費単位
+		#end	
+		#if @para["consumminqty"] > @command_c["#{@tblnamechop}_qty"]
+		#	@command_c["#{tblnamechop}_qty"] = @para["consumminqty"]  ###最小消費数
+		#end	
+	end	
+
+	def field_qty_case 
+		if @para["packqty"] > 0
+			rlst = ( @command_c["#{@tblnamechop}_qty"] /  @para["packqty"]).ceil
+			@command_c["#{@tblnamechop}_qty_case"] = @para["packqty"] *  rlst  ###購入数又は作成数
+		else
+			@command_c["#{@tblnamechop}_qty_case"] = @command_c["#{@tblnamechop}_qty"] 
+		end	
+	end	
+
+	def field_qty_stk 
+		@command_c["#{@tblnamechop}_qty_stk"] = @para["parent_qty"] * @para["chilnum"] / @para["parenum"]
+		if @consumminqty > @command_c["#{@tblnamechop}_qty_stk"]
+			@command_c["#{tblnamechop}_qty_stk"] = @para["consumunitqty"]
+		end	
+	end	
+
+	def field_price_amt_tax_contract_price 
+		@command_c["#{@tblnamechop}_price"] = 0 if @command_c["#{@tblnamechop}_price"].nil?
+		@command_c["#{@tblnamechop}_amt"] = 0 if @command_c["#{@tblnamechop}_amt"].nil?
+		@command_c["#{@tblnamechop}_tax"] = 0 if @command_c["#{@tblnamechop}_tax"].nil?
+	end
+
+	def proc_field_sno(tblnamechop,id)
+		ControlFields.proc_snolist["#{tblnamechop}s"] + format('%05d', id) 
+	end
+
+
+	def proc_field_cno id 
+		 format('%07d', id)
+	end
+
+	def proc_field_gno id
+		 format('%07d', id) 
+	end	
+
+	def field_prjnos_id 
+		@command_c["#{@tblnamechop}_prjno_id"] = @para["parent_prjno_id"] 
+	end	
+
+	def field_consumtype
+		@command_c["#{@tblnamechop}_consumtype"] = @para["consumtype"] if @command_c["#{@tblnamechop}_consumtype"].nil? or  @command_c["#{@tblnamechop}_consumtype"] == ""
+	end
+
+	def field_consumauto
+		@command_c["#{@tblnamechop}_consumauto"] = @para["consumauto"] if @command_c["#{@tblnamechop}_consumauto"].nil? or  @command_c["#{@tblnamechop}_consumauto"] == ""
+	end
+
+	def field_autocreate_ord_autoord_p opeitm_autocreate_ord,opeitm_autoord_p
+		if @command_c["#{@tblnamechop}_autocreate_ord"].nil? or  @command_c["#{@tblnamechop}_autocreate_ord"] == "" 
+			@command_c["#{@tblnamechop}_autocreate_ord"] = @para["autocreate_ord"] 
+			@command_c["#{@tblnamechop}_autoord_p"] = @para["autoord_p"] 
+		end
+	end	
+
+	def field_autocreate_inst 
+		@command_c["#{@tblnamechop}_autocreate_inst"] = @para["autocreate_inst"] if @command_c["#{@tblnamechop}_autocreate_inst"].nil? or  @command_c["#{@tblnamechop}_autocreate_inst"] == ""
+	end		
+
+	def field_autocreate_act 
+		@command_c["#{@tblnamechop}_autocreate_act"] = @para["autocreate_act"] if @command_c["#{@tblnamechop}_autocreate_act"].nil? or  @command_c["#{@tblnamechop}_autocreate_act"] == ""
+	end	
+		
+	def field_expiredate
+		@command_c["#{@tblnamechop}_expiredate"] = "2099/12/31" if @command_c["#{@tblnamechop}_expiredate"].nil? or @command_c["#{@tblnamechop}_expiredate"] == ""
+	end	
+
+
  
 end   ##module

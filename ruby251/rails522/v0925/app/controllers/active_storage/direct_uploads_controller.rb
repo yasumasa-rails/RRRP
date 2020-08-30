@@ -23,7 +23,6 @@ class ActiveStorage::DirectUploadsController < ActiveStorage::BaseController
     end
 
     def direct_upload_json(blob)
-      ##urltmp = 'http://localhost:3001/menus'
       blob.as_json(root: false, methods: :signed_id).merge(direct_upload: {
         url: blob.service_url_for_direct_upload,
         headers: blob.service_headers_for_direct_upload

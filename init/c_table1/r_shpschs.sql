@@ -1,4 +1,5 @@
-﻿
+
+
  --- drop view r_shpschs cascade  
  create or replace view r_shpschs as select  
 shpsch.id  shpsch_id,
@@ -59,6 +60,7 @@ shpsch.qty_case  shpsch_qty_case,
 shpsch.contract_price  shpsch_contract_price,
   itm.classlist_name  classlist_name ,
   prjno.prjno_code_chil  prjno_code_chil ,
+shpsch.processseq  shpsch_processseq,
   prjno.prjno_code  prjno_code ,
   shelfno_fm.shelfno_loca_id_shelfno  shelfno_loca_id_shelfno_fm ,
   chrg.chrg_person_id_chrg  chrg_person_id_chrg ,
@@ -126,25 +128,25 @@ shpsch.manual  shpsch_manual
 ,shpsch_paretblname  varchar (30) 
 ,shpsch_paretblid  numeric (38,0)
 ,shpsch_contract_price  varchar (1) 
+,shpsch_processseq  numeric (38,0)
 ,shpsch_manual  varchar (1) 
-,loca_addr2_to  varchar (50) 
-,shelfno_contents_fm  varchar (4000) 
+,scrlv_level1_chrg  varchar (1) 
 ,crr_pricedecimal  numeric (22,0)
 ,crr_amtdecimal  numeric (22,0)
 ,crr_contents  varchar (4000) 
 ,itm_model  varchar (50) 
 ,itm_std  varchar (50) 
-,loca_addr1_to  varchar (50) 
-,person_email_chrg  varchar (50) 
-,transport_contents  varchar (4000) 
+,loca_addr2_to  varchar (50) 
+,loca_prfct_to  varchar (20) 
+,shelfno_contents_fm  varchar (4000) 
 ,loca_fax_to  varchar (20) 
-,scrlv_level1_chrg  varchar (1) 
 ,loca_tel_to  varchar (20) 
-,loca_abbr_to  varchar (50) 
+,transport_contents  varchar (4000) 
+,loca_addr1_to  varchar (50) 
 ,itm_datascale  numeric (22,0)
 ,unit_contents  varchar (4000) 
-,loca_prfct_to  varchar (20) 
-,loca_mail_to  varchar (20) 
+,loca_zip_to  varchar (10) 
+,loca_abbr_to  varchar (50) 
 ,loca_country_to  varchar (20) 
 ,itm_deth  numeric (22,0)
 ,itm_wide  numeric (22,0)
@@ -152,26 +154,27 @@ shpsch.manual  shpsch_manual
 ,itm_weight  numeric (22,0)
 ,itm_design  varchar (50) 
 ,itm_material  varchar (50) 
-,loca_zip_to  varchar (10) 
+,person_email_chrg  varchar (50) 
+,loca_mail_to  varchar (20) 
 ,shpsch_remark  varchar (4000) 
-,shpsch_crr_id  numeric (22,0)
+,shpsch_prjno_id  numeric (38,0)
 ,shpsch_loca_id_to  numeric (38,0)
 ,shpsch_updated_at   timestamp(6) 
 ,shpsch_created_at   timestamp(6) 
 ,shpsch_update_ip  varchar (40) 
 ,shpsch_person_id_upd  numeric (38,0)
+,shpsch_crr_id  numeric (22,0)
 ,shpsch_id  numeric (38,0)
 ,shpsch_shelfno_id_fm  numeric (22,0)
 ,shpsch_itm_id  numeric (38,0)
-,shpsch_prjno_id  numeric (38,0)
+,id  numeric (38,0)
 ,shpsch_chrg_id  numeric (38,0)
 ,shpsch_transport_id  numeric (38,0)
-,id  numeric (38,0)
-,itm_unit_id  numeric (22,0)
+,chrg_person_id_chrg  numeric (38,0)
 ,person_sect_id_chrg  numeric (22,0)
 ,shelfno_loca_id_shelfno_fm  numeric (38,0)
 ,itm_classlist_id  numeric (38,0)
-,chrg_person_id_chrg  numeric (38,0)
+,itm_unit_id  numeric (22,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(38,0)

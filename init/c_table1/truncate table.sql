@@ -36,4 +36,10 @@ truncate table payinsts;
 truncate table processreqs;
 
 truncate table shpschs;
+truncate table shpords;
 
+truncate table mkords;
+
+truncate table srctbls;
+
+commit;

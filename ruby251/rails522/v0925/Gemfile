@@ -64,6 +64,8 @@ gem 'dotenv-rails'
 ##gem 'carrierwave'
 gem 'rubyXL'
 gem 'json'
+
+###https://www.nopio.com/blog/upload-files-with-rails-active-storage/
 gem 'active_model_serializers'
 
 ###gem 'ngrok-tunnel'

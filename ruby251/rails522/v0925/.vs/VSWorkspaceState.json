@@ -4,8 +4,10 @@
     "\\app",
     "\\app\\controllers",
     "\\app\\controllers\\api",
-    "\\app\\lib"
+    "\\client",
+    "\\client\\src",
+    "\\client\\src\\components"
   ],
-  "SelectedNode": "\\app\\lib\\operation.rb",
+  "SelectedNode": "\\client\\src\\components\\upload.js",
   "PreviewInSolutionExplorer": false
 }

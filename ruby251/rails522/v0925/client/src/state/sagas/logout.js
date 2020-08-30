@@ -1,13 +1,14 @@
 import { call,put} from 'redux-saga/effects'
 import axios         from 'axios'
+import {persistor} from '../../state/store.js'
 
 import history from 'histrory'
-import {  LOGOUT_SUCCESS } from '../../actions';
+import {  LOGOUT_SUCCESS , MENU_FAILURE} from '../../actions';
 
-function logoutApi(auth) {
+function logoutApi(token,client,uid) {
   const url = 'http://localhost:3001/api/auth/sign_out'
-  const headers =  { 'access-token':auth.token, 'client':auth.client,'uid':auth.uid}
-  const params =  { 'uid':auth.uid}
+  const headers =  { 'access-token':token, 'client':client,'uid':uid}
+  const params =  { 'uid':uid}
 
   let getApi = (url, params,headers) => {
     return axios({
@@ -16,22 +17,30 @@ function logoutApi(auth) {
       params:params, headers:headers
     });
   };
-  return getApi(url, params,headers)
+  return (getApi(url, params,headers)
+  .then((response ) => {
+    return  {response}  ;
+  })
+  .catch(error => (
+    { error }
+  )));
 }
 
-export function* LogoutSaga({ payload: auth }) {
-      yield call(logoutApi, auth )
+export function* LogoutSaga({ payload: {token,client,uid} }) {
+  let {response,error} = yield call(logoutApi, token,client,uid )
+    if(response || !error){
       yield put({ type: LOGOUT_SUCCESS})
       yield call(history.push,'/login')  //
       // persistor.purge() これを実行すると、Storageに保存された情報がクリアされる
-     //else{  
-     // let message;
-     // switch (response.status) {
-     //         case 500: message = 'Menu Internal Server Error'; break;
-     //         case 401: message = 'Menu Invalid credentials'; break;
-     //         default: message = response.status;}
-     // yield put({ type: MENU_FAILURE, errors: message })
-      // persistor.purge() これを実行すると、Storageに保存された情報がクリアされる
-    //} 
+    }else{  
+      persistor.purge() //これを実行すると、Storageに保存された情報がクリアされる
+      yield call(history.push,'/login') 
+      let message;
+      switch (error.status) {
+              case 500: message = 'Menu Internal Server Error'; break;
+              case 401: message = 'Menu Invalid credentials'; break;
+              default: message = response.status;}
+      yield put({ type: MENU_FAILURE, errors: message })
+    } 
   } 
 //  送信されてない。

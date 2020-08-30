@@ -1,35 +1,44 @@
 import { call, put, select } from 'redux-saga/effects'
 import axios         from 'axios'
-import {SCREEN_SUCCESS,SCREEN_FAILURE,SCREEN_LINEEDIT, FETCH_RESULT, FETCH_FAILURE,}
+import {SCREEN_SUCCESS,SCREEN_SUCCESS7,
+        SCREEN_FAILURE,SCREEN_LINEEDIT, FETCH_RESULT, FETCH_FAILURE,}
          from '../../actions'
 import {getScreenState} from '../reducers/screen'
-import {getLoginState} from '../reducers/login'
+import {getLoginState} from '../reducers/auth'
 //import { ReactReduxContext } from 'react-redux';
 
-function screenApi({params,token,client,uid}) {
-  const url = 'http://localhost:3001/api/menus'
-  const headers = {'access-token':token,'client':client,'uid':uid }
-
-  let postApi = (url, params, headers) => {
+function screenApi({params ,url,headers} ) {
+  
     return axios({
         method: "POST",
         url: url,
         contentType: "application/json",
         params:params,
         headers:headers,
-    });
-  };
-  return postApi(url, params, headers)
-}
+    })
+  }
 
 export function* ScreenSaga({ payload: {params}  }) {
   const screenState = yield select(getScreenState) //message="" confirm=""になっている。
   const loginState = yield select(getLoginState) 
-  let token = loginState.auth["access-token"]       
-  let client = loginState.auth.client         
-  let uid = loginState.auth.uid 
+  let token = loginState.token       
+  let client = loginState.client         
+  let uid = loginState.uid
+  let url = ""
+  // let sagaCallTime = new Date()
+  // let callTime =  sagaCallTime.getHours() + ":" + sagaCallTime.getMinutes() + ":" + 
+  //                 sagaCallTime.getSeconds()  + ":" + sagaCallTime.getMilliseconds()
+  switch(true){
+    case /7$/.test(params.req):
+       url = 'http://localhost:3001/api/menus7'
+       break
+    default:
+      url = 'http://localhost:3001/api/menus'
+  }     
+
+  const headers = {'access-token':token,'client':client,'uid':uid }
   try {
-      let response  = yield call(screenApi,{params ,token,client,uid} )
+      let response  = yield call(screenApi,{params ,url,headers} )
       switch(params.req) {
         case 'viewtablereq':
           response.data["params"] = params
@@ -42,6 +51,17 @@ export function* ScreenSaga({ payload: {params}  }) {
         case 'inlineaddreq':
             response.data["params"] = params
             return yield put({ type: SCREEN_SUCCESS, action: response })   
+
+        case 'viewtablereq7':
+             //response.data["params"]["callTime"] = callTime
+              return yield put({ type: SCREEN_SUCCESS7, action: response })    //action --> payload
+    
+        case 'editabletablereq7':
+              return yield put({ type: SCREEN_SUCCESS7, action: response })   
+    
+        case 'inlineaddreq7':
+              return yield put({ type: SCREEN_SUCCESS7, action: response })   
+    
 
         case "confirm":
             screenState.data[params.index] = response.data.linedata

@@ -1,17 +1,15 @@
 
-
-import {createAction} from 'redux-actions'
-// create actionの使用は止める
-
+export const LOGINFORM_REQUEST = 'LOGINFORM_REQUEST'
+export const LOGINFORM_SUCCESS = 'LOGINFORM_SUCCESS'
 export const LOGIN_REQUEST = 'LOGIN_REQUEST'
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
 export const LOGIN_FAILURE = 'LOGIN_FAILURE'
 
 export const LOGOUT_REQUEST = 'LOGOUT_REQUEST'
 export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS'
-export const SCREEN_RESET_REQUEST = 'SCREEN_RESET_REQUEST'
 
-
+export const SIGNUPFORM_REQUEST = 'SIGNUPFORM_REQUEST'
+export const SIGNUPFORM_SUCCESS = 'SIGNUPFORM_SUCCESS'
 export const SIGNUP_REQUEST = 'SIGNUP_REQUEST'
 export const SIGNUP_SUCCESS = 'SIGNUP_SUCCESS'
 export const SIGNUP_FAILURE = 'SIGNUP_FAILURE'
@@ -23,7 +21,10 @@ export const MENU_FAILURE = 'MENU_FAILURE'
 
 export const SCREEN_REQUEST = 'SCREEN_REQUEST'
 export const SCREEN_SUCCESS = 'SCREEN_SUCCESS'
+export const SCREEN_SUCCESS7 = 'SCREEN_SUCCESS7'
 export const SCREEN_PARAMS_SET = 'SCREEN_PARAMS_SET'
+export const SCREEN_LINEEDIT = 'SCREEN_LINEEDIT'
+
 export const SCREEN_FAILURE = 'SCREEN_FAILURE'
 export const SCREEN_ERR_CHECK_RESULT = 'SCREEN_ERR_CHECK_RESULT'
 export const SCREEN_ONBLUR = 'SCREEN_ONBLUR'
@@ -43,18 +44,16 @@ export const UPLOAD_SUCCESS = 'UPLOAD_SUCCESS'
 export const UPLOADLIST_SUCCESS = 'UPLOADLIST_SUCCESS'
 export const CHANGEUPLOADABLE_REQUEST = 'CHANGEUPLOADABLE_REQUEST'
 export const CHANGEUNUPLOAD_REQUEST = 'CHANGEUNUPLOAD_REQUEST'
-export const CHANGEUPLOADTITLE_REQUEST = 'CHANGEUPLOADTITLE_REQUEST'
-export const CHANGEUPLOADTITLEEDITABLE_REQUEST = 'CHANGEUPLOADTITLEEDITABLE_REQUEST'
-export const EXCELTOJSON_REQUEST = 'EXCELTOJSON_REQUEST'
+//export const CHANGEUPLOADTITLE_REQUEST = 'CHANGEUPLOADTITLE_REQUEST'
+//export const CHANGEUPLOADTITLEEDITABLE_REQUEST = 'CHANGEUPLOADTITLEEDITABLE_REQUEST'
+//export const EXCELTOJSON_REQUEST = 'EXCELTOJSON_REQUEST'
 export const EXCELTOJSON_SUCCESS = 'EXCELTOJSON_SUCCESS'
+export const UPLOADFORFIELDSET_REQUEST = 'UPLOADFORFIELDSET_REQUEST'
 
 export const DOWNLOAD_REQUEST = 'DOWNLOAD_REQUEST'
 export const DOWNLOAD_SUCCESS = 'DOWNLOAD_SUCCESS'
 export const DOWNLOAD_FAILURE = 'DOWNLOAD_FAILURE'
 export const DOWNLOAD_RESET = 'DOWNLOAD_RESET'
-
-export const SCREEN_LINEEDIT = 'SCREEN_LINEEDIT'
-
 
 export const FETCH_REQUEST = 'FETCH_REQUEST'
 export const FETCH_RESULT = 'FETCH_RESULT'
@@ -74,24 +73,46 @@ export const GANTTCHART_FAILURE = 'GANTTCHART_FAILURE'
 export const GANTTCHART_SUCCESS = 'GANTTCHART_SUCCESS'
 
 export const SETRESULTS_REQUEST = 'SETRESULTS_REQUEST'
+export const SETRESULTS_SUCCESS = 'SETRESULTS_SUCCESS'
+
+export const RESET_REQUEST = 'RESET_REQUEST'
 
 // LOGIN
 // Attach our Formik actions as meta-data to our action.
 
-export const SignupRequest = createAction(
-  SIGNUP_REQUEST,
-  ({values}) => values,
-  ({actions}) => actions
-)
+export const SignUpFormRequest =  ( isSignUp) => ({
+  type:SIGNUPFORM_REQUEST,
+  payload: { isSignUp }
+})
 
-export const authorize = (email, password) => ({
+export const SignUpFormSuccess =  ( isSignUp) => ({
+  type:SIGNUPFORM_SUCCESS,
+  payload: { isSignUp }
+})
+
+export const LoginFormRequest =  ( isSignUp) => ({
+  type:LOGINFORM_REQUEST,
+  payload: { isSignUp }
+})
+
+export const LoginFormSuccess =  ( isSignUp) => ({
+  type:LOGINFORM_SUCCESS,
+  payload: { isSignUp }
+})
+
+export const SignUpRequest =  (email, password,password_confirmation) => ({
+  type:SIGNUP_REQUEST,
+  payload: { email, password ,password_confirmation}
+})
+
+export const LoginRequest  = (email, password) => ({
   type: LOGIN_REQUEST,
   payload: { email, password }
 })
 
-export const LogoutRequest = (token,client,uid) => ({
+export const LogoutRequest =  (token,client,uid) => ({
   type: LOGOUT_REQUEST,
-  payload: {token:token,client:client,uid:uid }
+  payload: { token,client,uid }
 })
 
 export const LogoutSuccess = () => ({
@@ -113,6 +134,12 @@ export const ScreenRequest = (params) => ({
   type:  SCREEN_REQUEST,
   payload: { params}  //
 })
+
+export const ResetRequest = (params) => ({
+  type:  RESET_REQUEST,
+  payload: { params}  //
+})
+
 
 export const ScreenParamsSet = (params) => ({
   type:  SCREEN_PARAMS_SET,
@@ -213,6 +240,7 @@ export const UploadListSuccess = (uploadlists) => ({
   payload: { uploadlists}
 })
 
+/*
 export const ChangeUploadTitleEditableRequest = () => ({
   type: CHANGEUPLOADTITLEEDITABLE_REQUEST,
   payload: {}
@@ -222,22 +250,11 @@ export const ChangeUploadTitleRequest = (upload) => ({
   type: CHANGEUPLOADTITLE_REQUEST,
   payload: { upload}
 })
+*/
 
-
-export const ExcelToJsonRequest = (file,screenCode) => ({
-  type: EXCELTOJSON_REQUEST,
-  payload: { file,screenCode}
-})
-
-export const EditUploadResult = (message) => ({
-  type: EXCELTOJSON_SUCCESS,
-  payload: { message}
-})
-
-
-export const FetchRequest = (params,token,client,uid) => ({
+export const FetchRequest = (params) => ({
   type: FETCH_REQUEST,
-  payload: { params ,token,client,uid}
+  payload: { params }
 })
 
 export const InputFieldProtect = (columns) => ({
@@ -287,8 +304,22 @@ export const GanttReset = () => ({
   type:  GANTT_RESET,
 })
 
-export const SetResultsRequest = (e) => ({
-  type:  SETRESULTS_REQUEST,
-  payload:{e}
+export const uploadForFieldSetRequest = (jsonfilename,screenCode) => ({
+  type:  UPLOADFORFIELDSET_REQUEST,
+  payload:{jsonfilename,screenCode}
 })
 
+export const SetResultsRequest = (results,defCode,excelfile,screenCode) => ({
+  type:  SETRESULTS_REQUEST,
+  payload:{results,defCode,excelfile,screenCode}
+})
+
+export const ExcelToJsonRequest = (excelfile) => ({
+  type: SETRESULTS_REQUEST,  // sagaはExcelToJsonRequestと同じものを使用
+  payload: {results:null,defCode:"ExcelToJson", excelfile}
+})
+
+export const EditUploadResult = (message) => ({
+  type: EXCELTOJSON_SUCCESS,
+  payload: { message}
+})

@@ -1,6 +1,5 @@
 
-
---- drop view r_trngantts cascade  
+ --- drop view r_trngantts cascade  
  create or replace view r_trngantts as select  
 trngantt.consumauto  trngantt_consumauto,
   shelfno_fm.shelfno_code  shelfno_code_fm ,
@@ -56,8 +55,8 @@ trngantt.shelfnos_id_fm   trngantt_shelfno_id_fm,
 trngantt.itms_id_pare   trngantt_itm_id_pare,
 trngantt.processseq_pare  trngantt_processseq_pare,
 trngantt.locas_id_pare   trngantt_loca_id_pare,
-trngantt.qty_pare  trngantt_qty_pare,
 trngantt.qty_stk_pare  trngantt_qty_stk_pare,
+trngantt.qty_pare  trngantt_qty_pare,
   itm_pare.classlist_code  classlist_code_pare ,
   itm.classlist_code  classlist_code ,
 trngantt.qty_alloc  trngantt_qty_alloc,
@@ -192,8 +191,8 @@ trngantt.prjnos_id   trngantt_prjno_id
 ,trngantt_shelfno_id_fm  numeric (22,0)
 ,trngantt_itm_id_pare  numeric (38,0)
 ,trngantt_person_id_upd  numeric (38,0)
-,trngantt_loca_id_pare  numeric (38,0)
 ,trngantt_prjno_id  numeric (38,0)
+,trngantt_loca_id_pare  numeric (38,0)
 ,trngantt_id  numeric (38,0)
 ,trngantt_loca_id  numeric (38,0)
 ,trngantt_itm_id  numeric (38,0)

@@ -1,14 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Tab, Tabs, TabList,TabPanel , } from 'react-tabs'
-import Upload from './upload'
+import Upload from './upload.js'
 import Download from './download'
 import GanttChart from './ganttchart'
 import "react-tabs/style/react-tabs.css"
 import {Button} from '../styles/button'
 import "../index.css"
 import {ScreenRequest,ButtonFlgRequest,DownloadRequest,GanttChartRequest,GanttReset,
-        YupRequest,TblfieldRequest} from '../actions'
+        YupRequest,TblfieldRequest,ResetRequest} from '../actions'
 
 
  const  ButtonList = ({buttonListData,setButtonFlg,buttonflg,
@@ -28,7 +28,6 @@ import {ScreenRequest,ButtonFlgRequest,DownloadRequest,GanttChartRequest,GanttRe
         <div>
         {tmpbuttonlist[screenCode]&&   //画面のボタンが用意されてないときはskip
             <Tabs   forceRenderTabPanel defaultIndex={0}  selectedTabClassName="react-tabs--selected_custom_footer">
-              
                 <TabList>
                   {tmpbuttonlist[screenCode].map((val,index) => 
                     <Tab key={index} >
@@ -53,7 +52,7 @@ import {ScreenRequest,ButtonFlgRequest,DownloadRequest,GanttChartRequest,GanttRe
             </Tabs>
         }
         
-        {buttonflg==="ganttchart"?params["onClickSelect"]?params["onClickSelect"]["index"]?<GanttChart/>:" select item":"select item":""}
+        {buttonflg==="ganttchart"?<GanttChart/>:" select item"}
         {buttonflg==='import'&&<Upload/>}
         {buttonflg==="export"&&downloadloading==="done"?<Download/>:downloadloading==="doing"?<p>please wait </p>:""}
         {params.req==="createTblViewScreen"&&params.messages.map((msg,index) =>{
@@ -75,7 +74,7 @@ const  mapStateToProps = (state,ownProps) =>({
   params:state.screen.params ,  
   screenCode:state.screen.params.screenCode ,  
   screenName:state.screen.params.screenName ,  
-  uid:state.login.auth?state.login.auth.uid:"" ,
+  uid:state.auth.uid,
   page:state.screen?state.screen.page:0,
   sorted:state.screen?state.screen.sorted:[], 
   message:state.button.message,
@@ -91,10 +90,15 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
                     page,sorted,params) =>{
         dispatch(ButtonFlgRequest(buttonflg,params)) // import export 画面用
         switch (buttonflg) {
-          case "inlineedit":
-            params= { ...params, page: page,sorted:sorted,req:"editabletablereq"}
+          case "reset":
+            params= { ...params, page: page,sorted:sorted,req:"reset"}
           //editableflg = true
-            return dispatch(ScreenRequest(params)) //
+            return dispatch(ResetRequest(params)) //
+
+          case "inlineedit":
+              params= { ...params, page: page,sorted:sorted,req:"editabletablereq"}
+            //editableflg = true
+              return dispatch(ScreenRequest(params)) //
         
           case "inlineadd":
             params= {...params,  page: page, pages:1,req:"inlineaddreq"}
@@ -112,18 +116,19 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
             return  dispatch(YupRequest(params)) //
 
           case "ganttchart":
-            if(params["onClickSelect"]["index"]){
+            if(params["onClickSelect"]["index"]||params["onClickSelect"]["index"]===0){
                params= { ...params,req:"ganttchart"}
              //  editableflg = false
               return  dispatch(GanttChartRequest(params)) }//
             else{dispatch(GanttReset())}  
             break
 
-            case "crt_tbl_view_screen":
+          case "crt_tbl_view_screen":
                params= {req:"createTblViewScreen",screenCode:params.screenCode}
              //  editableflg = false
               return  dispatch(TblfieldRequest(params)) //
-            case "unique_index":
+
+          case "unique_index":
                     params= {req:"createUniqueIndex",screenCode:params.screenCode}
                      //  editableflg = false
                     return  dispatch(TblfieldRequest(params)) 

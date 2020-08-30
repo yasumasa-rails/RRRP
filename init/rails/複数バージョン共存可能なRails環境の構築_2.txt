@@ -4,53 +4,56 @@
     Ruby環境はrbenvを使用し、複数のバージョンを切替え可能とする。
     Bundlerを使用し、Railsをローカルディレクトリにインストールし、複数のバージョンのRailsプロジェクトの作成、共存を可能とする。
 
-Rubyのインストール
-rbenv とは
 
-Rubyを管理するツール。複数バージョンのRubyの管理/切替えができる。
-（１）rbenvのインストール
+rbenvのインストール
 
-・githubから
 
-Installation
+インストール済のバッケージを最新に更新に。
 
-Installer is here.
-Install rbenv for windows to your USERPROFILE directory.
+$ sudo apt update
+$ sudo apt upgrade
 
-    Clone git repositry
 
-    > git clone https://github.com/nak1114/rbenv-win.git %USERPROFILE%\.rbenv-win
+rubyのビルドに必要なパッケージをインストール。
 
-    Config path
-    Add the bin & shims directory to your PATH environment variable for access to the rbenv command
 
-    > for /f "skip=2 delims=" %a in ('reg query HKCU\Environment /v Path') do set orgpath=%a
-    > setx Path "%USERPROFILE%\.rbenv-win\bin;%USERPROFILE%\.rbenv-win\shims;%orgpath:~22%"
+$ sudo apt install git build-essential libssl-dev
 
-    Restart your shell
+rbenvを取得
 
-    > exit
 
-    Run the following command after rbenv installation , to enable the ruby.
+$ git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
+$ git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
 
-    > rbenv install 2.2.4
-    > rbenv global 2.2.4
-    > rbenv rehash
+
+.profileを編集。
+
+
+$ vim ~/.profile 
 
 
 
 
-（２）Homebrewでインストール実施。
+末尾に以下の内容を追記。
 
- (Xcodeインストール -> Command Line Tools for Xcodeインストール -> Homebrewインストール済）
 
-    最新パッケージリスト取得
-    $ brew update
-    rbenvのインストール
-    $ brew install rbenv
-    バージョンを確認
-    $ rbenv -v
-    rbenv 1.0.0
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+
+
+$ source ~/.profile 
+
+
+
+
+$ rbenv --version
+rbenv 1.1.1-6-g2d7cefe
+
+
+$ sudo apt install libreadline-dev
+
+
+
 
 	
 尚、ruby-build(rubyをビルドインするプラグイン)は、rbenvインストールでインストール済み。インストールする場合は、以下。(インストール済みの場合は、already installedと表示。
@@ -74,6 +77,8 @@ $ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
 $ source ~/.bash_profile
 
 （３）最新のRubyをインストールする
+
+Rubyのインストール
 
 rbenvからインストール可能なRubyのバージョンを確認
 
@@ -178,12 +183,18 @@ Railsアプリケーションを作成するために一時的にrailsをロー�
     source "https://rubygems.org"
 
     # gem "rails"
-    チュートリアルで使用するRailsのバージョン4.2.2を使用するよう以下に変更。
-    gem "rails", "4.2.2"
+    チュートリアルで使用するRailsのバージョンx.y.zを使用するよう以下に変更。
+    gem "rails", "x.y.z"
 
     Railsのインストール実施
+
+    インストール可能なrailsのバージョンを検索
+$ gem list -ra
+
+
+$ gem install rails -v x.y.z
     $ rbenv exec bundle install --path vendor/bundle
-    Installing rails 4.2.2
+    Installing rails x.y.z
     Bundle complete! 1 Gemfile dependency, 35 gems now installed.
     Bundled gems are installed into ./vendor/bundle.
     補足：オプション「--path vendor/bundle」を付けることによりgemは、アプリケーション限定の領域(vendor/bundleディレクトリ）にインストールされる。（オプションがない場合、Mac全体で共有される領域にインストールされる。）
@@ -199,8 +210,23 @@ Railsアプリケーションの新規作成
 
 先にbundleでインストールしたgemパッケージを利用し、Railsアプリケーション「sample_app」を作成。なお、すでに作成済みの「sample_app」ディレクトリをアプリケーション名とするので、「rails new アプリケーション名」は「rails new .」とする。
 
+
+DBはPostgreSQLを利用
+
+$ sudo sh -c "echo 'deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main' > /etc/apt/sources.list.d/pgdg.list"
+$ wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | sudo apt-key add -
+$ sudo apt-get update
+$ sudo apt-get install -y postgresql-common
+$ sudo apt-get install -y postgresql-9.6 libpq-dev
+
+
+
     Railsアプリケーションの新規作成
-    $ rbenv exec bundle exec rails new . --skip-bundle
+  例1  $ rbenv exec bundle exec rails new . --skip-bundle
+
+  例2  bundle exec rails new . --database=postgresql --api
+        bundle exec rails new HomeMedicalV01 --database=postgresql --api
+
     先に一時的に同一ディレクトリでrailsをインストールしているため、以下のようにGemfileの上書きの確認がされるが、許可を実施。
 
         conflict  Gemfile
@@ -224,7 +250,7 @@ Railsアプリケーションの環境セットアップ
     必要に応じてsample_appのGemfileの内容を編集
     Railsの標準gemのインストール実施。「--path vendor/bundle」オプションをつけ、アプリケーションに閉じた状態でGemをインストール
     $ bundle install --path vendor/bundle
-    Installing rails 4.2.2
+    Installing rails x.y.z
     Bundle complete! 12 Gemfile dependencies, 56 gems now installed.
     Bundled gems are installed into ./vendor/bundle.
     これにより、Rails(及び関連Gem)が、新規作成Railsアプリケーションのvender/bundleディレクトリ以下にインストールされる。
@@ -242,3 +268,25 @@ http://curl.haxx.se/ca/cacert.pem
 環境変数 SSL_CERT_FILE に cacert.pem のパスを設定する
 set SSL_CERT_FILE=./cacert.pem
 	
+create-react-app をインストール
+yarn global add create-react-app
+
+React プロジェクトの作成
+
+devise
+bundle exec rails g devise:install
+
+
+rails g controller auth/registrations
+--->他のclassも追加
+
+client---srcの追加
+
+routeの変更
+
+config/initializers/devise_token_auth.rbの変更
+
+##schema.rbにUserを登録
+bin/rails db:migrate RAILS_ENV=development
+
+package.jsonに"scripts"を追加

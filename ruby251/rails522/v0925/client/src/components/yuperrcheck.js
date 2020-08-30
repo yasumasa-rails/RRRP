@@ -92,3 +92,60 @@ export function datacheck(schema,field,linedata){
   }    
   return linedata    
 }
+
+//未実施　yupでは数値項目で　"スペース999" がエラーにならない。
+
+// yupでは　2019/12/32等がエラーにならない。　2020/01/01になってしまう
+export function dataCheck7(schema,updateRow){ 
+  Object.keys(updateRow).map((field)=>{
+    switch(schema.field["_type"]){
+      case "date" :
+          let moment = require('moment');
+          let yyyymmdd = updateRow[field].split(/-|\//)
+          if(yyyymmdd[1] === undefined){updateRow[`${field}_gridmessage`] = "not date type yyyy/mm/dd or yyyy-mm-dd"}
+          else{
+              if(yyyymmdd[1].length===1){yyyymmdd[1] = "0"+yyyymmdd[1]}
+              if(yyyymmdd[2] === undefined ){yyyymmdd[2] = "01"
+                                            updateRow[field] = yyyymmdd[0]+"-"+yyyymmdd[1]+"-"+yyyymmdd[2]}
+              //if(/(\d){4}\/|-\d+\d+\/|-\d+\d+/.test(updateRow[field])){ // "/"や2019-2-30 だとうるう年等のチェックができない。
+              if(yyyymmdd.length===3){ // "/"だとうるう年等のチェックができない。
+                  if(moment(yyyymmdd[0]+"-"+yyyymmdd[1]+"-"+yyyymmdd[2]).isValid()){
+                    updateRow[`${field}_gridmessage`] = "ok"
+                  }else{
+                    updateRow[`${field}_gridmessage`] = "not date "
+                    updateRow["confirm_gridmessage"] =  updateRow[`${field}_gridmessage`] + updateRow["confirm_gridmessage"]
+                  }
+              }else{
+                    updateRow[`${field}_gridmessage`] = "not date type yyyy/mm/dd or yyyy-mm-dd"
+                    updateRow["confirm_gridmessage"] =  updateRow[`${field}_gridmessage`] + updateRow["confirm_gridmessage"]
+               }
+              }
+        break     
+      default:
+        switch(field){
+            case "screen_rowlist":
+                if(updateRow[`${field}_gridmessage`]===""){updateRow[`${field}_gridmessage`] = "ok"}
+                    updateRow[field].split(",").map((rowcnt)=>{
+                    if(isNaN(rowcnt)){ 
+                        updateRow[`${field}_gridmessage`] = " must be xxx,yyy,zzz :xxx-->numeric"
+                        updateRow["confirm_gridmessage"] =  updateRow[`${field}_gridmessage`] + updateRow["confirm_gridmessage"]
+                      }
+                    return updateRow
+                })
+              break
+            case "screenfield_indisp":  //tipが機能しない。
+                if(/_code/.test(updateRow["pobject_code_sfd"])&updateRow["screenfield_editable"]!=="0")
+                    {if(updateRow["screenfield_indisp"]!=="1")
+                            {updateRow["screenfield_indisp_gridmessage"] = " must be Required"}
+                             updateRow["confirm_gridmessage"] =  updateRow[`${field}_gridmessage`] + updateRow["confirm_gridmessage"]
+                          }
+                break
+            default:
+                updateRow[`${field}_gridmessage`] = "ok"
+       }
+      }   
+      return  updateRow  
+  })
+  return updateRow   
+}   
+
