@@ -130,9 +130,9 @@ export const MenuFailure = (errors) => ({
   errors: { errors }  //
 })
 
-export const ScreenRequest = (params) => ({
+export const ScreenRequest = (params,data) => ({
   type:  SCREEN_REQUEST,
-  payload: { params}  //
+  payload: { params,data}  //
 })
 
 export const ResetRequest = (params) => ({
@@ -252,9 +252,9 @@ export const ChangeUploadTitleRequest = (upload) => ({
 })
 */
 
-export const FetchRequest = (params) => ({
+export const FetchRequest = (params,data) => ({
   type: FETCH_REQUEST,
-  payload: { params }
+  payload: { params,data }
 })
 
 export const InputFieldProtect = (columns) => ({
@@ -262,14 +262,14 @@ export const InputFieldProtect = (columns) => ({
   payload: { columns}
 })
 
-export const FetchResult = (data,columns) => ({
+export const FetchResult = (data,params) => ({
   type: FETCH_RESULT,
-  payload: { data,columns}
+  payload: { data,params}
 })
 
-export const FetchFailure = (data,columns) => ({
+export const FetchFailure = (data,params) => ({
   type: FETCH_FAILURE,
-  payload: { data,columns}
+  payload: { data,params}
 })
 
 

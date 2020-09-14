@@ -24,7 +24,7 @@ module Api
                 recs = ActiveRecord::Base.connection.select_all(strsql)
                 render json:  recs , status: :ok
             
-            when 'viewtablereq7','editabletablereq7'
+            when 'viewtablereq7','inlineedit7'
                 ScreenLib.proc_create_grid_editable_columns_info current_api_user[:email],params,grid_columns_info
                 if params[:filtered]  ###sortの処理はScreenLib内部だけ
                   if params[:filtered].class.to_s == "String"
@@ -33,20 +33,20 @@ module Api
                     ScreenLib.proc_create_filteredstr params,grid_columns_info
                 else
                   params[:where_str] = (grid_columns_info["where_info"]["filtered"]||="")  ###@where_info["filtered"] screen sort 規定値
-                  params[:filtered]={}
+                  params[:filtered]=[]
                 end    
-                params[:pageIndex]||=0 
+                params[:pageIndex] = params[:pageIndex].to_f
                 params[:pageSize] = params[:pageSize].to_f
                 pagedata = ScreenLib.proc_search_blk params,grid_columns_info   ###:pageInfo ,:yup -->menu7から未使用
                 render json:{:grid_columns_info=>grid_columns_info,:data=>pagedata,:params=>params}
                 # render json:{:columns=>grid_columns_info["columns_info"],:data=>pagedata,:pageInfo=>{},:params=>params,
                 #        :yup=>grid_columns_info["yup"],:dropdownlist=>grid_columns_info["dropdownlist"],:nameToCode=>grid_columns_info["nameToCode"]}         
              
-            when 'inlineaddreq7'
+            when 'inlineadd7'
                 screenCode = params[:screenCode]
                 ScreenLib.proc_create_grid_editable_columns_info current_api_user[:email] ,params,grid_columns_info
                 params[:pageIndex] = 0
-                params[:filtered]={}
+                params[:filtered]=[]
                 params[:sort]={}
                 pagedata = ScreenLib.add_empty_data  params,grid_columns_info ### nil filtered sorting
                 render json:{:grid_columns_info=>grid_columns_info,:data=>pagedata,:params=>params}               
@@ -63,11 +63,12 @@ module Api
                 rparams = ControlFields.proc_judge_check_code xparams
                 render json: {:params=>rparams}   
 
-            when "confirm"
+            when "confirm7"
                 rparams = params.dup
+                ScreenLib.proc_create_grid_editable_columns_info current_api_user[:email],params,grid_columns_info
                 tblnamechop = params[:screenCode].split("_")[1].chop
-                yup_fetch_code = JSON.parse(params["fetchcode"])
-                yup_check_code = JSON.parse(params["checkcode"])
+                yup_fetch_code = grid_columns_info["yup"]["yupfetchcode"]
+                yup_check_code = grid_columns_info["yup"]["yupcheckcode"]
                 rparams[:parse_linedata] = JSON.parse(params["linedata"])
                 parse_linedata = rparams[:parse_linedata].dup
                 addfield = {}
@@ -75,7 +76,7 @@ module Api
                 parse_linedata.each do |field,val|
                   if yup_fetch_code[field] 
                     ##rparams["fetchcode"] = %Q%{"#{field}":"#{val}"}%  ###clientのreq='fetch_request'で利用
-                    if rparams[:parse_linedata]["id"] == ""
+                    if rparams[:parse_linedata]["id"] == ""  ###tableのユニークid
                         rparams[:parse_linedata]["aud"]= "add" 
                     end  
                     rparams["fetchview"] = yup_fetch_code[field]
@@ -157,7 +158,10 @@ module Api
                 screenCode = params[:screenCode]
                 download_columns_info = ScreenLib.proc_create_download_columns_info params,current_api_user[:email]  
                 if params[:filtered]
-                  ScreenLib.proc_create_filteredstr params,download_columns_info
+                  if params[:filtered].class.to_s == "String"
+                    params[:filtered] = JSON.parse(params[:filtered])
+                  end
+                    ScreenLib.proc_create_filteredstr params,grid_columns_info
                 else
                   params[:where_str] = (grid_columns_info["where_info"]["filtered"]||"")
                 end    

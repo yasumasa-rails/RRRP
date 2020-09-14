@@ -11,8 +11,8 @@ import {ScreenRequest,ButtonFlgRequest,DownloadRequest,GanttChartRequest,GanttRe
         YupRequest,TblfieldRequest,ResetRequest} from '../actions'
 
 
- const  ButtonList = ({buttonListData,setButtonFlg,buttonflg,
-                        screenCode,page,sorted,params,downloadloading,disabled,
+ const  ButtonList = ({buttonListData,setButtonFlg,buttonflg,originalreq,
+                        screenCode,page,sortBy,params,downloadloading,disabled,
                         message,messages //  editableflg,message
                       }) =>{
       let tmpbuttonlist = {}
@@ -33,11 +33,9 @@ import {ScreenRequest,ButtonFlgRequest,DownloadRequest,GanttChartRequest,GanttRe
                     <Tab key={index} >
                       <Button  
                       disabled={disabled}
-                      type={val[1]==='inlineedit'||'inlineadd'||'yup'||'ganttchart'?"submit":"button"}
-                      onClick ={() =>{ setButtonFlg(val[1],  // buttonflg
-                                                    page,sorted,params
-                                                    )
-                                      }
+                      type={val[1]==='inlineedit7'||'inlineadd7'||'yup'||'ganttchart'?"submit":"button"}
+                      onClick ={() =>{
+                                      setButtonFlg(val[1],page,sortBy,params)} // buttonflg
                                      }>
                       {val[0]}       
                       </Button>             
@@ -52,7 +50,7 @@ import {ScreenRequest,ButtonFlgRequest,DownloadRequest,GanttChartRequest,GanttRe
             </Tabs>
         }
         
-        {buttonflg==="ganttchart"?<GanttChart/>:" select item"}
+        {buttonflg==="ganttchart"&&<GanttChart/>}
         {buttonflg==='import'&&<Upload/>}
         {buttonflg==="export"&&downloadloading==="done"?<Download/>:downloadloading==="doing"?<p>please wait </p>:""}
         {params.req==="createTblViewScreen"&&params.messages.map((msg,index) =>{
@@ -76,34 +74,33 @@ const  mapStateToProps = (state,ownProps) =>({
   screenName:state.screen.params.screenName ,  
   uid:state.auth.uid,
   page:state.screen?state.screen.page:0,
-  sorted:state.screen?state.screen.sorted:[], 
+  sortBy:state.screen?state.screen.sortBy:[], 
   message:state.button.message,
   messages:state.button.messages,
   downloadloading:state.button.downloadloading,
   disabled:state.button.disabled?true:false,
-  originalreq:state.screen.originalreq,
+ // originalreq:state.screen.originalreq,
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-  setButtonFlg : (buttonflg,
-                  //editableflg,screenCode,uid,screenName,
-                    page,sorted,params) =>{
+  setButtonFlg : (buttonflg,    //editableflg,screenCode,uid,screenName,
+                    page,sortBy,params) =>{
         dispatch(ButtonFlgRequest(buttonflg,params)) // import export 画面用
-        switch (buttonflg) {
+        switch (buttonflg) {  //buttonflg ==button_code
           case "reset":
-            params= { ...params, page: page,sorted:sorted,req:"reset"}
+            params= { ...params, page: page,sortBy:sortBy,req:"reset"}
           //editableflg = true
             return dispatch(ResetRequest(params)) //
 
-          case "inlineedit":
-              params= { ...params, page: page,sorted:sorted,req:"editabletablereq"}
+          case "inlineedit7":
+              params= { ...params, page: page,sortBy:sortBy,req:"inlineedit7"}
             //editableflg = true
-              return dispatch(ScreenRequest(params)) //
+              return dispatch(ScreenRequest(params,null)) //data=null
         
-          case "inlineadd":
-            params= {...params,  page: page, pages:1,req:"inlineaddreq"}
+          case "inlineadd7":
+            params= {...params,  page: page, pages:1,req:"inlineadd7"}
           //  editableflg = true
-             return  dispatch(ScreenRequest(params)) //
+             return  dispatch(ScreenRequest(params,null)) //data=null
           
           case "export":
               params= {...params,  req:"download"}

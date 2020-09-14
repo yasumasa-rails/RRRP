@@ -7,7 +7,7 @@ function ButtonListGetApi({token,client,uid}) {
   let url = 'http://localhost:3001/api/menus7'
 
   const headers =  { 'access-token':token.token, 
-                    client,uid,}
+                    client:client.client,uid:uid.uid}
   const params =  {uid:uid.uid,req:'bottunlistreq'}
 
   const options ={method:'POST',

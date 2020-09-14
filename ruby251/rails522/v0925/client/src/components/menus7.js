@@ -12,6 +12,7 @@ import  SignUp  from './signup'
 import  Login  from './login'
 import {ScreenRequest} from '../actions'
 import ScreenGrid7 from './screengrid7'
+import ButtonList from './buttonlist'
 
 const titleNameSet = (screenName) =>{ return (
   document.title = `${screenName}`
@@ -21,7 +22,7 @@ const titleNameSet = (screenName) =>{ return (
 class Menus7 extends React.Component {
   render() {
     const { isAuthenticated ,menuListData,uid,getScreen, params,screenCode,
-            pageSize,page,sorted,filtered,isSignUp } = this.props
+            pageSize,page,sortBy,filtered,isSignUp,hostError } = this.props
     
     if (isAuthenticated) {
       if(menuListData){
@@ -51,7 +52,7 @@ class Menus7 extends React.Component {
                     <Tab key={index} >
                       <Button   type="submit"
                       onClick ={() => getScreen(val.screen_code,pageSize?pageSize:val.page_size,
-                                                page,sorted,filtered,val.scr_name,uid,params
+                                                page,sortBy,filtered,val.scr_name,uid,params
                                                 )}>
                       {val.scr_name}       
                       </Button>             
@@ -66,7 +67,10 @@ class Menus7 extends React.Component {
                 </TabPanel> 
               )}
             </Tabs>
-                  {screenCode?screenCode==="" ? "" : <ScreenGrid7/>:"" }
+                  {screenCode?screenCode==="" ? "" :
+                              <div> <ScreenGrid7/></div>:hostError }
+                  {screenCode?screenCode==="" ? "" :
+                              <div> <ButtonList/></div>:""}
            </div>    
       )
     }
@@ -97,22 +101,22 @@ const  mapStateToProps = (state,ownProps) =>({
   pageSize:state.screen?state.screen.pageSize:null,
   page:state.screen?state.screen.page:0,
   data:state.screen?state.screen.data:[],
-  sorted:state.screen?state.screen.sorted:{}, 
+  sortBy:state.screen?state.screen.sortBy:{}, 
   filtered:state.screen?state.screen.filtered:{}, 
   params:state.screen.params,
   originalreq:state.screen.originalreq,
   message:state.menu.message,
   screenCode:state.screen.params?state.screen.params.screenCode:"",
+  hostError: state.screen.hostError,
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-      getScreen : (screenCode,pageSize, page,sorted,filtered,screenName, uid,params) =>{
+      getScreen : (screenCode,pageSize, page,sortBy,filtered,screenName, uid,params) =>{
         titleNameSet(screenName)
         if(params){}else{params={}}
         params= { ...params, page: page, pageSize : pageSize,
-                        sorted:sorted, screenName:  screenName,
+                        sortBy:sortBy, screenName:  screenName,
                          screenCode:screenCode,uid:uid,req:"viewtablereq7",filtered:filtered} 
-        dispatch(ScreenRequest(params))}
+        dispatch(ScreenRequest(params,null))}   //data:null
           })    
-
 export default connect(mapStateToProps,mapDispatchToProps)(Menus7)

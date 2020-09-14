@@ -6,14 +6,13 @@ module ScreenLib
 	extend self
 
 	def proc_create_filteredstr  params,grid_columns_info
-			filtered = params[:filtered]
 			where_info = (grid_columns_info["where_info"]||="")
 			if (where_info["filtered"]||="").size > 0
 				 where_str =   "  where " +	 where_info["filtered"] + "    and "
 			else
 				 where_str = "  where "	 
 			end	
-			filtered.each  do |strjson|  ##xparams gridの生
+			params[:filtered].each  do |strjson|  ##xparams gridの生
 				ff = JSON.parse(strjson)
 				next if ff["value"].nil?
 				next if ff["value"] == ""
@@ -115,24 +114,23 @@ module ScreenLib
 		where_str = params[:where_str]
 		
 		strsorting = ""
-			if params[:sort]
-				if  params[:sort].class.to_s == "String"
-						params[:sort] = JSON.parse(params[:sort])
+			if params[:sortBy]  and   params[:sortBy] != "" ###: {id: "itm_name", desc: false}
+				if  params[:sortBy].class.to_s == "String"
+						params[:sortBy] = JSON.parse(params[:sortBy])
 				end
-				params[:sort].each do |field,isSortedDesc|
-						if isSortedDesc	== true or isSortedDesc  == false
-							strsorting = " order by " if strsorting == ""
-							strsorting << %Q% #{filed} #{if isSortedDesc  == false then " asc " else "" end} %
-						end
+				params[:sortBy].each do |field|
+					strsorting = " order by " if strsorting == ""
+					sortKey = JSON.parse(field)
+					strsorting << %Q% #{sortKey["id"]} #{if sortKey["desc"]  == false then " asc " else "desc" end} ,%
 				end	
 				if strsorting == ""
 					strsorting = " order by id desc "
 				else
-					strsorting << ",id desc "
+					strsorting << " id desc "
 				end
 			else
-				strsorting = " order by id desc "
-				params[:sort] = {}
+				strsorting = "  order by id desc "
+				params[:sortBy] = {}
 			end
 			strsql = "select #{select_fields} from (SELECT ROW_NUMBER() OVER (#{strsorting}) ,#{select_fields}
 													 FROM #{screenCode} #{if where_str == '' then '' else where_str end } ) x
@@ -174,16 +172,17 @@ module ScreenLib
 	end	
 
 	def add_empty_data params,grid_columns_info
-				num = params[:pageSize].to_f
-				columns_info = grid_columns_info["columns_info"]
-				until num <= 0 do
-							temp ={}
-							columns_info.each do |cell|
-									temp[cell[:accessor]] = ""
-							end	
-							pagedata << temp
-							num = num - 1
-				end
+		num = params[:pageSize].to_f
+		columns_info = grid_columns_info["columns_info"]
+		pagedata = []
+		until num <= 0 do
+				temp ={}
+				columns_info.each do |cell|
+						temp[cell[:accessor]] = ""
+				end	
+				pagedata << temp
+				num = num - 1
+		end
 		params[:pageCount] = 1
 		return pagedata		
 	end	   ## proc_strwhere
@@ -336,7 +335,7 @@ module ScreenLib
 			nameToCode = {}
 			columns_info = []
 			hiddenColumns = []
-			if (req=='editabletablereq'|| req=="inlineaddreq" )
+			if (req=='inlineedit7'|| req=="inlineadd7" )
 				columns_info << {:Header=>"confirm",
 									:accessor=>"confirm",
 									:id=>"",
@@ -348,6 +347,7 @@ module ScreenLib
 									:id=>"",
 									:className=>"gridmessage",
 									}
+				hiddenColumns << "confirm_gridmessage"
 			end		
 			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|		
 				##if i["screenfield_selection"] == "0" or i["pobject_code_sfd"] == "id" or i["pobject_code_sfd"] =~ /_id/ 		
@@ -375,16 +375,16 @@ module ScreenLib
 									:width => i["screenfield_width"].to_i,
 									##:style=>%Q%{"textAlign":#{if i["screenfield_type"] == "numeric" then "right" else "left" end}%, 
 									##:style=>{:textAlign=>if i["screenfield_type"] == "numeric" then "right" else "left" end}, 
-									:className=>if  (req==="editabletablereq" or req==="inlineaddreq") and 
+									:className=>if  (req==="inlineedit7" or req==="inlineadd7") and 
 													(i["screenfield_editable"] === "1" or i["screenfield_editable"] === "2" or i["screenfield_editable"] === "3") 
-														if i["screenfield_editable"] === "1"  ###必須はyupでも
+														if i["screenfield_indisp"] === "1"  ###必須はyupでも
 															case i["screenfield_type"] 
 															when "select"
 																	"SelectEditableRequire"
 															when "check"
 																	"CheckEditableRequire"
 															when "numeric"
-																	"EditableNumericRequire"
+																	"EditableRequire Numeric "
 															else
 																	"EditableRequire"
 															end
@@ -395,7 +395,7 @@ module ScreenLib
 															when "check"
 																	"CheckEditable"
 															when "numeric"
-																	"EditableNumeric"
+																	"Editable Numeric "
 															else
 																	"Editable"
 															end
@@ -407,22 +407,22 @@ module ScreenLib
 															when "check"
 																"CheckNonEditable"
 															when "numeric"
-																"NonEditableNumeric"
+																"NonEditable Numeric "
 															else
 																"NonEditable"
 														end
 												end	
 									}
-					if ((req==="editabletablereq" or req==="inlineaddreq") and i["screenfield_editable"] === "1") or
-						(req==="editabletablereq"  and i["screenfield_editable"] === "2") or
+					if ((req==="inlineedit7" or req==="inlineadd7") and i["screenfield_editable"] === "1") or
+						(req==="inlineedit7"  and i["screenfield_editable"] === "2") or
 						( req==="inlineaddreq" and i["screenfield_editable"] === "3") 
 						columns_info << {:Header=>"#{i["screenfield_name"]}_gridmessage",
 										:accessor=>"#{i["pobject_code_sfd"]}_gridmessage",
-										:id=>"#{i["screenfield_id"]}_gridmessage",
+										:id=>"#{i["pobject_code_sfd"]}_gridmessage",
 										:className=>"gridmessages"
 									}
 						gridmessages_fields << %Q% '' #{i["pobject_code_sfd"]}_gridmessage,%	
-						hiddenColumns << %Q% '' #{i["pobject_code_sfd"]}_gridmessage,%	
+						hiddenColumns << %Q%#{i["pobject_code_sfd"]}_gridmessage%	
 					end																
 					where_info[i["pobject_code_sfd"].to_sym] = i["screenfield_type"]	
 					if cnt == 0

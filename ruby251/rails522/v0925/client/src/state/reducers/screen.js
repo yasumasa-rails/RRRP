@@ -80,7 +80,7 @@ nameToCode:action.action.data.nameToCode,
 case SCREEN_SUCCESS7: // payloadに統一
 return {...state,
   loading:false,
-  message: [],
+  hostError: null,
   data: action.action.data.data,
   params: action.action.data.params,
   status: action.action.data.status,
@@ -94,8 +94,10 @@ return {...state,
 case SCREEN_LINEEDIT:
 return {...state,
   data:action.payload.data,
+  params:action.payload.params,
   loading:false,
   filterable:false,  
+  hostError: null,
 }  
 
 case  DROPDOWNVALUE_SET:
@@ -110,7 +112,7 @@ case  DROPDOWNVALUE_SET:
 // set the success and requesting flags to false
 case SCREEN_FAILURE:
   return {
-  hostError: action.errors,
+  hostError: action.message,
 }
 
 case FETCH_REQUEST:
@@ -126,6 +128,7 @@ return {...state,
 case FETCH_FAILURE:
     return {...state,
       data:action.payload.data,  
+      params:action.payload.params,  
       loading:false,
       filterable:false,
     }
@@ -133,8 +136,10 @@ case FETCH_FAILURE:
 case FETCH_RESULT:
           return {...state,
             data:action.payload.data, 
+            params:action.payload.params,  
             loading:false,
             filterable:false,
+            hostError: null,
     }
 
 //  case INPUTFIELDPROTECT_REQUEST:

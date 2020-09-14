@@ -97,12 +97,14 @@ export function datacheck(schema,field,linedata){
 
 // yupでは　2019/12/32等がエラーにならない。　2020/01/01になってしまう
 export function dataCheck7(schema,updateRow){ 
+  let confirm_gridmessage = "done"
   Object.keys(updateRow).map((field)=>{
-    switch(schema.field["_type"]){
+    switch(schema.fields[field]["_type"]){
       case "date" :
           let moment = require('moment');
           let yyyymmdd = updateRow[field].split(/-|\//)
-          if(yyyymmdd[1] === undefined){updateRow[`${field}_gridmessage`] = "not date type yyyy/mm/dd or yyyy-mm-dd"}
+          if(yyyymmdd[1] === undefined){updateRow[`${field}_gridmessage`] = "not date type yyyy/mm/dd or yyyy-mm-dd"
+                                        confirm_gridmessage =  updateRow[`${field}_gridmessage`] + confirm_gridmessage}
           else{
               if(yyyymmdd[1].length===1){yyyymmdd[1] = "0"+yyyymmdd[1]}
               if(yyyymmdd[2] === undefined ){yyyymmdd[2] = "01"
@@ -113,11 +115,11 @@ export function dataCheck7(schema,updateRow){
                     updateRow[`${field}_gridmessage`] = "ok"
                   }else{
                     updateRow[`${field}_gridmessage`] = "not date "
-                    updateRow["confirm_gridmessage"] =  updateRow[`${field}_gridmessage`] + updateRow["confirm_gridmessage"]
+                    confirm_gridmessage =  updateRow[`${field}_gridmessage`] + confirm_gridmessage
                   }
               }else{
                     updateRow[`${field}_gridmessage`] = "not date type yyyy/mm/dd or yyyy-mm-dd"
-                    updateRow["confirm_gridmessage"] =  updateRow[`${field}_gridmessage`] + updateRow["confirm_gridmessage"]
+                    confirm_gridmessage =  updateRow[`${field}_gridmessage`] + confirm_gridmessage
                }
               }
         break     
@@ -128,7 +130,7 @@ export function dataCheck7(schema,updateRow){
                     updateRow[field].split(",").map((rowcnt)=>{
                     if(isNaN(rowcnt)){ 
                         updateRow[`${field}_gridmessage`] = " must be xxx,yyy,zzz :xxx-->numeric"
-                        updateRow["confirm_gridmessage"] =  updateRow[`${field}_gridmessage`] + updateRow["confirm_gridmessage"]
+                        confirm_gridmessage =  updateRow[`${field}_gridmessage`] + confirm_gridmessage
                       }
                     return updateRow
                 })
@@ -137,7 +139,7 @@ export function dataCheck7(schema,updateRow){
                 if(/_code/.test(updateRow["pobject_code_sfd"])&updateRow["screenfield_editable"]!=="0")
                     {if(updateRow["screenfield_indisp"]!=="1")
                             {updateRow["screenfield_indisp_gridmessage"] = " must be Required"}
-                             updateRow["confirm_gridmessage"] =  updateRow[`${field}_gridmessage`] + updateRow["confirm_gridmessage"]
+                            confirm_gridmessage =  updateRow[`${field}_gridmessage`] + confirm_gridmessage
                           }
                 break
             default:
@@ -146,6 +148,8 @@ export function dataCheck7(schema,updateRow){
       }   
       return  updateRow  
   })
+  
+  updateRow["confirm_gridmessage"] = confirm_gridmessage
   return updateRow   
 }   
 

@@ -1,5 +1,8 @@
 import {  BUTTONLIST_REQUEST, BUTTONLIST_SUCCESS, BUTTONFLG_REQUEST,GANTT_RESET,
-  TBLFIELD_SUCCESS,SCREEN_SUCCESS,GANTTCHART_SUCCESS,LOGOUT_REQUEST,RESET_REQUEST} from 'actions'
+  TBLFIELD_SUCCESS,SCREEN_SUCCESS,SCREEN_SUCCESS7,GANTTCHART_SUCCESS,LOGOUT_REQUEST,RESET_REQUEST}
+   from 'actions'
+
+export let getButtonState = state => state.button
 const initialValues = {
 errors:[],
 buttonflg:""
@@ -44,6 +47,13 @@ disabled:false,
 }
 
 case SCREEN_SUCCESS:
+return {...state,
+disabled:false,
+messages:null,
+message:null,
+}
+
+case SCREEN_SUCCESS7:
 return {...state,
 disabled:false,
 messages:null,
