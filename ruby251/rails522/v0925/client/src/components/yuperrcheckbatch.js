@@ -1,7 +1,7 @@
 //規定値はセットされない。
 import {yupschema} from '../yupschema'
-import {datacheck} from './yuperrcheck'
-import {onBlurFunc} from './onblurfunc'
+import {dataCheck7} from './yuperrcheck'
+import {onBlurFunc7} from './onblurfunc'
 export  function yupErrCheckBatch(lines,screenCode) 
 {
     let Yup = require('yup')
@@ -15,13 +15,13 @@ export  function yupErrCheckBatch(lines,screenCode)
                 line[`confirm`] = ""  //rb uploadで confirm=""のみを対象としているため
                 Object.keys(line).map((fd)=>{
                     if(screenSchema.fields[fd]){  //対象は入力項目のみ
-                        line = datacheck(screenSchema,fd,line)
+                        line = dataCheck7(screenSchema,fd,line)
                         if(line[`${fd}_gridmessage`] !== "ok"){
                           line[`${fd}_confirm`] = `err ${fd}`
-                          line[`${tblnamechop}_confirm_gridmessage`] = `err ${fd}`　
+                          line[`${tblnamechop}_confirm_gridmessage`] = `error ${fd}`　
                           importError = true
                         }else{
-                            let rval = onBlurFunc(screenCode,line,fd)
+                            let rval = onBlurFunc7(screenCode,line,fd)
                             line[fd] = rval["linedata"][fd] 
                         }
                     }
@@ -30,7 +30,7 @@ export  function yupErrCheckBatch(lines,screenCode)
                 )
             }      
             catch(err){  //jsonにはxxxx_gridmessageはない。
-                line[`${tblnamechop}_ confirm_gridmessage`] = `err ${err}`
+                line[`${tblnamechop}_ confirm_gridmessage`] = `error ${err}`
                 line[`confirm`] = false
                 importError = true
             }

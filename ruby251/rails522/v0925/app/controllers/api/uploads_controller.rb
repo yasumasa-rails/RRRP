@@ -153,7 +153,7 @@ module Api
           begin
               ActiveRecord::Base.connection.begin_db_transaction()
                   command_all.each do |command_cn|
-                      command_rn,tmpreqparams = RorBlkctl.proc_private_aud_rec(command_cn,r_cnt0,nil,nil,nil) ###nil:parenttblname,paretblid,reqparams
+                      reqparams = RorBlkctl.proc_private_aud_rec(command_cn,r_cnt0,nil,nil,nil) ###nil:parenttblname,paretblid,reqparams
                       acommand << command_rn
                       results[idx+1]["confirm"] = "OK" 
                       if reqparams.nil?

@@ -1,31 +1,38 @@
-import { SCREEN_REQUEST,SCREEN_SUCCESS,SCREEN_SUCCESS7,
+import {  SCREENINIT_REQUEST,SCREEN_REQUEST,SCREEN_SUCCESS7,
   SCREEN_FAILURE,LOGOUT_REQUEST,SCREEN_PARAMS_SET,
   SCREEN_LINEEDIT,SCREEN_ERR_CHECK_RESULT,SCREEN_ONBLUR,
   //SCREEN_ONKEYUP,
   FETCH_REQUEST,FETCH_RESULT,FETCH_FAILURE,
   YUP_ERR_SET,YUP_RESULT,DROPDOWNVALUE_SET,
-//  INPUTFIELDPROTECT_REQUEST
+  INPUTFIELDPROTECT_REQUEST,INPUTPROTECT_RESULT,
 } 
   from '../../actions'
 
 export let getScreenState = state => state.screen
 
 const initialValues = {
-  params:{screenCode:""},
 }
 
 const screenreducer =  ( state= initialValues , action) =>{
 switch (action.type) {
 // Set the requesting flag and append a message to be shown
-case SCREEN_REQUEST:
+
+case SCREENINIT_REQUEST:
   return {...state,
-          screenCode:action.payload.params.screenCode, 
-          pageSize:action.payload.params.pageSize, 
-          screenName:action.payload.params.screenName, 
+          params:action.payload.params,
           loading:true,
           message: [{ body: 'screen loading ...', time: new Date() }],
           // editableflg:action.payload.editableflg
 }
+
+case SCREEN_REQUEST:
+return {...state,
+        params:action.payload.params,
+        loading:true,
+        message: [{ body: 'screen loading ...', time: new Date() }],
+        // editableflg:action.payload.editableflg
+}
+
 
 case SCREEN_PARAMS_SET:
 return {...state,
@@ -57,39 +64,18 @@ return {...state,
   filterable:false,          
 }
 
-// Successful?  .
-case SCREEN_SUCCESS:
-return {...state,
-message: [],
-columns: action.action.data.columns,  /// payloadに統一
-data: action.action.data.data,
-params: action.action.data.params,
-pages: action.action.data.pageInfo.totalPage,
-sizePerPageList: action.action.data.pageInfo.sizePerPageList,
-screenwidth: action.action.data.pageInfo.screenwidth,
-yup:action.action.data.yup,
-dropDownList:action.action.data.dropdownlist,
-status: action.action.data.status,
-loading:false,
-//filterable:action.action.data.params.req==="viewtablereq"?true:false,
-filterable:true,
-originalreq: action.action.data.params.req,
-nameToCode:action.action.data.nameToCode,
-}
-
 case SCREEN_SUCCESS7: // payloadに統一
 return {...state,
   loading:false,
   hostError: null,
-  data: action.action.data.data,
-  params: action.action.data.params,
-  status: action.action.data.status,
-  //filterable:action.action.data.params.req==="viewtablereq"?true:false,
   filterable:true,
-  grid_columns_info:action.action.data.grid_columns_info,
+  disabled:false,
+  data: action.payload.data.data,
+  params: action.payload.data.params,
+  status: action.payload.data.status,
+  grid_columns_info:action.payload.data.grid_columns_info,
+  //filterable:action.action.data.params.req==="viewtablereq"?true:false,
 }
-
-
 
 case SCREEN_LINEEDIT:
 return {...state,
@@ -97,7 +83,7 @@ return {...state,
   params:action.payload.params,
   loading:false,
   filterable:false,  
-  hostError: null,
+  hostError:action.payload.data[action.payload.params.index].confirm_message
 }  
 
 case  DROPDOWNVALUE_SET:
@@ -107,21 +93,18 @@ case  DROPDOWNVALUE_SET:
       data:state.data
   }  
 
-
 // Append the error returned from our api
 // set the success and requesting flags to false
 case SCREEN_FAILURE:
-  return {
-  hostError: action.message,
+  return {...state,
+  hostError: action.payload.message,
+  data: action.payload.data,
 }
 
 case FETCH_REQUEST:
 return {...state,
   params:action.payload.params, 
-  token:action.payload.token, 
-  client:action.payload.client, 
-  uid:action.payload.uid, 
-  //loading:true,
+  loading:true,
   //editableflg:false
 }
 
@@ -131,6 +114,7 @@ case FETCH_FAILURE:
       params:action.payload.params,  
       loading:false,
       filterable:false,
+      hostError: action.payload.params.err,  
     }
 
 case FETCH_RESULT:
@@ -142,11 +126,12 @@ case FETCH_RESULT:
             hostError: null,
     }
 
-//  case INPUTFIELDPROTECT_REQUEST:
-//            return {...state,
-//              //columns:action.payload.columns, 
-//              editableflg:false
-//            }
+case INPUTFIELDPROTECT_REQUEST:
+  return {...state,
+            }
+case INPUTPROTECT_RESULT:
+  return {...state,
+          }
 
 case YUP_RESULT:
     return {...state,

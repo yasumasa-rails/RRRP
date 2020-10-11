@@ -7,14 +7,7 @@ import {getLoginState} from '../reducers/auth'
 
 
 function screenApi({params,token,client,uid}) {
-  let url
-  switch(true){
-    case /7$/.test(params.req):
-       url = 'http://localhost:3001/api/menus7'
-       break
-    default:
-      url = 'http://localhost:3001/api/menus'
-  }     
+  let url = 'http://localhost:3001/api/menus7'
   const headers = {'access-token':token,'client':client,'uid':uid }
 
   const options ={method:'POST',
@@ -22,13 +15,7 @@ function screenApi({params,token,client,uid}) {
     params: params,
     headers:headers,
     url,}
-    return (axios(options)
-      .then((response ) => {
-        return  {response}  ;
-        })
-      .catch(error => (
-        { error }
-    )));
+    return (axios(options));
 }
 
 export function* DownloadSaga({ payload: {params}  }) {
@@ -36,17 +23,22 @@ export function* DownloadSaga({ payload: {params}  }) {
   let token = loginState.token       
   let client = loginState.client         
   let uid = loginState.uid 
-  
-  let {response,error}  = yield call(screenApi,{params ,token,client,uid} )
-      if(response || !error){
-          return yield put({ type: DOWNLOAD_SUCCESS, payload: response })   
-      }else
-     {  
-      let message
-       switch (true) {
-           case /code.*500/.test(error): message = 'Internal Server Error'; break;
-           case /code.*401/.test(error): message = 'Invalid credentials'; break;
-           default: message = `Something went wrong ${error}`;}
-      yield put({ type: DOWNLOAD_FAILURE, errors: message })
-  }
- } 
+
+  let response  = yield call(screenApi,{params ,token,client,uid} )
+  let message
+  switch (response.status) {
+    case 200:  
+          yield put({ type: DOWNLOAD_SUCCESS, payload: response })   
+          break
+    case 500:
+           message = 'Internal Server Error';
+           yield put({ type: DOWNLOAD_FAILURE, errors: message })
+           break
+    case 401:
+            message = 'Invalid credentials'; 
+            yield put({ type: DOWNLOAD_FAILURE, errors: message })
+            break
+    default:
+           message = `${response.status} : Something went wrong ${response.statusText}`;}
+           yield put({ type: DOWNLOAD_FAILURE, errors: message })
+ }

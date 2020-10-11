@@ -4,6 +4,7 @@ module ControlFields
 	extend self	
 		
 	def  proc_chk_fetch_rec params  
+		params[:err] = ""
 		fetch_data,mainviewflg,keys,findstatus,screendata,missing = get_fetch_rec params
 	  	if findstatus
 			if mainviewflg   ##mainviewflg = true 自分自身の登録
@@ -85,7 +86,7 @@ module ControlFields
 						end
 					end
 				end
-				fetch_data[rec["pobject_code_sfd"]] = screendata[rec["pobject_code_sfd"]]	
+				##fetch_data[rec["pobject_code_sfd"]+delm] = screendata[rec["pobject_code_sfd"]]	  ###rec 画面のフィード名レコード
 			end
 			if missing == false  ###検索のための入力項目はすべて入力されている。
 				rec =  ActiveRecord::Base.connection.select_one(strsql[0..-8] + " limit 1")
@@ -97,12 +98,12 @@ module ControlFields
 				screendata.each do |key,val|  ###結果をセット
 					items = key.split("_")
 					if items[-1] == delm[1..-1]   ##delmは_(アンダーバー付き)
-						field = items[0..-2].join("_")
+						field = items[0..-2].join("_")   ##delm(:)が3在った時
 					else	
 						field = items.join("_")
 					end	
 					if rec[field] and key !="id" and key !~ /person.*upd/ and field !~ /^#{params[:screenCode].split("_")[1].chop}/ 
-						fetch_data[field+delm] =  rec[field]
+						fetch_data[field+delm] =  rec[field] ###rec:検索結果
 						case params[:screenCode]
 							when /opeitms$/
 								if screendata["opeitm_stktaking_proc"] == "" or screendata["opeitm_stktaking_proc"].nil?
@@ -113,12 +114,12 @@ module ControlFields
 									end
 								end
 						end	
-					else
+					else                ##tblnamechop idを持ったテーブル名
 						if 	field =~ /^#{tblnamechop}/ and  rec[field.gsub(tblnamechop,srctblnamechop)] and
 								field !~ /_isudate$|_sno$|_gno$|_cno$/ and field != "#{tblnamechop}_id" 
 							fetch_data[field] =  rec[field.gsub(tblnamechop,srctblnamechop)]
 						else ###gnoはまとめkeyのため対象外
-							if  key	=~ /_sno_|_cno_/ and field =~ /^#{tblnamechop}/ and val != "" 
+							if  key	=~ /_sno_|_cno_/ and field =~ /^#{tblnamechop}/ and val != ""  and key !~ /_gridmessage/
 								strsql = %Q% select sum(qty_src) qty_src 
 												from srctbls  where #{key.split("_")[1]} = '#{val}' 
 												and srctblname = '#{srctblnamechop}s'
@@ -171,7 +172,7 @@ module ControlFields
 						and blkuky_expiredate > current_date order by blkuky_grp,blkuky_seqno%
 		ActiveRecord::Base.connection.select_all(strsql).each do |rec|
 			if save_blkuky_grp != rec["blkuky_grp"] 
-				if  !save_blkuky_grp.nil?
+				if  !save_blkuky_grp.nil? and keys.exclude?("id")
 					err = blkuky_check_detail tbl,keys,linedata,err
 					keys = []
 				end
@@ -490,8 +491,11 @@ module ControlFields
 									where pobject_code_tbl = '#{@command_c[:sio_code].split("_")[1]}')
 						order by tblfield_seqno
 		%
-		ActiveRecord::Base.connection.select_values(strsql).each do |fd|
+		fields = ActiveRecord::Base.connection.select_values(strsql)
+		fields.each do |fd|
 			###lotnoはpur,prd項目ではないのでここにはない。
+			cnoflg = false
+			gnoflg = false
 			case fd
 				when "autocreate_act"
 						field_autocreate_act 
@@ -502,8 +506,11 @@ module ControlFields
 				when "chrgs_id"
 						field_chrgs_id 
 				when "cno"  ###画面の時用にror_blkctl.set_src_tblでもsetしてる
-						if @command_c["#{@tblnamechop}_cno"].nil? or @command_c["#{@tblnamechop}_cno"] == ""
+						if (@command_c["#{@tblnamechop}_cno"].nil? or @command_c["#{@tblnamechop}_cno"] == "") and
+								(!@command_c["id"].nil? and  @command_c["id"] != "")
 							@command_c["#{@tblnamechop}_cno"]  = proc_field_cno @command_c["id"]
+						else
+							cnoflg = true
 						end
 				when "confirm"
 						field_confirm
@@ -516,11 +523,20 @@ module ControlFields
 				when "expiredate"
 						field_expiredate
 				when "gno" ###画面の時用にror_blkctl.set_src_tblでもsetしてる
-					if @command_c["#{@tblnamechop}_gno"].nil? or @command_c["#{@tblnamechop}_gno"]  == ""
+					if @command_c["#{@tblnamechop}_gno"].nil? or @command_c["#{@tblnamechop}_gno"]  == "" and
+							(!@command_c["id"].nil? and @command_c["id"] != "")
 						@command_c["#{@tblnamechop}_gno"]   = proc_field_gno @command_c["id"]
+					else
+						gnoflg = true
 					end
 				when "id"  ###追加または更新の判断
 						field_tblid
+						if (@command_c["#{@tblnamechop}_cno"].nil? or @command_c["#{@tblnamechop}_cno"] == "") and cnoflg 
+							@command_c["#{@tblnamechop}_cno"]  = proc_field_cno @command_c["id"]
+						end  ###cnoセット時にまだ　idが決定してなかった。
+						if (@command_c["#{@tblnamechop}_gno"].nil? or @command_c["#{@tblnamechop}_gno"]  == "") and  gnoflg
+							@command_c["#{@tblnamechop}_gno"]   = proc_field_gno @command_c["id"]
+						end
 				when "isudate"
 						if @command_c[:sio_classname] == "_add_update_grid_line_data"
 							field_isudate 
@@ -551,13 +567,15 @@ module ControlFields
 						field_suppliers_id
 				when "workplaces_id"
 						field_workplaces_id
+				when "crrs_id_pur"
+						field_crrs_id_pur
 			end	
 		end		
 		return @command_c
 	end	 
 
 	def	field_tblid
-		if @command_c["id"] == ""
+		if @command_c["id"] == "" or  command_c["id"].nil?
 			@command_c[:sio_classname] = "_add_update_grid_line_data"
 			@command_c["id"] =  RorBlkctl.proc_get_nextval("#{@tblnamechop}s_seq")
 	 	else         
@@ -595,6 +613,10 @@ module ControlFields
 		###worlplace_code = dummy は必須 id = 0
 		id ||= 0
 		@command_c["#{@tblnamechop}_workplace_id"] = id ##
+	end 
+
+	def field_crrs_id_pur 
+		@command_c["#{@tblnamechop}_crr_id_pur"] = @para["crrs_id_pur"]
 	end 
 
 	def field_shelfnos_id_to 
@@ -660,7 +682,6 @@ module ControlFields
 	def proc_field_sno(tblnamechop,id)
 		ControlFields.proc_snolist["#{tblnamechop}s"] + format('%05d', id) 
 	end
-
 
 	def proc_field_cno id 
 		 format('%07d', id)

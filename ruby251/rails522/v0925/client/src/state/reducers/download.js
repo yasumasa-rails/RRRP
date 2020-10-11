@@ -1,5 +1,5 @@
 import {  DOWNLOAD_REQUEST,DOWNLOAD_SUCCESS,DOWNLOAD_RESET,LOGOUT_REQUEST,RESET_REQUEST,
-            SCREEN_SUCCESS,GANTTCHART_SUCCESS } from 'actions'
+            GANTTCHART_SUCCESS,DOWNLOAD_FAILURE } from 'actions'
 const initialValues = {
 errors:[],
 buttonflg:""
@@ -7,38 +7,41 @@ buttonflg:""
 
 const downloadreducer =  (state= initialValues , actions) =>{
 switch (actions.type) {
+
 case DOWNLOAD_REQUEST:
 return {...state,
 excelData:null,
-totalcnt:null,
+totalCount:null,
 params:actions.payload.params,
 downloadloading:"doing",
-disabled:true,
+isSubmitting:true,
 messages:null,
 message:null,
+errors:null,
 }
 case DOWNLOAD_SUCCESS:
 return {...state,
 excelData:actions.payload.data.excelData,
-totalcnt:actions.payload.data.totalcnt,
+totalCount:actions.payload.data.totalCount,
 downloadloading:"done",
-disabled:false,
-}
-case DOWNLOAD_RESET:
-return {...state,
-excelData:null,
-totalcnt:null,
-buttonflg:null,
-downloadloading:"",
-disabled:false,
+isSubmitting:false,
+errors:null,
 }
 
-case SCREEN_SUCCESS:
+case DOWNLOAD_RESET:
 return {...state,
+isSubmitting:true,
+}
+
+
+case  DOWNLOAD_FAILURE:
+return {...state,
+errors:actions.errors,
 disabled:false,
 messages:null,
 message:null,
 }
+
 
 case GANTTCHART_SUCCESS:
 return {...state,
@@ -54,7 +57,7 @@ return {}
 case RESET_REQUEST:
 return {...state,
   excelData:null,
-  totalcnt:null,
+  totalCount:null,
   buttonflg:null,
   downloadloading:"",
   disabled:false,

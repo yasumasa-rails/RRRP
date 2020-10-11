@@ -32,7 +32,7 @@ export function* GanttChartSaga({ payload: {params}  }) {
   let client = loginState.client         
   let uid = loginState.uid    
   const screenState = yield select(getScreenState) //
-  params["linedata"] = screenState.data[params.onClickSelect.index]
+  params["linedata"] = screenState.data[params.clickIndex]
   let {response,error} = yield call(GanttApi,{params ,token,client,uid} )
   if(response || !error){
       switch(params.req) {

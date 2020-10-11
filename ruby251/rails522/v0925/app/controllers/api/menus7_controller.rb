@@ -5,6 +5,9 @@ module Api
       end
       def create
             grid_columns_info = {}
+            strsql = "select person_code_chrg from r_chrgs rc where person_email_chrg = '#{current_api_user[:email]}'"
+            person_code_chrg = ActiveRecord::Base.connection.select_value(strsql)
+            params[:person_code_chrg] = person_code_chrg
             case params[:req] 
             when 'menureq'
               if Rails.env == "development" 
@@ -27,13 +30,10 @@ module Api
             when 'viewtablereq7','inlineedit7'
                 ScreenLib.proc_create_grid_editable_columns_info current_api_user[:email],params,grid_columns_info
                 if params[:filtered]  ###sortの処理はScreenLib内部だけ
-                  if params[:filtered].class.to_s == "String"
-                    params[:filtered] = JSON.parse(params[:filtered])
-                  end
                     ScreenLib.proc_create_filteredstr params,grid_columns_info
                 else
                   params[:where_str] = (grid_columns_info["where_info"]["filtered"]||="")  ###@where_info["filtered"] screen sort 規定値
-                  params[:filtered]=[]
+                  params[:filtered]="[]"
                 end    
                 params[:pageIndex] = params[:pageIndex].to_f
                 params[:pageSize] = params[:pageSize].to_f
@@ -43,25 +43,24 @@ module Api
                 #        :yup=>grid_columns_info["yup"],:dropdownlist=>grid_columns_info["dropdownlist"],:nameToCode=>grid_columns_info["nameToCode"]}         
              
             when 'inlineadd7'
-                screenCode = params[:screenCode]
                 ScreenLib.proc_create_grid_editable_columns_info current_api_user[:email] ,params,grid_columns_info
                 params[:pageIndex] = 0
-                params[:filtered]=[]
-                params[:sort]={}
+                params[:filtered]="[]"
+                params[:sort]="[]"
                 pagedata = ScreenLib.add_empty_data  params,grid_columns_info ### nil filtered sorting
                 render json:{:grid_columns_info=>grid_columns_info,:data=>pagedata,:params=>params}               
           
             when "fetch_request"
-                xparams = params.dup  
+                xparams = params.dup   ### ControlFields.proc_chk_fetch_rec でparamsがnilになってしまうため。
                 xparams[:parse_linedata] = JSON.parse(params[:linedata])
                 xparams = ControlFields.proc_chk_fetch_rec xparams
                 render json: {:params=>xparams}   
 
             when "check_request"  
-                xparams = params.dup  
+                xparams = params.dup　## ControlFields.proc_judge_check_code でparamsがnilになってしまうため。
                 xparams[:parse_linedata] =  JSON.parse(params[:linedata])
-                rparams = ControlFields.proc_judge_check_code xparams
-                render json: {:params=>rparams}   
+                xparams = ControlFields.proc_judge_check_code xparams
+                render json: {:params=>xparams}   
 
             when "confirm7"
                 rparams = params.dup
@@ -69,7 +68,7 @@ module Api
                 tblnamechop = params[:screenCode].split("_")[1].chop
                 yup_fetch_code = grid_columns_info["yup"]["yupfetchcode"]
                 yup_check_code = grid_columns_info["yup"]["yupcheckcode"]
-                rparams[:parse_linedata] = JSON.parse(params["linedata"])
+                rparams[:parse_linedata] = JSON.parse(params[:linedata])
                 parse_linedata = rparams[:parse_linedata].dup
                 addfield = {}
                 rparams[:err] = ""
@@ -83,6 +82,7 @@ module Api
                     rparams = ControlFields.proc_chk_fetch_rec rparams  
                     if rparams[:err] != ""  
                       rparams[:parse_linedata][:confirm_gridmessage] = rparams[:err] 
+                      rparams[:parse_linedata][:confirm] = false 
                       rparams[:parse_linedata][(field+"_gridmessage").to_sym] = rparams[:err] 
                       break
                     end
@@ -92,6 +92,7 @@ module Api
                       rparams = ControlFields.proc_judge_check_code rparams  
                       if rparams[:err] != ""
                         rparams[:parse_linedata][:confirm_gridmessage] = rparams[:err] 
+                        rparams[:parse_linedata][:confirm] = false 
                         rparams[:parse_linedata][(field+"_gridmessage").to_sym] = rparams[:err] 
                         break
                       end
@@ -100,10 +101,12 @@ module Api
                 end	
                 if  rparams[:err] == ""
                   command_c =  RorBlkctl.init_from_screen rparams[:uid],rparams[:screenCode]
+                  parse_linedata = rparams[:parse_linedata].dup
                   parse_linedata.each do |key,val|
                       if key.to_s =~ /_id/ and val == ""   and tblnamechop == key.to_s.split("_")[0] and
                          key.to_s !~ /_gridmessage$/ and  key.to_s !~ /_person_id_upd$/ and  key.to_s != "#{tblnamechop}_id"
                           rparams[:parse_linedata][:confirm_gridmessage] = " key #{key.to_s} missing"
+                          rparams[:parse_linedata][:confirm] = false 
                           rparams[:err] = "error  key #{key.to_s} missing"
                           break
                       else
@@ -115,8 +118,9 @@ module Api
                   err.each do |key,recs|
                     recs.each do |rec|
                         if command_c["id"] != rec["id"]
-                            rparams[:err] = key + " already exist "
+                            rparams[:err] = " error #{key} already exist "
                             rparams[:parse_linedata][("confirm_gridmessage").to_sym] = rparams[:err] 
+                            rparams[:parse_linedata][:confirm] = false 
                         end  
                     end	
                   end	
@@ -135,41 +139,48 @@ module Api
                   if (seqchkfields["screenfield_starttime"]||="99999") <  (seqchkfields["screenfield_duedate"]||="0")
                     rparams[:err] =  " starttime seqno > duedate seqno  "
                     rparams[:parse_linedata][("confirm_gridmessage").to_sym] = rparams[:err] 
+                    rparams[:parse_linedata][:confirm] = false 
                   else
                     if (seqchkfields["screenfield_qty_case"]||="99999") <  (seqchkfields["screenfield_qty"]||="0")
                         rparams[:err] =  " qty_case seqno > qty seqno  "  ###画面表示順　　包装単位の計算ため
                         rparams[:parse_linedata][("confirm_gridmessage").to_sym] = rparams[:err] 
+                        rparams[:parse_linedata][:confirm] = false 
                     end
                   end
                 end
                 if  rparams[:err] == ""
-                  if command_c["id"] == ""
+                  if command_c["id"] == "" or  command_c["id"].nil?
                       command_c[:sio_classname] = "_add_update_grid_line_data"
                   else         
                       command_c[:sio_classname] = "_edit_update_grid_line_data"
                   end
                   RorBlkctl.proc_update_table(command_c,1)
-                  rparams[:parse_linedata][:confirm] = true  
-                  rparams[:parse_linedata][("confirm_gridmessage").to_sym] = "done"
+                  if command_c[:sio_result_f]  == "9"
+                    rparams[:parse_linedata][:confirm] = false  
+                    err_message = command_c[:sio_message_contents].split(":")[1][0..100] + 
+                                  command_c[:sio_errline].split(":")[1][0..100]  
+                    rparams[:parse_linedata][("confirm_gridmessage").to_sym] = err_message
+                  else
+                    rparams[:parse_linedata][:id] = command_c["id"]
+                    rparams[:parse_linedata][(tblnamechop+"_id").to_sym] = command_c[tblnamechop+"_id"]
+                    rparams[:parse_linedata][:confirm] = true  
+                    rparams[:parse_linedata][("confirm_gridmessage").to_sym] = "done"
+                  end
                 end 
                 render json: {:linedata=> rparams[:parse_linedata]}
 
             when 'download7'
-                screenCode = params[:screenCode]
-                download_columns_info = ScreenLib.proc_create_download_columns_info params,current_api_user[:email]  
+                ScreenLib.proc_create_grid_editable_columns_info current_api_user[:email],params,grid_columns_info
                 if params[:filtered]
-                  if params[:filtered].class.to_s == "String"
-                    params[:filtered] = JSON.parse(params[:filtered])
-                  end
                     ScreenLib.proc_create_filteredstr params,grid_columns_info
                 else
                   params[:where_str] = (grid_columns_info["where_info"]["filtered"]||"")
-                end    
+                end 
+                download_columns_info = ScreenLib.proc_create_download_columns_info params,current_api_user[:email]  
                 pagedata = ScreenLib.proc_download_data_blk params,download_columns_info  ### nil filtered sorting
-
-                render json:{:excelData=>{:columns=>column_info,:data=>pagedata},:totalcnt=>params[:total_cnt]}    
+                render json:{:excelData=>{:columns=>download_columns_info["columns_info"],:data=>pagedata},:totalCount=>params[:totalCount]}    
             else
-              p "req not support "    
+              p "#{Time.now} : req-->#{req} not support "    
           end   
       end
       def show

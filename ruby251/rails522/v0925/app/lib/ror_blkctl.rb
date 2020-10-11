@@ -36,33 +36,32 @@ module RorBlkctl
 	def proc_update_table command_c,r_cnt0  ##rec = command_c command_rとの混乱を避けるためrecにした。
 		begin
 				ActiveRecord::Base.connection.begin_db_transaction()
-				command_r,reqparams = proc_private_aud_rec(command_c,r_cnt0,nil,nil,nil) 
+				reqparams = proc_private_aud_rec(command_c,r_cnt0,nil,nil,nil) 
 		rescue
         		ActiveRecord::Base.connection.rollback_db_transaction()
-				command_r = command_c.dup
-            	command_r[:sio_result_f] =   "9"  ##9:error
-            	command_r[:sio_message_contents] =  "class #{self} : LINE #{__LINE__} $!: #{$!} "    ###evar not defined
-            	command_r[:sio_errline] =  "class #{self} : LINE #{__LINE__} $@: #{$@} "[0..3999]
+				##command_r = command_c.dup
+            	command_c[:sio_result_f] =   "9"  ##9:error
+            	command_c[:sio_message_contents] =  "class #{self} : LINE #{__LINE__} $!: #{$!} "[0..3999]    ###evar not defined
+            	command_c[:sio_errline] =  "class #{self} : LINE #{__LINE__} $@: #{$@} "[0..3999]
             	Rails.logger.debug"error class #{self} : #{Time.now}: #{$@} "
           		Rails.logger.debug"error class #{self} : $!: #{$!} "
-          		Rails.logger.debug"  command_r: #{command_r} "
+          		Rails.logger.debug"  command_c: #{command_c} "
       	else
-        		command_r[:sio_result_f] =  "1"   ## 1 normal end
-				command_r[:sio_message_contents] = nil
-				tblname = command_r[:sio_viewname].split("_")[1]
-          		command_r[(tblname.chop + "_id")] =  command_r["id"] = @src_tbl[:id]
-				proc_insert_sio_r( command_r) #### if @pare_class != "batch"    ## 結果のsio書き込み
+        		command_c[:sio_result_f] =  "1"   ## 1 normal end
+				command_c[:sio_message_contents] = nil
+				tblname = command_c[:sio_viewname].split("_")[1]
+          		command_c[(tblname.chop + "_id")] =  command_c["id"] = @src_tbl[:id]
+				proc_insert_sio_r( command_c) #### if @pare_class != "batch"    ## 結果のsio書き込み
 				ActiveRecord::Base.connection.commit_db_transaction()
 				if reqparams   ###画面からの時はperform_later(reqparams["seqno"][0])　seqnoは一つのみ。次の処理がないときはreqparams=nil
-					if command_r["mkord_runtime"]
-						CreateOtherTableRecordJob.set(wait: command_r["mkord_runtime"].to_f.hours).perform_later(reqparams["seqno"][0])
+					if command_c["mkord_runtime"]
+						CreateOtherTableRecordJob.set(wait: command_c["mkord_runtime"].to_f.hours).perform_later(reqparams["seqno"][0])
 					else	
 						CreateOtherTableRecordJob.perform_later(reqparams["seqno"][0])
 					end
 				end	
       	ensure
 	  	end ##begin
-		return command_r
 	end
 
 	def proc_private_aud_rec  command_r,r_cnt0,paretblname,paretblid,reqparams
@@ -87,6 +86,8 @@ module RorBlkctl
 			else
 					proc_tbl_delete_arel(tblname," id = #{@src_tbl[:id]}")
 			end
+		else
+			3.times{p "sio_classname missing"}	
 		end
 		##
 		if reqparams.nil?
@@ -105,7 +106,7 @@ module RorBlkctl
 				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成 alloctbl inoutstkを含む
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams	
 				### trngantts,alloctblsを作成してないとordsの時対象とならない。
-				if reqparams["orgtblname"] =~ /^cust/  ###元がcust,・・・時のみ子、孫へと展開
+				if reqparams["orgtblname"] =~ /^cust/ or reqparams["mkords_id"] ###元がcust,・・・時のみ子、孫へと展開
 					reqparams["segment"]  = "mkschs"   ###構成展開
 					processreqs_id,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams	
 				end
@@ -117,31 +118,50 @@ module RorBlkctl
 				end
 
 			when /prdords/  
+				if reqparams["orgtblname"] == "mkords"
+					reqparams["orgtblname"] = tblname
+					reqparams["orgtblid"] = @src_tbl[:id]
+				end	
+				###
+				###➀
+				###
 				command_r.each do |key,val|   ###procの処理を実行
 					if key =~ /^opeitm_/ and key =~ /_proc$/ and val == "1"
 						reqparams["segment"] = key
 						processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 					end
 				end  
-				reqparams["segment"]  = "trngantts"   ###Operation.：構成を作成
-				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
+				###
+				###➁
+				###
+				reqparams["segment"]  = "trngantts"   ###Operation.：prdordsのtrngantts作成
+				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams				
+				###
+				###➂
+				###
 				reqparams["segment"]  = "mkschs"   ###構成展開
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
 				###reqparams["segment"] = "mkshpschs" ###子部品出庫 prdords作成時には子部品のschsはできてない。
 				###processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
 
-				reqparams["segment"]  =  "consume_self_ord_parts"
-				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams
-
+				###
+				###➃
+				###
+				if paretblname =~ /prd|pur/   ###親が受注の時はは出荷
+					reqparams["segment"]  =  "consume_self_ord_parts"
+					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams
+				end
 				###ordではsnoが入らないときがある。###sno,cnoでの前の状態との関係
 				add_update_srctbl(srctblname,srctblid,tblname) if srctblname != ""
-
+				###
 			when /prdinsts/ 
-				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：prdinstsのtrngantts作成
 				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	 
-				reqparams["segment"]  =  "consume_self_ord_parts"
-				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams
+				if paretblname =~ /prd|pur/    ###親が受注の時はは出荷
+					reqparams["segment"]  =  "consume_self_ord_parts"
+					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams
+				end
 				add_update_srctbl srctblname,srctblid,tblname ###sno,cnoでの前の状態との関係
 
 			when /prdacts/ 
@@ -157,43 +177,64 @@ module RorBlkctl
 				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams	
 				### trngantts,alloctblsを作成してないとordsの時対象とならない。
-				if reqparams["orgtblname"] =~ /^cust/  ###元がcust,・・・時のみ子、孫へと展開
+				if reqparams["orgtblname"] =~ /^cust/   or reqparams["mkords_id"] ###元がcust,・・・時のみ子、孫へと展開
 					reqparams["segment"]  = "mkschs"   ###構成展開
 					processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams	
 				end
 				##if (req["paretblid"] != @src_tbl[:id] or req["paretblname"] != tblname) ## and reqparams["orgtblname"] =~ /ords$/ 
+				if paretblname =~ /prd|pur/  
 					reqparams["segment"]  = "consume_self_sch_parts"
 					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams
 					reqparams["segment"]  = "mk_shpsch_by_prd_pursch"
 					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams
+				end
 				##end
+				###
 
 			when /purords/  
+				if reqparams["orgtblname"] == "mkords"
+					reqparams["orgtblname"] = tblname
+					reqparams["orgtblid"] =  @src_tbl[:id]
+				end	
+				###
+				###➀
+				###
 				command_r.each do |key,val|   ###procの処理を実行
 					if key =~ /^opeitm_/ and key =~ /_proc$/ and val == "1"
 						reqparams["segment"] = key
 						processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 					end
 				end  
-				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				###
+				###➁
+				###
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：
 				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
-
+				###
+				###➂
+				###
 				reqparams["segment"]  = "mkschs"   ###構成展開
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
 				###reqparams["segment"] = ""  ###子部品出庫　作成時には子部品のschsはできてない。
-				###processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
-				
-				reqparams["segment"]  =  "consume_self_ord_parts"
-				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams
+				###processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams
+				###
+				###➃
+				###	
+				if paretblname =~ /prd|pur/  
+					reqparams["segment"]  =  "consume_self_ord_parts"
+					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams
+				end
 
 				add_update_srctbl(srctblname,srctblid,tblname) if srctblname != ""  ###ordではsnoが入らないときがある。
-
+				###
 			when /purinsts/  
-				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：
 				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	 
-				reqparams["segment"]  =  "consume_self_ord_parts"
-				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams
+				if paretblname =~ /prd|pur/  
+					reqparams["segment"]  =  "consume_self_ord_parts"
+					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams
+				end
 				add_update_srctbl srctblname,srctblid,tblname
 
 			when /puracts/   
@@ -206,34 +247,35 @@ module RorBlkctl
 				add_update_srctbl srctblname,srctblid,tblname
 
 			when /custschs/  
-				reqparams["segment"]  = "trngantts"   ###Operation.：構成を作成
+				reqparams["segment"]  = "trngantts"   ###Operation.：
 				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
 			when /custords/  
-				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：custordsのtrngantts作成
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 				reqparams["segment"]  = "mkschs"   ###構成展開
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
 			when /custinsts/  
-				reqparams["segment"]  = "trngantts"   ###Operation.：構成を作成
+				reqparams["segment"]  = "trngantts"   ###Operation.：
 				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
 			when /custacts/   
-				reqparams["segment"]  = "trngantts"   ###Operation.：構成を作成
+				reqparams["segment"]  = "trngantts"   ###Operation.
 				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
 			when /^custs$|suppliers|workplaces/
 				reqparams["segment"] = "createtable"
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],nil,nil,reqparams	
 
-			when /mkords/
-				reqparams["segment"] = "mkords"
-				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],nil,nil,reqparams	
+			 when /mkords/
+			 	reqparams["segment"] = "mkords"
+			 	reqparams["mkords_id"] = @src_tbl[:id]
+			 	processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],nil,nil,reqparams	
 			else
 				reqparams = nil
 		end
-		return command_r,reqparams
+		return reqparams
 	end
 	  
 	def proc_insert_sio_r  command_c ####レスポンス
@@ -777,39 +819,46 @@ module RorBlkctl
 		values = ""
 		tblarel.each do |key,val|
 			fields << key.to_s + ","
-			values << case val.class.to_s
-						when "String"
-							%Q&'#{val.gsub("'","''")}',&
-						when "Fixnum","Bignum","BigDecimal","Float","Integer"
-							"#{val},"
-						when "Date"
-							%Q& to_date('#{val.strftime("%Y/%m/%d")}','yyyy/mm/dd'),&
-						when "Time"
-							case key.to_s
-							when "created_at","updated_at"
-									%Q& to_timestamp('#{val.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),&
-							else
-									%Q& to_timestamp('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
-							end
-						when "DateTime"
-							case key.to_s
-							when "expiredate"
+			strsql = %Q&select fieldcode_ftype from r_fieldcodes
+						where  pobject_code_fld = '#{if tblname.downcase =~ /^sio|^bk/ then key.to_s.split("_",2)[1] else key.to_s end}'&
+			ftype = ActiveRecord::Base.connection.select_value(strsql)
+			 	values << 	case ftype
+			 			when /char/  ###db type
+			 				%Q&'#{(val||="").gsub("'","''")}',&
+			 			when "numeric"
+			 				"#{(val||="").to_s.gsub(",","")},"
+						when /timestamp|date/  ##db type
+							case (val||="").class.to_s  ### ruby type
+							when  /Time|Data/
+								case key.to_s
+			 					when "created_at","updated_at"
+			 						%Q& to_timestamp('#{val.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),&
+								when "expiredate"
 									%Q& to_date('#{val.strftime("%Y/%m/%d")}','yyyy/mm/dd'),&
+			 					else
+									%Q& to_timestamp('#{val.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),&
+								end
+							when "String"	 
+								case key.to_s
+			 					when "created_at","updated_at"
+			 						%Q& to_timestamp('#{val.gsub("-","/")}','yyyy/mm/dd hh24:mi:ss'),&
+								when "expiredate"
+									%Q& to_date('#{val.gsub("-","/")}','yyyy/mm/dd'),&
+			 					else
+									%Q& to_timestamp('#{val.gsub("-","/")}','yyyy/mm/dd hh24:mi:ss'),&
+								end
 							else
-								%Q& to_timestamp('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
-							end
-						when "NilClass"
-							"null,"
-						when "Hash"
-							"'#{val.to_query}',"
-						when "TrueClass"
-							if val == true then "1," else "0," end	
-						when "FalseClass"
-							if val == true then "1," else "0," end	
+							   Rails.logger.debug " line #{__LINE__} : error val.class #{ftype}  key #{key.to_s} "
+							   p " line #{__LINE__} : error val.class #{ftype}  key #{key.to_s} "
+							end	
 						else
-							Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
-							p " line #{__LINE__} : error val.class #{val.class.to_s}  key #{key.to_s} "
-						end
+							if tblname.downcase =~ /^sio_|^bk_/
+								%Q&'#{val.to_s.gsub("'","''")}',&
+							else
+								Rails.logger.debug " line #{__LINE__} : error val.class #{ftype}  key #{key.to_s} "
+								p " line #{__LINE__} : error val.class #{ftype}  key #{key.to_s} "
+							end	
+			 			end
 		end
 		case tblname.downcase
 		when  /^sio_/
@@ -823,27 +872,46 @@ module RorBlkctl
 
 	def proc_tbl_edit_arel  tblname,hash,strwhere ##
 		strset = ""
+		strset = ""
 		hash.each do |key,val|
-			strset << key.to_s  + " = "
-			strset << case val.class.to_s
-				when "String"
-					%Q&'#{val.gsub("'","''")}',&
-				when "Fixnum","Bignum","BigDecimal","Float","Integer"
-					"#{val},"
-				when "Date"
-					%Q& to_timestamp('#{val.strftime("%Y/%m/%d")}','yyyy/mm/dd'),&
-				when "Time"
-					case key.to_s
-						when "created_at","updated_at"
-							%Q&to_timestamp('#{val.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),&
-						else
-							%Q& to_timestamp('#{val.strftime("%Y/%m/%d %H:%M")}','yyyy/mm/dd hh24:mi'),&
-					end
-				when "NilClass"
-					"null,"
+			strsql = %Q&select fieldcode_ftype from r_fieldcodes where  pobject_code_fld = '#{key.to_s}'&
+			ftype = ActiveRecord::Base.connection.select_value(strsql)
+			strset << case ftype
+			when /char/  ###db type
+				%Q& #{key.to_s} = '#{val.gsub("'","''")}',&
+			when "numeric"
+				"#{key.to_s} = #{val.to_s.gsub(",","")},"
+		   	when /timestamp|date/  ##db type
+			   case val.class.to_s  ### ruby type
+			   when  /Time|Data/
+				   case key.to_s
+					when "created_at","updated_at"
+						%Q& #{key.to_s} =  to_timestamp('#{val.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),&
+				   when "expiredate"
+					   %Q&  #{key.to_s} = to_date('#{val.strftime("%Y/%m/%d")}','yyyy/mm/dd'),&
+					else
+						%Q&  #{key.to_s} = to_timestamp('#{val.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),&
+				   end
+			   when "String"	 
+				   case key.to_s
+					when "created_at","updated_at"
+						%Q&  #{key.to_s} = to_timestamp('#{val.gsub("-","/")}','yyyy/mm/dd hh24:mi:ss'),&
+				   	when "expiredate"
+					   %Q&  #{key.to_s} = to_date('#{val.gsub("-","/")}','yyyy/mm/dd'),&
+					else
+						%Q&  #{key.to_s} = to_timestamp('#{val.gsub("-","/")}','yyyy/mm/dd hh24:mi:ss'),&
+				   end
+			   else
+				  Rails.logger.debug " line #{__LINE__} : error val.class #{ftype}  key #{key.to_s} "
+				  p " line #{__LINE__} : error val.class #{ftype}  key #{key.to_s} "
+			   end	
+			else
+				if tblname.downcase =~ /^sio_|^bk_/
+					%Q& #{key.to_s} = '#{val.to_s.gsub("'","''")}',&
 				else
-					Rails.logger.debug " line #{__LINE__} : error val.class #{val.class}  key #{key.to_s} "
-					raise
+					Rails.logger.debug " line #{__LINE__} : error val.class #{ftype}  key #{key.to_s} "
+					p " line #{__LINE__} : error val.class #{ftype}  key #{key.to_s} "
+				end	
 			end
 		end
 		ActiveRecord::Base.connection.update("update #{tblname}  set #{strset.chop} where #{strwhere} ")

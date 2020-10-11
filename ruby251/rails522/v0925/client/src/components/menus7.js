@@ -10,7 +10,7 @@ import "../index.css"
 
 import  SignUp  from './signup'
 import  Login  from './login'
-import {ScreenRequest} from '../actions'
+import {ScreenInitRequest} from '../actions'
 import ScreenGrid7 from './screengrid7'
 import ButtonList from './buttonlist'
 
@@ -19,13 +19,12 @@ const titleNameSet = (screenName) =>{ return (
 )
 }
 
-class Menus7 extends React.Component {
-  render() {
-    const { isAuthenticated ,menuListData,uid,getScreen, params,screenCode,
-            pageSize,page,sortBy,filtered,isSignUp,hostError } = this.props
-    
+const Menus7 = ({ isAuthenticated ,menuListData,uid,getScreen, params,grid_columns_info,hostError,
+            isSignUp,menuChanging}) =>{
+              
     if (isAuthenticated) {
-      if(menuListData){
+      if(menuListData)
+      {
       let tmpgrpscr =[]   //グルーブ化されたメニュー
       let ii = 0
       menuListData.map((cate) => {
@@ -34,7 +33,8 @@ class Menus7 extends React.Component {
           })  
       return (
         <div>
-            <Tabs  forceRenderTabPanel defaultIndex={0}  selectedTabClassName="react-tabs--selected_custom_head">
+            <Tabs
+                  forceRenderTabPanel   selectedTabClassName="react-tabs--selected_custom_head">
               <TabList>
                 { tmpgrpscr.map((grp_name,idx) => 
                   <Tab key={idx} >
@@ -51,9 +51,11 @@ class Menus7 extends React.Component {
                     grp_name===val.grp_name&&
                     <Tab key={index} >
                       <Button   type="submit"
-                      onClick ={() => getScreen(val.screen_code,pageSize?pageSize:val.page_size,
-                                                page,sortBy,filtered,val.scr_name,uid,params
-                                                )}>
+                      onClick ={() => {
+                                        params = {}
+                                        getScreen(val.screen_code,val.scr_name,uid,params)
+                                      }
+                      }>
                       {val.scr_name}       
                       </Button>             
                     </Tab>)}
@@ -67,18 +69,17 @@ class Menus7 extends React.Component {
                 </TabPanel> 
               )}
             </Tabs>
-                  {screenCode?screenCode==="" ? "" :
-                              <div> <ScreenGrid7/></div>:hostError }
-                  {screenCode?screenCode==="" ? "" :
-                              <div> <ButtonList/></div>:""}
+              {(grid_columns_info&&menuChanging===false)&&
+                        <div> <ScreenGrid7/></div>}
+              {(grid_columns_info&&menuChanging===false)&&<div> <ButtonList/></div>}
            </div>    
       )
-    }
+    }else{
      return(
      <div>
-      <p> please wait </p>
+      <p> {hostError?hostError:"please wait"} </p>
     </div>)}
-    else{
+    }else{
       if(isSignUp){
         return (
           <SignUp/>
@@ -90,33 +91,26 @@ class Menus7 extends React.Component {
         }  
     }  
   }
-}
 
 const  mapStateToProps = (state,ownProps) =>({
   isSignUp:state.auth.isSignUp ,
   isAuthenticated:state.auth.isAuthenticated ,
   menuListData:state.menu.menuListData ,
   uid:state.auth.uid ,
-//画面移動前のpageSize,・・・を持ってくるようにする。  
-  pageSize:state.screen?state.screen.pageSize:null,
-  page:state.screen?state.screen.page:0,
-  data:state.screen?state.screen.data:[],
-  sortBy:state.screen?state.screen.sortBy:{}, 
-  filtered:state.screen?state.screen.filtered:{}, 
   params:state.screen.params,
-  originalreq:state.screen.originalreq,
   message:state.menu.message,
+  grid_columns_info:state.screen.grid_columns_info,
   screenCode:state.screen.params?state.screen.params.screenCode:"",
   hostError: state.screen.hostError,
+  menuChanging:state.menu.menuChanging,
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-      getScreen : (screenCode,pageSize, page,sortBy,filtered,screenName, uid,params) =>{
+      getScreen : (screenCode, screenName, uid,params) =>{
         titleNameSet(screenName)
-        if(params){}else{params={}}
-        params= { ...params, page: page, pageSize : pageSize,
-                        sortBy:sortBy, screenName:  screenName,
-                         screenCode:screenCode,uid:uid,req:"viewtablereq7",filtered:filtered} 
-        dispatch(ScreenRequest(params,null))}   //data:null
+        params= { ...params,screenName:  (screenName||""),
+                         screenCode:screenCode,pageIndex:0,pageSize:20,
+                         uid:uid,req:"viewtablereq7",} 
+        dispatch(ScreenInitRequest(params,null))}   //data:null
           })    
 export default connect(mapStateToProps,mapDispatchToProps)(Menus7)

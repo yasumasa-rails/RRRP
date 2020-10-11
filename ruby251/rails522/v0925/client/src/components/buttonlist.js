@@ -7,12 +7,13 @@ import GanttChart from './ganttchart'
 import "react-tabs/style/react-tabs.css"
 import {Button} from '../styles/button'
 import "../index.css"
-import {ScreenRequest,ButtonFlgRequest,DownloadRequest,GanttChartRequest,GanttReset,
-        YupRequest,TblfieldRequest,ResetRequest} from '../actions'
+import {ScreenRequest,DownloadRequest,GanttChartRequest,GanttReset,
+        ScreenInitRequest,//ButtonFlgRequest,
+        YupRequest,TblfieldRequest,ResetRequest,} from '../actions'
 
 
- const  ButtonList = ({buttonListData,setButtonFlg,buttonflg,originalreq,
-                        screenCode,page,sortBy,params,downloadloading,disabled,
+ const  ButtonList = ({buttonListData,setButtonFlg,buttonflg,
+                        screenCode,page,params,downloadloading,disabled,
                         message,messages //  editableflg,message
                       }) =>{
       let tmpbuttonlist = {}
@@ -35,7 +36,7 @@ import {ScreenRequest,ButtonFlgRequest,DownloadRequest,GanttChartRequest,GanttRe
                       disabled={disabled}
                       type={val[1]==='inlineedit7'||'inlineadd7'||'yup'||'ganttchart'?"submit":"button"}
                       onClick ={() =>{
-                                      setButtonFlg(val[1],page,sortBy,params)} // buttonflg
+                                      setButtonFlg(val[1],page,params)} // buttonflg
                                      }>
                       {val[0]}       
                       </Button>             
@@ -74,36 +75,40 @@ const  mapStateToProps = (state,ownProps) =>({
   screenName:state.screen.params.screenName ,  
   uid:state.auth.uid,
   page:state.screen?state.screen.page:0,
-  sortBy:state.screen?state.screen.sortBy:[], 
   message:state.button.message,
   messages:state.button.messages,
-  downloadloading:state.button.downloadloading,
+  downloadloading:state.download.downloadloading,
   disabled:state.button.disabled?true:false,
  // originalreq:state.screen.originalreq,
 })
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
-  setButtonFlg : (buttonflg,    //editableflg,screenCode,uid,screenName,
-                    page,sortBy,params) =>{
-        dispatch(ButtonFlgRequest(buttonflg,params)) // import export 画面用
+  setButtonFlg : (buttonflg,    //editableflg,screenCode,uid,screenName,search
+                    page,params) =>{
+       // dispatch(ButtonFlgRequest(buttonflg,params)) // import export 画面用
         switch (buttonflg) {  //buttonflg ==button_code
           case "reset":
-            params= { ...params, page: page,sortBy:sortBy,req:"reset"}
+            params= { ...params, page: page,req:"reset"}
           //editableflg = true
             return dispatch(ResetRequest(params)) //
 
-          case "inlineedit7":
-              params= { ...params, page: page,sortBy:sortBy,req:"inlineedit7"}
+          case "search":
+              params= { ...params, page: page,req:"viewtablereq7"}
             //editableflg = true
-              return dispatch(ScreenRequest(params,null)) //data=null
+              return dispatch(ScreenRequest(params,null)) //data=null　再度もとめ直し
         
+          case "inlineedit7":
+              params= { ...params, page: page,req:"inlineedit7"}
+              //editableflg = true
+                return dispatch(ScreenInitRequest(params,null)) //data=null　再度もとめ直し
+          
           case "inlineadd7":
             params= {...params,  page: page, pages:1,req:"inlineadd7"}
           //  editableflg = true
-             return  dispatch(ScreenRequest(params,null)) //data=null
+             return  dispatch(ScreenInitRequest(params,null)) //data=null　空白を表示
           
           case "export":
-              params= {...params,  req:"download"}
+              params= {...params,  req:"download7"}
             //  editableflg = true
                return  dispatch(DownloadRequest(params)) //
                
@@ -113,7 +118,7 @@ const mapDispatchToProps = (dispatch,ownProps ) => ({
             return  dispatch(YupRequest(params)) //
 
           case "ganttchart":
-            if(params["onClickSelect"]["index"]||params["onClickSelect"]["index"]===0){
+            if(params["clickIndex"]){
                params= { ...params,req:"ganttchart"}
              //  editableflg = false
               return  dispatch(GanttChartRequest(params)) }//

@@ -216,7 +216,12 @@ extend self
 				@modifysql << " ;\n"
 			end	
 		when "numeric"
-			@modifysql << "\n alter table  #{rec["pobject_code_tbl"]} ALTER COLUMN #{rec["pobject_code_fld"]}  TYPE #{rec["fieldcode_ftype"]}(#{rec["fieldcode_dataprecision"]},#{rec["fieldcode_datascale"]});\n"
+			@modifysql << "\n alter table  #{rec["pobject_code_tbl"]} ALTER COLUMN #{rec["pobject_code_fld"]}  TYPE #{rec["fieldcode_ftype"]}(#{rec["fieldcode_dataprecision"]},#{rec["fieldcode_datascale"]})"
+			if rec["pobject_code_fld"] =~ /_id$|_id_/
+				@modifysql << " not null;\n"
+			else
+				@modifysql << " ;\n"
+			end	
         end
 	end
 	def create_add_field_sql rec  ###該当テーブルの項目作成
@@ -224,7 +229,12 @@ extend self
 		when /char/
 			@modifysql << "\n alter table #{rec["pobject_code_tbl"]}  ADD COLUMN #{rec["pobject_code_fld"]} #{rec["fieldcode_ftype"]}(#{rec["fieldcode_fieldlength"] });\n"
 		when "numeric"
-			@modifysql << "\n alter table  #{rec["pobject_code_tbl"]}  ADD COLUMN #{rec["pobject_code_fld"]} #{rec["fieldcode_ftype"]}(#{rec["fieldcode_dataprecision"]},#{rec["fieldcode_datascale"]});\n"
+			@modifysql << "\n alter table  #{rec["pobject_code_tbl"]}  ADD COLUMN #{rec["pobject_code_fld"]} #{rec["fieldcode_ftype"]}(#{rec["fieldcode_dataprecision"]},#{rec["fieldcode_datascale"]})"
+			if rec["pobject_code_fld"] =~ /_id$|_id_/
+				@modifysql << " not null;\n"
+			else
+				@modifysql << " ;\n"
+			end	
 		when /date|timestamp/
 			@modifysql << "\n alter table #{rec["pobject_code_tbl"]}  ADD COLUMN #{rec["pobject_code_fld"]} #{rec["fieldcode_ftype"]};\n"
 		end	
@@ -454,7 +464,7 @@ extend self
 		command_r["pobject_expiredate"] = '2099/12/31'
 		###screenfield_screen_id = 1201 and  screenfield_pobject_id_sfd = 13952
 		p command_r if command_r["screenfield_pobject_id_sfd"].to_s == "13952"
-		command_r,reqparams = RorBlkctl.proc_private_aud_rec(command_r,1,nil,nil,nil) 
+		reqparams = RorBlkctl.proc_private_aud_rec(command_r,1,nil,nil,nil) 
 		if @sio_result_f ==   "9"
 		 	@messages <<  "error  add_pobject_record #{screenfield}"
 		end  
@@ -506,7 +516,7 @@ extend self
    											end
 			command_r["screenfield_rowpos"]="0"
 			command_r["screenfield_colpos"]="0"
-			command_r["screenfield_width"]="100"
+			command_r["screenfield_width"]="120"
 			command_r["screenfield_type"]= field["fieldcode_ftype"]
 			command_r["screenfield_dataprecision"] = field["fieldcode_dataprecision"]
 			command_r["screenfield_datascale"] = field["fieldcode_datascale"]
@@ -534,7 +544,7 @@ extend self
 			command_r["screenfield_paragraph"] =""
 			command_r["screenfield_formatter"] =""
 			p command_r if command_r["screenfield_pobject_id_sfd"].to_s == "13952"
-			command_r,reqparams = RorBlkctl.proc_private_aud_rec(command_r,1,nil,nil,nil) 
+			reqparams = RorBlkctl.proc_private_aud_rec(command_r,1,nil,nil,nil) 
 			if @sio_result_f ==   "9"
 		 		@messages <<  "error  add_screenfield_record #{field["pobject_code_tbl"].chop}_#{field["pobject_code_fld"]}"
 			else  
@@ -592,7 +602,7 @@ extend self
 		command_r["screenfield_formatter"] =rec["screenfield_formatter"]
 		command_r["screenfield_crtfield"] = rec["screenfield_crtfield"]  ###create viewのview
 		p command_r if command_r["screenfield_pobject_id_sfd"].to_s == "13952"
-		command_r,reqparams = RorBlkctl.proc_private_aud_rec(command_r,1,nil,nil,nil) 
+		reqparams = RorBlkctl.proc_private_aud_rec(command_r,1,nil,nil,nil) 
 		if @sio_result_f ==   "9"
 		 	@messages <<  "error  add_screenfield_record: r_#{tbl} -->#{rec["pobject_code_sfd"]}"
 		else  
@@ -695,27 +705,27 @@ extend self
 		# 例外の発生有無に関わらず最後に必ず実行する処理
 		end
 			@modifysql << "\n CREATE TABLE " + "sio.sio_" + viewname   + " (\n"
-		  	@modifysql <<  "          sio_id numeric(38,0)  CONSTRAINT " +  "SIO_" + viewname   + "_id_pk PRIMARY KEY "
-		 	@modifysql <<  "          ,sio_user_code numeric(38,0)\n"
+		  	@modifysql <<  "          sio_id numeric(22,0)  CONSTRAINT " +  "SIO_" + viewname   + "_id_pk PRIMARY KEY "
+		 	@modifysql <<  "          ,sio_user_code numeric(22,0)\n"
 		  	@modifysql <<  "          ,sio_Term_id varchar(30)\n"
-		  	@modifysql <<  "          ,sio_session_id numeric(38,0)\n"
+		  	@modifysql <<  "          ,sio_session_id numeric(22,0)\n"
 		  	@modifysql <<  "          ,sio_Command_Response char(1)\n"
-		  	@modifysql <<  "          ,sio_session_counter numeric(38,0)\n"
+		  	@modifysql <<  "          ,sio_session_counter numeric(22,0)\n"
 		  	@modifysql <<  "          ,sio_classname varchar(50)\n"
 		  	@modifysql <<  "          ,sio_viewname varchar(30)\n"
 		  	@modifysql <<  "          ,sio_code varchar(30)\n"
 		  	@modifysql <<  "          ,sio_strsql varchar(4000)\n"
-		  	@modifysql <<  "          ,sio_totalcount numeric(38,0)\n"
-		  	@modifysql <<  "          ,sio_recordcount numeric(38,0)\n"
-		  	@modifysql <<  "          ,sio_start_record numeric(38,0)\n"
-		  	@modifysql <<  "          ,sio_end_record numeric(38,0)\n"
+		  	@modifysql <<  "          ,sio_totalcount numeric(22,0)\n"
+		  	@modifysql <<  "          ,sio_recordcount numeric(22,0)\n"
+		  	@modifysql <<  "          ,sio_start_record numeric(22,0)\n"
+		  	@modifysql <<  "          ,sio_end_record numeric(22,0)\n"
 		  	@modifysql <<  "          ,sio_sord varchar(256)\n"
 		  	@modifysql <<  "          ,sio_search varchar(10)\n"
 		  	@modifysql <<  "          ,sio_sidx varchar(256)\n"
 		  	@modifysql  <<  sio_fields(viewname)
 		  	@modifysql <<  "          ,sio_errline varchar(4000)\n"
 		  	@modifysql <<  "          ,sio_org_tblname varchar(30)\n"
-		  	@modifysql <<  "          ,sio_org_tblid numeric(38,0)\n"
+		  	@modifysql <<  "          ,sio_org_tblid numeric(22,0)\n"
 		  	@modifysql <<  "          ,sio_add_time date\n"
 		  	@modifysql <<  "          ,sio_replay_time date\n"
 		  	@modifysql <<  "          ,sio_result_f char(1)\n"

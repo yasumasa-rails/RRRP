@@ -1,11 +1,13 @@
-import {  BUTTONLIST_REQUEST, BUTTONLIST_SUCCESS, BUTTONFLG_REQUEST,GANTT_RESET,
-  TBLFIELD_SUCCESS,SCREEN_SUCCESS,SCREEN_SUCCESS7,GANTTCHART_SUCCESS,LOGOUT_REQUEST,RESET_REQUEST}
+import {  BUTTONLIST_REQUEST, BUTTONLIST_SUCCESS, BUTTONFLG_REQUEST,GANTT_RESET,SCREENINIT_REQUEST,
+  TBLFIELD_SUCCESS,GANTTCHART_SUCCESS,LOGOUT_REQUEST,DOWNLOAD_RESET,SCREEN_SUCCESS7,DOWNLOAD_SUCCESS} //RESET_REQUEST
    from 'actions'
 
 export let getButtonState = state => state.button
 const initialValues = {
 errors:[],
-buttonflg:""
+buttonflg:"viewtablereq7",
+messages:null,
+message:null, 
 }
 
 const buttonreducer =  (state= initialValues , actions) =>{
@@ -16,10 +18,21 @@ return {...state,
 buttonflg:actions.payload.buttonflg, 
 screenCode:actions.payload.params.screenCode,
 screenName:actions.payload.params.screenName,
-filtered:actions.payload.params.filtered,  
 disabled:true,  
 messages:null,
 message:null, 
+}
+
+
+case SCREENINIT_REQUEST:
+  return {...state,
+    buttonflg:actions.payload.params.req, 
+          // editableflg:action.payload.editableflg
+}
+
+case SCREEN_SUCCESS7:
+return {...state,
+disabled:false,
 }
 
 case BUTTONLIST_REQUEST:
@@ -46,40 +59,25 @@ message:actions.payload.message,
 disabled:false,
 }
 
-case SCREEN_SUCCESS:
-return {...state,
-disabled:false,
-messages:null,
-message:null,
-}
-
-case SCREEN_SUCCESS7:
-return {...state,
-disabled:false,
-messages:null,
-message:null,
-}
-
 case GANTTCHART_SUCCESS:
 return {...state,
-disabled:false,
-messages:null,
-message:null,
+  buttonflg:"ganttchart",
+}
+
+
+case DOWNLOAD_SUCCESS:
+return {...state,
+buttonflg:"export",
+}
+
+case DOWNLOAD_RESET:
+return {...state,
+  disabled:false,
 }
 
 
 case  LOGOUT_REQUEST:
 return {}  
-
-case RESET_REQUEST:
-return {...state,
-  excelData:null,
-  totalcnt:null,
-  buttonflg:null,
-  downloadloading:"",
-  disabled:false,
-}
-
 
 default:
 return state

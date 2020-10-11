@@ -1,4 +1,5 @@
-import {  MENU_REQUEST, MENU_SUCCESS,LOGOUT_REQUEST,MENU_FAILURE} from 'actions'
+import {  MENU_REQUEST, MENU_SUCCESS,LOGOUT_REQUEST,MENU_FAILURE,
+          SCREENINIT_REQUEST,SCREEN_SUCCESS7  } from 'actions'
 const initialValues = {
   isSubmitting:false,
   isSignUp:false,
@@ -22,7 +23,17 @@ const menureducer =  (state= initialValues , actions) =>{
     case MENU_FAILURE:
       return {...state,
         message:actions.errors,
-    }        
+    }    
+    
+    case SCREENINIT_REQUEST:
+      return {...state,
+        menuChanging:true,
+      }
+
+    case SCREEN_SUCCESS7:
+          return {...state,
+            menuChanging:false,
+    }
 
     case  LOGOUT_REQUEST:
     return {}  

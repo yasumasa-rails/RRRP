@@ -22,7 +22,7 @@ ${'' /* These styles are required for a horizontaly scrollable table overflow */
     overflow-y: hidden;
     overflow-x: scroll;
     .tr{ height: 35px;
-        white-space: nowrap;
+        ${ /*white-space: nowrap;折り返し禁止*/ ' '}
       }
   }
 
@@ -36,16 +36,36 @@ ${'' /* These styles are required for a horizontaly scrollable table overflow */
     border-bottom: 1px solid black;
   }
 
-  .th ,
+
+  .th {
+    height:55px;
+    width:100%;
+    word-wrap: break-word;
+    input { width:95%;
+             height:35%;
+             position: absolute;
+             top: ;
+             bottom: ;
+             left: ;
+             right: ;
+             top: 50%;
+             left: 0%;
+     }
+  },
   .td {
     margin: 0;
-    padding: 0.4rem;
+    padding: 0.1rem;
     border-right: 1px solid black;
     ${''/* font-size: screengrid7.cellFontSize で決めている。　更新の時font-size無効 */}
 
     ${'' /* In this example we use an absolutely position resizer,
      so this is required. */}
     position: relative;
+
+    
+    select { width:95%;
+             height:95%;
+     }
 
     :last-child {
       border-right: 0;
@@ -54,8 +74,8 @@ ${'' /* These styles are required for a horizontaly scrollable table overflow */
     .resizer {
       right: 0;
       background: steelblue;
-      width: 5px;
-      height: ${props => props.reqHeight}px;
+      width: 2px;
+      height: 50px;
       position: absolute;
       top: 0;
       z-index: 1;
@@ -71,12 +91,21 @@ ${'' /* These styles are required for a horizontaly scrollable table overflow */
     padding: 0.5rem;
   }
 
- input { width:100%;
-        height:25px;
-        border: 0.1px;}
+ input { width:95%;
+          height:85%;  ${'' /* gotoPgageはscreengrid7で設定*/}
+  }
+
+  th {
+     input { width:95%;
+            height:15px;}
+  }        
 
 .Editable {background:lightblue}
-.EditableRequire {background:dodgerblue}
+.EditableRequire {background:skyblue}
 
 .Numeric {text-align: right}
+
+.error {
+  background: red;
+}
 `

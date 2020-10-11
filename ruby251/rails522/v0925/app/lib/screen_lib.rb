@@ -12,12 +12,12 @@ module ScreenLib
 			else
 				 where_str = "  where "	 
 			end	
-			params[:filtered].each  do |strjson|  ##xparams gridの生
-				ff = JSON.parse(strjson)
+			JSON.parse(params[:filtered]).each  do |ff|  ##xparams gridの生
+				###ff = JSON.parse(strjson)
 				next if ff["value"].nil?
 				next if ff["value"] == ""
 				next if ff["value"] =~ /'/
-	      		case where_info[ff["id"].to_sym]  ### where_info[i["pobject_code_sfd"].to_sym] = i["screenfield_type"]	
+	      		case where_info[ff["id"]]  ### where_info[i["pobject_code_sfd"].to_sym] = i["screenfield_type"]	
 				when nil
 					next
 		 		when /numeric/
@@ -115,12 +115,9 @@ module ScreenLib
 		
 		strsorting = ""
 			if params[:sortBy]  and   params[:sortBy] != "" ###: {id: "itm_name", desc: false}
-				if  params[:sortBy].class.to_s == "String"
-						params[:sortBy] = JSON.parse(params[:sortBy])
-				end
-				params[:sortBy].each do |field|
+				sortBy = JSON.parse(params[:sortBy])
+				sortBy.each do |sortKey|
 					strsorting = " order by " if strsorting == ""
-					sortKey = JSON.parse(field)
 					strsorting << %Q% #{sortKey["id"]} #{if sortKey["desc"]  == false then " asc " else "desc" end} ,%
 				end	
 				if strsorting == ""
@@ -130,7 +127,7 @@ module ScreenLib
 				end
 			else
 				strsorting = "  order by id desc "
-				params[:sortBy] = {}
+				params[:sortBy] = "[]"
 			end
 			strsql = "select #{select_fields} from (SELECT ROW_NUMBER() OVER (#{strsorting}) ,#{select_fields}
 													 FROM #{screenCode} #{if where_str == '' then '' else where_str end } ) x
@@ -149,39 +146,48 @@ module ScreenLib
 		return pagedata 
 	end	
 
-	def proc_download_data_blk params,download_columns_info 
-		screenCode = params[:screenCode]
-		select_fields = download_columns_info["select_fields"] 
-		where_str = params[:where_str]
-		strsql = "select #{select_fields} from  #{screenCode}
-							 #{if where_str == '' then '' else where_str   end }  limit 1000000	  "
-		recs = ActiveRecord::Base.connection.select_all(strsql)
-		cnt = 0
-		pagedata = "[["
-		recs.each do |rec|
-					rec.each do |key,val|  ## nl 改行は使用できない。
-						pagedata << %Q%{"value":"#{if val then val.gsub(/"/,"'").gsub(/\n/," ").gsub(/\x09/," ") end}",
-										"style":{"fill":{"patternType": "solid", 
-										"fgColor": {"rgb": "#{download_columns_info["columns_color"][key.to_sym]}"}}}}\n,%
-					end
-					pagedata = pagedata.chop +  "],["
-					cnt += 1	
-				end	
-		pagedata = pagedata[0..-3] + "]"
-		return  pagedata
-	end	
 
 	def add_empty_data params,grid_columns_info
 		num = params[:pageSize].to_f
 		columns_info = grid_columns_info["columns_info"]
 		pagedata = []
 		until num <= 0 do
-				temp ={}
-				columns_info.each do |cell|
-						temp[cell[:accessor]] = ""
-				end	
-				pagedata << temp
-				num = num - 1
+			temp ={}
+			columns_info.each do |cell|
+				temp[cell[:accessor]] = ""
+				next if cell[:accessor] == "id" 
+				next if cell[:accessor] =~ /_id/
+				if cell[:className] =~ /Editable/
+					if cell[:className] =~ /Numeric/
+						temp[cell[:accessor]] = "0"
+					end
+					if cell[:className] =~ /^Editable/
+						case cell[:accessor]
+						when /_expiredate/
+							temp[cell[:accessor]] = "2099-12-31"
+						when /_isudate|_rcptdate|_cmpldate/
+							temp[cell[:accessor]] = Time.now.strftime("%Y/%m/%d")
+						when /pobject_objecttype_tbl/
+							temp[cell[:accessor]] = "tbl"
+						when /opeitm_processseq|opeitm_priority/	
+							temp[cell[:accessor]] = "999"
+						when /person_code_chrg/	
+							temp[cell[:accessor]] = params[:person_code_chrg]
+						end
+						case params[:screenCode]
+						when "r_mkords"
+							case cell[:accessor]
+								when /loca_code_|itm_code_/	
+									temp[cell[:accessor]] = "dummy"
+								when /mkord_starttime_|mkord_duedate_/
+									temp[cell[:accessor]] = "2099/12/31"  
+							end
+						end
+					end
+				end
+			end	
+			pagedata << temp
+			num = num - 1
 		end
 		params[:pageCount] = 1
 		return pagedata		
@@ -372,7 +378,8 @@ module ScreenLib
 													"text"
 												end	,
 									:canFilter => if i["screenfield_type"] =~ /check/ then false else true end,
-									:width => i["screenfield_width"].to_i,
+									###widthが120以下だと右の境界線が消える。	
+									:width => if i["screenfield_width"].to_i < 80 then 80 else  i["screenfield_width"].to_i end,
 									##:style=>%Q%{"textAlign":#{if i["screenfield_type"] == "numeric" then "right" else "left" end}%, 
 									##:style=>{:textAlign=>if i["screenfield_type"] == "numeric" then "right" else "left" end}, 
 									:className=>if  (req==="inlineedit7" or req==="inlineadd7") and 
@@ -415,7 +422,7 @@ module ScreenLib
 									}
 					if ((req==="inlineedit7" or req==="inlineadd7") and i["screenfield_editable"] === "1") or
 						(req==="inlineedit7"  and i["screenfield_editable"] === "2") or
-						( req==="inlineaddreq" and i["screenfield_editable"] === "3") 
+						( req==="inlineadd7" and i["screenfield_editable"] === "3") 
 						columns_info << {:Header=>"#{i["screenfield_name"]}_gridmessage",
 										:accessor=>"#{i["pobject_code_sfd"]}_gridmessage",
 										:id=>"#{i["pobject_code_sfd"]}_gridmessage",
@@ -424,7 +431,7 @@ module ScreenLib
 						gridmessages_fields << %Q% '' #{i["pobject_code_sfd"]}_gridmessage,%	
 						hiddenColumns << %Q%#{i["pobject_code_sfd"]}_gridmessage%	
 					end																
-					where_info[i["pobject_code_sfd"].to_sym] = i["screenfield_type"]	
+					where_info[i["pobject_code_sfd"]] = i["screenfield_type"]	
 					if cnt == 0
 								where_info["filtered"] = i["screen_strwhere"]
 								grid_columns_info[:pageSizeList] = []
@@ -476,18 +483,13 @@ module ScreenLib
 	
 	def proc_create_download_columns_info params,email
 		screenCode = params[:screenCode]
+		columns_info = "["
+		columns_color = {}
+		select_fields = ""	
 		download_columns_info = Rails.cache.fetch('download'+RorBlkctl.grp_code(email)+screenCode) do
-				download_columns_info = {}
 				###  ダブルコーティション　「"」は使用できない。 
 				sqlstr = "select * from  func_get_screenfield_grpname('#{email}','#{screenCode}')"
-				columns_info = "["
-				columns_color = {}
-				where_info = {}
-				select_fields = ""	
 				ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
-					if cnt == 0
-						where_info["filtered"] = i["screen_strwhere"]
-					end
 					if i["screenfield_hideflg"] == "0"
 						case  i["screenfield_type"] 
 							when  'numeric'
@@ -505,51 +507,41 @@ module ScreenLib
 							end
 						end			##value: "Blue",  style: {fill: {patternType: "solid", fgColor: {rgb: "FF0000FF"}}}
 						columns_info << %Q%{"title":"#{i["screenfield_name"]}"},%
-						where_info[i["pobject_code_sfd"].to_sym] = 	i["screenfield_type"]	
-						columns_color[i["pobject_code_sfd"].to_sym] = color							
+						columns_color[i["pobject_code_sfd"]] = color							
 						select_fields = 	select_fields + 	i["pobject_code_sfd"] + ','
 					end	
 				end
-				download_columns_info["columns_info"] = columns_info.chop  + "]"
-				download_columns_info["where_info"] = 	where_info	
-				download_columns_info["columns_color"] = 	columns_color
+				columns_info = columns_info.chop  + "]"
+				download_columns_info = {"columns_info"=>columns_info,
+									  	"select_fields"=>select_fields.chop,	
+										"columns_color" =>	columns_color}
 		end
 		return download_columns_info
 	end
+	
+	def proc_download_data_blk params,download_columns_info 
+		screenCode = params[:screenCode]
+		strsql = "select #{ download_columns_info["select_fields"]} from  #{screenCode}
+							 #{if params[:where_str] == '' then '' else params[:where_str]   end }  limit 10000	  "
+		recs = ActiveRecord::Base.connection.select_all(strsql)
+		cnt = 0
+		pagedata = "[["
+		recs.each do |rec|
+					rec.each do |key,val|  ## nl 改行は使用できない。
+						pagedata << %Q%{"value":"#{if val then val.gsub(/"/,"'").gsub(/\n/," ").gsub(/\x09/," ") end}",
+										"style":{"fill":{"patternType": "solid", 
+										"fgColor": {"rgb": "#{download_columns_info["columns_color"][key]}"}}}}\n,%
+					end
+					pagedata = pagedata.chop +  "],["
+					cnt += 1	
+				end	
+		params[:totalCount] = recs.count
+		if params[:totalCount] > 0
+			pagedata = pagedata[0..-3] + "]"
+		else
+			pagedata = "[]"
+		end	
+		return  pagedata
+	end	
 
-	# Float()で変換できれば数値、例外発生したら違う
-	def float_string?(str)
-		begin
-			if str.class == Fixnum  or str.class == Bignum    or str.class == Float
-				true
-			else
-				Float(str)
-				true
-			end
-		rescue ###ArgumentError
-			false
-		end
-	end
-	def date_string?(str)
-		begin
-			if str.class == Time
-				true
-			else
-				Date.parse(str)
-				true
-			end
-		rescue ###ArgumentError
-			false
-		end
-	end
-	class Float
-		def floor2(exp = 0)
-			multiplier = 10 ** exp
-			((self * multiplier).floor).to_f/multiplier.to_f
-		end
-		def ceil2(exp = 0)
-			multiplier = 10 ** exp
-			((self * multiplier).ceil).to_f/multiplier.to_f
-		end
-	end
 end   ##module Ror_blk

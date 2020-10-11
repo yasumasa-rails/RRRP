@@ -19,6 +19,7 @@ export const MENU_SUCCESS = 'MENU_SUCCESS'
 export const MENU_FAILURE = 'MENU_FAILURE'
 
 
+export const SCREENINIT_REQUEST = 'SCREENINIT_REQUEST'
 export const SCREEN_REQUEST = 'SCREEN_REQUEST'
 export const SCREEN_SUCCESS = 'SCREEN_SUCCESS'
 export const SCREEN_SUCCESS7 = 'SCREEN_SUCCESS7'
@@ -58,7 +59,8 @@ export const DOWNLOAD_RESET = 'DOWNLOAD_RESET'
 export const FETCH_REQUEST = 'FETCH_REQUEST'
 export const FETCH_RESULT = 'FETCH_RESULT'
 export const FETCH_FAILURE = 'FETCH_FAILURE'
-export const INPUTFIELDPROTECT_REQUEST = ' INPUTFIELDPROTECT_REQUEST'
+export const INPUTFIELDPROTECT_REQUEST = 'INPUTFIELDPROTECT_REQUEST'
+export const INPUTPROTECT_RESULT = 'INPUTPROTECT_RESULT'
 
 export const YUP_RESULT = 'YUP_RESULT'
 export const YUP_REQUEST = 'YUP_REQUEST'
@@ -130,10 +132,16 @@ export const MenuFailure = (errors) => ({
   errors: { errors }  //
 })
 
+export const ScreenInitRequest = (params,data) => ({
+  type:  SCREENINIT_REQUEST,
+  payload: { params,data}  //
+})
+
 export const ScreenRequest = (params,data) => ({
   type:  SCREEN_REQUEST,
   payload: { params,data}  //
 })
+
 
 export const ResetRequest = (params) => ({
   type:  RESET_REQUEST,
@@ -240,27 +248,18 @@ export const UploadListSuccess = (uploadlists) => ({
   payload: { uploadlists}
 })
 
-/*
-export const ChangeUploadTitleEditableRequest = () => ({
-  type: CHANGEUPLOADTITLEEDITABLE_REQUEST,
-  payload: {}
-})
-
-export const ChangeUploadTitleRequest = (upload) => ({
-  type: CHANGEUPLOADTITLE_REQUEST,
-  payload: { upload}
-})
-*/
-
-export const FetchRequest = (params,data) => ({
+export const FetchRequest = (params,data,loading) => ({
   type: FETCH_REQUEST,
-  payload: { params,data }
+  payload: { params,data,loading }
 })
 
-export const InputFieldProtect = (columns) => ({
+export const InputFieldProtectRequest = () => ({
   type: INPUTFIELDPROTECT_REQUEST,
-  payload: { columns}
 })
+export const InputProtectResult = () => ({
+  type: INPUTPROTECT_RESULT,
+})
+
 
 export const FetchResult = (data,params) => ({
   type: FETCH_RESULT,

@@ -52,9 +52,7 @@ const GanttChart = ({ ganttChartData,loading,message}) => {
 const mapStateToProps = state =>({
       ganttChartData:state.ganttchart.ganttChartData,
       loading:state.ganttchart.loading,
-      message:state.ganttchart.message,
-      params:state.ganttchart.params,
-    
+      message:state.ganttchart.message,    
   })
   
 
