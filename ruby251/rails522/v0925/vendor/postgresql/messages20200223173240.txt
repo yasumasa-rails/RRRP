@@ -1,1 +1,0 @@
- create TABLE_CONSTRAINTS :trngantts_ukyG1 

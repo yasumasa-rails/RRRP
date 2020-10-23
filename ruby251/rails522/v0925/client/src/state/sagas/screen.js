@@ -1,7 +1,7 @@
 import { call, put, select } from 'redux-saga/effects'
 import axios         from 'axios'
 import {SCREEN_SUCCESS7,
-        SCREEN_FAILURE,SCREEN_LINEEDIT, FETCH_RESULT, FETCH_FAILURE,}
+        SCREEN_FAILURE,SCREEN_LINEEDIT, FETCH_RESULT, FETCH_FAILURE,MKSHPINSTS_SUCCESS,}
          from '../../actions'
 import {getLoginState} from '../reducers/auth'
 import {getButtonState} from '../reducers/button'
@@ -19,7 +19,7 @@ function screenApi({params ,url,headers} ) {
   }
 
  // const delay = (ms) => new Promise(res => setTimeout(res, ms)) 
-export function* ScreenSaga({ payload: {params,data,loading}  }) {
+export function* ScreenSaga({ payload: {params,data,}  }) {
   const loginState = yield select(getLoginState)  //loginStateの変更は不可　思わぬことが発生。
   const buttonState = yield select(getButtonState) //buttonStateの変更は不可　思わぬことが発生。
   let token = loginState.token       
@@ -57,12 +57,21 @@ export function* ScreenSaga({ payload: {params,data,loading}  }) {
               data[params.index] = {...response.data.linedata}
               params.req = buttonState.buttonflg
               return yield put({ type: SCREEN_LINEEDIT, payload:{data:data,params:params} })   
+                    
+            case "mkshpinsts":
+                params.req = buttonState.buttonflg
+                // data[params.index] = {...response.data.linedata}
+                // return yield put({ type: MKSHPINSTS_SUCCESS, payload:{data:data,params:params} })  
+                let messages = []
+                messages[0] = "out count : " + response.data.outcnt
+                messages[1] = "shortage count : " + response.data.shortcnt
+                return yield put({ type: MKSHPINSTS_SUCCESS, payload:{messages:messages}})  
 
-            case "fetch_request":  //viewによる存在チェック　内容表示
+            case "fetch_request":  //viewによる存在チェック内容表示
               let tmp 
               xparams = {...response.data.params}
               xparams.req = buttonState.buttonflg
-              data[params.index].confirm_gridmessage =  ""
+              data[params.index].confirm_gridmessage =  "ok"
               if(response.data.params.err){
                  tmp =  JSON.parse(response.data.params.fetchcode) //javascript -->rails hush で渡せず
                  tmp.map((idx)=>{
@@ -83,10 +92,10 @@ export function* ScreenSaga({ payload: {params,data,loading}  }) {
                    })
                 return  yield put({ type: FETCH_RESULT, payload: {data:data,params:xparams} })   
               }    
-            case "check_request":   //　項目毎のチェック　帰りはfetchと同じ
+            case "check_request":   //項目毎のチェック帰りはfetchと同じ
                   xparams = {...response.data.params}
                   xparams.req = buttonState.buttonflg
-                  data[params.index].confirm_gridmessage =  ""
+                  data[params.index].confirm_gridmessage =  "ok"
                   if(response.data.params.err){
                        tmp =  JSON.parse(response.data.params.yupcheckcode)
                        Object.keys(tmp).map((idx)=>{

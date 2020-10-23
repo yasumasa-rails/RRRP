@@ -238,7 +238,7 @@ module Operation
 		return rec
 	end	
 
-	def proc_consume_child_parts rec,act_qty,tblname,tblid  ###親がactsの時
+	def proc_consume_child_parts rec,act_qty,tblname,tblid  ###親がactsの時 rec:trngantts,packqty 
 		strsql = %Q%select * from outstks where alloctbls_id = #{rec["alloc_id"]} 
 											and inoutflg = 'con'
 		%	###  xxxORDSの消費量変更
@@ -283,14 +283,16 @@ module Operation
 						end				
 					end	
 				end
-				ActiveRecord::Base.connection.insert(outstk_strsql stkinout)
+				outstks_id = RorBlkctl.proc_get_nextval("outstks_seq")
+				ActiveRecord::Base.connection.insert(outstk_strsql(stkinout,outstks_id))
 				break  if  consume_qty <= 0
 			end	 
 			if consume_qty > 0
 				stkinout["lotno"] = ""
-				stkinout["packno"] = "" 
+				stkinout["packno"] = if rec["packqty"].to_f == 0 then "" else "packno" end
 				stkinout["qty_stk"] = consume_qty
-				ActiveRecord::Base.connection.insert(outstk_strsql stkinout)
+				outstks_id = RorBlkctl.proc_get_nextval("outstks_seq")
+				ActiveRecord::Base.connection.insert(outstk_strsql(stkinout,outstks_id))
 			end
 			### schs,ordsの消費削除
 			if outstk["qty_stk"].to_f >= consume_qty1   ###xxxordsの消費を削除
@@ -690,12 +692,8 @@ module Operation
 		r_inout["qty_sch"] = qty_sch
 		r_inout["qty"] = qty
 		r_inout["qty_stk"] = qty_stk
-		stkinout = rinout_to_inout "instk",r_inout 
-		if r_inout["alloctbl_srctblname"] =~ /shpschs|shpords|shpinsts/
-			###在庫の移動はなし　　shpords shpinstsはあくまで予定
-		else	
-			lotstkhists_in_out "in",stkinout  ##,old_alloc,r_inout["alloctbl_srctblname"]
-		end
+		stkinout = rinout_to_inout "instk",r_inout 	
+		lotstkhists_in_out "in",stkinout  ##,old_alloc,r_inout["alloctbl_srctblname"]
 		##
 		strsql = %Q%update outstks  set 
 						qty = #{qty},qty_stk = #{qty_stk} ,qty_sch = #{qty_sch} 
@@ -704,11 +702,7 @@ module Operation
 		strsql  = %Q%select * from r_outstks  where  outstk_alloctbl_id = #{key[:alloctbls_id]} %
 		r_inout  = ActiveRecord::Base.connection.select_one(strsql)
 		stkinout = rinout_to_inout "outstk",r_inout 
-		if r_inout["alloctbl_srctblname"] =~ /shpschs|shpords|shpinsts/
-			###在庫の移動はなし　　shpords shpinstsはあくまで予定
-		else	
-			lotstkhists_in_out "out",stkinout   ###,old_alloc,r_inout["alloctbl_srctblname"]
-		end
+		lotstkhists_in_out "out",stkinout   ###,old_alloc,r_inout["alloctbl_srctblname"]
 	end	
 
 	def child_trngantts  tblname,tblid,reqparams
@@ -793,14 +787,16 @@ module Operation
 		return trngantts_id,reqparams
 	end
 	
-	def proc_create_shp req,email,pare_loca_id,parent,tbldata
+	def proc_create_shp req,email,pare_loca_id,parent,shelfnos_id_to 
+		###shpschs shpordsの時   shpinstsはmkshpinstsで対応
 		command_c = {}
-		command_c[:sio_code] =  command_c[:sio_viewname] =  "r_shp#{yield}s"
+		tblnamechop = "shp#{yield}"
+		command_c[:sio_code] =  command_c[:sio_viewname] =  "r_#{tblnamechop}s"
 		command_c[:sio_message_contents] = nil
 		command_c[:sio_recordcount] = 1
 		command_c[:sio_result_f] =   "0"  
-		command_c[:sio_classname] = "shp#{yield}_add_"
-		strsql = %Q% select pobject_code_sfd from  func_get_screenfield_grpname('#{email}','r_shp#{yield}s')
+		command_c[:sio_classname] = "#{tblnamechop}_add_"
+		strsql = %Q% select pobject_code_sfd from  func_get_screenfield_grpname('#{email}','r_#{tblnamechop}s')
 				%
 		fields = ActiveRecord::Base.connection.select_values(strsql) 
 		opeitm_id = {}
@@ -809,36 +805,38 @@ module Operation
 		ActiveRecord::Base.connection.select_one(strsql).each do |key,val|
 				if key == "id" 
 					command_c[key] = ""
-					command_c["shp#{yield}_id"] = "" 
+					command_c["#{tblnamechop}_id"] = "" 
 				else
 					if fields.index(key)
 						command_c[key] = val
 					else
-						if fields.index(key.sub("#{req["tblname"].chop}","shp#{yield}"))
-							command_c[key.sub("#{req["tblname"].chop}","shp#{yield}")] = val
+						if fields.index(key.sub("#{req["tblname"].chop}","#{tblnamechop}"))
+							command_c[key.sub("#{req["tblname"].chop}","#{tblnamechop}")] = val
 						else
 							case key.to_s
 							when "opeitm_itm_id"
-								command_c["shp#{yield}_itm_id"] = val
+								command_c["#{tblnamechop}_itm_id"] = val
 							when "opeitm_processseq"
-								command_c["shp#{yield}_processseq"] = val
+								command_c["#{tblnamechop}_processseq"] = val
 							end
 						end
 					end
 				end
 		end
-		command_c["shp#{yield}_isudate"] = Time.now 
-		command_c["shp#{yield}_shelfno_id_fm"] = tbldata["shelfnos_id_to"]
-		command_c["shp#{yield}_loca_id_to"] = pare_loca_id
-		command_c["shp#{yield}_depdate"] = parent["#{req["paretblname"].chop}_starttime"]
-		command_c["shp#{yield}_gno"] = parent["#{req["paretblname"].chop}_sno"] 
-		command_c["shp#{yield}_transport_id"] = 0 
-		command_c["shp#{yield}_paretblname"] = req["paretblname"] 
-		command_c["shp#{yield}_paretblid"] = req["paretblid"]
+		command_c["#{tblnamechop}_isudate"] = Time.now 
+		command_c["#{tblnamechop}_packno"] = ""  ###shpschs,shpordsの時は何もセットしない。
+		command_c["#{tblnamechop}_lotno"] = "" 
+		command_c["#{tblnamechop}_shelfno_id_fm"] = shelfnos_id_to
+		command_c["#{tblnamechop}_loca_id_to"] = pare_loca_id
+		command_c["#{tblnamechop}_depdate"] = parent["#{req["paretblname"].chop}_starttime"]
+		command_c["#{tblnamechop}_gno"] = parent["#{req["paretblname"].chop}_sno"] 
+		command_c["#{tblnamechop}_transport_id"] = 0 
+		command_c["#{tblnamechop}_paretblname"] = req["paretblname"] 
+		command_c["#{tblnamechop}_paretblid"] = req["paretblid"]
 		if req["paretblname"] =~ /^pur/   ###tblname= 'feepayment'--->有償支給
 			strsql =%Q&select * from pricemsts where tblname= 'feepayment' and expiredate >= current_date
-								and itms_id = #{command_c["shp#{yield}_itm_id"]} 
-								and processseq = #{command_c["shp#{yield}_processseq"]}
+								and itms_id = #{command_c["#{tblnamechop}_itm_id"]} 
+								and processseq = #{command_c["#{tblnamechop}_processseq"]}
 								and (locas_id = #{pare_loca_id} or locas_id = (select id from locas where code = 'dummy' ))
 								order by expiredate limit 1
 			& 
@@ -846,17 +844,53 @@ module Operation
 			if rec
 				###日付、数量による再設定
 			else
-				command_c["shp#{yield}_price"] = 0 	
-				command_c["shp#{yield}_amt"] = 0 	
-				command_c["shp#{yield}_tax"] = 0 	
-				command_c["shp#{yield}_crr_id"] = 0 	
+				command_c["#{tblnamechop}_price"] = 0 	
+				command_c["#{tblnamechop}_amt"] = 0 	
+				command_c["#{tblnamechop}_tax"] = 0 	
+				command_c["#{tblnamechop}_crr_id"] = 0 	
 			end
 		else
-			command_c["shp#{yield}_price"] = 0 	
-			command_c["shp#{yield}_amt"] = 0 	
-			command_c["shp#{yield}_tax"] = 0 	
-			command_c["shp#{yield}_crr_id"] = 0 	
+			command_c["#{tblnamechop}_price"] = 0 	
+			command_c["#{tblnamechop}_amt"] = 0 	
+			command_c["#{tblnamechop}_tax"] = 0 	
+			command_c["#{tblnamechop}_crr_id"] = 0 	
 		end	
+		stkinout = {}
+		opeitm = proc_get_opeitms_rec(command_c[tblnamechop+"_itm_id"],nil,command_c[tblnamechop+"_processseq"],nil)
+		packqty = command_c["opeitm_packqty"] = opeitm["packqty"].to_f
+
+		stkinout["expiredate"] = command_c[tblnamechop+"_expiredate"]
+		stkinout["lotno"] =  ""   ###shpschs,shpordsの時は何もセットしない。
+		stkinout["packno"] =  if packqty == 0 then "" else "packno" end
+		stkinout["alloctbls_id"] = req["alloc_id"]
+		stkinout["processseq"] = command_c[tblnamechop+"_processseq"]
+		stkinout["itms_id"] = command_c[tblnamechop+"_itm_id"]
+		stkinout["stktaking_proc"] = opeitm["stktaking_proc"]
+		stkinout["prjnos_id"] = command_c[tblnamechop+"_prjno_id"]
+		stkinout["inoutflg"] = tblnamechop[0..2]
+		stkinout["shelfnos_id_out"] = command_c[tblnamechop+"_shelfno_id_fm"] 
+		stkinout["starttime"]  = command_c[tblnamechop+"_depdate"]
+		stkinout["qty_stk"] = 0
+
+		case tblnamechop 
+		when /shpsch/
+			stkinout["qty_sch"] = command_c["#{tblnamechop}_qty"]  
+			stkinout["qty"] = 0 
+			packnos = proc_mk_outstks_rec stkinout,packqty,"add"
+		when /shpord/
+			stkinout["qty"] = command_c["#{tblnamechop}_qty"]  
+			stkinout["qty_sch"] = 0 
+			packnos = proc_mk_outstks_rec stkinout,packqty,"add"
+		end	
+
+		strsql = %Q&select id from shelfnos where locas_id_shelfno = #{command_c["#{tblnamechop}_loca_id_to"]}
+											and code = 'consume'
+			&
+		shelfnos_id_to = ActiveRecord::Base.connection.select_value(strsql)
+		stkinout["shelfnos_id_in"] = (shelfnos_id_to||=0)
+		if tblnamechop =~ /shpsch|shpord/
+			proc_mk_instks_rec stkinout,packnos,packqty,"add"
+		end
 		reqparams = RorBlkctl.proc_private_aud_rec  command_c,1,nil,nil,nil
 	end
 
@@ -907,7 +941,7 @@ module Operation
 					%
 					strwhere[sel] << "orgtblname = '#{tblxxx}'     and"
 				when "pare"
-					next if tbldata["paretblname"] == "" or	tbldata["orgtblname"].nil?	
+					next if tbldata["paretblname"] == "" or	tbldata["paretblname"].nil?	
 					tblxxx = tbldata["paretblname"]
 					add_tbl << %Q% inner join (select a.*,src.srctblid from r_#{tblxxx} a inner join srctbls src 
 								on a.id = src.tblid 
@@ -986,7 +1020,7 @@ module Operation
 					gantt.prjnos_id,trn.#{tblxxx.chop}_shelfno_id_to shelfno_id_to
 				from trngantts gantt #{if add_tbl.size > 1 then add_tbl.chop else "" end } 
 				where #{strwhere["org"]}  #{strwhere["pare"]}  #{strwhere["trn"]}
-				 (gantt.qty - gantt.qty_alloc - gantt.qty_linkto_alloctbl ) > 0
+				 (gantt.qty - gantt.qty_alloc - gantt.qty_linkto_alloctbl) > 0
 				and not exists(select 1 from mkordopeitms mk 
 									where mk.itms_id = gantt.itms_id  and mk.processseq = gantt.processseq 
 									and mk.locas_id = gantt.locas_id  and mk.prjnos_id = gantt.prjnos_id 
@@ -1021,12 +1055,12 @@ module Operation
 					rec["prjnos_id"] == (save_rec["prjnos_id"]||="0")  and
 					rec["shelfno_id_to"] == (save_rec["shelfno_id_to"]||="0") 
 					###まとめ機関の確認
-					if rec["duedate"].to_date <= command_c[duedate].date  + command_c["opeitm_opt_fixoterm"].to_i
+					if rec["duedate"].to_date <= command_c[duedate].to_date  + command_c["opeitm_opt_fixoterm"].to_i
 						command_c[symqty] = command_c[symqty].to_f + rec["qty"].to_f
-						mkordparams[:inqty_pare] += rec["qty"].to_f
+						mkordparams[:outqty] += rec["qty"].to_f
 					else
-						if overqty >  command_c[symqty] 
-							overqty  = overqty  - command_c[symqty] 
+						if overqty >  command_c[symqty].to_f 
+							overqty  = overqty  - command_c[symqty].to_f 
 							command_c[symqty] = 0
 						else	
 							qty = command_c[symqty].to_f - overqty
@@ -1093,6 +1127,7 @@ module Operation
 			end	 
 			###最後のレコードの処理
 			if command_c[symqty].to_f > 0
+				command_c["#{tblord}_id"] = command_c["id"] = ""
 				qty = command_c["symqty"]
 				if pare_opeitm["packqty"].to_f > 0 ###親の作業単位数で子部品再計算
 					qty = (inqty_pare / 
@@ -1157,7 +1192,7 @@ module Operation
 	end
 
 	def lotno_set tblname,stkinout,command_r  ###新規の時のみ
-		if command_r["opeitm_packqty"].to_f > 1
+		if command_r["opeitm_packqty"].to_f > 0
 			if tblname =~ /^prd|^insp|^pur/
 				if command_r["#{tblname.chop}_lotno"] == ""  or  command_r["#{tblname.chop}_lotno"] == "dummy" 
 						stkinout["lotno"] = command_r["#{tblname.chop}_lotno"] = command_r["#{tblname.chop}_sno"]
@@ -1174,39 +1209,40 @@ module Operation
 			stkinout["packno"] = command_r["#{tblname.chop}_packno"] = "packno"
 		else	
 			if command_r["#{tblname.chop}_lotno"] == ""   
-				stkinout["lotno"] = command_r["#{tblname.chop}_lotno"] = "dummy"
+				stkinout["lotno"] = command_r["#{tblname.chop}_lotno"] = ""
 			else
 				stkinout["lotno"] = command_r["#{tblname.chop}_lotno"] 
 			end
-			stkinout["packno"] = command_r["#{tblname.chop}_packno"] = "dummy"
+			stkinout["packno"] = command_r["#{tblname.chop}_packno"] = ""
 		end
 		return stkinout
 	end
 
-	def mk_outstks_rec stkinout,command_r,au ###opeitm_stktaking_proc,opeitm_packqty
+	def proc_mk_outstks_rec stkinout,packqty,au ###opeitm_stktaking_proc,opeitm_packqty
 		packnos = []
 		idx = 1
 		qty_stk = stkinout["qty_stk"].to_f
-		packqty = command_r["opeitm_packqty"].to_f
 		if au == "add"
-			###old_alloc = {"qty_sch"=>0,"qty"=>0,"qty_stk"=>0,"srctblname"=>""} ### "srctblname"=>"":旧データなし又はsch,ords等で対応済
 			if stkinout["packno"] == "packno" and qty_stk > 0
 				stkinout["qty_stk"] = packqty 
 				until qty_stk <= 0 do
 					stkinout["packno"] = format('%03d', idx) 
-					ActiveRecord::Base.connection.insert(outstk_strsql(stkinout)) 
+					outstks_id = RorBlkctl.proc_get_nextval("outstks_seq")
+					ActiveRecord::Base.connection.insert(outstk_strsql(stkinout,outstks_id)) 
 					lotstkhists_in_out "out", stkinout  ###,old_alloc,""  ###新規登録のためテーブル情報は不要
 					qty_stk -=  packqty 
 					idx += 1
-					packnos << stkinout["packno"]
+					packnos << {:packno=>stkinout["packno"],:outstks_id=>outstks_id}
 				end
 			else
-				packnos << stkinout["packno"]
-				ActiveRecord::Base.connection.insert(outstk_strsql(stkinout)) 
+				outstks_id = RorBlkctl.proc_get_nextval("outstks_seq")
+				ActiveRecord::Base.connection.insert(outstk_strsql(stkinout,outstks_id)) 
+				packnos << {:packno=>stkinout["packno"],:outstks_id=>outstks_id}
 				lotstkhists_in_out "out", stkinout   ###,old_alloc,""
 			end
 		else
-			strsql = %Q&select out.id,out.packno from outstks out
+			strsql = %Q&select out.id,out.packno,out.starttime,out.expiredate,out.shelfnos_id_out
+									from outstks out
 									inner join alloctbls alloc on alloc.id = out.alloctbls_id 
 									where alloctbls_id = #{stkinout["alloctbls_id"]} and
 										lotno = '#{stkinout["lotno"]}' 
@@ -1215,17 +1251,13 @@ module Operation
 										for update
 			&	
 			ActiveRecord::Base.connection.select_all(strsql).each do |rec|
-					update_sql = %Q% update outstks set 
-									----shelfnos_id_out = #{stkinout["shelfnos_id_out"]},
-									starttime = '#{stkinout["starttime"]}',
+				update_sql = %Q% update outstks set 
+									starttime = '#{rec["starttime"]}',
 									qty = #{stkinout["qty"]},
 									qty_sch = #{stkinout["qty_sch"]},
-									----lotno = '#{stkinout["lotno"]}',
-									---inoutflg = '#{stkinout["inoutflg"]}',
 									updated_at = to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
-									expiredate = '#{stkinout["expiredate"]}'
+									expiredate = '#{rec["expiredate"]}'
 					%
-				packnos << rec["packno"]
 				if packqty  < qty_stk and qty_stk > 0
 					qty_stk = packqty
 				else
@@ -1235,26 +1267,15 @@ module Operation
 				update_sql << " ,qty_stk = #{qty_stk.to_f} where id = #{rec["id"]}"
 				ActiveRecord::Base.connection.update(update_sql) 
 				stkinout["packno"] = rec["packno"]
+				stkinout["shelnos_id_out"] = rec["shelfnos_id_out"]
 				lotstkhists_in_out "out", stkinout   ###,old_alloc,""
-				packnos << stkinout["packno"]
+				packnos << {:packno=>stkinout["packno"],:outstks_id=>rec["id"]}
 			end	
 		end
-		return  packnos,command_r
+		return  packnos
 	end
 
-	def mk_shpact_outstks_rec stkinout,command_r ###opeitm_stktaking_proc,opeitm_packqty
-		packnos = []
-		stkinout["lotno"] = command_r["lot_packno"] 
-		stkinout["packno"] = command_r["shpact_packno"] 
-		packno << command_r["shpact_packno"] 
-		ActiveRecord::Base.connection.insert(outstk_strsql(stkinout)) 
-		###old_alloc = {"qty_sch"=>0,"qty"=>0,"qty_stk"=>0,"srctblname"=>""} ### "srctblname"=>"":旧データなし又はsch,ords等で対応済
-		lotstkhists_in_out "out", stkinout   ###,old_alloc,"shpacts"
-		return  packnos,command_r
-	end
-
-	def outstk_strsql stkinout
-		outstks_id = RorBlkctl.proc_get_nextval("outstks_seq")
+	def outstk_strsql stkinout,outstks_id
 		strsql = %Q&
 				insert into outstks(id,alloctbls_id,shelfnos_id_out,
 								starttime,
@@ -1273,7 +1294,7 @@ module Operation
 		&
 	end 	
 
-	def mk_instks_rec stkinout,packnos,packqty,au
+	def proc_mk_instks_rec stkinout,packnos,packqty,au
 		if au == "add"
 			packnos.each do |packno|
 				instks_id = RorBlkctl.proc_get_nextval("instks_seq")
@@ -1288,20 +1309,20 @@ module Operation
 						values(#{instks_id},#{stkinout["alloctbls_id"]},#{stkinout["shelfnos_id_in"]},
 								'#{stkinout["starttime"]}',
 								#{stkinout["qty"]},#{stkinout["qty_stk"]},#{stkinout["qty_sch"]},
-								'#{stkinout["lotno"]}','#{packno}','#{stkinout["inoutflg"]}',
+								'#{stkinout["lotno"]}','#{packno[:packno]}','#{stkinout["inoutflg"]}',
 								to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
 								to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
 								' ','#{@sio_user_code||=0}','#{stkinout["expiredate"]}','')
 					&
 				ActiveRecord::Base.connection.insert(strsql) 
 				###old_alloc = {"qty_sch"=>0,"qty"=>0,"qty_stk"=>0,"srctblname"=>""} ### "srctblname"=>"":旧データなし又はsch,ords等で対応済
-				stkinout["packno"] = packno
+				stkinout["packno"] = packno[:packno]
 				lotstkhists_in_out "in", stkinout   ###,old_alloc,""  ###新規登録のためテーブル情報は不要
 			end	
 		else	
 			packnos.each do |packno|
 				strsql = %Q%select * from instks where alloctbls_id = #{stkinout["alloctbls_id"]} 
-										and lotno = '#{stkinout["lotno"]}' and packno = '#{packno}' 
+										and lotno = '#{stkinout["lotno"]}' and packno = '#{packno[:packno]}' 
 										order by lotno,packno
 										for update
 				%	
@@ -1316,9 +1337,9 @@ module Operation
 									updated_at = to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
 									expiredate = '#{stkinout["expiredate"]}',
 					%
-					update_sql << " packno = '#{packno}'  where id = #{rec["id"]} "
+					update_sql << " packno = '#{packno[:packno]}'  where id = #{rec["id"]} "
 					ActiveRecord::Base.connection.update(update_sql) 
-					stkinout["packno"] = packno
+					stkinout["packno"] = packno[:packno]
 					lotstkhists_in_out "in", stkinout   ###,old_alloc,""  ###新規登録のためテーブル情報は不要
 				end	
 			end
@@ -1340,7 +1361,7 @@ module Operation
 								'#{stkinout["duedate"]}',
 								#{stkinout["qty"]},
 								#{stkinout["qty_stk"]},
-								'#{stkinout["lotno"]}','#{packno}','#{stkinout["inoutflg"]}',
+								'#{stkinout["lotno"]}','#{packno[:packno]}','#{stkinout["inoutflg"]}',
 								to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
 								to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
 								' ','#{@sio_user_code||=0}','#{stkinout["expiredate"]}','')
@@ -1360,14 +1381,14 @@ module Operation
 									updated_at = to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
 									expiredate = '#{stkinout["expiredate"]}',
 				%
-				packnos << rec["packno"]
+				
 				qty_stk = rec["qty_stk"].to_f
 				if packqty  < qty_stk and qty_stk > 0
 					qty_stk = packqty
 				else
 					qty_stk = 0
 				end		
-				update_sql << " qty_stk = #{qty_stk},packno = '#{packno}'  "
+				update_sql << " qty_stk = #{qty_stk},packno = '#{packno[:packno]}'  "
 				ActiveRecord::Base.connection.update(update_sql) 
 			end	
 		end
@@ -1424,41 +1445,25 @@ module Operation
 			stk_shelfnos_id =  stkinout["shelfnos_id_in"] 
 			inout = 1
 		end	
+	
 		strsql = %Q% select qty_sch ,qty, qty_stk,id
-							from lotstkhists
-							where   itms_id = #{stkinout["itms_id"]} and
-									processseq = #{stkinout["processseq"]} and
-									prjnos_id = #{stkinout["prjnos_id"]} and  shelfnos_id = #{stk_shelfnos_id} and
-									starttime = to_date('#{stkinout["starttime"]}','yyyy-mm-dd hh24:mi:ss') and 
-									packno = '#{stkinout["packno"]}' and  lotno = '#{stkinout["lotno"]}' for update
-			%
-		lot = ActiveRecord::Base.connection.select_one(strsql)
-
-		if lot
-			strsql = %Q& update lotstkhists set  updated_at = to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
-							starttime = to_date('#{stkinout["starttime"]}','yyyy/mm/dd  hh24:mi:ss'),
-							persons_id_upd = #{@sio_user_code||=0},
-							qty_stk = #{lot["qty_stk"].to_f  + stkinout["qty_stk"].to_f * inout}  , 
-							qty = #{lot["qty"].to_f  + stkinout["qty"].to_f * inout},
-							qty_sch = #{lot["qty_sch"].to_f + stkinout["qty_sch"].to_f * inout} where id = #{lot["id"]}					
-				&
-			ActiveRecord::Base.connection.update(strsql)
-		else	
-			strsql = %Q% select qty_sch ,qty, qty_stk,id
 								from lotstkhists
 								where   itms_id = #{stkinout["itms_id"]} and
 										processseq = #{stkinout["processseq"]} and
 										prjnos_id = #{stkinout["prjnos_id"]} and  shelfnos_id = #{stk_shelfnos_id} and
-										starttime < to_date('#{stkinout["starttime"]}','yyyy-mm-dd hh24:mi:ss') and 
+										starttime <= to_date('#{stkinout["starttime"]}','yyyy-mm-dd hh24:mi:ss') and 
 										packno = '#{stkinout["packno"]}' and  lotno = '#{stkinout["lotno"]}'
-										order by starttime desc limit 1
+										order by starttime desc for update limit 1
 				%
-			pre_lot = ActiveRecord::Base.connection.select_one(strsql)
-			if pre_lot.nil?
-				pre_lot = {"qty_sch"=>0,"qty"=>0,"qty_stk"=>0}
-			end
-			lotstkhists_seq = RorBlkctl.proc_get_nextval("lotstkhists_seq")
-			strsql = %Q&insert into lotstkhists(id,
+		pre_lot = ActiveRecord::Base.connection.select_one(strsql)
+		if pre_lot.nil?
+				pre_lot = {"qty_sch"=>0,"qty"=>0,"qty_stk"=>0} 
+		end
+		pre_lot["qty_sch"] = pre_lot["qty_sch"].to_f + stkinout["qty_sch"].to_f * inout
+		pre_lot["qty"] = pre_lot["qty"].to_f + stkinout["qty"].to_f * inout
+		pre_lot["qty_stk"] = pre_lot["qty_stk"].to_f + stkinout["qty_stk"].to_f * inout
+		lotstkhists_seq = RorBlkctl.proc_get_nextval("lotstkhists_seq")
+		strsql = %Q&insert into lotstkhists(id,
 									itms_id,shelfnos_id,
 									prjnos_id,
 									starttime,processseq,
@@ -1475,16 +1480,19 @@ module Operation
 									#{stkinout["prjnos_id"]},
 									'#{stkinout["starttime"]}',#{stkinout["processseq"]},
 									'#{stkinout["lotno"]}','#{stkinout["packno"]}',
-									#{stkinout["qty_sch"].to_f * inout + pre_lot["qty_sch"].to_f},
-									#{stkinout["qty_stk"].to_f * inout + pre_lot["qty_stk"].to_f},
-									#{stkinout["qty"].to_f * inout + pre_lot["qty"].to_f},
+									#{pre_lot["qty_sch"].to_f},
+									#{pre_lot["qty_stk"].to_f},
+									#{pre_lot["qty"].to_f},
 									'#{stkinout["stktaking_proc"]}',
 									to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
 									to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
 									' ',#{@sio_user_code||=0},'#{stkinout["expiredate"]}','')
+									ON CONFLICT on CONSTRAINT lotstkhists_uky10 DO UPDATE SET
+												qty_stk = #{pre_lot["qty_stk"].to_f} ,
+												qty = #{pre_lot["qty"].to_f},
+												qty_sch = #{pre_lot["qty_sch"].to_f} 
 			&
-			ActiveRecord::Base.connection.insert(strsql) 
-		end
+		ActiveRecord::Base.connection.insert(strsql) 
 		strsql = %Q% select id from lotstkhists
 						where itms_id = #{stkinout["itms_id"]} and  lotno = '#{stkinout["lotno"]}' and 
 								processseq = #{stkinout["processseq"]} and
@@ -1496,7 +1504,7 @@ module Operation
 		ActiveRecord::Base.connection.select_all(strsql).each do |futrec|
 			strsql = %Q& update lotstkhists set  updated_at = to_timestamp('#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}','yyyy/mm/dd hh24:mi:ss'),
 												persons_id_upd = #{@sio_user_code||=0},
-												qty_stk = #{stkinout["qty_stk"].to_f * inout + futrec["qty_stk"].to_f}  ,
+												qty_stk = #{stkinout["qty_stk"].to_f * inout + futrec["qty_stk"].to_f},
 												qty = #{stkinout["qty"].to_f * inout + futrec["qty"].to_f},
 												qty_sch = #{stkinout["qty_sch"].to_f * inout + futrec["qty_sch"].to_f} where id = #{futrec["id"]}					
 			&
@@ -1668,7 +1676,8 @@ module Operation
 			else
 				stkinout["qty"] = stkinout["qty_stk"] = stkinout["qty_sch"] =  0
 			end		
-			ActiveRecord::Base.connection.insert(outstk_strsql(stkinout))
+			outstks_id = RorBlkctl.proc_get_nextval("outstks_seq")
+			ActiveRecord::Base.connection.insert(outstk_strsql(stkinout,outstks_id))
 			##old_alloc = {"qty_sch"=>0,"qty"=>0,"qty_stk"=>0,"srctblname"=>""} ### 旧データなし又はsch,ords等で対応済
 			lotstkhists_in_out "out", stkinout   ###,old_alloc,paretblname
 		end
@@ -1704,7 +1713,8 @@ module Operation
 		stkinout["qty"] = stkinout["qty"].to_f  + stkinout["qty_stk"].to_f
 		stkinout["qty_sch"] = 0
 		stkinout["qty_stk"] = 0
-		ActiveRecord::Base.connection.insert(outstk_strsql(stkinout))
+		outstks_id = RorBlkctl.proc_get_nextval("outstks_seq")
+		ActiveRecord::Base.connection.insert(outstk_strsql(stkinout,outstks_id))
 			##old_alloc = {"qty_sch"=>0,"qty"=>0,"qty_stk"=>0,"srctblname"=>""} ### 旧データなし又はsch,ords等で対応済
 		lotstkhists_in_out "out", stkinout   ###,old_alloc,paretblname
 	end
@@ -1858,7 +1868,7 @@ module Operation
 			return stkinout
 	end
 	
-	def add_stkinouts(fields,command_r,au)  ###au--> add or update
+	def add_stkinouts(fields,command_r,au)  ###au--> add or update。shpxxxは対象外
 		tblname = fields[:srctblname]
 		stkinout = {}
 		stkinout["expiredate"] = command_r[tblname.chop+"_expiredate"]
@@ -1872,7 +1882,7 @@ module Operation
 		case tblname
 		###  stk
 		###  out
-		when /^pur|^insp/  ###shelfnos_id = 0は必須
+		when /^pur|^insp/  ###発注・検査の時shelfnos_id = 0は必須
 			case tblname ###purschs-->opeitm_loca_id 
 				when /^pur/
 					strsql = %Q%select id from shelfnos where locas_id_shelfno  = #{command_r["supplier_loca_id_supplier"]}
@@ -1910,10 +1920,10 @@ module Operation
 					stkinout["starttime"]  = command_r[tblname.chop+"_cmpldate"]
 			end
 			stkinout["processseq"] = command_r["opeitm_processseq"]
-		when /^shp/
-			stkinout["shelfnos_id_out"] = command_r[tblname.chop+"_shelfno_id_fm"] 
-			stkinout["starttime"]  = command_r[tblname.chop+"_depdate"]
-			stkinout["processseq"] = command_r["trngantt_processseq"]
+		# when /^shp/
+		# 	stkinout["shelfnos_id_out"] = command_r[tblname.chop+"_shelfno_id_fm"] 
+		# 	stkinout["starttime"]  = command_r[tblname.chop+"_depdate"]
+		# 	stkinout["processseq"] = command_r["trngantt_processseq"]
 		when /^cust/  ###shelfnos_id = 0は必須
 			case tblname ###
 				when /schs$|ords$/
@@ -1947,19 +1957,15 @@ module Operation
 			stkinout["qty"] =  fields[:qty].to_f - fields[:qty_linkto_alloctbl].to_f - fields[:qty_alloc].to_f
 		end	
 		##
+		packqty = command_r["opeitm_packqty"].to_f
 		if tblname == "puracts" and !command_r["puract_sno_purdlv"].nil? and command_r["puract_sno_purdlv"] != ""
 			### stk-in purdlvを使用
 		else
-			if 	tblname == "shpacts"
-				packnos,command_r = mk_shpact_outstks_rec stkinout,command_r,au
-			else
-				packnos,command_r = mk_outstks_rec stkinout,command_r,au
-			end
+				packnos = proc_mk_outstks_rec stkinout,packqty,au
 		end
 		
 		###  stk
 		###  in
-		packqty = command_r["opeitm_packqty"].to_f
 		case tblname
 			when /^pur|^insp/
 				case tblname
@@ -1973,7 +1979,7 @@ module Operation
 						stkinout["starttime"]  =  (Date.strptime(command_r["purdlv_depdate"].gsub("/","-"),'%Y-%m-%d')  + 1).to_s
 				end
 				stkinout["shelfnos_id_in"] = command_r[tblname.chop+"_shelfno_id_to"]
-				mk_instks_rec stkinout,packnos,packqty,au
+				proc_mk_instks_rec stkinout,packnos,packqty,au
 			when /^prd/
 				case tblname
 					when /schs$|ords$/
@@ -1984,16 +1990,16 @@ module Operation
 						stkinout["starttime"]  = command_r[tblname.chop+"_cmpldate"]
 				end
 				stkinout["shelfnos_id_in"] = command_r[tblname.chop+"_shelfno_id_to"]
-				mk_instks_rec stkinout,packnos,packqty,au
-			when /^shp/
-				stkinout["starttime"]  = command_r[tblname.chop+"_duedate"]
-				strsql = %Q%select id from r_shelfnos where shelfno_loca_id_shelfno = #{command_r[tblname.chop+"_loca_id_to"]}
-														and loca_code = shelfno_code
-				%  ###作業場所、外注先に棚は必須(loca_code=棚code)
-				shelfnos_id_in =  ActiveRecord::Base.connection.select_value(strsql)  
-				shelfnos_id_in ||= 0
-				stkinout["shelfnos_id_in"] = shelfnos_id_in
-				mk_instks_rec stkinout,packnos,packqty,au
+				proc_mk_instks_rec stkinout,packnos,packqty,au
+			# when /^shpschs|^shpords/
+			# 	stkinout["starttime"]  = command_r[tblname.chop+"_duedate"]
+			# 	strsql = %Q%select id from r_shelfnos where shelfno_loca_id_shelfno = #{command_r[tblname.chop+"_loca_id_to"]}
+			# 											and loca_code = shelfno_code
+			# 	%  ###作業場所、外注先に棚は必須(loca_code=棚code)
+			# 	shelfnos_id_in =  ActiveRecord::Base.connection.select_value(strsql)  
+			# 	shelfnos_id_in ||= 0
+			# 	stkinout["shelfnos_id_in"] = shelfnos_id_in
+			# 	mk_instks_rec stkinout,packnos,packqty,au
 			when /^cust/
 				stkinout["duedate"]  = command_r[tblname.chop+"_duedate"]
 				stkinout["custrcvplcs_id"]  = command_r[tblname.chop+"_custrcvplc_id"]
@@ -2017,7 +2023,7 @@ module Operation
 			end	
 			reqparams["trngantts_id"] =  trngantts_id
 			tbldata.each do |key,val|   ###前の状態のtrn変更
-				if key =~ /^sno_|^cno_/ and val  ##gnoはレコードをまとめるもので前の状態変化には使用できない。
+				if key =~ /^sno_|^cno_/ and val  ##gnoはレコードをまとめるもの
 					if val.size > 0
 						xno = key.to_s.split("_")[0] 
 						prevtbl = key.to_s.split("_")[1] + "s"
@@ -2035,6 +2041,9 @@ module Operation
 						break
 					end	
 				end	
+				if key =~ /^gno_/ and val  ##gnoはレコードをまとめるもの
+					###未登録
+				end
 			end	
 			reqparams["trngantts_id"] = trngantts_id
 		else ###trngantts 変更
@@ -2098,7 +2107,6 @@ module Operation
 		return reqparams
 	end
 
-	
 	def mk_mkordopeitms mkords_id,save_rec
 		id = RorBlkctl.proc_get_nextval("mkordopeitms_seq")
 		strsql = %Q&

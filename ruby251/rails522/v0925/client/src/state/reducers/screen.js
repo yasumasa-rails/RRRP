@@ -4,7 +4,7 @@ import {  SCREENINIT_REQUEST,SCREEN_REQUEST,SCREEN_SUCCESS7,
   //SCREEN_ONKEYUP,
   FETCH_REQUEST,FETCH_RESULT,FETCH_FAILURE,
   YUP_ERR_SET,YUP_RESULT,DROPDOWNVALUE_SET,
-  INPUTFIELDPROTECT_REQUEST,INPUTPROTECT_RESULT,
+  INPUTFIELDPROTECT_REQUEST,INPUTPROTECT_RESULT, MKSHPINSTS_SUCCESS,
 } 
   from '../../actions'
 
@@ -23,14 +23,6 @@ case SCREENINIT_REQUEST:
           loading:true,
           message: [{ body: 'screen loading ...', time: new Date() }],
           // editableflg:action.payload.editableflg
-}
-
-case SCREEN_REQUEST:
-return {...state,
-        params:action.payload.params,
-        loading:true,
-        message: [{ body: 'screen loading ...', time: new Date() }],
-        // editableflg:action.payload.editableflg
 }
 
 
@@ -62,6 +54,14 @@ return {...state,
   data:action.payload.data,
   loading:false,
   filterable:false,          
+}
+
+case SCREEN_REQUEST:
+return {...state,
+        params:action.payload.params,
+        loading:true,
+        message: [{ body: 'screen loading ...', time: new Date() }],
+        // editableflg:action.payload.editableflg
 }
 
 case SCREEN_SUCCESS7: // payloadに統一
@@ -99,6 +99,7 @@ case SCREEN_FAILURE:
   return {...state,
   hostError: action.payload.message,
   data: action.payload.data,
+  loading:false,
 }
 
 case FETCH_REQUEST:
@@ -137,6 +138,11 @@ case YUP_RESULT:
     return {...state,
       message: action.payload.message,
     }
+
+case MKSHPINSTS_SUCCESS:
+      return {...state,
+        loading:false,
+}
 
 case  LOGOUT_REQUEST:
 return {}  

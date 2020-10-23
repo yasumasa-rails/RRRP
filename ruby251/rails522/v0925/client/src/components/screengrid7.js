@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect,useRef, } from 'react';
 import { connect } from 'react-redux'
-import { ScreenRequest, FetchRequest, } from '../actions'
+import { ScreenRequest, FetchRequest,ScreenParamsSet, } from '../actions'
 //import DropDown from './dropdown'
 import { yupschema } from '../yupschema'
 import Tooltip from 'react-tooltip-lite'
@@ -218,8 +218,7 @@ const AutoCell = ({
             />)}
         </Tooltip>)
     case /SelectEditable/.test(className):
-      return (
-        <select
+      return (<select
           value={value||""}
           onChange={e => {
             setFieldsByonChange(e)
@@ -265,27 +264,6 @@ const AutoCell = ({
   }
 }
  
-const SelectFilter = ({
-      column: { filterValue, setFilter, id,  dropDownList,}, // dropDownList, 修正要　仮     
-    }) => {
-      // Render a multi-select box
-      return (
-        <select
-          value={filterValue}
-          onChange={e => {
-            setFilter(id,e.target.value )
-          }}
-        >
-          <option value="">All</option>
-          {dropDownList[id].map((option, i) => (
-            <option key={i} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      )
-}
-
 //serverデータとのチェック又はserverデータの検索
 const fetch_check = (id, index, yup, data, updateParams, params,handleFetchRequest,loading) => {
     switch (true) {
@@ -352,19 +330,17 @@ let fieldSchema = (field, screenCode) => {
     ))
 }
 
-
-
 ///
 ///ScreenGrid7 
 ///
-const ScreenGrid7 = ({ isAuthenticated,
+const ScreenGrid7 = ({ 
   screenCode, screenwidth, hiddenColumns,
   pageSizeList, 
   dropDownListOrg, buttonflgOrg, yup,
   paramsOrg,  //buttonflg 下段のボタン：request params[:req] MenusControllerでの実行ケース
   loading, hostError, columnsOrg, dataOrg,
   //callTime,
-  handleScreenRequest, handleFetchRequest,
+  handleScreenRequest, handleFetchRequest,handleScreenParamsSet,
   }) => {
 
   // Define a text UI for filtering 
@@ -462,7 +438,7 @@ const ScreenGrid7 = ({ isAuthenticated,
           screenwidth={screenwidth} >
           <GridTable  columns={columns}  screenCode={screenCode}
             dataOrg={dataOrg} data={data} setData={setData} dropDownListOrg={dropDownListOrg}
-            loading={loading} 
+            loading={loading} handleScreenParamsSet={handleScreenParamsSet}
             controlledPageIndex={controlledPageIndex}  controlledPageSize={controlledPageSize} buttonflg={buttonflg}
             pageSizeList={pageSizeList}  yup={yup}
             paramsOrg={paramsOrg} params={params} setParams={setParams}  updateParams={updateParams} 
@@ -590,13 +566,12 @@ const defaultPropGetter = () => ({})
 const GridTable = ({
         columns,screenCode,
         dataOrg, data,setData, dropDownListOrg,
-        loading,
-        controlledPageIndex, controlledPageSize,
-        pageSizeList,yup,
+        loading,yup,
+        controlledPageIndex, controlledPageSize,pageSizeList,
         paramsOrg,params, setParams, updateParams,buttonflg,
         disableFilters,
         hiddenColumns,handleScreenRequest,
-        handleFetchRequest,
+        handleFetchRequest,handleScreenParamsSet,
         getHeaderProps = defaultPropGetter,
         getColumnProps = defaultPropGetter,
         getCellProps = defaultPropGetter,
@@ -661,23 +636,46 @@ const GridTable = ({
   //                   [loading])
 
 
-  const filterTypes = useMemo(
-    () => ({
-      includes: SelectFilter,  //screenfield_type　に従う
-      // override 
-      text: (rows, id, filterValue) => {
-        return rows.filter(row => {
-          const rowValue = row.values[id]
-          return rowValue !== undefined
-            ? String(rowValue)
-                .toLowerCase()
-                .startsWith(String(filterValue).toLowerCase())
-            : true
-        })
-      },
-    }),
-    []
-  )
+  // const filterTypes = useMemo(
+  //   () => ({
+  //     includes: SelectFilter,  //screenfield_type　に従う
+  //     // override 
+  //     text: (rows, id, filterValue) => {
+  //       return rows.filter(row => {
+  //         const rowValue = row.values[id]
+  //         return rowValue !== undefined
+  //           ? String(rowValue)
+  //               .toLowerCase()
+  //               .startsWith(String(filterValue).toLowerCase())
+  //           : true
+  //       })
+  //     },
+  //   }),
+  //   []
+  //)
+
+  
+// const SelectFilter = ({
+//   column: { filterValue, setFilter, id,  dropDownList,}, // dropDownList, 修正要　仮     
+// }) => {
+//   // Render a multi-select box
+//   return (
+//     <select
+//       value={filterValue}
+//       onChange={e => {
+//         setFilter(id,e.target.value )
+//       }}
+//     >
+//       <option value="">All</option>
+//       {dropDownList[id].map((option, i) => (
+//         <option key={i} value={option.value}>
+//           {option.label}
+//         </option>
+//       ))}
+//     </select>
+//   )
+// }
+
 
   const ColumnHeader = ({
     column ,
@@ -688,19 +686,49 @@ const GridTable = ({
   }
   
   const DefaultColumnFilter = ({
-    column:{filterValue,setFilter,} ,column,
+    column:{filterValue,setFilter,filter, id,  } ,column,
+    dropDownList,
   }) => {
-     
-    return (
-      <input
-        value={filterValue||""}
-        onChange={e => {  // onBlur can not use
+    switch(filter){
+      case "text": 
+        return (
+        <input
+          value={filterValue||""}
+          onChange={e => {  // onBlur can not use
           setFilter(e.target.value || "")
-        }
-        }
-      />
-    )
+          }
+          }
+        />
+        )
+      case "includes":  
+         return (
+           <select
+             value={filterValue}
+             onChange={e => {
+               setFilter(e.target.value )
+             }}
+           >
+             <option value={""}></option>
+             {JSON.parse(dropDownList[id]).map((option, i) => (
+               <option key={i} value={option.value}>
+                 {option.label}
+               </option>
+             ))}
+           </select>
+         )
+       default:
+        return (
+        <input
+          value={filterValue||""}
+          onChange={e => {  // onBlur can not use
+          setFilter(e.target.value || "")
+          }
+          }
+        />
+        )
+      }
   }
+
   const defaultColumn = useMemo(
     () => ({
       Header: ColumnHeader,
@@ -741,7 +769,7 @@ const GridTable = ({
       manualSortBy: true,
       disableMultiSort: false,
       autoResetSortBy: true,
-      filterTypes,
+      //filterTypes,
       disableFilters,
       //updateMyData,   //pageCount: controlledPageCount,
       initialState: {hiddenColumns:hiddenColumns,
@@ -816,9 +844,13 @@ const GridTable = ({
                       },
                   onClick: e => {
                       toggleAllRowsSelected(false)
+                      updateParams([{clickIndex:[]}])
                       row.toggleRowSelected()
-                      updateParams([{clickIndex:row.index}])
-                      },
+                      let starttime = params.screenCode.split("_")[1].slice(0,-1)+"_starttime" //outstksで使用
+                      updateParams([{clickIndex:[{lineId:row.index,id:data[row.index]["id"],starttime:data[row.index][starttime]}]},
+                                    {index:row.index}])
+                      handleScreenParamsSet(params)  
+                    },
                   })
                   }
                     className="tr">
@@ -863,6 +895,9 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   },
   handleFetchRequest: (params,data) => {
     dispatch(FetchRequest(params,data))
+  },
+  handleScreenParamsSet: (params) => {
+    dispatch(ScreenParamsSet(params))
   },
 })
 export default connect(mapStateToProps, mapDispatchToProps)(ScreenGrid7)

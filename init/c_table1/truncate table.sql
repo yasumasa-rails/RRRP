@@ -4,8 +4,6 @@ truncate table purords;
 truncate table purinsts;
 truncate table purdlvs;
 truncate table puracts;
-truncate table instks;
-truncate table outstks;
 truncate table inamts;
 truncate table outamts;
 truncate table lotstkhists;
@@ -37,11 +35,14 @@ truncate table processreqs;
 
 truncate table shpschs;
 truncate table shpords;
+truncate table shpinsts;
 
 truncate table mkordopeitms cascade;
 
 truncate table mkords  cascade;
 truncate table srctbls;
+truncate table instks cascade;
+truncate table outstks cascade;
 
 commit;
 

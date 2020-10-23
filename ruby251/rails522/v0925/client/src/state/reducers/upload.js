@@ -1,4 +1,4 @@
-import {  UPLOAD_REQUEST,
+import {  IMPORT_REQUEST,
         UPLOAD_SUCCESS,EXCELTOJSON_SUCCESS,UPLOADFORFIELDSET_REQUEST,
         SETRESULTS_REQUEST,SETRESULTS_SUCCESS,
         // CHANGEUPLOADTITLEEDITABLE_REQUEST,EXCELTOJSON_REQUEST,
@@ -13,9 +13,9 @@ errors:[],
 const uploadreducer =  (state= initialValues , actions) =>{
 switch (actions.type) {
   
-  case UPLOAD_REQUEST:
+  case IMPORT_REQUEST:
     return {...state,
-            values:actions.payload.values}
+            }
    
   
   case UPLOAD_SUCCESS:

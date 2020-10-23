@@ -11,26 +11,32 @@ export  function yupErrCheckBatch(lines,screenCode)
     let tblnamechop = screenCode.split("_")[1].slice(0, -1)
     lines.map((line,inx) => {
         if(["add","update","delete"].includes(line["aud"])){
-            try{screenSchema.validateSync(line)
-                line[`confirm`] = ""  //rb uploadで confirm=""のみを対象としているため
+            try{
+                line[`confirm`] = true  //rb uploadで confirm=trueのみを対象としているため
+                let row = {}
                 Object.keys(line).map((fd)=>{
-                    if(screenSchema.fields[fd]){  //対象は入力項目のみ
-                        line = dataCheck7(screenSchema,fd,line)
-                        if(line[`${fd}_gridmessage`] !== "ok"){
-                          line[`${fd}_confirm`] = `err ${fd}`
-                          line[`${tblnamechop}_confirm_gridmessage`] = `error ${fd}`　
+                     if(screenSchema.fields[fd]){  //対象は入力項目のみ
+                         row[fd] = line[fd]
+                         }
+                         return null
+                     }
+                )
+                screenSchema.validateSync(row)
+                row = dataCheck7(screenSchema,row) //row:_gridmessageを含む
+                Object.keys(screenSchema.fields).map((fd)=>{  // line:_gridmessageを含まない
+                    if(row[`${fd}_gridmessage`] !== "ok"){
+                          line[`${fd}_gridmessage`] = row[`${fd}_gridmessage`]
+                          line[`${tblnamechop}_confirm_gridmessage`] = `x error ${fd}`
                           importError = true
                         }else{
-                            let rval = onBlurFunc7(screenCode,line,fd)
-                            line[fd] = rval["linedata"][fd] 
+                            line = onBlurFunc7(screenCode,line,fd)
                         }
+                        return null
                     }
-                   return line
-                  }
                 )
             }      
             catch(err){  //jsonにはxxxx_gridmessageはない。
-                line[`${tblnamechop}_ confirm_gridmessage`] = `error ${err}`
+                line[`${tblnamechop}_confirm_gridmessage`] = `y error ${err}`
                 line[`confirm`] = false
                 importError = true
             }

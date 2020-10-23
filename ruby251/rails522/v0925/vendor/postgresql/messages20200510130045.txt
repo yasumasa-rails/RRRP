@@ -1,2 +1,0 @@
- create TABLE_CONSTRAINTS :opeitms_uky1 
- create TABLE_CONSTRAINTS :opeitms_uky2 

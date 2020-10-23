@@ -179,6 +179,10 @@ module Api
                 download_columns_info = ScreenLib.proc_create_download_columns_info params,current_api_user[:email]  
                 pagedata = ScreenLib.proc_download_data_blk params,download_columns_info  ### nil filtered sorting
                 render json:{:excelData=>{:columns=>download_columns_info["columns_info"],:data=>pagedata},:totalCount=>params[:totalCount]}    
+
+            when 'mkshpinsts'  ###shpordsは作成済が条件
+                  outcnt,shortcnt,err = ScreenLib.proc_mkshpinsts params["screenCode"],params["clickIndex"]
+                  render json:{ :outcnt=>outcnt,:shortcnt=>shortcnt,:err=>err}    
             else
               p "#{Time.now} : req-->#{req} not support "    
           end   

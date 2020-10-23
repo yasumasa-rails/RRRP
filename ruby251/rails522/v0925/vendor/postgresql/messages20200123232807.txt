@@ -1,2 +1,0 @@
- create TABLE_CONSTRAINTS :custschs_uky10 
- create TABLE_CONSTRAINTS :custschs_uky20 

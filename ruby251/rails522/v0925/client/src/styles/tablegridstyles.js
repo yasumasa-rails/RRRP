@@ -51,6 +51,16 @@ ${'' /* These styles are required for a horizontaly scrollable table overflow */
              top: 50%;
              left: 0%;
      }
+     select { width:95%;
+              height:45%;
+              position: absolute;
+              top: ;
+              bottom: ;
+              left: ;
+              right: ;
+              top: 50%;
+              left: 0%;
+      }
   },
   .td {
     margin: 0;

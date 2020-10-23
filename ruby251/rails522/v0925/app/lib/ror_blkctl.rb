@@ -54,10 +54,12 @@ module RorBlkctl
 				proc_insert_sio_r( command_c) #### if @pare_class != "batch"    ## 結果のsio書き込み
 				ActiveRecord::Base.connection.commit_db_transaction()
 				if reqparams   ###画面からの時はperform_later(reqparams["seqno"][0])　seqnoは一つのみ。次の処理がないときはreqparams=nil
-					if command_c["mkord_runtime"]
-						CreateOtherTableRecordJob.set(wait: command_c["mkord_runtime"].to_f.hours).perform_later(reqparams["seqno"][0])
-					else	
-						CreateOtherTableRecordJob.perform_later(reqparams["seqno"][0])
+					if reqparams["seqno"].size > 0
+						if command_c["mkord_runtime"] 
+							CreateOtherTableRecordJob.set(wait: command_c["mkord_runtime"].to_f.hours).perform_later(reqparams["seqno"][0])
+						else	
+							CreateOtherTableRecordJob.perform_later(reqparams["seqno"][0])
+						end
 					end
 				end	
       	ensure
@@ -106,7 +108,7 @@ module RorBlkctl
 				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成 alloctbl inoutstkを含む
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams	
 				### trngantts,alloctblsを作成してないとordsの時対象とならない。
-				if reqparams["orgtblname"] =~ /^cust/ or reqparams["mkords_id"] ###元がcust,・・・時のみ子、孫へと展開
+				if reqparams["orgtblname"] =~ /^cust/ ###元がcust,・・・時のみ子、孫へと展開
 					reqparams["segment"]  = "mkschs"   ###構成展開
 					processreqs_id,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams	
 				end
@@ -142,7 +144,7 @@ module RorBlkctl
 				reqparams["segment"]  = "mkschs"   ###構成展開
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
-				###reqparams["segment"] = "mkshpschs" ###子部品出庫 prdords作成時には子部品のschsはできてない。
+				 ###子部品出庫 prdords作成時には子部品のschsはできてない。
 				###processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],reqparams	
 
 				###
@@ -177,7 +179,7 @@ module RorBlkctl
 				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams	
 				### trngantts,alloctblsを作成してないとordsの時対象とならない。
-				if reqparams["orgtblname"] =~ /^cust/   or reqparams["mkords_id"] ###元がcust,・・・時のみ子、孫へと展開
+				if reqparams["orgtblname"] =~ /^cust/    ###元がcust,・・・時のみ子、孫へと展開
 					reqparams["segment"]  = "mkschs"   ###構成展開
 					processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams	
 				end
@@ -273,7 +275,7 @@ module RorBlkctl
 			 	reqparams["mkords_id"] = @src_tbl[:id]
 			 	processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],nil,nil,reqparams	
 			else
-				reqparams = nil
+				###reqparams = nil
 		end
 		return reqparams
 	end
@@ -543,7 +545,7 @@ module RorBlkctl
 					j_to_sfld != "code_upd" and  j_to_sfld != "name_upd"   and  j_to_sfld != "id_upd"##本体の更新
 			    if  k
 	            	@src_tbl[j_to_sfld.sub("_id","s_id").to_sym] = k
-						@src_tbl[j_to_sfld.to_sym] = nil  if k  == "\#{nil}"  ##
+					@src_tbl[j_to_sfld.to_sym] = nil  if k  == "\#{nil}"  ##
 					if k == ""
 						case 	  j_to_sfld
 						when 'sno'
@@ -816,7 +818,7 @@ module RorBlkctl
 
 	def proc_tbl_add_arel  tblname,tblarel ##
 		fields = ""
-		values = ""
+		values = ""  ###insert into(....) value(xxx)のxxx
 		tblarel.each do |key,val|
 			fields << key.to_s + ","
 			strsql = %Q&select fieldcode_ftype from r_fieldcodes

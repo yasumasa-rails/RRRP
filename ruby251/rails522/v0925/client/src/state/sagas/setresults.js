@@ -85,8 +85,8 @@ export function* SetResultsSaga({ payload: {results,defCode,excelfile} }) {
     //let importdata
     //let importError
     let payload
-    let nameToCode = screenState.nameToCode
-    let screenCode = screenState.screenCode
+    let nameToCode = screenState.grid_columns_info.nameToCode
+    let screenCode = screenState.params.screenCode
     switch (defCode) {
         case "ExcelToJson":
             try{

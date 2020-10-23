@@ -120,9 +120,10 @@ export function dataCheck7(schema,updateRow){
               break
             case "screenfield_indisp":  //tipが機能しない。
                 if(/_code/.test(updateRow["pobject_code_sfd"])&updateRow["screenfield_editable"]!=="0")
-                    {if(updateRow["screenfield_indisp"]!=="1")
-                            {updateRow["screenfield_indisp_gridmessage"] = "error!  must be Required"}
-                            confirm_gridmessage =  updateRow[`${field}_gridmessage`] + confirm_gridmessage
+                    {if(updateRow["screenfield_indisp"]==="1")
+                            {updateRow[`${field}_gridmessage`] = "ok"}
+                            else{updateRow["screenfield_indisp_gridmessage"] = "error!  must be Required"
+                            confirm_gridmessage =  updateRow[`${field}_gridmessage`] + confirm_gridmessage}
                           }else{
                             updateRow[`${field}_gridmessage`] = "ok"}
                 break

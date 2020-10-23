@@ -7,13 +7,13 @@ import GanttChart from './ganttchart'
 import "react-tabs/style/react-tabs.css"
 import {Button} from '../styles/button'
 import "../index.css"
-import {ScreenRequest,DownloadRequest,GanttChartRequest,GanttReset,
+import {ScreenRequest,DownloadRequest,ImportRequest,GanttChartRequest,GanttReset,
         ScreenInitRequest,//ButtonFlgRequest,
         YupRequest,TblfieldRequest,ResetRequest,} from '../actions'
 
 
  const  ButtonList = ({buttonListData,setButtonFlg,buttonflg,
-                        screenCode,page,params,downloadloading,disabled,
+                        screenCode,page,data,params,downloadloading,disabled,
                         message,messages //  editableflg,message
                       }) =>{
       let tmpbuttonlist = {}
@@ -36,7 +36,7 @@ import {ScreenRequest,DownloadRequest,GanttChartRequest,GanttReset,
                       disabled={disabled}
                       type={val[1]==='inlineedit7'||'inlineadd7'||'yup'||'ganttchart'?"submit":"button"}
                       onClick ={() =>{
-                                      setButtonFlg(val[1],page,params)} // buttonflg
+                                      setButtonFlg(val[1],page,params,data)} // buttonflg
                                      }>
                       {val[0]}       
                       </Button>             
@@ -71,6 +71,7 @@ const  mapStateToProps = (state,ownProps) =>({
   buttonListData:state.button.buttonListData ,  
   buttonflg:state.button.buttonflg ,  
   params:state.screen.params ,  
+  data:state.screen.data ,  
   screenCode:state.screen.params.screenCode ,  
   screenName:state.screen.params.screenName ,  
   uid:state.auth.uid,
@@ -84,55 +85,55 @@ const  mapStateToProps = (state,ownProps) =>({
 
 const mapDispatchToProps = (dispatch,ownProps ) => ({
   setButtonFlg : (buttonflg,    //editableflg,screenCode,uid,screenName,search
-                    page,params) =>{
+                    page,params,data) =>{
        // dispatch(ButtonFlgRequest(buttonflg,params)) // import export 画面用
         switch (buttonflg) {  //buttonflg ==button_code
           case "reset":
             params= { ...params, page: page,req:"reset"}
-          //editableflg = true
             return dispatch(ResetRequest(params)) //
 
           case "search":
               params= { ...params, page: page,req:"viewtablereq7"}
-            //editableflg = true
               return dispatch(ScreenRequest(params,null)) //data=null　再度もとめ直し
         
           case "inlineedit7":
-              params= { ...params, page: page,req:"inlineedit7"}
-              //editableflg = true
+              params= { ...params,page:page,req:"inlineedit7"}
                 return dispatch(ScreenInitRequest(params,null)) //data=null　再度もとめ直し
           
           case "inlineadd7":
-            params= {...params,  page: page, pages:1,req:"inlineadd7"}
-          //  editableflg = true
+            params= {...params,page:page, pages:1,req:"inlineadd7"}
              return  dispatch(ScreenInitRequest(params,null)) //data=null　空白を表示
           
           case "export":
-              params= {...params,  req:"download7"}
-            //  editableflg = true
+              params= {...params,req:"download7"}
                return  dispatch(DownloadRequest(params)) //
+         
+          case "import":
+                  params= {...params,req:"import"}
+                    return  dispatch(ImportRequest(params)) //
+
+          case "mkshpinsts":
+                  params= {...params,req:"mkshpinsts"}
+                  params.linedata = {}    
+                  return  dispatch(ScreenRequest(params,data)) //
                
           case "yup":
              params= { ...params,req:"yup"}
-           //  editableflg = false
             return  dispatch(YupRequest(params)) //
 
           case "ganttchart":
             if(params["clickIndex"]){
                params= { ...params,req:"ganttchart"}
-             //  editableflg = false
               return  dispatch(GanttChartRequest(params)) }//
             else{dispatch(GanttReset())}  
             break
 
           case "crt_tbl_view_screen":
                params= {req:"createTblViewScreen",screenCode:params.screenCode}
-             //  editableflg = false
               return  dispatch(TblfieldRequest(params)) //
 
           case "unique_index":
                     params= {req:"createUniqueIndex",screenCode:params.screenCode}
-                     //  editableflg = false
                     return  dispatch(TblfieldRequest(params)) 
           default:
             return 

@@ -91,12 +91,12 @@ export function  onBlurFunc7(screenCode,lineData,id){
                         lineData[qty_case] =  String(Math.ceil(lineData[id]/lineData["opeitm_packqty"]))}
                 break 
             default:
-                lineData["confirm_gridmessage"] = ""
+                lineData["confirm_gridmessage"] = "ok"
                 break    
             }        
             break
         default:
-            lineData["confirm_gridmessage"] = ""
+            lineData["confirm_gridmessage"] = "ok"
              break    
         }
        

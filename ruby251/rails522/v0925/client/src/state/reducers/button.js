@@ -1,5 +1,6 @@
 import {  BUTTONLIST_REQUEST, BUTTONLIST_SUCCESS, BUTTONFLG_REQUEST,GANTT_RESET,SCREENINIT_REQUEST,
-  TBLFIELD_SUCCESS,GANTTCHART_SUCCESS,LOGOUT_REQUEST,DOWNLOAD_RESET,SCREEN_SUCCESS7,DOWNLOAD_SUCCESS} //RESET_REQUEST
+  TBLFIELD_SUCCESS,GANTTCHART_SUCCESS,LOGOUT_REQUEST,MKSHPINSTS_SUCCESS,
+  DOWNLOAD_RESET,SCREEN_SUCCESS7,DOWNLOAD_SUCCESS,IMPORT_REQUEST} //RESET_REQUEST
    from 'actions'
 
 export let getButtonState = state => state.button
@@ -27,6 +28,8 @@ message:null,
 case SCREENINIT_REQUEST:
   return {...state,
     buttonflg:actions.payload.params.req, 
+    messages:actions.payload.messages,
+    message:actions.payload.message,
           // editableflg:action.payload.editableflg
 }
 
@@ -64,6 +67,12 @@ return {...state,
   buttonflg:"ganttchart",
 }
 
+case MKSHPINSTS_SUCCESS:
+return {...state,
+  buttonflg:"mkshpinsts",
+  messages:actions.payload.messages,
+  loading:false,
+}
 
 case DOWNLOAD_SUCCESS:
 return {...state,
@@ -75,6 +84,11 @@ return {...state,
   disabled:false,
 }
 
+case IMPORT_REQUEST:
+  return {...state,
+    buttonflg:"import", 
+          // editableflg:action.payload.editableflg
+}
 
 case  LOGOUT_REQUEST:
 return {}  

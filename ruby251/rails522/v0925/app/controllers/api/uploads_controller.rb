@@ -31,7 +31,7 @@ module Api
         command_init =  RorBlkctl.init_from_screen current_api_user[:uid],screenCode
         jparams = {}
 
-  		yupfetchcode = YupSchema.create_yupfetchcode screenCode   
+  		  yupfetchcode = YupSchema.create_yupfetchcode screenCode   
         yupcheckcode  = YupSchema.create_yupcheckcode screenCode   
         tblid = screenCode.split("_")[1].chop + "_id"
         
@@ -45,10 +45,10 @@ module Api
             end  
             jparams[:screenCode] = screenCode
             jparams[:err] = ""  
-            linedata.each do |field,val| 
-                if linedata["confirm"] == ""  or linedata["confirm"].nil?
+            linedata.each do |field,val| ###confirmはfunction batchcheckで項目追加している。
+                if linedata["confirm"] == true  or linedata["confirm"].nil?
                   ##エラーと最初のレコード(confirm="confirm")のname項目行を除く
-                  jparams[:parse_linedata]["confirm"] = "レ"
+                  jparams[:parse_linedata]["confirm"] = true
                   if yupfetchcode[field] 
                     jparams[:fetchcode] = %Q%{"#{field}":"#{val}"}%
                     jparams[:fetchview] = yupfetchcode[field]
@@ -61,7 +61,7 @@ module Api
                             jparams["yupcheckcode"] = %Q%{"#{field}":"#{val}"}%
                             jparams = ControlFields.proc_judge_check_code jparams
                             if jparams[:err] != ""
-                                jparams[:parse_linedata]["confirm"] = jparams[:err]
+                                jparams[:parse_linedata]["confirm_gridmessage"] = jparams[:err]
                                 status = false    
                             end
                         end
@@ -72,13 +72,13 @@ module Api
                 end 
             end 
             if status == false    
-                jparams[:parse_linedata]["confirm"] = jparams[:err]
+                jparams[:parse_linedata]["confirm_gridmessage"] = jparams[:err]
             end
             results << jparams[:parse_linedata]
         end
         results.each do |parse_linedata|
             command_c = command_init.dup  ###blkukyはid以外でユニークを保証するkey
-            if parse_linedata["confirm"] == "レ"    ###重複keyチェック
+            if parse_linedata["confirm"] == true    ###重複keyチェック
                 err = ControlFields.blkuky_check screenCode.split("_")[1],parse_linedata
                 tblid = screenCode.split("_")[1].chop + "_id"
                 err.each do |key,recs|
@@ -89,23 +89,23 @@ module Api
                         else
                           if command_c["id"] != rec["id"]
                               status = false  
-                              parse_linedata["confirm"] = "error:#{key}"
+                              parse_linedata["confirm_gridmessage"] = "error:#{key}"
                           end
                         end  
                         if  parse_linedata["aud"] == "add" and  rec["id"] 
                           status = false  
-                          parse_linedata["confirm"] = "error already exist:#{key}"
+                          parse_linedata["confirm_gridmessage"] = "error already exist:#{key}"
                         end 
                     end	
                     if recs.empty?
                       if  parse_linedata["aud"] == "update" or parse_linedata["aud"] == "delete"
                           status = false  
-                          parse_linedata["confirm"] = "error not exist:#{key}"
+                          parse_linedata["confirm_gridmessage"] = "error not exist:#{key}"
                       end 
                     end  
                 end
             end
-            if status == true and parse_linedata["confirm"] == "レ" and defCode == "add_update"
+            if status == true and parse_linedata["confirm"] == true and defCode == "add_update"
                 parse_linedata.each do |key,value|
                     command_c[key] = (value||="")
                 end
@@ -154,17 +154,9 @@ module Api
               ActiveRecord::Base.connection.begin_db_transaction()
                   command_all.each do |command_cn|
                       reqparams = RorBlkctl.proc_private_aud_rec(command_cn,r_cnt0,nil,nil,nil) ###nil:parenttblname,paretblid,reqparams
-                      acommand << command_rn
-                      results[idx+1]["confirm"] = "OK" 
-                      if reqparams.nil?
-                          reqparams = tmpreqparams.dup
-                      else
-                        if  tmpreqparams["seqno"][0].nil?  ####performなし
-                        else
-                            reqparams["seqno"][idx] =  tmpreqparams["seqno"][0]  
-                            idx += 1
-                        end
-                      end     
+                      acommand << command_cn
+                      results[idx+1]["confirm"] = true
+                      idx += 1
                   end
           rescue
               ActiveRecord::Base.connection.rollback_db_transaction()
@@ -174,7 +166,7 @@ module Api
                   Rails.logger.debug"error class #{self} : #{Time.now}: #{$@} "
                   Rails.logger.debug"error class #{self} : $!: #{$!} "
                   Rails.logger.debug"  idx = #{idx} command_r: #{command_all[idx]} "
-                  results[idx+1]["confirm"] = command_all[idx][:sio_message_contents].to_s[0..1000] 
+                  results[idx+1]["confirm_gridmessage"] = command_all[idx][:sio_message_contents].to_s[0..1000] 
           else
               acommand.each do |command|
                   command[:sio_result_f] =  "1"   ### 1 normal end
@@ -182,9 +174,9 @@ module Api
                   RorBlkctl.proc_insert_sio_r(command) ### if @pare_class != "batch"    ## 結果のsio書き込み
               end	
               ActiveRecord::Base.connection.commit_db_transaction()
-              reqparams["seqno"].each do |idx|
-                CreateOtherTableRecordJob.perform_later idx
-              end
+              # reqparams["seqno"].each do |idx|
+              #   CreateOtherTableRecordJob.perform_later idx
+              # end
           ensure
           end ##begin
           return results

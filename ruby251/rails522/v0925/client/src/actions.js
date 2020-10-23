@@ -39,7 +39,7 @@ export const BUTTONFLG_REQUEST = 'BUTTONFLG_REQUEST'
 export const BUTTON_RESET = 'BUTTON_RESET'
 export const GANTT_RESET = 'GANTT_RESET'
 
-export const UPLOAD_REQUEST = 'UPLOAD_REQUEST'
+export const IMPORT_REQUEST = 'IMPORT_REQUEST'
 export const UPLOADLIST_REQUEST = 'UPLOADLIST_REQUEST'
 export const UPLOAD_SUCCESS = 'UPLOAD_SUCCESS'
 export const UPLOADLIST_SUCCESS = 'UPLOADLIST_SUCCESS'
@@ -73,6 +73,8 @@ export const DROPDOWNVALUE_SET = 'DROPDOWNVALUE_SET'
 export const GANTTCHART_REQUEST = 'GANTTCHART_REQUEST'
 export const GANTTCHART_FAILURE = 'GANTTCHART_FAILURE'
 export const GANTTCHART_SUCCESS = 'GANTTCHART_SUCCESS'
+
+export const MKSHPINSTS_SUCCESS = 'MKSHPINSTS_SUCCESS'
 
 export const SETRESULTS_REQUEST = 'SETRESULTS_REQUEST'
 export const SETRESULTS_SUCCESS = 'SETRESULTS_SUCCESS'
@@ -228,9 +230,8 @@ export const ChangeUnUploadRequest = (isUpload) => ({
 })
 
 
-export const UploadRequest = (values) => ({
-  type: UPLOAD_REQUEST,
-  payload: { values}
+export const ImportRequest = () => ({
+  type: IMPORT_REQUEST,
 })
 
 export const UploadSuccess = (imageFromController) => ({

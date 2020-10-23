@@ -1,3 +1,0 @@
- --- create view script   r_prdacts 
- --- create view script   r_prdinsts 
- --- create view script   r_prdords 
