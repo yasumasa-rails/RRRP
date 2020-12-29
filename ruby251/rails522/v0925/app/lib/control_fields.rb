@@ -49,11 +49,12 @@ module ControlFields
 			mainviewflg = true  ##自分自身の登録か？
 			keys = ""
 			fetch_data = {}
-			tblnamechop = ""
+			viewtblnamechop = ""
 			xno = ""
 			srctblnamechop = ""
+			screentblnamechop = params[:screenCode].split("_")[1].chop
 			fetchview = params[:fetchview].split(":")[0]  ##拡張子の確認
-			tblnamechop = fetchview.split("_")[1].chop
+			viewtblnamechop = fetchview.split("_")[1].chop
 			screendata = params[:parse_linedata]
 			if params[:screenCode].split("_")[1] != fetchview.split("_")[1] 
 					mainviewflg = false
@@ -75,7 +76,7 @@ module ControlFields
 					missing = true
 				else
 					if rec["pobject_code_sfd"] 	=~ /_sno_|_cno_/
-						tblnamechop,xno,srctblnamechop = rec["pobject_code_sfd"].split("_")
+						screentblnamechop,xno,srctblnamechop = rec["pobject_code_sfd"].split("_")  ### 
 						strsql << " #{srctblnamechop}_#{xno} = '#{screendata[rec["pobject_code_sfd"]]}'       and"
 					else
 						delm = (params[:fetchview].split(":")[1]||="")  ###/_sno_|_cno_|_gno_/の時はdelm意味なし
@@ -100,71 +101,116 @@ module ControlFields
 					if items[-1] == delm[1..-1]   ##delmは_(アンダーバー付き)
 						field = items[0..-2].join("_")   ##delm(:)が3在った時
 					else	
-						field = items.join("_")
+						field = key
 					end	
-					if rec[field] and key !="id" and key !~ /person.*upd/ and field !~ /^#{params[:screenCode].split("_")[1].chop}/ 
+					if rec[field] and key !="id" and key !~ /person.*upd/ 
 						fetch_data[field+delm] =  rec[field] ###rec:検索結果
 						case params[:screenCode]
-							when /opeitms$/
-								if screendata["opeitm_stktaking_proc"] == "" or screendata["opeitm_stktaking_proc"].nil?
-									if screendata["classlist_code"] == "ship"
-										fetch_data["opeitm_stktaking_proc"] = 0
-									else
-										fetch_data["opeitm_stktaking_proc"] = 1  ###在庫管理有
-									end
+							when /opeitms$/  ###下記の内容は画面でチェックする。未実施
+								# if screendata["opeitm_stktaking_proc"] == "" or screendata["opeitm_stktaking_proc"].nil?
+								# 	if screendata["classlist_code"] == "ship"   ###出庫・出荷用dummy item 特別品目
+								# 		fetch_data["opeitm_stktaking_proc"] = 0
+								# 	else
+								# 		fetch_data["opeitm_stktaking_proc"] = 1  ###在庫管理有
+								# 	end
+								# end
+							when /custords$/
+								if fetchview =~ /opeitms$/
+									fetch_data["loca_code_fm"] = rec["loca_code"]
 								end
 						end	
-					else                ##tblnamechop idを持ったテーブル名
-						if 	field =~ /^#{tblnamechop}/ and  rec[field.gsub(tblnamechop,srctblnamechop)] and
-								field !~ /_isudate$|_sno$|_gno$|_cno$/ and field != "#{tblnamechop}_id" 
-							fetch_data[field] =  rec[field.gsub(tblnamechop,srctblnamechop)]
-						else ###gnoはまとめkeyのため対象外
-							if  key	=~ /_sno_|_cno_/ and field =~ /^#{tblnamechop}/ and val != ""  and key !~ /_gridmessage/
+					else 
+						if srctblnamechop =~ /^pur|^prd|^shp|^cust/ and rec[field] and key !~ /person.*upd/  and field !=  "id"
+							fetch_data[field+delm] =  rec[field] ###rec:検索結果
+						end
+						if srctblnamechop =~ /^pur|^prd|^shp|^cust/ and rec[field.gsub(screentblnamechop,srctblnamechop)] and 
+								key !~ /person.*upd/ and field =~ /_id/   and field != "#{screentblnamechop}_id"  and field != "id"
+							fetch_data[field+delm] =  rec[field.gsub(screentblnamechop,srctblnamechop)] ###rec:検索結果
+						end
+						if  field =~ /_sno_|_cno_/ and field =~ /^#{screentblnamechop}/ and val != ""  and field !~ /_gridmessage/ and 
+							srctblnamechop =~ /^pur|^prd|^shp|^cust/
 								strsql = %Q% select sum(qty_src) qty_src 
-												from srctbls  where #{key.split("_")[1]} = '#{val}' 
+												from srctbls  where #{key.split("_")[1]} = '#{val}' ---key.split("_")[1] :xno
 												and srctblname = '#{srctblnamechop}s'
-								%  ###次のステータスに移行していないqty
+								%  ###次のステータスに移行していないqtyを求める。　
 								org =  ActiveRecord::Base.connection.select_one(strsql)
-								strsql = %Q% select qty from #{srctblnamechop}s where #{key.split("_")[1]} = '#{val}'
-								% 
-								sno_qty = ActiveRecord::Base.connection.select_value(strsql)
-								if org
-									if tblnamechop =~ /act$/
-										fetch_data["#{tblnamechop}_qty_stk"] =  sno_qty.to_f - org["qty_src"].to_f
-										if fetch_data["#{tblnamechop}_qty_stk"] <= 0
-											params[:err] =  "error   --->over qty"
-										end	
+								# strsql = %Q% select qty from #{srctblnamechop}s where #{key.split("_")[1]} = '#{val}'
+								# % 
+								# sno_qty = ActiveRecord::Base.connection.select_value(strsql)
+								if org["qty_src"]
+									if srctblnamechop =~ /act$/
+										if screentblnamechop =~ /act$/
+											if screendata["#{screentblnamechop}_qty_stk"]
+												fetch_data["#{screentblnamechop}_qty_stk"] =  rec["#{srctblnamechop}_qty_stk"].to_f - org["qty_src"].to_f
+												if fetch_data["#{screentblnamechop}_qty_stk"] <= 0
+													params[:err] =  "error   --->over qty"
+												end
+											end
+										else
+											if screendata["#{screentblnamechop}_qty"]
+												fetch_data["#{screentblnamechop}_qty"] =  rec["#{srctblnamechop}_qty_stk"].to_f - org["qty_src"].to_f
+												if fetch_data["#{screentblnamechop}_qty"] <= 0
+													params[:err] =  "error   --->over qty"
+												end
+											end
+										end
 									else
-										fetch_data["#{tblnamechop}_qty"] = sno_qty.to_f - org["qty_src"].to_f
-										if fetch_data["#{tblnamechop}_qty"] <= 0
-											params[:err] =  "error   --->over qty"
+										if screentblnamechop =~ /act$/
+											if screendata["#{screentblnamechop}_qty_stk"]
+												fetch_data["#{screentblnamechop}_qty_stk"] = rec["#{srctblnamechop}_qty"].to_f  - org["qty_src"].to_f
+												if fetch_data["#{screentblnamechop}_qty_stk"] <= 0
+													params[:err] =  "error   --->over qty"
+												end
+											end
+										else	
+											if screendata["#{screentblnamechop}_qty"]
+												fetch_data["#{screentblnamechop}_qty"] = rec["#{srctblnamechop}_qty"].to_f  - org["qty_src"].to_f
+												if fetch_data["#{screentblnamechop}_qty"] <= 0
+													params[:err] =  "error   --->over qty"
+												end
+											end
+										end
+									end
+								else
+									if srctblnamechop =~ /act$/
+										if screentblnamechop =~ /act$/
+											if screendata["#{screentblnamechop}_qty_stk"]		
+												fetch_data["#{screentblnamechop}_qty_stk"] =  rec["#{srctblnamechop}_qty_stk"].to_f 
+											end
+										else
+											if screendata["#{screentblnamechop}_qty"]		
+												fetch_data["#{screentblnamechop}_qty"] =  rec["#{srctblnamechop}_qty_stk"].to_f 
+											end
+										end	
+									else	
+										if screentblnamechop =~ /act$/
+											if screendata["#{screentblnamechop}_qty_stk"]		
+												fetch_data["#{screentblnamechop}_qty_stk"] =  rec["#{srctblnamechop}_qty"].to_f 
+											end
+										else
+											if screendata["#{screentblnamechop}_qty"]		
+												fetch_data["#{screentblnamechop}_qty"] =  rec["#{srctblnamechop}_qty"].to_f 
+											end
 										end	
 									end
-								else	
-									fetch_data["#{tblnamechop}_qty"] = sno_qty.to_f 
 								end
 							else
 							end
-						end
 					end
 				end	
-				field = params[:screenCode].split("_")[1].chop+"_"+tblnamechop+"_id"+delm
-				if params[:parse_linedata][field]
+				field = screentblnamechop+"_"+viewtblnamechop+"_id"+delm
+				if screendata[field]
 					fetch_data[field] =  rec["id"]
 				end
-				field = tblnamechop+"_id"+delm
-				if params[:parse_linedata][field] and fetchview.split("_")[1].chop == tblnamechop
-					fetch_data[field] =  rec["id"]
-				end	
 				findstatus = true
 			else
-				fetch_data[params[:screenCode].split("_")[1].chop+"_"+tblnamechop+"_id"+delm] =  ""  ##再入力時のNgに対応
+				fetch_data[screentblnamechop+"_"+viewtblnamechop+"_id"+delm] =  ""  ##再入力時のNgに対応
 				findstatus = false
 			end	
 		return fetch_data,mainviewflg,keys,findstatus,screendata,missing
 	end		
 
-	def blkuky_check tbl,linedata   ###重複チェック
+	def proc_blkuky_check tbl,linedata   ###重複チェック
 		save_blkuky_grp = nil
 		keys = []
 		err = {}
@@ -191,10 +237,17 @@ module ControlFields
 		tblchop = tbl.chop
 		keys.each do |key|
 			symkey = tblchop + "_" + key.gsub("s_id","_id")
+			if linedata[symkey].nil?
+				strwhere = "        #{symkey} must be select "
+				recs = []
+				break
+			end
 			strwhere << "  #{key} = '#{linedata[symkey]}'     and "
 		end
-		strsql = "select id from #{tbl} " + strwhere[0..-5]
-		recs = ActiveRecord::Base.connection.select_all(strsql)
+		if strwhere =~ /where/ 
+			strsql = "select id from #{tbl} " + strwhere[0..-5]
+			recs = ActiveRecord::Base.connection.select_all(strsql)
+		end
 		err[strwhere[6..-5]] = recs
 		return err
 	end
@@ -291,7 +344,6 @@ module ControlFields
 	def check_qty params
 		linedata = params[:parse_linedata]
 		tblname =  params[:screenCode].split("_")[1]
-		symqty = tblname.chop + "_qty"
 		if linedata[tblname.chop + "_qty"]
 			symqty = tblname.chop + "_qty"
 		else
@@ -311,16 +363,19 @@ module ControlFields
 						if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
 							currtblnamechop,tblnamechop = key.to_s.split("_sno_")
 							strsql = %Q%select id from #{tblnamechop}s  where sno = '#{val}' %
+							break
 						end
 					when  /_cno_/  
 						if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
 							currtblnamechop,tblnamechop = key.to_s.split("_cno_")
 							strsql = %Q%select id from #{tblnamechop}s  where cno = '#{val}' %
+							break
 						end
 					when  /_gno_/  
 						if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
 							currtblnamechop,tblnamechop = key.to_s.split("_gno_")
 							strsql = %Q%select id from #{tblnamechop}s  where gno = '#{val}' %
+							break
 						end
 				end
 			end
@@ -463,9 +518,7 @@ module ControlFields
 		yield @command_c,@para   ###@para 子供自身の員数等
 		parent.each do |key,val|
 			case key
-				when /^opeitm_loca_id/
-					@para["parent_locas_id"] = val
-				when	/opeitm_processseq$/
+				when /opeitm_processseq$/
 					@para["parent_processseq"] = val
 				when /#{paretblname.chop}_starttime/
 					@para["parent_starttime"] = val.to_date
@@ -473,10 +526,12 @@ module ControlFields
 					@para["chrgs_id"] = val
 				when /#{paretblname.chop}_qty$/
 					@para["parent_qty"] = val.to_f
+				when /#{paretblname.chop}_qty_bal$/
+					@para["parent_qty_bal"] = val.to_f
 				when  /#{paretblname.chop}_prjno_id/
 					@para["parent_prjno_id"] = val
 				when  /opeitm_packqty/
-					@para["packqty"] = val.to_f
+					@para["parent_packqty"] = val.to_f
 			end
 		end	
 		@command_c[:sio_message_contents] = nil
@@ -492,7 +547,7 @@ module ControlFields
 						order by tblfield_seqno
 		%
 		fields = ActiveRecord::Base.connection.select_values(strsql)
-		fields.each do |fd|
+		fields.each do |fd|  ###tblfield_seqnoの順に処理される。
 			###lotnoはpur,prd項目ではないのでここにはない。
 			cnoflg = false
 			gnoflg = false
@@ -555,6 +610,8 @@ module ControlFields
 						field_qty 
 				when "qty_case"
 						field_qty_case 
+				when "qty_bal"
+						field_qty_bal 
 				when "qty_stk"
 						field_qty_stk 
 				when "starttime"  ###稼働日計算
@@ -632,7 +689,7 @@ module ControlFields
 	end	 
 
 	def field_duedate 
-		duedate = @para["parent_starttime"].to_date - 1
+		duedate = @para["parent_starttime"] - 1
 		@command_c["#{@tblnamechop}_toduedate"] = @command_c["#{@tblnamechop}_duedate"] = duedate.to_s
 	end
 
@@ -642,27 +699,39 @@ module ControlFields
 	end
 
 	def field_chrgs_id 
-		@command_c["#{@tblnamechop}_chrg_id"] = @para["chrgs_id"] if @command_c["#{@tblnamechop}_chrg_id"].nil? or  @command_c["#{@tblnamechop}_chrg_id"] == ""
+		if @command_c["#{@tblnamechop}_chrg_id"].nil? or  @command_c["#{@tblnamechop}_chrg_id"] == ""
+			@command_c["#{@tblnamechop}_chrg_id"] = @para["chrgs_id"]
+		end
 	end	
 
 	def field_qty 
-		@command_c["#{@tblnamechop}_qty"] = @para["parent_qty"] * @para["chilnum"] / @para["parenum"]
+		@qty = @para["parent_qty"] * @para["chilnum"] / @para["parenum"]
 		#consumunitqty等については親に合わせて計算する。
-		#if @para["consumunitqty"] > 0
-		#	rlst = (@command_c["#{@tblnamechop}_qty"] /  @para["consumunitqty"]).ceil
-		#	@command_c["#{tblnamechop}_qty"] = @para["consumunitqty"] * rlst   ###消費単位
-		#end	
-		#if @para["consumminqty"] > @command_c["#{@tblnamechop}_qty"]
-		#	@command_c["#{tblnamechop}_qty"] = @para["consumminqty"]  ###最小消費数
-		#end	
+		 if @para["consumunitqty"] > 0
+		 	@qty = (@qty /  @para["consumunitqty"]).ceil *  @para["consumunitqty"]
+		# #	@command_c["#{tblnamechop}_qty"] = @para["consumunitqty"] * rlst   ###消費単位
+		# else
+		# 	rlst = 0
+		end	
+		if @para["packqty"] > 0			
+			qty_case = (@qty /  @para["packqty"]).ceil 
+			@command_c["#{@tblnamechop}_qty"]  =  qty_case  *  @para["packqty"]
+			@qty_bal = @command_c["#{@tblnamechop}_qty"]  - @qty
+		else
+			@command_c["#{@tblnamechop}_qty"] = @qty
+			@qty_bal = 0
+		end	
+		if @para["consumminqty"] > @command_c["#{@tblnamechop}_qty"]
+			@command_c["#{tblnamechop}_qty"] = @para["consumminqty"]  ###最小消費数
+			@qty_bal = 0
+		end	
 	end	
 
 	def field_qty_case 
 		if @para["packqty"] > 0
-			rlst = ( @command_c["#{@tblnamechop}_qty"] /  @para["packqty"]).ceil
-			@command_c["#{@tblnamechop}_qty_case"] = @para["packqty"] *  rlst  ###購入数又は作成数
+			@command_c["#{@tblnamechop}_qty_case"] = (@qty /  @para["packqty"]).ceil 
 		else
-			@command_c["#{@tblnamechop}_qty_case"] = @command_c["#{@tblnamechop}_qty"] 
+			@command_c["#{@tblnamechop}_qty_case"] = 1
 		end	
 	end	
 
@@ -671,6 +740,10 @@ module ControlFields
 		if @consumminqty > @command_c["#{@tblnamechop}_qty_stk"]
 			@command_c["#{tblnamechop}_qty_stk"] = @para["consumunitqty"]
 		end	
+	end	
+
+	def field_qty_bal ### custords・・・の時@para["parent_qty_bal"]= nil
+		@command_c["#{@tblnamechop}_qty_bal"] = @qty_bal  ###field_qty で計算
 	end	
 
 	def field_price_amt_tax_contract_price 

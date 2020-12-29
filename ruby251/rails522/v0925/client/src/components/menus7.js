@@ -12,7 +12,6 @@ import  SignUp  from './signup'
 import  Login  from './login'
 import {ScreenInitRequest} from '../actions'
 import ScreenGrid7 from './screengrid7'
-import ButtonList from './buttonlist'
 
 const titleNameSet = (screenName) =>{ return (
   document.title = `${screenName}`
@@ -69,9 +68,8 @@ const Menus7 = ({ isAuthenticated ,menuListData,uid,getScreen, params,grid_colum
                 </TabPanel> 
               )}
             </Tabs>
-              {(grid_columns_info&&menuChanging===false)&&
-                        <div> <ScreenGrid7/></div>}
-              {(grid_columns_info&&menuChanging===false)&&<div> <ButtonList/></div>}
+              {(grid_columns_info&&menuChanging===false)&&<div> <ScreenGrid7 second={false} /></div>}
+              {/*(grid_columns_info&&menuChanging===false)&&<div> <ButtonList second={false} /></div>*/}
            </div>    
       )
     }else{
@@ -108,7 +106,7 @@ const  mapStateToProps = (state,ownProps) =>({
 const mapDispatchToProps = (dispatch,ownProps ) => ({
       getScreen : (screenCode, screenName, uid,params) =>{
         titleNameSet(screenName)
-        params= { ...params,screenName:  (screenName||""),
+        params= { ...params,screenName:  (screenName||""),disableFilters:false,
                          screenCode:screenCode,pageIndex:0,pageSize:20,
                          uid:uid,req:"viewtablereq7",} 
         dispatch(ScreenInitRequest(params,null))}   //data:null

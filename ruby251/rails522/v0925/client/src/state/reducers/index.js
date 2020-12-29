@@ -10,6 +10,7 @@ import  uploadreducer  from './upload'
 import  buttonreducer  from './button'
 import  downloadreducer  from './download'
 import  ganttchartreducer  from './ganttchart'
+import  secondreducer  from './second'
 
 
 const reducer = combineReducers({
@@ -22,6 +23,7 @@ const reducer = combineReducers({
   button:buttonreducer,
   download:downloadreducer,
   ganttchart:ganttchartreducer,
+  second:secondreducer,
   routing: routerReducer,
 })
 

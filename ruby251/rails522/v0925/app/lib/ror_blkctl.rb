@@ -40,7 +40,7 @@ module RorBlkctl
 		rescue
         		ActiveRecord::Base.connection.rollback_db_transaction()
 				##command_r = command_c.dup
-            	command_c[:sio_result_f] =   "9"  ##9:error
+            	command_c[:sio_result_f] = "9"  ##9:error
             	command_c[:sio_message_contents] =  "class #{self} : LINE #{__LINE__} $!: #{$!} "[0..3999]    ###evar not defined
             	command_c[:sio_errline] =  "class #{self} : LINE #{__LINE__} $@: #{$@} "[0..3999]
             	Rails.logger.debug"error class #{self} : #{Time.now}: #{$@} "
@@ -70,12 +70,13 @@ module RorBlkctl
 		tmp_key = {}
 		tblname = command_r[:sio_viewname].split("_")[1]
 		if  command_r[:sio_message_contents].nil? 
+			@src_tbl = {}   ###テーブル更新
 			command_r,srctblname,srctblid = set_src_tbl(command_r) ### @src_tblの項目作成
 		end
 		command_r[:sio_recordcount] = r_cnt0
 		case command_r[:sio_classname]
 		when /_add_|_insert_/
-			proc_tbl_add_arel(tblname,@src_tbl)
+			proc_tbl_add_arel(tblname,@src_tbl) ###@src_tblはset_src_tblで求めている。
 		when /_edit_|_update_/
 			proc_tbl_edit_arel(tblname,@src_tbl," id = #{@src_tbl[:id]}")
 		when  /_delete_|_purge_/
@@ -104,15 +105,30 @@ module RorBlkctl
 		reqparams["tbldata"] = @src_tbl.stringify_keys  
 		   
 		case  tblname
-			when /prdschs/  
-				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成 alloctbl inoutstkを含む
+			when /screenfields|tblfields|^prd|^pur|^cust|^shp/
+			### view refresh
+			###
+				# strsql = %Q%select 1 from pg_catalog.pg_matviews pm 
+				# 		where schemaname NOT IN ('pg_catalog', 'information_schema')
+				# 		and matviewname = 'r_#{tblname}' %
+				strsql = %Q%select 1 from pg_catalog.pg_matviews pm 
+				 		where matviewname = 'r_#{tblname}' %
+				if ActiveRecord::Base.connection.select_one(strsql)			
+					strsql = %Q%REFRESH MATERIALIZED VIEW r_#{tblname} %
+					ActiveRecord::Base.connection.execute(strsql)
+				end
+		end
+		   
+		case  tblname
+			when /prdschs/  ###prdords,purordsから作成されるときと、custschs,custordsの子供、孫、ひ孫・・・として作成されるときがある。
+				reqparams["segment"]  = "trngantts"   ### alloctbl inoutstkをも作成
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams	
 				### trngantts,alloctblsを作成してないとordsの時対象とならない。
 				if reqparams["orgtblname"] =~ /^cust/ ###元がcust,・・・時のみ子、孫へと展開
 					reqparams["segment"]  = "mkschs"   ###構成展開
 					processreqs_id,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams	
 				end
-				if paretblname =~ /prd|pur/  
+				if paretblname =~ /^prd|^pur/  and (paretblname != tblname or paretblid != @src_tbl[:id])
 					reqparams["segment"]  = "consume_self_sch_parts"  ###消費
 					processreqs_id,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams
 					reqparams["segment"]  = "mk_shpsch_by_prd_pursch"   ###出庫
@@ -120,10 +136,8 @@ module RorBlkctl
 				end
 
 			when /prdords/  
-				if reqparams["orgtblname"] == "mkords"
-					reqparams["orgtblname"] = tblname
-					reqparams["orgtblid"] = @src_tbl[:id]
-				end	
+				reqparams["orgtblname"] = tblname
+				reqparams["orgtblid"] = @src_tbl[:id]
 				###
 				###➀
 				###
@@ -142,6 +156,7 @@ module RorBlkctl
 				###➂
 				###
 				reqparams["segment"]  = "mkschs"   ###構成展開
+				reqparams["trnganttkey"] = "00000"
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
 				 ###子部品出庫 prdords作成時には子部品のschsはできてない。
@@ -150,15 +165,15 @@ module RorBlkctl
 				###
 				###➃
 				###
-				if paretblname =~ /prd|pur/   ###親が受注の時はは出荷
-					reqparams["segment"]  =  "consume_self_ord_parts"
+				if paretblname =~ /^prd|^pur/   ###親が受注の時はは出荷
+					reqparams["segment"]  =  "consume_self_ord_parts"  ###消費
 					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams
 				end
 				###ordではsnoが入らないときがある。###sno,cnoでの前の状態との関係
-				add_update_srctbl(srctblname,srctblid,tblname) if srctblname != ""
+				###add_update_srctbl(srctblname,srctblid,tblname) if srctblname != ""  ##operation.free_ordtbl_to_allocで作成
 				###
 			when /prdinsts/ 
-				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：prdinstsのtrngantts作成
+				reqparams["segment"]  = "trngantts"   ##
 				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	 
 				if paretblname =~ /prd|pur/    ###親が受注の時はは出荷
 					reqparams["segment"]  =  "consume_self_ord_parts"
@@ -176,7 +191,7 @@ module RorBlkctl
 				add_update_srctbl srctblname,srctblid,tblname
 
 			when /purschs/  
-				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：構成を作成
+				reqparams["segment"]  = "trngantts"   ###
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams	
 				### trngantts,alloctblsを作成してないとordsの時対象とならない。
 				if reqparams["orgtblname"] =~ /^cust/    ###元がcust,・・・時のみ子、孫へと展開
@@ -184,7 +199,7 @@ module RorBlkctl
 					processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams	
 				end
 				##if (req["paretblid"] != @src_tbl[:id] or req["paretblname"] != tblname) ## and reqparams["orgtblname"] =~ /ords$/ 
-				if paretblname =~ /prd|pur/  
+				if paretblname =~ /prd|pur/   and (paretblname != tblname or paretblid != tblid)
 					reqparams["segment"]  = "consume_self_sch_parts"
 					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],paretblname,paretblid,reqparams
 					reqparams["segment"]  = "mk_shpsch_by_prd_pursch"
@@ -194,10 +209,8 @@ module RorBlkctl
 				###
 
 			when /purords/  
-				if reqparams["orgtblname"] == "mkords"
-					reqparams["orgtblname"] = tblname
-					reqparams["orgtblid"] =  @src_tbl[:id]
-				end	
+				reqparams["orgtblname"] = tblname
+				reqparams["orgtblid"] =  @src_tbl[:id]
 				###
 				###➀
 				###
@@ -210,7 +223,7 @@ module RorBlkctl
 				###
 				###➁
 				###
-				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：
+				reqparams["segment"]  = "trngantts"   ##
 				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 				###
 				###➂
@@ -228,10 +241,11 @@ module RorBlkctl
 					processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams
 				end
 
-				add_update_srctbl(srctblname,srctblid,tblname) if srctblname != ""  ###ordではsnoが入らないときがある。
+				### ##operation.free_ordtbl_to_allocで作成
+				###add_update_srctbl(srctblname,srctblid,tblname) if srctblname != ""  ###ordではsnoが入らないときがある。
 				###
 			when /purinsts/  
-				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：
+				reqparams["segment"]  = "trngantts"   #
 				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	 
 				if paretblname =~ /prd|pur/  
 					reqparams["segment"]  =  "consume_self_ord_parts"
@@ -253,7 +267,7 @@ module RorBlkctl
 				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
 			when /custords/  
-				reqparams["segment"]  = "trngantts"   ###Operation.proc_trngantts：custordsのtrngantts作成
+				reqparams["segment"]  = "trngantts"   ###
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 				reqparams["segment"]  = "mkschs"   ###構成展開
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
@@ -270,10 +284,10 @@ module RorBlkctl
 				reqparams["segment"] = "createtable"
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],nil,nil,reqparams	
 
-			 when /mkords/
+			when /mkords/
 			 	reqparams["segment"] = "mkords"
 			 	reqparams["mkords_id"] = @src_tbl[:id]
-			 	processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],nil,nil,reqparams	
+				 processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],nil,nil,reqparams	
 			else
 				###reqparams = nil
 		end
@@ -296,7 +310,49 @@ module RorBlkctl
 		proc_tbl_add_arel  "SIO_#{command_c[:sio_viewname]}",rec
 	end   ## 
 	
-
+	def proc_update_table_json command_all,r_cnt0,results  ##rec = command_c command_rとの混乱を避けるためrecにした。          
+		acommand =[]
+		idx = 0
+		reqparams = nil
+		begin
+			ActiveRecord::Base.connection.begin_db_transaction()
+				command_all.each do |command_cn|
+					reqparams = proc_private_aud_rec(command_cn,r_cnt0,nil,nil,nil) ###nil:parenttblname,paretblid,reqparams
+					acommand << command_cn
+					if results.nil?
+						###redults excelへの返し
+					else
+						results[idx+1]["confirm"] = true
+					end
+					idx += 1
+				end
+		rescue
+			ActiveRecord::Base.connection.rollback_db_transaction()
+				command_all[idx][:sio_result_f] =   "9"  ##9:error
+				command_all[idx][:sio_message_contents] =  "error class #{self} : LINE #{__LINE__} $!: #{$!} "    ###evar not defined
+				command_all[idx][:sio_errline] =  "class #{self} : LINE #{__LINE__} $@: #{$@} "[0..3999]
+				Rails.logger.debug"error class #{self} : #{Time.now}: #{$@} "
+				Rails.logger.debug"error class #{self} : $!: #{$!} "
+				Rails.logger.debug"  idx = #{idx} command_r: #{command_all[idx]} "
+				if results.nil?
+					###redults excelへの返し
+				else
+					results[idx+1]["confirm_gridmessage"] = command_all[idx][:sio_message_contents].to_s[0..1000]
+				end
+		else
+			acommand.each do |command|
+				command[:sio_result_f] =  "1"   ### 1 normal end
+				command[:sio_message_contents] = nil
+				proc_insert_sio_r(command) ### if @pare_class != "batch"    ## 結果のsio書き込み
+			end	
+			ActiveRecord::Base.connection.commit_db_transaction()
+			# reqparams["seqno"].each do |idx|
+			#   CreateOtherTableRecordJob.perform_later idx
+			# end
+		ensure
+		end ##begin
+		return results
+	end	
 
 	def proc_create_filteredstr filtered,where_info
 			if (where_info[:filtered]||="").size > 0
@@ -526,7 +582,6 @@ module RorBlkctl
 
 	def set_src_tbl rec  ##rec["xxxxx"]
 		srctblid = srctblname = ""
-  		@src_tbl = {}   ###テーブル更新
 		tblnamechop = rec[:sio_viewname].split("_",2)[1].chop
 		if rec[:sio_classname] =~ /_add_/
 			@src_tbl[:created_at] =  rec["#{tblnamechop}_created_at"] = Time.now
@@ -633,9 +688,7 @@ module RorBlkctl
 			sort_info = {}
 			screenwidth = 0
 			nameToCode = {}
-			if (req==='editabletablereq' )
-
-				columns_info << {:Header=>"confirm",
+			columns_info << {:Header=>"confirm",
 									:accessor=>"confirm",
 									:show=>true,
 									:filtered=>false,
@@ -643,14 +696,13 @@ module RorBlkctl
 									:className=>"checkbox",
 									:width=>50
 									}
-				columns_info << {:Header=>"confirm_gridmessage",
+			columns_info << {:Header=>"confirm_gridmessage",
 									:accessor=>"confirm_gridmessage",
 									:show=>false,
 									:filtered=>false,
 									:id=>"",
 									:className=>"gridmessage",
 									}
-			end		
 			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|		
 				##if i["screenfield_selection"] == "0" or i["pobject_code_sfd"] == "id" or i["pobject_code_sfd"] =~ /_id/ 		
 					select_fields = 	select_fields + 	i["pobject_code_sfd"] + ','
@@ -979,6 +1031,7 @@ module RorBlkctl
 			false
 		end
 	end
+
 	class Float
 		def floor2(exp = 0)
 			multiplier = 10 ** exp

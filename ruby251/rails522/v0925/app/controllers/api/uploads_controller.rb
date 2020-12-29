@@ -79,7 +79,7 @@ module Api
         results.each do |parse_linedata|
             command_c = command_init.dup  ###blkukyはid以外でユニークを保証するkey
             if parse_linedata["confirm"] == true    ###重複keyチェック
-                err = ControlFields.blkuky_check screenCode.split("_")[1],parse_linedata
+                err = ControlFields.proc_blkuky_check screenCode.split("_")[1],parse_linedata
                 tblid = screenCode.split("_")[1].chop + "_id"
                 err.each do |key,recs|
                     recs.each do |rec|
@@ -122,7 +122,7 @@ module Api
             end
         end
         if status == true  and defCode == "add_update"
-          results = update_table_json(command_all,command_all.size,results)
+          results = RorBlkctl.proc_update_table_json(command_all,command_all.size,results)
         end
         render json: {:results=>results}
 
@@ -146,40 +146,5 @@ module Api
       def create_params
         params.permit(:excel)
       end
-      def update_table_json command_all,r_cnt0,results  ##rec = command_c command_rとの混乱を避けるためrecにした。          
-          acommand =[]
-          idx = 0
-          reqparams = nil
-          begin
-              ActiveRecord::Base.connection.begin_db_transaction()
-                  command_all.each do |command_cn|
-                      reqparams = RorBlkctl.proc_private_aud_rec(command_cn,r_cnt0,nil,nil,nil) ###nil:parenttblname,paretblid,reqparams
-                      acommand << command_cn
-                      results[idx+1]["confirm"] = true
-                      idx += 1
-                  end
-          rescue
-              ActiveRecord::Base.connection.rollback_db_transaction()
-                  command_all[idx][:sio_result_f] =   "9"  ##9:error
-                  command_all[idx][:sio_message_contents] =  "error class #{self} : LINE #{__LINE__} $!: #{$!} "    ###evar not defined
-                  command_all[idx][:sio_errline] =  "class #{self} : LINE #{__LINE__} $@: #{$@} "[0..3999]
-                  Rails.logger.debug"error class #{self} : #{Time.now}: #{$@} "
-                  Rails.logger.debug"error class #{self} : $!: #{$!} "
-                  Rails.logger.debug"  idx = #{idx} command_r: #{command_all[idx]} "
-                  results[idx+1]["confirm_gridmessage"] = command_all[idx][:sio_message_contents].to_s[0..1000] 
-          else
-              acommand.each do |command|
-                  command[:sio_result_f] =  "1"   ### 1 normal end
-                  command[:sio_message_contents] = nil
-                  RorBlkctl.proc_insert_sio_r(command) ### if @pare_class != "batch"    ## 結果のsio書き込み
-              end	
-              ActiveRecord::Base.connection.commit_db_transaction()
-              # reqparams["seqno"].each do |idx|
-              #   CreateOtherTableRecordJob.perform_later idx
-              # end
-          ensure
-          end ##begin
-          return results
-      end	
   end
 end  

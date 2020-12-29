@@ -1,6 +1,6 @@
 ﻿
  --- drop view r_tblfields cascade  
- create or replace view r_tblfields as select  
+ create MATERIALIZED view  r_tblfields as select  
   blktb.pobject_code_tbl  pobject_code_tbl ,
   blktb.pobject_objecttype_tbl  pobject_objecttype_tbl ,
   blktb.blktb_contents  blktb_contents ,
@@ -10,10 +10,8 @@ tblfield.id  tblfield_id,
   fieldcode.fieldcode_datascale  fieldcode_datascale ,
   blktb.blktb_pobject_id_tbl  blktb_pobject_id_tbl ,
   blktb.pobject_id_tbl  pobject_id_tbl ,
-  blktb.blktb_id  blktb_id ,
 tblfield.blktbs_id   tblfield_blktb_id,
 tblfield.fieldcodes_id   tblfield_fieldcode_id,
-  fieldcode.fieldcode_id  fieldcode_id ,
   fieldcode.pobject_id_fld  pobject_id_fld ,
 tblfield.persons_id_upd   tblfield_person_id_upd,
   fieldcode.fieldcode_dataprecision  fieldcode_dataprecision ,
@@ -89,10 +87,8 @@ tblfield.updated_at  tblfield_updated_at
 ,tblfield_id  numeric (22,0)
 ,blktb_pobject_id_tbl  numeric (22,0)
 ,pobject_id_tbl  numeric (22,0)
-,blktb_id  numeric (22,0)
 ,tblfield_blktb_id  numeric (22,0)
 ,tblfield_fieldcode_id  numeric (22,0)
-,fieldcode_id  numeric (22,0)
 ,pobject_id_fld  numeric (22,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)

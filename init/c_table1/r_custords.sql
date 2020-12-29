@@ -1,6 +1,6 @@
 ﻿
  --- drop view r_custords cascade  
- create or replace view r_custords as select  
+ create MATERIALIZED view r_custords as select  
   opeitm.opeitm_boxe_id  opeitm_boxe_id ,
   custrcvplc.cust_bill_id_custrcvplc  cust_bill_id_custrcvplc ,
   cust.cust_bill_id  cust_bill_id ,

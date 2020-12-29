@@ -210,8 +210,21 @@ extend self
 		case rec["fieldcode_ftype"]
 		when /char/
 			@modifysql << "\n alter table #{rec["pobject_code_tbl"]} ALTER COLUMN #{rec["pobject_code_fld"]}  TYPE #{rec["fieldcode_ftype"]}(#{rec["fieldcode_fieldlength"] })"
-			if rec["pobject_code_fld"] == "sno" or rec["pobject_code_fld"] == "cno" or rec["pobject_code_fld"] == "gno"
+			case rec["pobject_code_fld"]
+			when  "sno"
+				create_uniq_constraint rec["pobject_code_tbl"],"_sno",["sno"]
+			when "cno" 
+				case  rec["pobject_code_tbl"]
+				when /custschs|custords|custinsts|custdlvs|custacts/
+					create_uniq_constraint rec["pobject_code_tbl"],"_cno",["custs_id","cno"]
+				when /purschs|purords|purinsts|purdlvs|puracts/
+					create_uniq_constraint rec["pobject_code_tbl"],"_cno",["suppliers_id","cno"]
+				when /prdschs|prdords|prdinsts|prdacts/
+					create_uniq_constraint rec["pobject_code_tbl"],"_cno",["workplaces_id","cno"]
+				end
+			when "gno"
 				@modifysql << ";\n alter table #{rec["pobject_code_tbl"]} ALTER COLUMN #{rec["pobject_code_fld"]}  set not null;\n"
+				###手動で設定
 			else
 				@modifysql << " ;\n"
 			end	
@@ -269,12 +282,15 @@ extend self
 	end	
 	def add_other_viewfield othertbl,owntbl,delm 
 		howntbl = {}
-		strsql = "select 	column_name from 	information_schema.columns 
-					where 	table_catalog='#{ActiveRecord::Base.configurations["development"]["database"]}'  and 
-		 			table_name='r_screenfields'  and column_name like 'screenfield%'
-					and column_name not  in('screenfield_updated_at','screenfield_created_at','screenfield_update_ip',
-					'screenfield_id','screenfield_person_id_upd','screenfield_editable') "
-		
+		# strsql = "select 	column_name from 	information_schema.columns 
+		# 			where 	table_catalog='#{ActiveRecord::Base.configurations["development"]["database"]}'  and 
+		#  			table_name='r_screenfields'  and column_name like 'screenfield%'
+		# 			and column_name not  in('screenfield_updated_at','screenfield_created_at','screenfield_update_ip',
+		# 			'screenfield_id','screenfield_person_id_upd','screenfield_editable') "
+		strsql = "select 	pobject_code_sfd column_name from 	r_screenfields
+					where 	pobject_code_sfd like 'screenfield%'
+					and pobject_code_sfd not  in('screenfield_updated_at','screenfield_created_at','screenfield_update_ip',
+					'screenfield_id','screenfield_person_id_upd','screenfield_editable')"		
 		fields = ActiveRecord::Base.connection.select_values(strsql)	###screenfieldsの項目を調べる。項目が増えた時の対応
 		screencode = if othertbl == "persons" and delm == "_upd"
 						 "upd_persons"
@@ -880,18 +896,6 @@ extend self
 						@messages << "<p>step 1-2: view field #{view} duplicate </p>"
 					end
 				else
-					##if tblname != tbl
-					##	strsql =%Q% delete from screenfields where id in(select id from r_screenfields 
-					##			where pobject_code_scr  = 'r_#{tbl}' and  pobject_code_sfd = '#{view}')
-					##			and (created_at = updated_at or expiredate < current_date)		
-					##	%
-					##	ActiveRecord::Base.connection.delete(strsql)
-					##end
-					##strsql =%Q% delete from screenfields where id in(select id from r_screenfields 
-					##			where pobject_code_scr  = 'r_#{tbl}' )
-					##			and (created_at = updated_at or expiredate < current_date)		
-					##	%
-					##	ActiveRecord::Base.connection.delete(strsql)
 									
 				end
 			##end

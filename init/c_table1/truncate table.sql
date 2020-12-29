@@ -17,7 +17,7 @@ truncate table prdacts;
 
 
 truncate table custschs;
-truncate table custords;
+truncate table custords cascade;
 ---truncate table custinsts;
 ---truncate table custacts;
 
@@ -37,6 +37,7 @@ truncate table shpschs;
 truncate table shpords;
 truncate table shpinsts;
 
+truncate table shpacts;
 truncate table mkordopeitms cascade;
 
 truncate table mkords  cascade;
@@ -89,5 +90,14 @@ truncate table sio.sio_r_shpords;
 truncate table sio.sio_r_mkords;
 
 truncate table sio.sio_r_srctbls;
+truncate table sio.sio_r_shpacts;
 
+
+REFRESH MATERIALIZED view r_custords; 
+REFRESH MATERIALIZED view r_screenfields; 
+REFRESH MATERIALIZED view r_tblfields; 
+REFRESH MATERIALIZED view r_prdschs; 
+REFRESH MATERIALIZED view r_prdords; 
+REFRESH MATERIALIZED view r_purschs; 
+REFRESH MATERIALIZED view r_purords; 
 commit;

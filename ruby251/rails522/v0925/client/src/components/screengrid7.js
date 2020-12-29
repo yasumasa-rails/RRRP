@@ -1,11 +1,13 @@
 import React, { useState, useMemo, useEffect,useRef, } from 'react';
 import { connect } from 'react-redux'
-import { ScreenRequest, FetchRequest,ScreenParamsSet, } from '../actions'
+import { ScreenRequest, FetchRequest,ScreenParamsSet, 
+          SecondScreenRequest, SecondFetchRequest,SecondScreenParamsSet, } from '../actions'
 //import DropDown from './dropdown'
 import { yupschema } from '../yupschema'
 import Tooltip from 'react-tooltip-lite'
 import { onBlurFunc7 } from './onblurfunc'
 import { yupErrCheck } from './yuperrcheck'
+import ButtonList from './buttonlist'
 import {useTable, useRowSelect, useFilters, useSortBy, useResizeColumns, useBlockLayout,
         useExpanded,
         //useTokenPagination,  //usePagination,
@@ -45,12 +47,6 @@ const cellFontSize = (column,para) =>{
  //return '100%'
 }
 
-// Create an editable cell renderer
-//  let contentEditablechk = contentEditablefunc(cellInfo)
-// const renderNonEditable 
-//const renderCheckbox
-
-
 const AutoCell = ({
   value: initialValue,
   row: { index,values },
@@ -59,14 +55,10 @@ const AutoCell = ({
   row,params, updateParams,dropDownList,yup,handleScreenRequest,handleFetchRequest,
   params:{req},buttonflg,loading,  //useTableへの登録が必要
   }) => {
-  // We need to keep and update the state of the cell normally
-  //const [fieldValue, setFieldValue] = useState( initialValue)
   const [value, setValue] = useState(initialValue)
   const [newClassName, setNewClassName] = useState(className)
   const [newReadOnly, setNewReadOnly] = useState(false)
   const inputRef = useRef()
-  //useEffect(()=>setFieldValue(initialValue),[initialValue])
-  // We'll only update the external data when the input is blurred
   const setFieldsByonChange = (e) => {
     if(e.target){
       //initialValue = (e.target.value||"")  他の項目に移動すると、入力内容が消える。
@@ -75,31 +67,26 @@ const AutoCell = ({
         inputRef.current = true
       }   
   }
-  const setFieldsByonFocus = (e) => {//未使用
+  const setFieldsByonFocus = (e) => {//
       inputRef.current = false
       if(e.target){
          if(e.target.value===null||e.target.value===""||e.target.value===undefined){
-           //initialValue = setInitailValueForAddFunc(id,row,・・・　画面表示されない。
-           values[id] = setInitailValueForAddFunc(id,row,className,params.screenCode)
+            //initialValue = setInitailValueForAddFunc(id,row,・・・　画面表示されない。
+            values[id] = setInitailValueForAddFunc(id,row,className,params.screenCode)
+          }else{
+            values[id] = e.target.value
           }
           if(values[id]){
-              setValue(values[id])
+              //setValue(values[id])
               updateMyData(index, id, values[id])
-              fetch_check(id,index, yup, data, updateParams, params, handleFetchRequest,loading,inputRef)
+              fetch_check(id,index, yup, data, updateParams, params, handleFetchRequest,loading,updateMyData)
           }
          // e.target.value||undefinedにすると日付チェックの時splitでエラーが発生
        }  
   }
   
   const setFieldsByonBlur = (e) => {
-    // if(e.target){
-    //     if(e.target.value===null||e.target.value===""||e.target.value===undefined){
-    //       values[id] = setInitailValueForAddFunc(id,row,className,params.screenCode)
-    //       //initialValue = setInitailValueForAddFunc(id,row,・・・　画面表示されない。
-    //       setValue(values[id])
-    //     }
-        // e.target.value||undefinedにすると日付チェックの時splitでエラーが発生
-      if(inputRef.current === false){
+      if(inputRef.current === false&&buttonflg === "inlineedit7"){
           let updateRow = { [id]: e.target.value}
           onFieldValite(updateRow, id, params.screenCode)  //clientでのチェック
           let msg_id = `${id}_gridmessage`
@@ -108,11 +95,10 @@ const AutoCell = ({
             let updateRow = { [id]: e.target.value}
             onFieldValite(updateRow, id, params.screenCode)  //clientでのチェック
             let msg_id = `${id}_gridmessage`
-            updateMyData(index, msg_id, updateRow[msg_id])
             if ( updateRow[msg_id] === "ok") {
-                fetch_check(id,index, yup, data, updateParams, params, handleFetchRequest,loading)
-           // updateMyData(index, id,  value)
-            }else{}
+                fetch_check(id,index, yup, data, updateParams, params, handleFetchRequest,loading,updateMyData)
+            }else{
+              updateMyData(index, msg_id, updateRow[msg_id])}
       }    
   }
   
@@ -137,14 +123,6 @@ const AutoCell = ({
       return updateRow  //更新可能項目のみをセレクト
     })  
     yupErrCheck(screenSchema,"confirm",updateRow)
-    // Object.keys(data[0]).map((field) => {
-    //   if(/_id/.test(field)||field==="id")
-    //     {updateRow[field] = row[field]} 
-    //   return updateRow  //idを追加
-    // })  
-    // Object.keys(updateRow).map((key,idx)=>{ 
-    //           updateMyData(index, key,  updateRow[key])
-    //           return key})
     if (updateRow["confirm_gridmessage"] === "doing") {
       let row = {}
       Object.keys(data[index]).map((key,idx)=>{  //複数key対応
@@ -164,8 +142,6 @@ const AutoCell = ({
    useEffect(()=>setNewReadOnly(()=>loading===false?setProtectFunc(id,row):true),[loading])
 
     const updateMyData = (rowIndex, columnId, value) => {
-     // We also turn on the flag to not reset the page
-     //skipResetRef.current = true
      setData(old=>
               old.map((row, index) => {
                 if (index === rowIndex) {
@@ -179,14 +155,13 @@ const AutoCell = ({
      )
    }
 
-
-
   switch (true){   
     case /^Editable/.test(className):
       return (
         <Tooltip content={data[index][id + '_gridmessage']||""}
           border={true} tagName="span" arrowSize={2}>
           {buttonflg === "inlineadd7"&&(  //params["req"] === "inlineadd7"?a:b  だとa,b両方処理した。
+          //buttonflg:画面のコントロール　params.req ScreenLibでcolumnsのclassName等をセット
             <input value={value||""}
                    //placeholder(入力されたことにならない。) defaultvale（照会内容の残像が残る。)
                     onFocus={(e) => { setFieldsByonFocus(e)
@@ -202,7 +177,7 @@ const AutoCell = ({
                               }
                       }}        
                     />)}
-           {buttonflg === "inlineedit7"&&(
+           {buttonflg === "inlineedit7"&&(//buttonflg:画面のコントロール　params.req ScreenLibでcolumnsのclassName等をセット
             <input  value={value||""} 
                   //  onFocus={(e) =>  setProtectFunc(id,row)} //numeric-->varchar等うまくいかない
                     onChange={(e) => setFieldsByonChange(e)}
@@ -255,17 +230,18 @@ const AutoCell = ({
     case /checkbox/.test(className):
         return (
           <Tooltip content={data[index]['confirm_gridmessage']||""}
-          border={true} tagName="span" arrowSize={2}>
-              <input  type="checkbox" checked={initialValue===true?"checked":""} className={newClassName} readOnly />
+              border={true} tagName="span" arrowSize={2}>
+              <input  type="checkbox" checked={data[index]['confirm']===true?"checked":""} 
+                      className={newClassName} readOnly />
               {/*     style={{bakground:"red"}}が有効にならない。*/}
-              </Tooltip>)
+          </Tooltip>)
     default:
       return <input value={initialValue || ""} readOnly />
   }
 }
  
 //serverデータとのチェック又はserverデータの検索
-const fetch_check = (id, index, yup, data, updateParams, params,handleFetchRequest,loading) => {
+const fetch_check = (id, index, yup, data, updateParams, params,handleFetchRequest,loading,updateMyData) => {
     switch (true) {
       case /confirm$/.test(id):
         break;
@@ -274,13 +250,13 @@ const fetch_check = (id, index, yup, data, updateParams, params,handleFetchReque
           let chkcondtion = yup.yupcheckcode[id].split(",")[1]
           if (chkcondtion === undefined || (chkcondtion === "add" & data[index][id] === "") ||
             (chkcondtion === "update" & data[index][id] !== "")) {
-            updateParams([{
-              ...params, "checkcode": JSON.stringify({ [id]: yup.yupcheckcode[id] }),
-              "linedata": JSON.stringify(data[index]),
-              "index": index,
-              "req": "check_request",
-            }])
-            handleFetchRequest(params,data)
+            updateParams([
+              {"checkcode": JSON.stringify({ [id]: yup.yupcheckcode[id] })},
+              {"linedata": JSON.stringify(data[index])},
+              {"index": index},
+              {"req": "check_request"},
+            ])
+            handleFetchRequest(params,data,loading)
           }
         }
         //チェック項目と検索項目は兼用できない。
@@ -293,7 +269,7 @@ const fetch_check = (id, index, yup, data, updateParams, params,handleFetchReque
                   flg = false
                   return  idKeys
                 }
-                else(idKeys.push({ [key]: data[index][key] }))
+                else(idKeys.push({[key]:data[index][key]}))
               }
             return idKeys
             })
@@ -314,7 +290,8 @@ const fetch_check = (id, index, yup, data, updateParams, params,handleFetchReque
             ])
             handleFetchRequest(params,data,loading)
           }else{}//未入力keyがある。  
-        }
+        }else{
+          updateMyData(index, `${id}_gridmessage`,"ok" )}
         break;
     }
 }
@@ -334,23 +311,14 @@ let fieldSchema = (field, screenCode) => {
 ///ScreenGrid7 
 ///
 const ScreenGrid7 = ({ 
-  screenCode, screenwidth, hiddenColumns,
-  pageSizeList, 
-  dropDownListOrg, buttonflgOrg, yup,
-  paramsOrg,  //buttonflg 下段のボタン：request params[:req] MenusControllerでの実行ケース
-  loading, hostError, columnsOrg, dataOrg,
-  //callTime,
-  handleScreenRequest, handleFetchRequest,handleScreenParamsSet,
+  screenCode, screenwidth, hiddenColumns,yup,
+  dropDownListOrg, buttonflgOrg, paramsOrg,columnsOrg, dataOrg,
+    //buttonflg 下段のボタン：request params[:req] MenusControllerでの実行ケース
+  loading, hostError, pageSizeList, 
+  handleScreenRequest, handleFetchRequest,handleScreenParamsSet,second,
   }) => {
 
-  // Define a text UI for filtering 
- 
-  // const initial = { hiddenColumns, //dropDownList  
-  //                   }
-  
-  //const skipResetRef = useRef(false)
-
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => (columnsOrg))
   const [params, setParams] = useState({})
   const updateParams = (changeParams) => {
@@ -362,52 +330,15 @@ const ScreenGrid7 = ({
 
   const [controlledPageIndex, setControlledPageIndex] = useState(0)  //独自のものを用意  
   useEffect(()=>{setControlledPageIndex(()=>Number(params["pageIndex"]))},[(params["pageIndex"])])
-  //useEffect(()=>{setControlledPageIndex(()=>Number(params["pageIndex"]))},[(paramsOrg["pageIndex"])])  //Ng
-  //useEffect(()=>{setControlledPageIndex(()=>Number(params["pageIndex"]))},[controlledPageIndex])  //Ng
-  //const [controlledPageIndex, setControlledPageIndex] = useState(Number(params["pageIndex"]),[(params["pageIndex"])])  //Ng
   const [controlledPageSize, setControlledPageSize] = useState(0)  //独自のものを用意  
   useEffect(()=>{setControlledPageSize(()=>Number(params["pageSize"]))},[(params["pageSize"])])
   //useEffect(() => { skipResetRef.current = false}, [dataOrg])
 
   const [data, setData] = useState([]) 
-   
-  // useEffect(()=>{paramsOrg.fetch_data&&Object.keys(paramsOrg.fetch_data).map((idx)=>{
-  //                              updateMyData(paramsOrg.index,idx,paramsOrg.fetch_data[idx])
-  //                              let msg
-  //                              if(paramsOrg.err===""){
-  //                                  if(paramsOrg.fetch_data[idx]==="")
-  //                                        {msg = "on the way"}
-  //                                  else{ msg = "detected"}
-  //                              }else{msg = paramsOrg.err
-  //                                    updateMyData(paramsOrg.index,"confirm_gridmessage",msg)}
-  //                              updateMyData(paramsOrg.index,idx+"_gridmessage",msg)
-  //                              console.log(idx)
-  //                              console.log(data[paramsOrg.index])
-  //                              console.log(paramsOrg.fetch_data)
-  //                              return null})}
-  //       ,[paramsOrg.fetch_data,paramsOrg.err])
-
-  //       const updateMyData = (rowIndex, columnId, value) => {
-  //         // We also turn on the flag to not reset the page
-  //         //skipResetRef.current = true
-  //         setData(old=>
-  //                 old.map((row, index) => {
-  //                   if (index === rowIndex) {
-  //                       return {
-  //                         ...old[rowIndex],
-  //                       [columnId]: value,
-  //                       }
-  //                   }
-  //                 return row
-  //                 })
-  //         )
-  //       } 
 
   const [buttonflg, setButtonflg] = useState()
   useEffect(()=>{setButtonflg(buttonflgOrg)},[buttonflgOrg])
  
-  // Since we're using pagination tokens intead of index, we need
-  // to be a bit clever with page-like navigation here.
   const nextPage = () => {
     updateParams([{pageIndex:(controlledPageIndex + 1)}])
     handleScreenRequest(params,data) 
@@ -443,7 +374,7 @@ const ScreenGrid7 = ({
             pageSizeList={pageSizeList}  yup={yup}
             paramsOrg={paramsOrg} params={params} setParams={setParams}  updateParams={updateParams} 
             //skipReset={skipResetRef.current}
-            disableFilters={/viewtablereq7|export|inlineedit7|search/.test(buttonflg) ? false : true}
+            disableFilters={params.disableFilters}
             hiddenColumns={hiddenColumns} handleScreenRequest={handleScreenRequest} 
             handleFetchRequest={handleFetchRequest}
             getHeaderProps={column => ({  //セルのサイズ合わせとclick　keyが重複するのを避けるため
@@ -537,10 +468,6 @@ const ScreenGrid7 = ({
             //params["pageIndex"]= 1
              let pageIndex=Math.floor(controlledPageSize*controlledPageIndex/
                                                              Number(e.target.value))
-            //setControlledPageSize(Number(e.target.value))
-            // setControlledPageIndex(Math.floor(Number(params["pageSize"])*Number(params["pageIndex"])/
-            //                                       controlledPageSize) )
-            //controlledPageSizeとcontrolledPageIndexはeffectでセットされる。
             updateParams([{pageIndex:pageIndex},{pageSize:Number(e.target.value)}])
             handleScreenRequest(params,data) 
           }}
@@ -553,6 +480,8 @@ const ScreenGrid7 = ({
         </select>
       </div>  /*nextPage等終わり*/}  
       <p>{hostError}</p>
+     
+       { columns&&<div> <ButtonList second={second} /></div>}
     </div>
   )
 }
@@ -567,7 +496,7 @@ const GridTable = ({
         columns,screenCode,
         dataOrg, data,setData, dropDownListOrg,
         loading,yup,
-        controlledPageIndex, controlledPageSize,pageSizeList,
+        //controlledPageIndex, controlledPageSize,pageSizeList,
         paramsOrg,params, setParams, updateParams,buttonflg,
         disableFilters,
         hiddenColumns,handleScreenRequest,
@@ -579,25 +508,6 @@ const GridTable = ({
       }) => {
         
  
-  // const fetchIdRef = useRef(0)
-  //    const fetchData = useCallback(() => {
-  //  //  // This will get called when the table needs new data
-  //  //  // You could fetch your data from literally anywhere,
-  //  //  // even a server. But for this example, we'll just fake it.
-  //  //  // Give this fetch an ID
-  //     const fetchId = ++fetchIdRef.current
-
-  //  //  // Set the loading state
-  //     setLoading(true)
-
-  //  //  // We'll even set a delay to simulate a server here
-  //       if (fetchId === fetchIdRef.current) {
-  //         setData(dataOrg)
-  //         setLoading(false)
-  //       }
-  //     })
-
-
   const [dropDownList, setDropDownList] = useState()
   
   useEffect(() => {
@@ -620,62 +530,7 @@ const GridTable = ({
              
   useEffect(()=>{setParams(paramsOrg)},[paramsOrg])  
 
-  //setHiddenColumns:react-tableで用意されている。
-  // useEffect(() => {setHiddenColumns(initial.hiddenColumns)
-  //                   }, [(params["req"]),screenCode,controlledPageIndex, controlledPageSize,]) 
-  // //                   //setHiddenColumns:react-tableで用意されている。
-  // useEffect(() => { //fetchData()
-  //     setHiddenColumns(initial.hiddenColumns)},[data])   
-  //                  setData(dataOrg)
-  //                   //                clearSortBy
-  //                                   },
-  // //                 [paramsOrg.req,buttonflg]) 
-  // useEffect(()=>{   
-  //                   setDropDownList(dropDownListOrg)
-  //                   setData(dataOrg)},
-  //                   [loading])
-
-
-  // const filterTypes = useMemo(
-  //   () => ({
-  //     includes: SelectFilter,  //screenfield_type　に従う
-  //     // override 
-  //     text: (rows, id, filterValue) => {
-  //       return rows.filter(row => {
-  //         const rowValue = row.values[id]
-  //         return rowValue !== undefined
-  //           ? String(rowValue)
-  //               .toLowerCase()
-  //               .startsWith(String(filterValue).toLowerCase())
-  //           : true
-  //       })
-  //     },
-  //   }),
-  //   []
-  //)
-
   
-// const SelectFilter = ({
-//   column: { filterValue, setFilter, id,  dropDownList,}, // dropDownList, 修正要　仮     
-// }) => {
-//   // Render a multi-select box
-//   return (
-//     <select
-//       value={filterValue}
-//       onChange={e => {
-//         setFilter(id,e.target.value )
-//       }}
-//     >
-//       <option value="">All</option>
-//       {dropDownList[id].map((option, i) => (
-//         <option key={i} value={option.value}>
-//           {option.label}
-//         </option>
-//       ))}
-//     </select>
-//   )
-// }
-
 
   const ColumnHeader = ({
     column ,
@@ -701,7 +556,7 @@ const GridTable = ({
         />
         )
       case "includes":  
-         return (
+        return (
            <select
              value={filterValue}
              onChange={e => {
@@ -709,14 +564,14 @@ const GridTable = ({
              }}
            >
              <option value={""}></option>
-             {JSON.parse(dropDownList[id]).map((option, i) => (
+             {dropDownList&&JSON.parse(dropDownList[id]).map((option, i) => (
                <option key={i} value={option.value}>
                  {option.label}
                </option>
              ))}
            </select>
          )
-       default:
+      default:
         return (
         <input
           value={filterValue||""}
@@ -746,17 +601,17 @@ const GridTable = ({
     getTableBodyProps,
     headerGroups,
     rows,
-     prepareRow, //page,
+     prepareRow, 
+    toggleAllRowsSelected,   
+    setAllFilters,setSortBy,
+    //setHiddenColumns,// to set the `hiddenColumns` state for the entire table.
+    //setHiddenColumns,   //pageCount,//page,
     //canPreviousPage, canNextPage,
     //setPageIndex,
     //previousPage,nextPage,
     //setPageSize, //Instance Properties This function sets state.pageSize to the new value. already prepare
-    //gotoPage,
-    toggleAllRowsSelected,   //toggleSortBy,
+    //gotoPage,//toggleSortBy,
     //clearSortBy,
-    setAllFilters,setSortBy,
-    //setHiddenColumns,// to set the `hiddenColumns` state for the entire table.
-    //setHiddenColumns,   //pageCount,
     state:{filters,sortBy}  //:{controlledPageIndex,controlledPageSize},  //hiddenColumns,}
   } = useTable(
     {
@@ -769,14 +624,14 @@ const GridTable = ({
       manualSortBy: true,
       disableMultiSort: false,
       autoResetSortBy: true,
-      //filterTypes,
       disableFilters,
-      //updateMyData,   //pageCount: controlledPageCount,
       initialState: {hiddenColumns:hiddenColumns,
                       sortBy:params.sortBy===undefined?[]:JSON.parse(params.sortBy).map((sort)=>{return sort})
                     },
     //  autoResetPage: !skipReset,
     //  autoResetSelectedRows: !skipReset,
+      //updateMyData,   //pageCount: controlledPageCount,
+      //filterTypes,
     handleFetchRequest,handleScreenRequest,
      // initialState: { controlledPageIndex: 0, controlledPageSize: 0, },
     },
@@ -804,7 +659,7 @@ const GridTable = ({
                      },
               onKeyUp: (e) =>  //filter
                      {  // filterv sortでの検索しなおし
-                      if (e.key === "Enter" &&(params["req"] === "viewtablereq7"||params["req"]==="inlineedit7") )
+                      if (e.key === "Enter" &&(params.disableFilters===false) )
                           { 
                             updateParams([{filtered:JSON.stringify(filters)},{sortBy:JSON.stringify(sortBy)}])
                             // Apply the header cell props
@@ -870,34 +725,66 @@ const GridTable = ({
   )
 }
 
-const mapStateToProps = (state) => {
-  return {
-    loading: state.screen.loading,
-    filterable: state.screen.filterable,
-    isAuthenticated: state.auth.isAuthenticated,
-    buttonflgOrg: state.button.buttonflg,
-    dataOrg: state.screen.data,
-    paramsOrg: state.screen.params,
-    screenCode: state.screen.params.screenCode,
-    pageSizeList: state.screen.grid_columns_info.pageSizeList,
-    columnsOrg: state.screen.grid_columns_info.columns_info,
-    screenwidth: state.screen.grid_columns_info.screenwidth,
-    yup: state.screen.grid_columns_info.yup,
-    dropDownListOrg: state.screen.grid_columns_info.dropdownlist,
-    hiddenColumns: state.screen.grid_columns_info.hiddenColumns,
-    hostError: state.screen.hostError,
-  }
+const mapStateToProps = (state,ownProps) => {
+  if(ownProps.second===true){
+    return {
+        buttonflgOrg: state.second.buttonflg,
+        loading: state.second.loading,
+        dataOrg: state.second.data,
+        paramsOrg: state.second.params,
+        screenCode: state.second.params.screenCode,
+        pageSizeList: state.second.grid_columns_info.pageSizeList,
+        columnsOrg: state.second.grid_columns_info.columns_info,
+        screenwidth: state.second.grid_columns_info.screenwidth,
+        yup: state.second.grid_columns_info.yup,
+        dropDownListOrg: state.second.grid_columns_info.dropdownlist,
+        hiddenColumns: state.second.grid_columns_info.hiddenColumns,
+        hostError: state.second.hostError,
+        second:ownProps.second,
+       }
+    }else{
+      return {
+        buttonflgOrg: state.button.buttonflg,
+        loading: state.screen.loading,
+        dataOrg: state.screen.data,
+        paramsOrg: state.screen.params,
+        screenCode: state.screen.params.screenCode,
+        pageSizeList: state.screen.grid_columns_info.pageSizeList,
+        columnsOrg: state.screen.grid_columns_info.columns_info,
+        screenwidth: state.screen.grid_columns_info.screenwidth,
+        yup: state.screen.grid_columns_info.yup,
+        dropDownListOrg: state.screen.grid_columns_info.dropdownlist,
+        hiddenColumns: state.screen.grid_columns_info.hiddenColumns,
+        hostError: state.screen.hostError,
+        second:ownProps.second,
+        }
+  }      
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     handleScreenRequest: (params,data) => {
+      params.second = ownProps.second
+    if( ownProps.second===true){ 
+      dispatch(SecondScreenRequest(params,data))
+      }else{  
     dispatch(ScreenRequest(params,data))
+    }
   },
-  handleFetchRequest: (params,data) => {
-    dispatch(FetchRequest(params,data))
+  handleFetchRequest: (params,data,loading) => {
+    params.second = ownProps.second
+    if( ownProps.second===true){ 
+      dispatch(SecondFetchRequest(params,data,loading))
+      }else{  
+    dispatch(FetchRequest(params,data,loading))
+    }
   },
   handleScreenParamsSet: (params) => {
+    params.second = ownProps.second
+    if( ownProps.second===true){ 
+      dispatch(SecondScreenParamsSet(params))
+      }else{  
     dispatch(ScreenParamsSet(params))
+    }
   },
 })
 export default connect(mapStateToProps, mapDispatchToProps)(ScreenGrid7)

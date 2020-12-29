@@ -1,6 +1,6 @@
 
- --- drop view r_purords cascade  
- create or replace view r_purords as select  
+--drop  MATERIALIZED view   r_purords cascade  ;
+ create materialized view  r_purords as select  
   opeitm.opeitm_boxe_id  opeitm_boxe_id ,
   opeitm.opeitm_shelfno_id  opeitm_shelfno_id ,
 purord.itm_code_client  purord_itm_code_client,

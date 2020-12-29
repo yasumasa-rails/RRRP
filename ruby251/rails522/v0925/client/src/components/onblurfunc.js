@@ -47,22 +47,22 @@ export function  onBlurFunc7(screenCode,lineData,id){
                                 lineData["shelfno_code_to_gridmessage"] = "in"
                      }
                  }
-                 if(/prdords$/.test(screenCode)){
-                     if(lineData["opeitm_priority"] === "999")
+                if(/prdords$/.test(screenCode)){
+                    if(lineData["opeitm_priority"] === "999")
                              {
                                 lineData["loca_code_workplace"] = lineData["loca_code"]   //lineData["loca_code"] -->opeitmsのlocas_id
                                 lineData["shelfno_code_to"] = lineData["shelfno_code"]
                                 lineData["loca_code_workplace_gridmessage"] = "in"
                                 lineData["shelfno_code_to_gridmessage"] = "in"
-                      }
-                  }
+                    }
+                }
                 if(/custords$/.test(screenCode)){  //custrordsでは棚まで指定しない。
-                         if(lineData["loca_code_fm"]===""){
+                        if(lineData["loca_code_fm"]===""){
                             lineData["loca_code_fm"] = lineData["loca_code_shelfno"]
                             lineData["custord_loca_id_fm"] = lineData["shelfno_loca_id_shelfno"]
                             lineData["loca_code_fm_gridmessage"] = "in"
-                         }
-                     }
+                        }
+                }
             break
         /*case /loca_code_supplier/.test(id):
                 lineData["loca_code"] = lineData[id]

@@ -21,15 +21,11 @@ export const MENU_FAILURE = 'MENU_FAILURE'
 
 export const SCREENINIT_REQUEST = 'SCREENINIT_REQUEST'
 export const SCREEN_REQUEST = 'SCREEN_REQUEST'
-export const SCREEN_SUCCESS = 'SCREEN_SUCCESS'
 export const SCREEN_SUCCESS7 = 'SCREEN_SUCCESS7'
 export const SCREEN_PARAMS_SET = 'SCREEN_PARAMS_SET'
 export const SCREEN_LINEEDIT = 'SCREEN_LINEEDIT'
 
 export const SCREEN_FAILURE = 'SCREEN_FAILURE'
-export const SCREEN_ERR_CHECK_RESULT = 'SCREEN_ERR_CHECK_RESULT'
-export const SCREEN_ONBLUR = 'SCREEN_ONBLUR'
-//export const SCREEN_ONKEYUP = 'SCREEN_ONKEYUP'
 
 export const BUTTONLIST_REQUEST = 'BUTTONLIST_REQUEST'
 export const BUTTONLIST_SUCCESS = 'BUTTONLIST_SUCCESS'
@@ -45,9 +41,6 @@ export const UPLOAD_SUCCESS = 'UPLOAD_SUCCESS'
 export const UPLOADLIST_SUCCESS = 'UPLOADLIST_SUCCESS'
 export const CHANGEUPLOADABLE_REQUEST = 'CHANGEUPLOADABLE_REQUEST'
 export const CHANGEUNUPLOAD_REQUEST = 'CHANGEUNUPLOAD_REQUEST'
-//export const CHANGEUPLOADTITLE_REQUEST = 'CHANGEUPLOADTITLE_REQUEST'
-//export const CHANGEUPLOADTITLEEDITABLE_REQUEST = 'CHANGEUPLOADTITLEEDITABLE_REQUEST'
-//export const EXCELTOJSON_REQUEST = 'EXCELTOJSON_REQUEST'
 export const EXCELTOJSON_SUCCESS = 'EXCELTOJSON_SUCCESS'
 export const UPLOADFORFIELDSET_REQUEST = 'UPLOADFORFIELDSET_REQUEST'
 
@@ -59,6 +52,25 @@ export const DOWNLOAD_RESET = 'DOWNLOAD_RESET'
 export const FETCH_REQUEST = 'FETCH_REQUEST'
 export const FETCH_RESULT = 'FETCH_RESULT'
 export const FETCH_FAILURE = 'FETCH_FAILURE'
+
+export const MKSHPINSTS_SUCCESS = 'MKSHPINSTS_SUCCESS'
+export const MKSHPINSTS_RESULT = 'MKSHPINSTS_RESULT'
+export const MKSHPACTS_RESULT = 'MKSHPACTS_RESULT'
+export const CONFIRMALL_REQUEST = 'CONFIRMALL_REQUEST'
+export const CONFIRMALL_SUCCESS = 'CONFIRMALL_SUCCESS'
+
+export const SECONDSCREEN_REQUEST = 'SECONDSCREEN_REQUEST'
+export const SECONDSCREEN_SUCCESS7 = 'SECONDSCREEN_SUCCESS7'
+export const SECONDSCREEN_FAILURE = 'SECONDSCREEN_FAILURE'
+export const SECONDFETCH_REQUEST = 'SECONDFETCH_REQUEST'
+export const SECONDFETCH_RESULT = 'SECONDFETCH_RESULT'
+export const SECONDFETCH_FAILURE = 'SECONDFETCH_FAILURE'
+export const SECONDSCREEN_LINEEDIT = 'SECONDSCREEN_LINEEDIT'
+export const SECONDSCREEN_PARAMS_SET = 'SECONDSCREEN_PARAMS_SET'
+
+export const SETRESULTS_REQUEST = 'SETRESULTS_REQUEST'
+export const SETRESULTS_SUCCESS = 'SETRESULTS_SUCCESS'
+
 export const INPUTFIELDPROTECT_REQUEST = 'INPUTFIELDPROTECT_REQUEST'
 export const INPUTPROTECT_RESULT = 'INPUTPROTECT_RESULT'
 
@@ -73,12 +85,6 @@ export const DROPDOWNVALUE_SET = 'DROPDOWNVALUE_SET'
 export const GANTTCHART_REQUEST = 'GANTTCHART_REQUEST'
 export const GANTTCHART_FAILURE = 'GANTTCHART_FAILURE'
 export const GANTTCHART_SUCCESS = 'GANTTCHART_SUCCESS'
-
-export const MKSHPINSTS_SUCCESS = 'MKSHPINSTS_SUCCESS'
-
-export const SETRESULTS_REQUEST = 'SETRESULTS_REQUEST'
-export const SETRESULTS_SUCCESS = 'SETRESULTS_SUCCESS'
-
 export const RESET_REQUEST = 'RESET_REQUEST'
 
 // LOGIN
@@ -144,28 +150,25 @@ export const ScreenRequest = (params,data) => ({
   payload: { params,data}  //
 })
 
-
 export const ResetRequest = (params) => ({
   type:  RESET_REQUEST,
   payload: { params}  //
 })
-
 
 export const ScreenParamsSet = (params) => ({
   type:  SCREEN_PARAMS_SET,
   payload: { params}  //
 })
 
-export const ScreenOnblur = (data) => ({
-  type:  SCREEN_ONBLUR,
-  payload: {data}  //
+export const SecondScreenParamsSet = (params) => ({
+  type:  SECONDSCREEN_PARAMS_SET,
+  payload: { params}  //
 })
 
-//export const ScreenOnKeyUp = (data) => ({
-//  type:  SCREEN_ONKEYUP,
-//  payload: {data}  //
-//})
-
+export const SecondScreenRequest = (params,data) => ({
+  type:  SECONDSCREEN_REQUEST,
+  payload: { params,data}  //
+})
 
 export const YupErrSet = (data,error) => ({
   type:  YUP_ERR_SET,
@@ -192,7 +195,6 @@ export const DownloadReset = () => ({
   payload: { }
 })
 
-
 /*
 export const DownloadSuccess = (response) => ({
   type: DOWNLOAD_SUCCESS,
@@ -213,7 +215,6 @@ export const ButtonListFailure = (error) => ({
   payload:{error} 
 })
 
-
 export const ButtonFlgRequest = (buttonflg,params) => ({
   type: BUTTONFLG_REQUEST,
   payload: { buttonflg,params}
@@ -228,7 +229,6 @@ export const ChangeUnUploadRequest = (isUpload) => ({
   type: CHANGEUNUPLOAD_REQUEST,
   payload: {isUpload}
 })
-
 
 export const ImportRequest = () => ({
   type: IMPORT_REQUEST,
@@ -254,14 +254,6 @@ export const FetchRequest = (params,data,loading) => ({
   payload: { params,data,loading }
 })
 
-export const InputFieldProtectRequest = () => ({
-  type: INPUTFIELDPROTECT_REQUEST,
-})
-export const InputProtectResult = () => ({
-  type: INPUTPROTECT_RESULT,
-})
-
-
 export const FetchResult = (data,params) => ({
   type: FETCH_RESULT,
   payload: { data,params}
@@ -271,7 +263,42 @@ export const FetchFailure = (data,params) => ({
   type: FETCH_FAILURE,
   payload: { data,params}
 })
+export const SecondFetchRequest = (params,data,loading) => ({
+  type: SECONDFETCH_REQUEST,
+  payload: { params,data,loading }
+})
 
+export const SecondFetchResult = (data,params) => ({
+  type: SECONDFETCH_RESULT,
+  payload: { data,params}
+})
+
+export const SecondFetchFailure = (data,params) => ({
+  type: SECONDFETCH_FAILURE,
+  payload: { data,params}
+})
+
+export const SecondScreenFailure = (errors) => ({
+  type: SECONDSCREEN_FAILURE,
+  errors: { errors }  //
+})
+
+export const MkShpinstsResult = (data,params) => ({
+  type: MKSHPINSTS_RESULT,
+  payload: { data,params}
+})
+
+export const ConfirmAllRequest = (params,data) => ({
+  type: CONFIRMALL_REQUEST,
+  payload:{params,data}
+})
+
+export const InputFieldProtectRequest = () => ({
+  type: INPUTFIELDPROTECT_REQUEST,
+})
+export const InputProtectResult = () => ({
+  type: INPUTPROTECT_RESULT,
+})
 
 export const YupRequest = (params) => ({
   type:  YUP_REQUEST,
@@ -282,7 +309,6 @@ export const TblfieldRequest = (params) => ({
   type:  TBLFIELD_REQUEST,
   payload: { params}  //
 })
-
 
 export const TblfielSuccess = (messages) => ({
   type:  TBLFIELD_SUCCESS,

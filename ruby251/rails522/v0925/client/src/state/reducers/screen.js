@@ -1,11 +1,9 @@
 import {  SCREENINIT_REQUEST,SCREEN_REQUEST,SCREEN_SUCCESS7,
-  SCREEN_FAILURE,LOGOUT_REQUEST,SCREEN_PARAMS_SET,
-  SCREEN_LINEEDIT,SCREEN_ERR_CHECK_RESULT,SCREEN_ONBLUR,
-  //SCREEN_ONKEYUP,
+  SCREEN_FAILURE,LOGOUT_REQUEST,SCREEN_PARAMS_SET,SCREEN_LINEEDIT,
   FETCH_REQUEST,FETCH_RESULT,FETCH_FAILURE,
   YUP_ERR_SET,YUP_RESULT,DROPDOWNVALUE_SET,
-  INPUTFIELDPROTECT_REQUEST,INPUTPROTECT_RESULT, MKSHPINSTS_SUCCESS,
-} 
+  INPUTFIELDPROTECT_REQUEST,INPUTPROTECT_RESULT,
+  MKSHPINSTS_SUCCESS,SECONDSCREEN_SUCCESS7,CONFIRMALL_SUCCESS,} 
   from '../../actions'
 
 export let getScreenState = state => state.screen
@@ -31,10 +29,6 @@ return {...state,
   params:action.payload.params,
 }
 
-case SCREEN_ONBLUR:
-return {...state,
-  data:action.payload.data,
-}
 
 //case SCREEN_ONKEYUP:
 //return {...state,
@@ -49,13 +43,6 @@ case YUP_ERR_SET:
     error : action.payload.error,
 }
   
-case SCREEN_ERR_CHECK_RESULT:
-return {...state,
-  data:action.payload.data,
-  loading:false,
-  filterable:false,          
-}
-
 case SCREEN_REQUEST:
 return {...state,
         params:action.payload.params,
@@ -68,13 +55,11 @@ case SCREEN_SUCCESS7: // payloadに統一
 return {...state,
   loading:false,
   hostError: null,
-  filterable:true,
   disabled:false,
   data: action.payload.data.data,
   params: action.payload.data.params,
   status: action.payload.data.status,
   grid_columns_info:action.payload.data.grid_columns_info,
-  //filterable:action.action.data.params.req==="viewtablereq"?true:false,
 }
 
 case SCREEN_LINEEDIT:
@@ -82,7 +67,6 @@ return {...state,
   data:action.payload.data,
   params:action.payload.params,
   loading:false,
-  filterable:false,  
   hostError:action.payload.data[action.payload.params.index].confirm_message
 }  
 
@@ -114,7 +98,6 @@ case FETCH_FAILURE:
       data:action.payload.data,  
       params:action.payload.params,  
       loading:false,
-      filterable:false,
       hostError: action.payload.params.err,  
     }
 
@@ -123,7 +106,6 @@ case FETCH_RESULT:
             data:action.payload.data, 
             params:action.payload.params,  
             loading:false,
-            filterable:false,
             hostError: null,
     }
 
@@ -142,6 +124,21 @@ case YUP_RESULT:
 case MKSHPINSTS_SUCCESS:
       return {...state,
         loading:false,
+}
+
+case SECONDSCREEN_SUCCESS7: // payloadに統一
+return {...state,
+    loading:false,
+    hostError: null,
+    disabled:false,
+}
+
+
+case CONFIRMALL_SUCCESS:
+  return {...state,
+   loading:false,
+   hostError: action.payload.messages,
+   disabled:false,
 }
 
 case  LOGOUT_REQUEST:

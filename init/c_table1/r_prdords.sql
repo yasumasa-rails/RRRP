@@ -1,6 +1,6 @@
 
 --- drop view r_prdords cascade  
- create or replace view r_prdords as select  
+ create MATERIALIZED view r_prdords as select  
   opeitm.opeitm_boxe_id  opeitm_boxe_id ,
   opeitm.opeitm_prdpurshp  opeitm_prdpurshp ,
 prdord.opeitms_id   prdord_opeitm_id,

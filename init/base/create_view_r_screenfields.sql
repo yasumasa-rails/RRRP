@@ -1,6 +1,6 @@
 ﻿
  ---drop view r_screenfields cascade  
- create or replace view r_screenfields as select  
+ create MATERIALIZED  view r_screenfields as select  
 screenfield.width  screenfield_width,
   screen.pobject_objecttype_scr  pobject_objecttype_scr ,
 screenfield.id  screenfield_id,

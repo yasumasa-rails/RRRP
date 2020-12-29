@@ -1,6 +1,7 @@
 import {  BUTTONLIST_REQUEST, BUTTONLIST_SUCCESS, BUTTONFLG_REQUEST,GANTT_RESET,SCREENINIT_REQUEST,
-  TBLFIELD_SUCCESS,GANTTCHART_SUCCESS,LOGOUT_REQUEST,MKSHPINSTS_SUCCESS,
-  DOWNLOAD_RESET,SCREEN_SUCCESS7,DOWNLOAD_SUCCESS,IMPORT_REQUEST} //RESET_REQUEST
+  TBLFIELD_SUCCESS,GANTTCHART_SUCCESS,LOGOUT_REQUEST,MKSHPINSTS_SUCCESS,MKSHPACTS_RESULT,
+  DOWNLOAD_RESET,SCREEN_SUCCESS7,DOWNLOAD_SUCCESS,IMPORT_REQUEST,CONFIRMALL_SUCCESS,
+  SECONDSCREEN_SUCCESS7} //RESET_REQUEST
    from 'actions'
 
 export let getButtonState = state => state.button
@@ -27,7 +28,8 @@ message:null,
 
 case SCREENINIT_REQUEST:
   return {...state,
-    buttonflg:actions.payload.params.req, 
+    //buttonflg:actions.payload.params.req, 
+    buttonflg:"search", 
     messages:actions.payload.messages,
     message:actions.payload.message,
           // editableflg:action.payload.editableflg
@@ -74,6 +76,18 @@ return {...state,
   loading:false,
 }
 
+case MKSHPACTS_RESULT:
+return {...state,
+  buttonflg:"mkshpacts",
+  loading:false,
+}
+case SECONDSCREEN_SUCCESS7: // payloadに統一
+return {...state,
+    disabled:false,
+}
+
+
+
 case DOWNLOAD_SUCCESS:
 return {...state,
 buttonflg:"export",
@@ -89,6 +103,12 @@ case IMPORT_REQUEST:
     buttonflg:"import", 
           // editableflg:action.payload.editableflg
 }
+
+case CONFIRMALL_SUCCESS:
+  return {...state,
+   disabled:false,
+}
+
 
 case  LOGOUT_REQUEST:
 return {}  

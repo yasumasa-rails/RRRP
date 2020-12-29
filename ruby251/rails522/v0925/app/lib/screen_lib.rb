@@ -6,8 +6,8 @@ module ScreenLib
 	extend self
 
 	def proc_create_filteredstr  params,grid_columns_info
-			where_info = (grid_columns_info["where_info"]||="")
-			if (where_info["filtered"]||="").size > 0
+			where_info = (grid_columns_info["init_where_info"]||={})
+			if (where_info["filtered"]||={}).size > 0
 				 where_str =   "  where " +	 where_info["filtered"] + "    and "
 			else
 				 where_str = "  where "	 
@@ -111,7 +111,6 @@ module ScreenLib
 
 	def proc_search_blk params,grid_columns_info
 		screenCode = params[:screenCode]
-		select_fields = grid_columns_info["select_fields"] 
 		where_str = params[:where_str]
 		
 		strsorting = ""
@@ -130,23 +129,23 @@ module ScreenLib
 				strsorting = "  order by id desc "
 				params[:sortBy] = "[]"
 			end
-			strsql = "select #{select_fields} from (SELECT ROW_NUMBER() OVER (#{strsorting}) ,#{select_fields}
+			strsql = "select #{grid_columns_info["select_fields"]} 
+						from (SELECT ROW_NUMBER() OVER (#{strsorting}) ,#{grid_columns_info["select_fields"]}
 													 FROM #{screenCode} #{if where_str == '' then '' else where_str end } ) x
 														where ROW_NUMBER > #{(params[:pageIndex].to_f)*params[:pageSize] } 
 														and ROW_NUMBER <= #{(params[:pageIndex].to_f + 1)*params[:pageSize] } 
 																  "
 			pagedata = ActiveRecord::Base.connection.select_all(strsql)
-				if where_str =~ /where/ 
-					strsql = "SELECT count(*) FROM #{screenCode} #{where_str}"
-				else
-					strsql = "SELECT count(*) FROM #{screenCode.split("_")[1]} "
-				end  ###fillterがあるので、table名は抽出条件に合わず使用できない。
+			if where_str =~ /where/ 
+				strsql = "SELECT count(*) FROM #{screenCode} #{where_str}"
+			else
+				strsql = "SELECT count(*) FROM #{screenCode.split("_")[1]} "
+			end  ###fillterがあるので、table名は抽出条件に合わず使用できない。
 			totalCount = ActiveRecord::Base.connection.select_value(strsql)
-				params[:pageCount] = (totalCount.to_f/params[:pageSize].to_f).ceil
-				params[:totalCount] = totalCount.to_f
+			params[:pageCount] = (totalCount.to_f/params[:pageSize].to_f).ceil
+			params[:totalCount] = totalCount.to_f
 		return pagedata 
 	end	
-
 
 	def add_empty_data params,grid_columns_info
 		num = params[:pageSize].to_f
@@ -174,6 +173,8 @@ module ScreenLib
 							temp[cell[:accessor]] = "999"
 						when /person_code_chrg/	
 							temp[cell[:accessor]] = params[:person_code_chrg]
+						when /prjno_code/	
+							temp[cell[:accessor]] = "0"
 						end
 						case params[:screenCode]
 						when "r_mkords"
@@ -287,7 +288,7 @@ module ScreenLib
 			screenwidth = 0
 			select_fields = ""
 			gridmessages_fields = ""  ### error messages
-			where_info = {}
+			init_where_info = {}
 			dropdownlist = {}
 			sort_info = {}
 			nameToCode = {}
@@ -383,9 +384,9 @@ module ScreenLib
 						gridmessages_fields << %Q% '' #{i["pobject_code_sfd"]}_gridmessage,%	
 						hiddenColumns << %Q%#{i["pobject_code_sfd"]}_gridmessage%	
 					end																
-					where_info[i["pobject_code_sfd"]] = i["screenfield_type"]	
+					init_where_info[i["pobject_code_sfd"]] = i["screenfield_type"]	
 					if cnt == 0
-								where_info["filtered"] = i["screen_strwhere"]
+								init_where_info["filtered"] = i["screen_strwhere"]
 								grid_columns_info[:pageSizeList] = []
 								i["screen_rowlist"].split(",").each do |list|
 									grid_columns_info[:pageSizeList]  <<  list.to_i
@@ -422,7 +423,7 @@ module ScreenLib
 				ary_select_fields = select_fields.split(',')
 				sort_info = ControlFields.proc_detail_check_strorder sort_info,ary_select_fields
 			end	
-			grid_columns_info["where_info"] = where_info
+			grid_columns_info["init_where_info"] = init_where_info
 			grid_columns_info["sort_info"] = sort_info	
 			grid_columns_info["screenwidth"] = screenwidth	
 			if gridmessages_fields.size > 1
@@ -496,7 +497,7 @@ module ScreenLib
 		return  pagedata
 	end	
 
-	def proc_mkshpinsts screenCode,clickIndex
+	def proc_mkshpinsts screenCode,clickIndex  ###screenCode:r_purords,r_prdords
 		pagedata = []
 		outcnt = 0
 		shortcnt = 0
@@ -512,7 +513,7 @@ module ScreenLib
 							gantt.itms_id,gantt.processseq,gantt.prjnos_id,
 							gantt.shelfnos_id_fm shelfnos_id_out,gantt.starttime,
 							alloc.srctblname,alloc.srctblid,gantt.expiredate,	alloc.id alloctbls_id,						
-							(alloc.qty_stk + alloc.qty - 
+							(alloc.qty - 
 								(alloc.qty_linkto_alloctbl + alloc.qty_alloc +  coalesce(inst.shp_qty,0))) qty 
 							from trngantts gantt 
 								inner join alloctbls alloc on gantt.id = alloc.trngantts_id
@@ -525,7 +526,7 @@ module ScreenLib
 							where gantt.orgtblname = '#{screenCode.split("_")[1]}' and gantt.orgtblid = #{selected["id"]}
 							and (gantt.orgtblname = gantt.paretblname or gantt.orgtblid = gantt.paretblid)
 							and (gantt.orgtblname != gantt.tblname or gantt.orgtblid != gantt.tblid)
-							and (alloc.qty_stk + alloc.qty - 
+							and (alloc.qty - 
 									(alloc.qty_linkto_alloctbl + alloc.qty_alloc +  coalesce(inst.shp_qty,0)))  > 0
 							and gantt.locas_id_pare != shelf.locas_id_shelfno
 			&
@@ -583,6 +584,7 @@ module ScreenLib
 									shp["qty_stk"] = allshpqty
 									shp["qty_shortage"] = allshpqty
 									allshpqty = 0
+									shortcnt += 1
 								end
 								packnos = Operation.proc_mk_outstks_rec shp,opeitm["packqty"].to_f,"add"
 								packnos.each do |outstk|
@@ -620,6 +622,7 @@ module ScreenLib
 		end  
 		return outcnt,shortcnt,err
 	end	
+
 	def create_r_shpinsts outstk,shp,pare,screenCode
 		command_c = {}
 		command_c[:sio_code] =  command_c[:sio_viewname] =  "r_shpinsts"
@@ -650,11 +653,19 @@ module ScreenLib
 		command_c["shpinst_processseq"] = shp["processseq"]
 		command_c["shpinst_qty_stk"] = shp["qty_stk"]
 		command_c["shpinst_qty_shortage"] = if shp["qty_shortage"].to_f >= shp["qty_stk"].to_f then shp["qty_stk"] else shp["qty_shortage"] end
+		command_c["shpinst_qty"] = shp["qty"]
+		command_c["shpinst_qty_case"] = 0
 		command_c["shpinst_starttime"] = shp["starttime"]
+		command_c["shpinst_expiredate"] = "2099/12/31"
 		if pare["paretblname"] =~ /^pur/   ###tblname= 'feepayment'--->有償支給
+		else	
+			command_c["shpinst_price"] = 0
+			command_c["shpinst_tax"] = 0
+			command_c["shpinst_amt"] = 0
 		end
 		reqparams = RorBlkctl.proc_private_aud_rec  command_c,1,nil,nil,nil
-	end	
+	end
+
 	def reset_shpords outstk,shp,pare,screenCode,packqty
 		stkinout = {}
 		stkinout["lotno"] =  ""   ###shpschs,shpordsの時は何もセットしない。
@@ -753,5 +764,160 @@ module ScreenLib
 				end	
 			end
 		end		
+	end	
+	
+	def proc_mkshpacts params,grid_columns_info
+		tmp = []
+		outcnt = 0
+		err = ""
+		strselect = "("
+		(params["clickIndex"]).each do |selected|  ###-次のフェーズに進んでないこと。
+			selected = JSON.parse(selected)
+			strselect << selected["id"]+","
+		end
+		strselect = strselect.chop + ")"
+		strsorting = ""
+		if params[:sortBy]  and   params[:sortBy] != "" ###: {id: "itm_name", desc: false}
+			sortBy = JSON.parse(params[:sortBy])
+			sortBy.each do |sortKey|
+				strsorting = " order by " if strsorting == ""
+				strsorting << %Q% #{sortKey["id"]} #{if sortKey["desc"]  == false then " asc " else "desc" end} ,%
+			end	
+			if strsorting == ""
+				strsorting = " order by id desc "
+			else
+				strsorting << " id desc "
+			end
+		else
+			strsorting = "  order by paretblid,id desc "
+			params[:sortBy] = "[]"
+		end
+		strsql = "select   #{grid_columns_info["select_fields"]} 
+						from (SELECT ROW_NUMBER() OVER (#{strsorting}) , #{grid_columns_info["select_fields"]} 
+												 FROM r_shpinsts inst where
+												 shpinst_paretblname = '#{params["pareScreenCode"].split("_")[1]}' and
+												 shpinst_paretblid = #{strselect} and 
+												 not exists(select 1 from shpacts act where
+													 paretblname = '#{params["pareScreenCode"].split("_")[1]}' and
+													 paretblid = #{strselect} and 
+													 act.itms_id = inst.shpinst_itm_id and
+													 act.processseq = inst.shpinst_processseq) ) x
+													where ROW_NUMBER > #{(params[:pageIndex].to_f)*params[:pageSize].to_f} 
+													and ROW_NUMBER <= #{(params[:pageIndex].to_f + 1)*params[:pageSize].to_f} 
+															  "
+		pagedata = ActiveRecord::Base.connection.select_all(strsql)
+		
+		strsql = " select count(*) FROM r_shpinsts inst where
+					shpinst_paretblname = '#{params["pareScreenCode"].split("_")[1]}' and
+					shpinst_paretblid = #{strselect} and 
+					not exists(select 1 from shpacts act where
+						paretblname = '#{params["pareScreenCode"].split("_")[1]}' and
+						paretblid = #{strselect} and 
+						act.itms_id = inst.shpinst_itm_id and
+						act.processseq = inst.shpinst_processseq)"
+		 ###fillterがあるので、table名は抽出条件に合わず使用できない。
+		totalCount = ActiveRecord::Base.connection.select_value(strsql)
+		params[:pageCount] = (totalCount.to_f/params[:pageSize].to_f).ceil
+		params[:totalCount] = totalCount.to_f
+		return pagedata 
+	end	
+	
+	def proc_refshpacts params,grid_columns_info
+		tmp = []
+		outcnt = 0
+		err = ""
+		strselect = "("
+		(params["clickIndex"]).each do |selected|  ###-次のフェーズに進んでないこと。
+			selected = JSON.parse(selected)
+			strselect << selected["id"]+","
+		end
+		strselect = strselect.chop + ")"
+		strsorting = ""
+		if params[:sortBy]  and   params[:sortBy] != "" ###: {id: "itm_name", desc: false}
+			sortBy = JSON.parse(params[:sortBy])
+			sortBy.each do |sortKey|
+				strsorting = " order by " if strsorting == ""
+				strsorting << %Q% #{sortKey["id"]} #{if sortKey["desc"]  == false then " asc " else "desc" end} ,%
+			end	
+			if strsorting == ""
+				strsorting = " order by id desc "
+			else
+				strsorting << " id desc "
+			end
+		else
+			strsorting = "  order by paretblid,id desc "
+			params[:sortBy] = "[]"
+		end
+		strsql = "select   #{grid_columns_info["select_fields"]} 
+						from (SELECT ROW_NUMBER() OVER (#{strsorting}) , #{grid_columns_info["select_fields"]} 
+												 FROM r_shpacts inst where
+												 shpact_paretblname = '#{params["pareScreenCode"].split("_")[1]}' and
+												 shpact_paretblid = #{strselect}  ) x
+													where ROW_NUMBER > #{(params[:pageIndex].to_f)*params[:pageSize].to_f} 
+													and ROW_NUMBER <= #{(params[:pageIndex].to_f + 1)*params[:pageSize].to_f} 
+															  "
+		pagedata = ActiveRecord::Base.connection.select_all(strsql)
+		
+		strsql = " select count(*) FROM r_shpacts act where
+					shpact_paretblname = '#{params["pareScreenCode"].split("_")[1]}' and
+					shpact_paretblid = #{strselect} "
+		 ###fillterがあるので、table名は抽出条件に合わず使用できない。
+		totalCount = ActiveRecord::Base.connection.select_value(strsql)
+		params[:pageCount] = (totalCount.to_f/params[:pageSize].to_f).ceil
+		params[:totalCount] = totalCount.to_f
+		return pagedata 
+	end	
+
+	def proc_shpact_confirmall params
+		command_all = []
+		pagedata = []
+		outcnt = 0
+		err = ""
+		confirm_data = JSON.parse(params["confirm_data"])
+		confirm_data.each do |selected|  ###-次のフェーズに進んでないこと。
+			command_c = {}
+			strsql = %Q&select * from r_shpinsts where id = #{selected["id"]}
+			& 
+			rec = ActiveRecord::Base.connection.select_one(strsql)
+			strsql = %Q&select pobject_code_sfd from r_screenfields where pobject_code_scr = 'r_shpacts'
+						and screenfield_expiredate > current_date and screenfield_selection = '1'
+						and pobject_code_sfd like 'shpact_%' 
+			& 
+			fields = ActiveRecord::Base.connection.select_values(strsql)			
+			rec.each do |key,val|
+				if key !~ /_id/ and key != "id"
+					if selected[key]
+						commnad_r[key] =  selected[key]
+					end
+				end
+				new_key = key.gsub("shpinst","shpact")
+				if !(fields.select{|k| k == new_key}).empty?
+					command_c[new_key] = rec[key]
+				end
+			end
+			strsql  = %Q%select * from r_outstks  where  id = #{rec["shpinst_outstk_id"]} %
+			r_outstks  = ActiveRecord::Base.connection.select_one(strsql)  ###更新後のr_instks
+			strsql = %Q&select id from shelfnos where locas_id_shelfno = #{rec["shpinst_loca_id_to"]}
+												and code = 'consume'
+				&
+			shelfnos_id = ActiveRecord::Base.connection.select_value(strsql)
+			stkinout = Operation.proc_rinout_to_inout "outstk",r_outstks 
+			stkinout["shelfnos_id_in"] = shelfnos_id
+			stkinout["alloctbls_id"] = r_outstks["outstk_alloctbl_id"]
+			stkinout["inoutflg"] = "shp"
+			packnos =[{:packno=>r_outstks["outstk_packno"]}]
+			instk_ids = Operation.proc_mk_instks_rec stkinout,packnos,"add"
+			command_c["shpact_instk_id"] = instk_ids[0]
+			command_c[:sio_code] =  command_c[:sio_viewname] =  "r_shpacts"
+			command_c[:sio_message_contents] = nil
+			command_c[:sio_recordcount] = 1
+			command_c[:sio_result_f] =   "0"  
+			command_c[:sio_classname] = "shpacts_add_"
+			command_all << command_c
+			outcnt += 1
+		end  
+		### このケースはバッチでないので results=nil
+		RorBlkctl.proc_update_table_json(command_all,command_all.size,nil)
+		return outcnt,err
 	end	
 end   ##module Ror_blk

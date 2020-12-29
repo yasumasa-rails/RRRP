@@ -4,30 +4,25 @@ class CreateOtherTableRecordJob < ApplicationJob
         # 後で実行したい作業をここに書く
         begin
         ActiveRecord::Base.connection.begin_db_transaction()
-            loopcnt = 0
-            perform_strsql = "select * from  processreqs t 
+            check = 1
+            until check.nil? do
+                perform_strsql = "select * from  processreqs t 
                                 where t.result_f = '0'  and t.seqno = #{pid} 
-                                order by t.id limit 1 "
-            req = ActiveRecord::Base.connection.select_one(perform_strsql)
-            until req.nil? do 
-                check_strsql = "select * from  processreqs t 
-                                    where t.result_f = '0'  and t.seqno = #{pid} and id = #{req["id"]}
-                                    and not exists(select 1 from processreqs c where t.seqno = c.seqno and t.id > c.id
-                                                and (c.result_f = '0' or c.result_f = '5'))
-                                    order by t.id limit 1 "
-                check = ActiveRecord::Base.connection.select_one(check_strsql)
-                if check
-                    strsql = %Q%update processreqs set result_f = '5'  where id = #{req["id"]}
+                                and not exists(select 1 from processreqs c where t.seqno = c.seqno and t.id > c.id
+                                            and c.result_f != '1')
+                                order by t.id limit 1 for update"
+                processreq = ActiveRecord::Base.connection.select_one(perform_strsql)
+                if processreq
+                    strsql = %Q%update processreqs set result_f = '5'  where id = #{processreq["id"]}
                     %
                     ActiveRecord::Base.connection.update(strsql)
-                    if req["paretblname"].size > 0
-                        strsql = %Q%select * from  r_#{req["paretblname"]} where id = #{req["paretblid"]}%
+                    if processreq["paretblname"].size > 0
+                        strsql = %Q%select * from  r_#{processreq["paretblname"]} where id = #{processreq["paretblid"]}%
                         parent = ActiveRecord::Base.connection.select_one(strsql) ###依頼元
                     else
                         parent = nil
                     end
-                    orgReqParams = JSON.parse(req["reqparams"])
-                    reqparams = orgReqParams.dup
+                    reqparams = JSON.parse(processreq["reqparams"])
                     tbldata = reqparams["tbldata"]
                     strsql = %Q% select email from persons where id = #{tbldata["persons_id_upd"]}
                     %
@@ -37,17 +32,20 @@ class CreateOtherTableRecordJob < ApplicationJob
                     case reqparams["segment"]
                     when "skip" 
                     when "trngantts" 
-                        reqparams = Operation.proc_trngantts req["tblname"],req["tblid"],req["paretblname"],req["paretblid"],reqparams
+                        reqparams = Operation.proc_trngantts processreq["tblname"],processreq["tblid"],
+                                                    processreq["paretblname"],processreq["paretblid"],reqparams
                         if reqparams["mkords_id"] 
 					        reqparams["segment"] = "mkords"
 					        strsql = "select * from mkords where id = #{reqparams["mkords_id"]} "
 					        mkord = ActiveRecord::Base.connection.select_one(strsql) 
 					        reqparams["tbldata"] = mkord.stringify_keys  
+					        reqparams["orgtblname"] = "mkords"  
+					        reqparams["orgtblid"] = reqparams["mkords_id"] 
 					        processreqs_id ,reqparams= Operation.proc_processreqs_add "mkords",reqparams["mkords_id"] ,nil,nil,reqparams	
 				        end
                     when "opeitm_acceptance_proc"  ### opeitmsのフラグ処理
                         if parent 
-                            case req["tblname"]
+                            case processreq["tblname"]
                             when "purords"  
                                     Operation.proc_createtable("purords","inspords",parent,email)
                                     Operation.proc_createtable("purords","payschs",parent,email)
@@ -58,50 +56,53 @@ class CreateOtherTableRecordJob < ApplicationJob
                             when "inspacts"
                                 Operation.proc_createtable("inspacts","payords",parent,email)
                             when /^pay/
-                                Operation.proc_amtinouts(req["tblname"],req["tblid"],parent,orgReqParams["trngantts_id"])
+                                Operation.proc_amtinouts(processreq["tblname"],processreq["tblid"],parent,reqparams["trngantts_id"])
                             end
                         else
                             result_f = '7'
-                            remark = "opeitm_acceptance_proc parent table data nothing. delete #{req["paretblname"]} id= #{req["paretblid"]} ?" 
+                            remark = "opeitm_acceptance_proc parent table data nothing. delete #{processreq["paretblname"]} id= #{processreq["paretblid"]} ?" 
                         end
                     when "mkschs"  ### XXXXschs,ordsの時XXXschsを作成
-                            case req["tblname"]
-                                when /^custords/   ###custxxxではitm_code = 'dummyship'初期設定での登録が必要
+                        ###依頼されたテーブルから子供を作成する。
+                        strsql = %Q%select * from  r_#{processreq["tblname"]} where id = #{processreq["tblid"]}%
+                        parent = ActiveRecord::Base.connection.select_one(strsql) ###依頼元
+                        case processreq["tblname"]
+                        when /^custords/   ###custxxxではitm_code = 'dummyship'初期設定での登録が必要
                                    qty,trnganttkey = chk_custords_alloc tbldata ###引き当てるcustschsを検索
                                    tbldata["custord_qty"] = qty
                                    strsql = custxxx_strsql tbldata
-                                when /^custschs/  ###itm_code = 'dummyship'初期設定での登録が必要
+                        when /^custschs/  ###itm_code = 'dummyship'初期設定での登録が必要
                                     strsql = custxxx_strsql tbldata
-                                else
-                                    tbl_opeitm_id = req["tblname"].chop + "_opeitm_id"
+                        else
+                                    tbl_opeitm_id = processreq["tblname"].chop + "_opeitm_id"
                                     strsql = %Q%select * from nditms where expiredate > current_date and opeitms_id = #{tbldata["opeitms_id"]}%
-                            end
-                            trnganttkey ||= 0  ###keyのカウンター
-                            key = orgReqParams["trnganttkey"]
-                            if key
+                        end
+                        trnganttkey ||= 0  ###keyのカウンター
+                        key = reqparams["trnganttkey"]
+                        if key
                                 reqparams["orgtrnganttkey"] = key 
-                            else
+                        else
                                 reqparams["orgtrnganttkey"] = "00000"
                                 key = ""
-                            end   
-                            ActiveRecord::Base.connection.select_all(strsql).each do |child|
-                                command_r,opeitm = add_update_table_from_nditm  child,parent,req["paretblname"]
+                        end   
+                        ActiveRecord::Base.connection.select_all(strsql).each do |child|
+                                command_r,opeitm = add_update_table_from_nditm  child,parent,processreq["tblname"]
                                 trnganttkey += 1
                                 reqparams["trnganttkey"] = key + format('%05d', trnganttkey)
                                 reqparams["child"] = child
                                 reqparams["opeitm"] = opeitm  ###子部品のopeitms
-				                RorBlkctl.proc_private_aud_rec(command_r,1,req["tblname"],req["tblid"],reqparams) 
+				                RorBlkctl.proc_private_aud_rec(command_r,1,processreq["tblname"],processreq["tblid"],reqparams) 
                                 command_r[:sio_result_f] =  "1"   ## 1 normal end
                                 command_r[:sio_message_contents] = nil
                                 tblname = command_r[:sio_viewname].split("_")[1]
                                 tblid = command_r[(tblname.chop + "_id")] =  command_r["id"]
                                 RorBlkctl.proc_insert_sio_r(command_r) #### if @pare_class != "batch"    ## 結果のsio書き込み
-                            end 
+                        end 
                     when "sumrequest" 
                     when "splitrequest"  
                     when "createtable"
                         if parent 
-                            case req["tblname"]
+                            case processreq["tblname"]
                             ### 仕入れ先登録時仕入れ先の棚番自動登録
                             when "suppliers"
                                 Operation.proc_createtable("suppliers","shelfnos",parent,email)
@@ -113,7 +114,7 @@ class CreateOtherTableRecordJob < ApplicationJob
                             end
                         else
                             result_f = '7'
-                            remark = "createtable parent table data nothing. delete #{req["paretblname"]} id= #{req["paretblid"]} ?" 
+                            remark = "createtable parent table data nothing. delete #{processreq["paretblname"]} id= #{processreq["paretblid"]} ?" 
                         end    
 
                     when "mkords"  ###  xxxschsからxxxordsを作成。
@@ -136,12 +137,12 @@ class CreateOtherTableRecordJob < ApplicationJob
 
                     when "consume_child_parts"  ###qty_act子部品の消費 ###金型返却　###装置の解放
                             act_qty = tbldata["qty_stk"].to_f
-                            strsql =%Q% select gantt.* ,c_alloc.id alloc_id, '#{req["tblname"]}' act_tblname,#{req["tblid"]} acttblid,
+                            strsql =%Q& select gantt.* ,c_alloc.id alloc_id, '#{processreq["tblname"]}' act_tblname,#{processreq["tblid"]} acttblid,
                                                 ope.packqty packqty
                                             from trngantts gantt 
                                             inner join((alloctbls p_alloc inner join srctbls src 
                                                 on p_alloc.srctblname = src.srctblname and p_alloc.srctblid = src.srctblid
-                                                    and  src.tblname = '#{req["tblname"]}' and src.tblid =  #{req["tblid"]})
+                                                    and  src.tblname = '#{processreq["tblname"]}' and src.tblid =  #{processreq["tblid"]})
                                                     --- xxxactsからxxxords(insts)を求める p_alloc親のalloctbls
                                                     inner join trngantts  pare_trn on p_alloc.trngantts_id = pare_trn.id 
                                                         and pare_trn.paretblname = p_alloc.srctblname and pare_trn.paretblid = p_alloc.srctblid
@@ -151,52 +152,53 @@ class CreateOtherTableRecordJob < ApplicationJob
                                             inner join alloctbls c_alloc on gantt.id = c_alloc.trngantts_id 
                                                 --- c_alloc消費される子部品のalloctbls
                                             inner join opeitms ope on gantt.itms_id = ope.itms_id and gantt.processseq = ope.processseq     
-                                                where (c_alloc.qty > c_alloc.qty_linkto_alloctbl or c_alloc.qty_stk >  c_alloc.qty_linkto_alloctbl)
+                                                where ((c_alloc.qty - c_alloc.qty_linkto_alloctbl) > 0 and c_alloc.srctblname like '%schs') or
+                                                        ( c_alloc.qty_linkto_alloctbl > 0 and c_alloc.srctblname not like '%schs') 
                                                 and gantt.orgtblname = gantt.paretblname and gantt.orgtblid = gantt.paretblid
                                                 and (gantt.tblname != gantt.paretblname or gantt.tblid != gantt.paretblid)
                                                 for update    
-                           %
-                            ActiveRecord::Base.connection.select_all(strsql).each do |rec|
-                                consumtype = (rec["consumtype"]||="")
-                                consumtype = consumtype.gsub(" ","")
-                                case consumtype
+                           &
+                        ActiveRecord::Base.connection.select_all(strsql).each do |rec|
+                            consumtype = (rec["consumtype"]||="")
+                            consumtype = consumtype.gsub(" ","")
+                            case consumtype
                                 when "con" ###子部品の消費
-                                    Operation.proc_consume_child_parts rec,act_qty,req["tblname"],req["tblid"]
+                                    Operation.proc_consume_child_parts rec,act_qty,processreq["tblname"],processreq["tblid"]
                                 when "" ###子部品の消費
-                                    Operation.proc_consume_child_parts rec,act_qty,req["tblname"],req["tblid"]
-                                end
+                                    Operation.proc_consume_child_parts rec,act_qty,processreq["tblname"],processreq["tblid"]
                             end
+                        end
 
                     when "consume_self_sch_parts"  ###qty_sch消費予定 ・・・
                             ###schs -->新規時親から作成するので親登録時には、まだ子供のtrnganttsはないので子供作成時に、消費を作成する。
-                            strsql =%Q% select gantt.*  from trngantts gantt 
-                                                where gantt.tblname = '#{req["tblname"]}' and gantt.tblid = #{req["tblid"]}
+                            strsql =%Q& select gantt.*  from trngantts gantt 
+                                                where gantt.tblname = '#{processreq["tblname"]}' and gantt.tblid = #{processreq["tblid"]}
                                                 and (gantt.tblname != gantt.paretblname or gantt.tblid != gantt.paretblid )
-                                                and (gantt.qty > 0 or gantt.qty_stk >0) for update
-                           %
+                                                and gantt.tblname like '%schs'
+                                                and (gantt.paretblname like 'prd%' or gantt.paretblname like 'pur%') 
+                                                and (gantt.qty - gantt.qty_linkto_alloctbl ) > 0 
+                                                and (gantt.qty - gantt.qty_alloc) > 0 for update
+                            &
                             ActiveRecord::Base.connection.select_all(strsql).each do |rec|
-                                
-                                consumtype = (rec["consumtype"]||="")
-                                consumtype = consumtype.gsub(" ","")
-                                consumtype = consumtype.gsub("","con")
+                                consumtype = (rec["consumtype"]||="con")
                                 case consumtype  ###
                                 when "con" ###子部品消費
                                     ###消費
-                                    Operation.proc_consume_self_sch_parts rec,req["paretblname"],parent
+                                    Operation.proc_consume_self_sch_parts rec,processreq["paretblname"],parent
                                 end
                             end
                     
                     when "consume_self_ord_parts"  ###ords,insts 自身の消費予定 ・・・
                             ###schs -->新規時親から作成するのでまだ子供のtrnganttsはないので子供作成時に、消費を作成する。
-                            strsql =%Q& select t2.itms_id ,t2.processseq,t2.prjnos_id ,
-                                            a2.srctblname,((a2.qty + a2.qty_stk) - (a2.qty_alloc + a2.qty_linkto_alloctbl )) qty,
+                            strsql =%Q& 
+                                        select t2.itms_id ,t2.processseq,t2.prjnos_id ,
+                                            a2.srctblname,((a2.qty + a2.qty_stk) - (a2.qty_alloc + a2.qty_linkto_alloctbl) ) qty,
                                             a2.id alloctbls_id,
                                             t2.paretblname,t2.paretblid,t2.expiredate
                                             from trngantts t2 
                                             inner join alloctbls a2 	on t2.id = a2.trngantts_id 
-                                            where a2.srctblname = '#{req["tblname"]}'  and a2.srctblid = #{req["tblid"]}
-                                            and		(a2.qty + a2.qty_stk) > (a2.qty_alloc + a2.qty_linkto_alloctbl )
-                                            and (t2.consumtype = 'con' or  t2.consumtype = '' or t2.consumtype is null) 
+                                            where a2.srctblname = '#{processreq["tblname"]}'  and a2.srctblid = #{processreq["tblid"]}
+                                            and		a2.qty  > (a2.qty_alloc + a2.qty_linkto_alloctbl) 
                                             and (t2.paretblname != t2.tblname or t2.paretblid != t2.tblid) 
                                             and t2.paretblname = t2.orgtblname and t2.paretblid = t2.orgtblid
                                             and t2.paretblname not like '%acts'  ---actsは除く"consume_child_parts"で対応
@@ -204,51 +206,58 @@ class CreateOtherTableRecordJob < ApplicationJob
                                             and t2.paretblname not like 'cust%'  
                                 &
                             ActiveRecord::Base.connection.select_all(strsql).each do |stkinout|
-                                Operation.proc_consume_self_ord_parts stkinout
+                                consumtype = (stkinout["consumtype"]||="con")
+                                case consumtype  ###
+                                when "con" ###子部品消費
+                                    ###消費
+                                    Operation.proc_consume_self_ord_parts stkinout
+                                end
                             end
                     when "consume_exception"
-                            ###出庫の前の完成　完成時の員数可変による消費数対応
+                            ###出庫の前の完成,完成時の員数可変による消費数対応
 
                     
                     when "mk_shpsch_by_prd_pursch"  ###qty_sch 自身の出庫 ・・・
                         ###schs -->新規時親から作成するので親登録時には、まだ子供のtrnganttsはないので子供作成時に、出庫を作成する。
                         strsql =%Q% select gantt.*,alloc.id alloc_id  from trngantts  gantt
                                                     inner join alloctbls alloc on gantt.id = alloc.trngantts_id 
-                                                    where alloc.srctblname = '#{req["tblname"]}' and alloc.srctblid = #{req["tblid"]}
-                                                    and (gantt.orgtblname = gantt.paretblname and gantt.orgtblid = gantt.paretblid)
+                                                    where alloc.srctblname = '#{processreq["tblname"]}' and alloc.srctblid = #{processreq["tblid"]}
                                                     and (gantt.tblname != gantt.paretblname or gantt.tblid != gantt.paretblid)
-                                                    and (alloc.qty + alloc.qty_stk - alloc.qty_linkto_alloctbl - alloc.qty_alloc) > 0
+                                                    ----and (alloc.qty - alloc.qty_linkto_alloctbl - alloc.qty_alloc) > 0
+                                                    ---child_trngantts でxxxordsを作成済　 alloc.qty_linkto_alloctbl > 0
                                                     for update
                                %
                         ActiveRecord::Base.connection.select_all(strsql).each do |rec|                                
-                            consumtype = (rec["consumtype"]||="")
-                            consumtype = consumtype.gsub(" ","")
-                            consumtype = consumtype.gsub("","con")
-                            req["alloc_id"] = rec["alloc_id"]
+                            consumtype = (rec["consumtype"]||="con")
+                            consumtype = consumtype.gsub(/\s+/,"con")
+                            processreq["alloc_id"] = rec["alloc_id"]
                             strsql = %Q& select locas_id_shelfno  from shelfnos shelf where shelf.id = #{tbldata["shelfnos_id_to"]}
                                     &
                             locas_id_shelfno = ActiveRecord::Base.connection.select_value(strsql)
-                            case req["paretblname"]
+                            case processreq["paretblname"]
                                 when /^prd/
                                         pare_loca_id = parent["workplace_loca_id_workplace"]
                                 when /^pur/      
-                                        pare_loca_id = parent["supplier_locas_id_supplier"]
+                                        pare_loca_id = parent["supplier_loca_id_supplier"]
                                 when /^cust/      
                                         pare_loca_id = parent["cust_loca_id_cust_custrcvplc"]
                             end 
                             case consumtype  ###
                                 when "con" ###消費のための子部品出庫
                                     if locas_id_shelfno != pare_loca_id 
-                                        case  req["paretblname"]
+                                        case  processreq["paretblname"]
                                             when /schs$/
-                                                Operation.proc_create_shp req,email,pare_loca_id,parent,tbldata["shelfnos_id_to"] do
+                                                Operation.proc_create_shp processreq,email,pare_loca_id,parent,tbldata["shelfnos_id_to"] do
                                                     "sch"
                                                 end
                                             when  /ords$/   
-                                                Operation.proc_create_shp req,email,pare_loca_id,parent,tbldata["shelfnos_id_to"] do
+                                                Operation.proc_create_shp processreq,email,pare_loca_id,parent,tbldata["shelfnos_id_to"] do
                                                     "ord"
-                                                end  
-                                                Operation.proc_reset_shp req,reqparams
+                                                end
+                                                ##
+                                                ##  alloctblsの変化で対応
+                                                ##  
+                                               ### Operation.proc_reset_shp processreq,reqparams
                                         end
                                     end
                             end
@@ -257,34 +266,19 @@ class CreateOtherTableRecordJob < ApplicationJob
                         result_f = '6'
                         remark = " program nothing for #{reqparams["segment"]} "  
                     end ## process   
-                    strsql = %Q%update processreqs set result_f = '#{result_f}',remark = '#{remark}' where id = #{req["id"]}
+                    strsql = %Q%update processreqs set result_f = '#{result_f}',remark = '#{remark}' where id = #{processreq["id"]}
                     %
                     ActiveRecord::Base.connection.update(strsql)
-                    loopcnt = 0
-                else    
-                    loopcnt += 1
-                    if loopcnt > 10
-                        Rails.logger.debug"error waiting "
-                        Rails.logger.debug"error waiting "
-                        Rails.logger.debug"error waiting"
-                        Rails.logger.debug"error strsql #{check_strsql} :  "
-                        Rails.logger.debug"error req #{req} :  "
-                        raise
-                    end    
-                    wait_strsql = "select * from  processreqs t 
-                                        where  t.seqno = #{pid} and t.id < #{req["id"]}
-                                        and (c.result_f = '0' or c.result_f = '5')
-                                        for update "
-                    check = ActiveRecord::Base.connection.select_one(check_strsql)
-                    Rails.logger.debug" waiting "
-                end
-                req = ActiveRecord::Base.connection.select_one(perform_strsql)
-            end 
+                end    
+                check_strsql = "select id from  processreqs t 
+                                where t.result_f = '0'  and t.seqno = #{pid} "
+                check = ActiveRecord::Base.connection.select_one(check_strsql)
+            end
         rescue
             ActiveRecord::Base.connection.rollback_db_transaction()
             ActiveRecord::Base.connection.begin_db_transaction()
-            if req 
-                strsql = %Q%update processreqs set result_f = '5'  where seqno = #{pid} and id < #{req["id"]}
+            if processreq 
+                strsql = %Q%update processreqs set result_f = '5'  where seqno = #{pid} and id < #{processreq["id"]}
                 %
                 ActiveRecord::Base.connection.update(strsql)
             end
@@ -294,12 +288,12 @@ class CreateOtherTableRecordJob < ApplicationJob
             Rails.logger.debug"error rollback "
             Rails.logger.debug"error class #{self} : #{Time.now}: #{$@} "
             Rails.logger.debug"error class #{self} : $!: #{$!} "
-            if req
-                strsql = %Q%update processreqs set result_f = '9'  where seqno = #{pid} and id = #{req["id"]}
+            if processreq
+                strsql = %Q%update processreqs set result_f = '9'  where seqno = #{pid} and id = #{processreq["id"]}
                 %
                 ActiveRecord::Base.connection.update(strsql)
 
-                strsql = %Q%update processreqs set result_f = '8'  where seqno = #{pid} and id > #{req["id"]}
+                strsql = %Q%update processreqs set result_f = '8'  where seqno = #{pid} and id > #{processreq["id"]}
                 %
                 ActiveRecord::Base.connection.update(strsql)
             end
@@ -311,9 +305,6 @@ class CreateOtherTableRecordJob < ApplicationJob
     
     #############修正要
     def chk_custords_alloc  tbldata  ###引き当てるcustschsを検索
-        ###strsql = %Q%select * from trngantts where id = #{orgReqParams["trngantts_id"]}
-        ###%
-        ###trn =  ActiveRecord::Base.connection.select_one(strsql)
         ###同一品目(processseqを含む)、同一出庫場所(棚は無視),同一プロジェクト
         strsql = %Q%select a.* from trngantts a
             inner join custschs b  on a.orgtblid = b.id 
@@ -323,7 +314,7 @@ class CreateOtherTableRecordJob < ApplicationJob
             and a.orgtblid = a.paretblid  and a.paretblid = a.tblid
             and  b.opeitms_id = #{tbldata["opeitms_id"]} 
             --- and  b.locas_id_fm = #{tbldata["locas_id_fm"]}  ---場所の違いは無視した
-            and (a.qty + a.qty_stk - a.qty_linkto_alloctbl > 0) order by a.duedate
+            and (a.qty - a.qty_linkto_alloctbl > 0) order by a.duedate
             for update
         %
         recs = ActiveRecord::Base.connection.select_all(strsql)
@@ -336,7 +327,7 @@ class CreateOtherTableRecordJob < ApplicationJob
                 ActiveRecord::Base.connection.update(strsql)
                 key += 1
                 trn["key"] = format("%05d",key)
-                gantt = {"id"=>orgReqParams["trngantts_id"],"qty_linkto_alloctbl"=>0}
+                gantt = {"id"=>rec["id"],"qty_linkto_alloctbl"=>0}
                 Operation.xxxxxxxxxxxxx
                 break if qty <= 0
             else
@@ -378,20 +369,21 @@ class CreateOtherTableRecordJob < ApplicationJob
  
 	###schsの追加	paretblname =~ /schs$|ords$/の時呼ばれる 
 	def add_update_table_from_nditm  child,parent,paretblname ### id processreqsのid child-->nditms  parent ===> r_prd,pur XXXs
-		opeitm  = Operation.proc_get_opeitms_rec(child["itms_id_nditm"],nil,child["processseq_nditm"],nil)
+		opeitm  = Operation.proc_get_opeitms_rec(child["itms_id_nditm"],nil,child["processseq_nditm"],999)
 		command_r = ControlFields.proc_fields_update parent,paretblname do |command_c,para|
 			command_c[:sio_viewname] =  "r_"+ opeitm["prdpurshp"]+"schs" 
 			command_c["id"]=""
-			command_c["opeitm_loca_id"]= opeitm["locas_id"]
+			command_c["opeitm_loca_id"] = opeitm["locas_id"]
 			para["opeitms_id"] = opeitm["id"]
 			para["duration"] =  opeitm["duration"].to_f
+			para["packqty"] =  opeitm["packqty"].to_f
+			para["shelfnos_id_to"] = opeitm["shelfnos_id"]
+			para["locas_id"] = opeitm["locas_id"]  ###発注の時の作業場所
 			para["parenum"] = child["parenum"].to_f
 			para["chilnum"] = child["chilnum"].to_f
 			para["locas_id_fm"] = child["locas_id_fm"]
 			para["consumunitqty"] = child["consumunitqty"].to_f
 			para["consumminqty"] = child["consumminqty"].to_f
-			para["shelfnos_id_to"] = opeitm["shelfnos_id"]
-			para["locas_id"] = opeitm["locas_id"]  ###発注の時の作業場所
 			para["crrs_id_pur"] = child["crrs_id"]  ###発注の時の作業場所
 		end
 		return command_r,opeitm
