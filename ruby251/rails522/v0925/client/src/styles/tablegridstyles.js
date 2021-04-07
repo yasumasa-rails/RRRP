@@ -118,4 +118,5 @@ ${'' /* These styles are required for a horizontaly scrollable table overflow */
 .error {
   background: red;
 }
+
 `

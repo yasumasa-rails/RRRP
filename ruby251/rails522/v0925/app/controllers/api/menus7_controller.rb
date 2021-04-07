@@ -110,7 +110,7 @@ module Api
                   end    
                 end	
                 if  rparams[:err] == ""
-                  command_c =  RorBlkctl.init_from_screen rparams[:uid],rparams[:screenCode]
+                  command_c =  RorBlkctl.proc_init_from_screen rparams[:uid],rparams[:screenCode]
                   parse_linedata = rparams[:parse_linedata].dup
                   parse_linedata.each do |key,val|
                       if key.to_s =~ /_id/ and val == ""   and tblnamechop == key.to_s.split("_")[0] and
@@ -176,6 +176,18 @@ module Api
                     rparams[:parse_linedata][(tblnamechop+"_id").to_sym] = command_c[tblnamechop+"_id"]
                     rparams[:parse_linedata][:confirm] = true  
                     rparams[:parse_linedata][("confirm_gridmessage").to_sym] = "done"
+                    if $materiallized[tblnamechop+"s"]
+                      $materiallized[tblnamechop+"s"].each do |view|
+                        strsql = %Q%select 1 from pg_catalog.pg_matviews pm 
+                              where matviewname = '#{view}' %
+                        if ActiveRecord::Base.connection.select_one(strsql)			
+                              strsql = %Q%REFRESH MATERIALIZED VIEW #{view} %
+                              ActiveRecord::Base.connection.execute(strsql)
+                        else
+                              3.times{p "materiallized error :#{view}"}
+                        end
+                      end
+                    end
                   end
                 end 
                 render json: {:linedata=> rparams[:parse_linedata]}
@@ -192,7 +204,7 @@ module Api
                 render json:{:excelData=>{:columns=>download_columns_info["columns_info"],:data=>pagedata},:totalCount=>params[:totalCount]}    
 
             when 'mkshpinsts'  ###shpordsは作成済が条件
-                outcnt,shortcnt,err = ScreenLib.proc_mkshpinsts params[:screenCode],params[:clickIndex]
+                outcnt,shortcnt,err = Shipment.proc_mkshpinsts params[:screenCode],params[:clickIndex]
                 render json:{:outcnt=>outcnt,:shortcnt=>shortcnt,:err=>err}    
             
             when 'mkshpacts'
@@ -203,7 +215,7 @@ module Api
                 req = params[:req] = "inlineedit7"
                 screenCode = params[:screenCode] = "foract_shpinsts"   ###shpinstsがshpactsに変わるため
                 ScreenLib.proc_create_grid_editable_columns_info current_api_user[:email],params,grid_columns_info
-                pagedata = ScreenLib.proc_mkshpacts params,grid_columns_info
+                pagedata = Shipment.proc_mkshpacts params,grid_columns_info
                 render json:{:grid_columns_info=>grid_columns_info,:data=>pagedata,:params=>params}  
             
             when 'refshpacts'
@@ -214,13 +226,13 @@ module Api
                 req = params[:req] = "'viewtablereq7'"
                 screenCode = params[:screenCode] = "r_shpacts"   ###shpinstsがshpactsに変わるため
                 ScreenLib.proc_create_grid_editable_columns_info current_api_user[:email],params,grid_columns_info
-                pagedata = ScreenLib.proc_refshpacts params,grid_columns_info
+                pagedata = Shipment.proc_refshpacts params,grid_columns_info
                 render json:{:grid_columns_info=>grid_columns_info,:data=>pagedata,:params=>params}
   
             when 'confirm_all'  ###チェック済が条件
                 case params[:screenCode]
                 when "foract_shpinsts"
-                    outcnt,shortcnt,err = ScreenLib.proc_shpact_confirmall params
+                    outcnt,shortcnt,err = Shipment.proc_shpact_confirmall params
                     render json:{:outcnt=>outcnt,:err=>err}  
                 end  
             else

@@ -53,55 +53,93 @@ module GanttChart
         ## opeitmのsubtblidのopeitmは子のinsert用
         @ganttdata = strgantt.chop + %Q|],"selectedRow":0,"deletedTaskIds":[],"canWrite":true,"canWriteOnParent":true }|
     end
-	def sql_proc_trn_gantt trn_code,id   ###opeitms_idはない。
+	def sql_trn_gantt_alloctbl orgtblname,orgtblid   ###opeitms_idはない。
 	    ### a.trngantt 引当て先　　b.trngantt オリジナル
-        %Q& select a.trngantt_key,a.ITM_CODE,a.ITM_NAME,a.LOCA_CODE,a.loca_name,a.trngantt_prdpurshp prdpurshp,
-                            alloctbl_destblname,alloctbl_destblid,max(trngantt_depends) trngantt_depends,
-							a.itm_id,a.loca_id,max(a.trngantt_parenum) parenum,max(a.trngantt_chilnum) chilnum,max(a.trngantt_duration) duration,
-							max(a.trngantt_processseq) processseq,max(a.trngantt_priority) priority,
-							min(a.TRNGANTT_starttime) org_starttime,max(a.TRNGANTT_MLEVEL) mlevel,
-							max(a.TRNGANTT_dueDATE) org_duedate,max(a.trngantt_qty + a.trngantt_qty_stk) qty,
-							sum(case  when b.alloctbl_destblname like '%schs' then  b.alloctbl_qty else 0 end) qty_alloc_sch,
-							sum(case  when b.alloctbl_destblname like '%ords' then  b.alloctbl_qty else 0 end) qty_alloc_ord,
-							sum(case  when b.alloctbl_destblname like '%insts' then  b.alloctbl_qty else 0 end) qty_alloc_inst,
-							sum(case  when b.alloctbl_destblname like '%act%' then  b.alloctbl_qty else 0 end) qty_alloc_act,
-							sum(case  when b.alloctbl_destblname like '%lotstk%' then  b.alloctbl_qty_stk   else 0 end) qty_alloc_stk,
-							sum(case  when b.alloctbl_destblname like 'cons%' then  b.alloctbl_qty   else 0 end) qty_alloc_cons,
-							a.trngantt_orgtblname,a.trngantt_orgtblid
-                      from r_trngantts a
-					  left join r_alloctbls b on a.trngantt_id = b.alloctbl_srctblid and b.alloctbl_srctblname = 'trngantts' and b.alloctbl_allocfree in('alloc','free')
-					  and (b.alloctbl_qty != 0 or b.alloctbl_qty_stk !=  0 or b.alloctbl_destblname = 'lotstkhists' )
-					  where   a.trngantt_orgtblname = '#{trn_code}' and a.trngantt_orgtblid = #{id}
-					  group by a.trngantt_key,a.ITM_CODE,a.ITM_NAME,a.LOCA_CODE,a.loca_name,a.trngantt_orgtblname,a.trngantt_orgtblid,
-								alloctbl_destblname,alloctbl_destblid,a.trngantt_prdpurshp,a.itm_id,a.loca_id
-					  order by a.trngantt_key&
+        %Q& select trn.*,alloc.tblname alloc_tblname,alloc.tblid alloc_tblid,alloc.srctblname,alloc.srctblid,
+					case 
+					when alloc.srctblname like '%schs' then
+						alloc.qty_sch - alloc.qty_linkto_alloctbl
+					when alloc.srctblname like '%acts' then
+						alloc.qty_stk - alloc.qty_linkto_alloctbl
+					else
+						alloc.qty - alloc.qty_linkto_alloctbl
+					end qty_bal		
+	  			from trngantts trn
+	  				inner join alloctbls alloc on trn.id = alloc.trngantts_id
+	  				where   trn.orgtblname = '#{orgtblname}' and trn.orgtblid = #{orgtblid}
+	  				and (trn.qty_sch + trn.qty + trn.qty_stk) > trn.qty_alloc
+	  				and (alloc.qty_sch + alloc.qty + trn.qty_stk) > alloc.qty_linkto_alloctbl
+					and (trn.orgtblname != trn.tblname or trn.orgtblid != trn.tblid)   --- topは除く 
+	  				order by trn.key&
 	end
-    def  proc_trn_gantt  trn_code,id
-		trn_gantts = ActiveRecord::Base.connection.select_all(sql_proc_trn_gantt(trn_code,id))
+
+    def  proc_trn_gantt  orgtblname,orgtblid,gantts,gkey,idx
+		ActiveRecord::Base.connection.select_all(sql_trn_gantt_alloctbl(orgtblname,orgtblid)).each do |trn|
+			break if idx > 1000
+			gantts[gkey+trn["key"]] = trn
+			tblname,tblid = get_ordtbl_ordid(trn["srctblname"],trn["srctblid"])
+			gantts,idx = proc_trn_gantt(tblname,tblid,gkey+trn["key"],idx)
+			idx += 1
+		end	
+		return gantts,idx
+	end
+
+	def get_ordtbl_ordid tblname,tblid
+		until tblname =~ /ords$/
+			strsql %Q&select srctblname,srctblid from srctbls 
+										where tblname = '#{tblname} and tblid = #{tblid}		
+			&
+			ord = ActiveRecord::Base.connection.select_one(strsql)
+			tblid = ord["srctblid"]
+			tblname = ord["srctblname"]
+		end	
+		retuen tblname,tblid
+	end
+
+	def aaa orgtblname,orgtblid
+		gantts = {}
+		idx = 0
+		gkey = ""
+		gantts,idx = proc_trn_gantt(orgtblname,orgtblid,gantts,gkey,idx)
 		@bgantts = {}
 		save_pare_key = {}
-		trn_gantts.each_with_index do |value,idx|
-			break if idx > 10000
-			if value["alloctbl_destblname"]
-				alloc =  proc_get_viewrec_from_id(value["alloctbl_destblname"],value["alloctbl_destblid"])
-				alloc["#{value["alloctbl_destblname"].chop}_sno"] = "Done" if 	value["alloctbl_destblname"] == "lotstkhists"
-			end
-			@bgantts[sprintf("%04d",idx)] = {:id=>(idx).to_s,
-														:itm_id=>value["itm_id"],:itm_code=>value["itm_code"],:itm_name=>value["itm_name"],
-			                                            :loca_code=>if value["alloctbl_destblname"] == "lotstkhists" then alloc["loca_code_to"] else value["loca_code"] end,
-														:loca_name=>if value["alloctbl_destblname"] == "lotstkhists" then alloc["loca_name_to"] else value["loca_name"] end,
-														:loca_id=>value["loca_id"],
-														:parenum=>value["parenum"],:chilnum=>value["chilnum"],
-                            :duration=>if value["alloctbl_destblname"][0..2] == value["prdpurshp"] then value["duration"] else 1 end,
-														:sno=>alloc["#{value["alloctbl_destblname"].chop}_sno"],:qty=>"#{value["qty"]||=0}",
-														:qty_sch=>"#{value["qty_alloc_sch"]||=0}",:qty_ord=>"#{value["qty_alloc_ord"]||=0}",
-														:qty_inst=>"#{value["qty_alloc_inst"]||=0}",:qty_stk=>"#{(value["qty_alloc_stk"]||=0)+(value["qty_alloc_act"]||=0)}",
-														:starttime=> value["org_starttime"],:org_start=>(value["org_starttime"].to_i * 1000),
-														:processseq=>"#{value["processseq"]}",:priority=>"#{value["priority"]}",:prdpurshp=>"#{value["alloctbl_destblname"]}",
-                            :duedate=>value["org_duedate"],:org_end=>(value["org_duedate"].to_i * 1000),"assigs"=>[],
-														:level=>if value["trngantt_key"] == '000' then 0 else 1 end,
-														:mlevel=>value["mlevel"],:subtblid=>"",:paretblcode=>"",:depends=>""}
-			case value["alloctbl_destblname"]
+		gantts.each do |key,value|    ### value=>trngantts   rec=>alloctblkの該当テーブルのview 
+			rec = RorBlkctl.prc_get_viewrec_by_tblname_tblid(value["alloc_tblname"],value["alloc_tblid"])
+			@bgantts[key] = {:id=>key,
+					:itm_id=>value["itms_id"],:itm_code=>rec["itm_code"],:itm_name=>rec["itm_name"],
+			        :loca_code=>case value["alloc_tblname"] 
+								when /^pur/
+									rec["loca_code_supplier"]
+								when /^prd/
+									rec["loca_code_workplace"]
+								end,
+					:loca_name=>case value["alloc_tblname"] 
+								when /^pur/
+									rec["loca_name_supplier"]
+								when /^prd/
+									rec["loca_name_workplace"]
+								end,
+					:loca_id=>value["locas_id"],
+					:parenum=>value["parenum"],:chilnum=>value["chilnum"],
+                    :duration=>value["duration"],
+					:sno=>rec["#{value["alloc_tblname"].chop}_sno"],
+					:qty=>(rec["#{value["alloc_tblname"].chop}_qty"]||=0),
+					:qty_sch=>(rec["#{value["alloc_tblname"].chop}_qty_sch"]||=0),
+					:qty_stk=>(rec["#{value["alloc_tblname"].chop}_qty_stk"]||=0),
+					:starttime=> value["starttime"],
+					:processseq=>value["processseq"],
+                    :org_duedate=>value["duedate"],
+					:duedate=>case value["alloc_tblname"] 
+								when /purschs|purords|purinsts|prdschs|prdords|prdinsts/
+									rec["#{value["alloc_tblname"].chop}_duedate"]
+								when /puracts/
+									rec["puract_rcptdate"]
+								when /prdacts/
+									rec["prdact_cmpldate"]
+								end,
+					:assigs=>[],
+					:mlevel=>value["mlevel"],:subtblid=>"",:paretblcode=>"",:depends=>""}
+			case value["srctblname"]
 				when /^cust/
 					@bgantts[sprintf("%04d",idx)][:loca_code] = alloc["loca_code_cust"]
 					@bgantts[sprintf("%04d",idx)][:loca_name] = alloc["loca_name_cust"]
@@ -114,13 +152,7 @@ module GanttChart
 					@bgantts[sprintf("%04d",idx)][:loca_id] = alloc["#{value["alloctbl_destblname"].chop}_loca_id_to"]
 					@bgantts[sprintf("%04d",idx)][:starttime] = alloc["#{value["alloctbl_destblname"].chop}_depdate"]
 					@bgantts[sprintf("%04d",idx)][:duedate] = alloc["#{value["alloctbl_destblname"].chop}_duedate"]
-				when /^shp/
-					@bgantts[sprintf("%04d",idx)][:loca_code] = alloc["loca_code"]
-					@bgantts[sprintf("%04d",idx)][:loca_name] = alloc["loca_name"]
-					@bgantts[sprintf("%04d",idx)][:loca_id] = alloc["#{value["alloctbl_destblname"].chop}_loca_id"]
-					@bgantts[sprintf("%04d",idx)][:starttime] = alloc["#{value["alloctbl_destblname"].chop}_depdate"]
-					@bgantts[sprintf("%04d",idx)][:duedate] = alloc["#{value["alloctbl_destblname"].chop}_duedate"]
-				when /^prd|^pur|^ipr|^con/
+				when /^prd|^pur/
 					@bgantts[sprintf("%04d",idx)][:loca_code] = alloc["loca_code"]
 					@bgantts[sprintf("%04d",idx)][:loca_name] = alloc["loca_name"]
 					@bgantts[sprintf("%04d",idx)][:loca_id] = alloc["#{value["alloctbl_destblname"].chop}_loca_id"]
@@ -132,19 +164,6 @@ module GanttChart
 						when /^puracts|^ipracts/
 							@bgantts[sprintf("%04d",idx)][:duedate] = alloc["puract_rcptdate"]
 					end
-				when /^pic/
-					@bgantts[sprintf("%04d",idx)][:loca_code] = alloc["loca_code"]
-					@bgantts[sprintf("%04d",idx)][:loca_name] = alloc["loca_name"]
-					@bgantts[sprintf("%04d",idx)][:loca_id] = alloc["#{value["alloctbl_destblname"].chop}_loca_id"]
-					@bgantts[sprintf("%04d",idx)][:starttime] = alloc["#{value["alloctbl_destblname"].chop}_isudate"]
-					@bgantts[sprintf("%04d",idx)][:duedate] = if value["alloctbl_destblname"] == "picacts" then
-                                                               alloc["picact_cmpldate"] else alloc["#{value["alloctbl_destblname"].chop}_duedate"] end
-				when /^lotstk/
-					@bgantts[sprintf("%04d",idx)][:loca_code] = alloc["loca_code"]
-					@bgantts[sprintf("%04d",idx)][:loca_name] = alloc["loca_name"]
-					@bgantts[sprintf("%04d",idx)][:loca_id] = alloc["#{value["alloctbl_destblname"].chop}_loca_id"]
-					@bgantts[sprintf("%04d",idx)][:starttime] = Time.now
-					@bgantts[sprintf("%04d",idx)][:duedate] = Time.now
 				else
 					##logger.debug"error class #{self}   #{Time.now}  alloctbl_destblname: #{value["alloctbl_destblname"]} "
 					##raise

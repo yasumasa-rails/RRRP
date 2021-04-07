@@ -449,7 +449,7 @@ CREATE UNIQUE INDEX POBJECTS_UKYS1 ON POBJECTS (CODE, OBJECTTYPE)
 ;
 CREATE  SEQUENCE  POBJECTS_SEQ  INCREMENT BY 1 START WITH 1000000
 ;
-CREATE OR REPLACE VIEW R_POBJECTS (POBJECT_CODE, POBJECT_OBJECTTYPE, POBJECT_EXPIREDATE, POBJECT_UPDATED_AT, POBJECT_REMARK, POBJECT_CREATED_AT,
+CREATE  MATERIALIZED view R_POBJECTS (POBJECT_CODE, POBJECT_OBJECTTYPE, POBJECT_EXPIREDATE, POBJECT_UPDATED_AT, POBJECT_REMARK, POBJECT_CREATED_AT,
 POBJECT_UPDATE_IP, ID, POBJECT_ID, POBJECT_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, POBJECT_CONTENTS) AS
 select
 pobject.code pobject_code
@@ -556,8 +556,7 @@ where
   
 CREATE  SEQUENCE BLKTBS_seq INCREMENT BY 1 START WITH 10000 
 ;
-  CREATE
-OR REPLACE  VIEW R_BLKTBS (
+  create MATERIALIZED VIEW R_BLKTBS (
   BLKTB_CONTENTS
   , ID  , BLKTB_ID  , BLKTB_POBJECT_ID_TBL  , POBJECT_CODE_TBL  , POBJECT_OBJECTTYPE_TBL  ,  POBJECT_ID_TBL
   , POBJECT_CONTENTS_TBL  , BLKTB_REMARK  , BLKTB_EXPIREDATE  , BLKTB_UPDATE_IP  , BLKTB_CREATED_AT  , BLKTB_UPDATED_AT
@@ -632,8 +631,8 @@ CREATE TABLE SCREENS
 CREATE  SEQUENCE  SCREENS_seq INCREMENT BY 1 START WITH 10000 
 ;
 
-  CREATE
-OR REPLACE  VIEW R_SCREENS (
+  drop MATERIALIZED view if exists R_SCREENS cascade;
+  create MATERIALIZED VIEW R_SCREENS (
   SCREEN_EXPIREDATE
   , SCREEN_UPDATED_AT
   , SCREEN_STRWHERE
@@ -678,6 +677,7 @@ OR REPLACE  VIEW R_SCREENS (
   , pobject_id_sgrp
   , pobject_contents_sgrp
   , screen_seqno
+  , screen_width
 ) AS
 select
   screen.expiredate screen_expiredate
@@ -724,6 +724,7 @@ select
   , pobject_sgrp.pobject_id pobject_id_sgrp
   , pobject_sgrp.pobject_contents pobject_contents_sgrp
   , screen.seqno screen_seqno
+  , screen.width screen_width
 from
   screens screen
   , r_pobjects pobject_view
@@ -771,8 +772,7 @@ CREATE  SEQUENCE  FIELDCODES_seq INCREMENT BY 1 START WITH 10000
 ;
 
   
-  CREATE
-OR REPLACE VIEW R_FIELDCODES (
+  create MATERIALIZED VIEW R_FIELDCODES (
   FIELDCODE_EXPIREDATE
   , FIELDCODE_UPDATED_AT
   , FIELDCODE_SEQNO
@@ -855,8 +855,7 @@ CREATE TABLE TBLFIELDS
 CREATE  SEQUENCE   TBLFIELDS_seq INCREMENT BY 1 START WITH 100000 
 ;
 
-  CREATE
-OR REPLACE  VIEW R_TBLFIELDS (
+  create MATERIALIZED  VIEW R_TBLFIELDS (
   TBLFIELD_CONTENTS
   , TBLFIELD_BLKTB_ID
   , BLKTB_CONTENTS
@@ -993,140 +992,98 @@ CREATE TABLE SCREENFIELDS
 CREATE  SEQUENCE   SCREENFIELDS_seq INCREMENT BY 1 START WITH 1000000 
 ;
 
-CREATE
-OR REPLACE  VIEW R_SCREENFIELDS (
-  SCREENFIELD_POBJECT_ID_SFD
-  , POBJECT_CODE_SFD
-  , POBJECT_OBJECTTYPE_SFD
-  , POBJECT_CONTENTS_SFD
-  , SCREENFIELD_EXPIREDATE
-  , SCREENFIELD_UPDATED_AT
-  , SCREENFIELD_EDOPTCOLS
-  , SCREENFIELD_EDOPTROW
-  , SCREENFIELD_WIDTH
-  , SCREENFIELD_INDISP
-  , SCREENFIELD_ROWPOS
-  , SCREENFIELD_SEQNO
-  , SCREENFIELD_HIDEFLG
-  , SCREENFIELD_MAXVALUE
-  , SCREENFIELD_EDITABLE
-  , SCREENFIELD_PARAGRAPH
-  , SCREENFIELD_SELECTION
-  , SCREENFIELD_CRTFIELD
-  , SCREENFIELD_EDOPTVALUE
-  , SCREENFIELD_SUBINDISP
-  , SCREENFIELD_TYPE
-  , SCREENFIELD_SUMKEY
-  , SCREENFIELD_REMARK
-  , SCREENFIELD_CREATED_AT
-  , SCREENFIELD_UPDATE_IP
-  , SCREENFIELD_EDOPTMAXLENGTH
-  , SCREENFIELD_DATASCALE
-  , SCREENFIELD_DATAPRECISION
-  , SCREENFIELD_MINVALUE
-  , SCREENFIELD_EDOPTSIZE
-  , SCREENFIELD_COLPOS
-  , ID
-  , SCREENFIELD_ID
-  , SCREENFIELD_FORMATTER
-  , SCREENFIELD_PERSON_ID_UPD
-  , PERSON_CODE_UPD
-  , PERSON_NAME_UPD
-  , SCREENFIELD_CONTENTS
-  , SCREENFIELD_SCREEN_ID
-  , SCREEN_STRWHERE
-  , SCREEN_ROWS_PER_PAGE
-  , SCREEN_ROWLIST
-  , SCREEN_HEIGHT
-  , POBJECT_CODE_VIEW
-  , POBJECT_OBJECTTYPE_VIEW
-  , POBJECT_CONTENTS_VIEW
-  , SCREEN_FORM_PS
-  , SCREEN_STRSELECT
-  , SCREEN_CDRFLAYOUT
-  , SCREEN_YMLCODE
-  , POBJECT_CODE_SCR
-  , POBJECT_OBJECTTYPE_SCR
-  , POBJECT_CONTENTS_SCR
-  , SCREEN_CONTENTS
-  , SCRLV_LEVEL1
-  , SCRLV_CODE
-  , SCREENFIELD_TBLFIELD_ID
-  , TBLFIELD_CONTENTS
-  , FIELDCODE_CONTENTS
-) AS
-select
-  screenfield.pobjects_id_sfd screenfield_pobject_id_sfd
-  , pobject_sfd.pobject_code pobject_code_sfd
-  , pobject_sfd.pobject_objecttype pobject_objecttype_sfd
-  , pobject_sfd.pobject_contents pobject_contents_sfd
-  , screenfield.expiredate screenfield_expiredate
-  , screenfield.updated_at screenfield_updated_at
-  , screenfield.edoptcols screenfield_edoptcols
-  , screenfield.edoptrow screenfield_edoptrow
-  , screenfield.width screenfield_width
-  , screenfield.indisp screenfield_indisp
-  , screenfield.rowpos screenfield_rowpos
-  , screenfield.seqno screenfield_seqno
-  , screenfield.hideflg screenfield_hideflg
-  , screenfield.maxvalue screenfield_maxvalue
-  , screenfield.editable screenfield_editable
-  , screenfield.paragraph screenfield_paragraph
-  , screenfield.selection screenfield_selection
-  , screenfield.crtfield screenfield_crtfield
-  , screenfield.edoptvalue screenfield_edoptvalue
-  , screenfield.subindisp screenfield_subindisp
-  , screenfield.type screenfield_type
-  , screenfield.sumkey screenfield_sumkey
-  , screenfield.remark screenfield_remark
-  , screenfield.created_at screenfield_created_at
-  , screenfield.update_ip screenfield_update_ip
-  , screenfield.edoptmaxlength screenfield_edoptmaxlength
-  , screenfield.datascale screenfield_datascale
-  , screenfield.dataprecision screenfield_dataprecision
-  , screenfield.minvalue screenfield_minvalue
-  , screenfield.edoptsize screenfield_edoptsize
-  , screenfield.colpos screenfield_colpos
-  , screenfield.id id
-  , screenfield.id screenfield_id
-  , screenfield.formatter screenfield_formatter
-  , screenfield.persons_id_upd screenfield_person_id_upd
-  , person_upd.person_code_upd person_code_upd
-  , person_upd.person_name_upd person_name_upd
-  , screenfield.contents screenfield_contents
-  , screenfield.screens_id screenfield_screen_id
-  , screen.screen_strwhere screen_strwhere
-  , screen.screen_rows_per_page screen_rows_per_page
-  , screen.screen_rowlist screen_rowlist
-  , screen.screen_height screen_height
-  , screen.pobject_code_view pobject_code_view
-  , screen.pobject_objecttype_view pobject_objecttype_view
-  , screen.pobject_contents_view pobject_contents_view
-  , screen.screen_form_ps screen_form_ps
-  , screen.screen_strselect screen_strselect
-  , screen.screen_cdrflayout screen_cdrflayout
-  , screen.screen_ymlcode screen_ymlcode
-  , screen.pobject_code_scr pobject_code_scr
-  , screen.pobject_objecttype_scr pobject_objecttype_scr
-  , screen.pobject_contents_scr pobject_contents_scr
-  , screen.screen_contents screen_contents
-  , screen.scrlv_level1 scrlv_level1
-  , screen.scrlv_code scrlv_code
-  , screenfield.TBLFIELDS_id
-  , TBLFIELD.TBLFIELD_contents
-  , TBLFIELD.fieldcode_contents
-from
-  screenfields screenfield
-  , r_pobjects pobject_sfd
-  , upd_persons person_upd
-  , r_screens screen
-  , R_TBLFIELDS TBLFIELD
-where
-  pobject_sfd.id = screenfield.pobjects_id_sfd
-  and person_upd.id = screenfield.persons_id_upd
-  and screen.id = screenfield.screens_id
-  AND TBLFIELD.ID = SCREENFIELD.TBLFIELDS_ID
+drop  MATERIALIZED  view if exists r_screenfields cascade;  
+ create MATERIALIZED  view r_screenfields as select  
+screenfield.width  screenfield_width,
+  screen.pobject_objecttype_scr  pobject_objecttype_scr ,
+screenfield.id  screenfield_id,
+  screen.screen_form_ps  screen_form_ps ,
+  screen.pobject_contents_view  pobject_contents_view ,
+screenfield.contents  screenfield_contents,
+screenfield.created_at  screenfield_created_at,
+screenfield.update_ip  screenfield_update_ip,
+screenfield.updated_at  screenfield_updated_at,
+  screen.screen_strwhere  screen_strwhere ,
+  screen.screen_contents  screen_contents ,
+  screen.scrlv_level1  scrlv_level1 ,
+screenfield.crtfield  screenfield_crtfield,
+  screen.screen_strselect  screen_strselect ,
+  screen.screen_cdrflayout  screen_cdrflayout ,
+  screen.screen_ymlcode  screen_ymlcode ,
+screenfield.sumkey  screenfield_sumkey,
+  screen.screen_strgrouporder  screen_strgrouporder ,
+  tblfield.pobject_id_tbl  pobject_id_tbl ,
+  tblfield.pobject_id_fld  pobject_id_fld ,
+  screen.screen_id  screen_id ,
+  pobject_sfd.pobject_id  pobject_id_sfd ,
+  tblfield.tblfield_id  tblfield_id ,
+screenfield.indisp  screenfield_indisp,
+screenfield.hideflg  screenfield_hideflg,
+screenfield.selection  screenfield_selection,
+  screen.pobject_objecttype_view  pobject_objecttype_view ,
+  screen.pobject_code_view  pobject_code_view ,
+  screen.pobject_contents_scr  pobject_contents_scr ,
+  screen.pobject_code_scr  pobject_code_scr ,
+screenfield.editable  screenfield_editable,
+  screen.scrlv_code  scrlv_code ,
+  pobject_sfd.pobject_code  pobject_code_sfd ,
+screenfield.edoptvalue  screenfield_edoptvalue,
+screenfield.paragraph  screenfield_paragraph,
+screenfield.edoptcols  screenfield_edoptcols,
+screenfield.edoptmaxlength  screenfield_edoptmaxlength,
+screenfield.datascale  screenfield_datascale,
+screenfield.dataprecision  screenfield_dataprecision,
+screenfield.remark  screenfield_remark,
+screenfield.type  screenfield_type,
+screenfield.minvalue  screenfield_minvalue,
+screenfield.edoptsize  screenfield_edoptsize,
+screenfield.expiredate  screenfield_expiredate,
+screenfield.edoptrow  screenfield_edoptrow,
+screenfield.maxvalue  screenfield_maxvalue,
+screenfield.subindisp  screenfield_subindisp,
+screenfield.persons_id_upd   screenfield_person_id_upd,
+screenfield.screens_id   screenfield_screen_id,
+screenfield.rowpos  screenfield_rowpos,
+screenfield.seqno  screenfield_seqno,
+screenfield.colpos  screenfield_colpos,
+screenfield.tblfields_id   screenfield_tblfield_id,
+screenfield.pobjects_id_sfd   screenfield_pobject_id_sfd,
+  screen.screen_pobject_id_view  screen_pobject_id_view ,
+  screen.screen_pobject_id_scr  screen_pobject_id_scr ,
+  screen.screen_rows_per_page  screen_rows_per_page ,
+  screen.screen_scrlv_id  screen_scrlv_id ,
+  screen.screen_rowlist  screen_rowlist ,
+  screen.screen_height  screen_height ,
+screenfield.formatter  screenfield_formatter,
+  tblfield.fieldcode_ftype  fieldcode_ftype ,
+  tblfield.tblfield_viewflmk  tblfield_viewflmk ,
+  screen.screen_width  screen_width ,
+  screen.screen_strorder  screen_strorder ,
+  screen.screen_pobject_id_sgrp  screen_pobject_id_sgrp ,
+  screen.pobject_objecttype_sgrp  pobject_objecttype_sgrp ,
+  screen.pobject_contents_sgrp  pobject_contents_sgrp ,
+  screen.screen_seqno  screen_seqno ,
+screenfield.id id,
+  pobject_sfd.pobject_contents  pobject_contents_sfd ,
+  tblfield.fieldcode_contents  fieldcode_contents ,
+  screen.pobject_code_sgrp  pobject_code_sgrp ,
+  pobject_sfd.pobject_objecttype  pobject_objecttype_sfd ,
+  tblfield.blktb_seltbls  blktb_seltbls ,
+  tblfield.tblfield_blktb_id  tblfield_blktb_id ,
+  tblfield.tblfield_fieldcode_id  tblfield_fieldcode_id ,
+  tblfield.fieldcode_fieldlength  fieldcode_fieldlength ,
+  tblfield.fieldcode_datascale  fieldcode_datascale ,
+  tblfield.tblfield_contents  tblfield_contents ,
+  tblfield.tblfield_seqno  tblfield_seqno ,
+  tblfield.fieldcode_dataprecision  fieldcode_dataprecision ,
+  tblfield.pobject_code_fld  pobject_code_fld ,
+  tblfield.pobject_code_tbl  pobject_code_tbl 
+ from screenfields   screenfield,
+  upd_persons  person_upd ,  r_screens  screen ,  r_tblfields  tblfield ,  r_pobjects  pobject_sfd 
+  where       screenfield.persons_id_upd = person_upd.id      and screenfield.screens_id = screen.id      
+ and screenfield.tblfields_id = tblfield.id      and screenfield.pobjects_id_sfd = pobject_sfd.id 
 ;
+
 CREATE TABLE CHILSCREENS
    (	ID numeric(38,0),
 	EXPIREDATE DATE,

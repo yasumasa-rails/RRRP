@@ -11,12 +11,13 @@ module Api
       def update
       end
       
-      def create
+      def create   ###自動で作成されたファイル名は変更しないこと。
         upload = Upload.create!(upload_params)
         blob_path = Rails.application.routes.url_helpers.rails_blob_path(upload.excel, only_path: true)
         tmp1,defCode,screenCode,tmp2 = blob_path.split("@")
+        tblname = screenCode.split("_")[1]
         column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info,nameToCode = 
-                  RorBlkctl.proc_create_grid_editable_columns_info screenCode,current_api_user[:email],"inlineaddreq" 
+                  RorBlkctl.proc_create_upload_editable_columns_info screenCode,current_api_user[:email],"inlineaddreq" 
         
         strsql = "select	column_name from 	information_schema.columns 
                   where 	table_catalog='#{ActiveRecord::Base.configurations["development"]["database"]}' 
@@ -28,7 +29,7 @@ module Api
         command_all = []
         results = []   
         status = true
-        command_init =  RorBlkctl.init_from_screen current_api_user[:uid],screenCode
+        command_init =  RorBlkctl.proc_init_from_screen current_api_user[:uid],screenCode
         jparams = {}
 
   		  yupfetchcode = YupSchema.create_yupfetchcode screenCode   
@@ -52,7 +53,7 @@ module Api
                   if yupfetchcode[field] 
                     jparams[:fetchcode] = %Q%{"#{field}":"#{val}"}%
                     jparams[:fetchview] = yupfetchcode[field]
-                    jparams = ControlFields.proc_chk_fetch_rec jparams  
+                    jparams = ControlFields.proc_chk_fetch_rec jparams
                     if jparams[:err] == ""
                         jparams[:fetch_data].each do |fd,vl|
                             jparams[:parse_linedata][fd] = vl
@@ -62,12 +63,15 @@ module Api
                             jparams = ControlFields.proc_judge_check_code jparams
                             if jparams[:err] != ""
                                 jparams[:parse_linedata]["confirm_gridmessage"] = jparams[:err]
-                                status = false    
+                                status = false 
+                            else
+                              jparams[:parse_linedata]["#{field}_gridmessage"] = "ok"
                             end
                         end
                     else   
                         status = false    
                     end  
+                  else  
                   end
                 end 
             end 
@@ -89,19 +93,19 @@ module Api
                         else
                           if command_c["id"] != rec["id"]
                               status = false  
-                              parse_linedata["confirm_gridmessage"] = "error:#{key}"
+                              parse_linedata["confirm_gridmessage"] = "error key:#{key}"
                           end
                         end  
                         if  parse_linedata["aud"] == "add" and  rec["id"] 
                           status = false  
-                          parse_linedata["confirm_gridmessage"] = "error already exist:#{key}"
+                          parse_linedata["confirm_gridmessage"] = "error already exist key:#{key}"
                         end 
                     end	
                     if recs.empty?
                       if  parse_linedata["aud"] == "update" or parse_linedata["aud"] == "delete"
                           status = false  
-                          parse_linedata["confirm_gridmessage"] = "error not exist:#{key}"
-                      end 
+                          parse_linedata["confirm_gridmessage"] = "error key not exist key:#{key}"
+                      end
                     end  
                 end
             end
@@ -111,18 +115,30 @@ module Api
                 end
                 case command_c["aud"] 
                 when "add" 
-                    command_c[:sio_classname] = "_add_update_grid_line_data"
+                    command_c[:sio_classname] = "_add_grid_line_data"
                 when "update"         
-                    command_c[:sio_classname] = "_edit_update_grid_line_data"
+                    command_c[:sio_classname] = "_update_grid_line_data"
                 when "delete"       
-                    command_c[:sio_classname] = "_delete_update_grid_line_data"
+                    command_c[:sio_classname] = "_delete_grid_line_data"
                 end
                 ###command_r = Operation.add_update_rec(jparams,command_c) 
                 command_all << command_c
             end
         end
         if status == true  and defCode == "add_update"
-          results = RorBlkctl.proc_update_table_json(command_all,command_all.size,results)
+            results = RorBlkctl.proc_update_table_json(command_all,command_all.size,results)
+            if $materiallized[tblname]
+              $materiallized[tblname].each do |view|
+                strsql = %Q%select 1 from pg_catalog.pg_matviews pm 
+                      where matviewname = '#{view}' %
+                if ActiveRecord::Base.connection.select_one(strsql)			
+                      strsql = %Q%REFRESH MATERIALIZED VIEW #{view} %
+                      ActiveRecord::Base.connection.execute(strsql)
+                else
+                      3.times{p "materiallized error :#{view}"}
+                end
+              end
+            end
         end
         render json: {:results=>results}
 

@@ -34,12 +34,12 @@ export function* TblfieldSaga({ payload: {params}  }) {
   switch(params.req) {
       case "yup":
           break
-      case  "createTblViewScreen": 
-            screenState.data.map((val,index) =>{ 
-            return data.push({pobject_code_tbl:val.pobject_code_tbl,                      
+      case  "createTblViewScreen":
+              screenState.data.map((val,index) =>{ 
+              return data.push({pobject_code_tbl:val.pobject_code_tbl,                      
                   pobject_code_fld:val.pobject_code_fld, })
-             }) 
-            params["data"] = data
+               })
+              params["data"] = data
             break
       case "createUniqueIndex": 
           screenState.data.map((val,index) =>{ 

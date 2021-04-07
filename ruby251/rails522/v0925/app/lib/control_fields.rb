@@ -134,12 +134,11 @@ module ControlFields
 												and srctblname = '#{srctblnamechop}s'
 								%  ###次のステータスに移行していないqtyを求める。　
 								org =  ActiveRecord::Base.connection.select_one(strsql)
-								# strsql = %Q% select qty from #{srctblnamechop}s where #{key.split("_")[1]} = '#{val}'
-								# % 
-								# sno_qty = ActiveRecord::Base.connection.select_value(strsql)
 								if org["qty_src"]
-									if srctblnamechop =~ /act$/
-										if screentblnamechop =~ /act$/
+									case srctblnamechop
+									when /act$/
+										case screentblnamechop
+										when  /act$/
 											if screendata["#{screentblnamechop}_qty_stk"]
 												fetch_data["#{screentblnamechop}_qty_stk"] =  rec["#{srctblnamechop}_qty_stk"].to_f - org["qty_src"].to_f
 												if fetch_data["#{screentblnamechop}_qty_stk"] <= 0
@@ -149,6 +148,22 @@ module ControlFields
 										else
 											if screendata["#{screentblnamechop}_qty"]
 												fetch_data["#{screentblnamechop}_qty"] =  rec["#{srctblnamechop}_qty_stk"].to_f - org["qty_src"].to_f
+												if fetch_data["#{screentblnamechop}_qty"] <= 0
+													params[:err] =  "error   --->over qty"
+												end
+											end
+										end
+									when /sch$/
+										if screentblnamechop =~ /schs$/
+											if screendata["#{screentblnamechop}_qty_sch"]
+												fetch_data["#{screentblnamechop}_qty_sch"] = rec["#{srctblnamechop}_qt_sch"].to_f  - org["qty_src"].to_f
+												if fetch_data["#{screentblnamechop}_qty_sch"] <= 0
+													params[:err] =  "error   --->over qty"
+												end
+											end
+										else	
+											if screendata["#{screentblnamechop}_qty"]
+												fetch_data["#{screentblnamechop}_qty"] = rec["#{srctblnamechop}_qty_sch"].to_f  - org["qty_src"].to_f
 												if fetch_data["#{screentblnamechop}_qty"] <= 0
 													params[:err] =  "error   --->over qty"
 												end
@@ -172,14 +187,27 @@ module ControlFields
 										end
 									end
 								else
-									if srctblnamechop =~ /act$/
-										if screentblnamechop =~ /act$/
+									case srctblnamechop 
+									when	/act$/
+										case screentblnamechop 
+										when	/act$/
 											if screendata["#{screentblnamechop}_qty_stk"]		
 												fetch_data["#{screentblnamechop}_qty_stk"] =  rec["#{srctblnamechop}_qty_stk"].to_f 
 											end
 										else
 											if screendata["#{screentblnamechop}_qty"]		
 												fetch_data["#{screentblnamechop}_qty"] =  rec["#{srctblnamechop}_qty_stk"].to_f 
+											end
+										end	
+									when /sch/	
+										case screentblnamechop 
+										when	/sch$/
+											if screendata["#{screentblnamechop}_qty_sch"]		
+												fetch_data["#{screentblnamechop}_qty_sch"] =  rec["#{srctblnamechop}_qty_sch"].to_f 
+											end
+										else
+											if screendata["#{screentblnamechop}_qty"]		
+												fetch_data["#{screentblnamechop}_qty"] =  rec["#{srctblnamechop}_qty_sch"].to_f 
 											end
 										end	
 									else	
@@ -199,9 +227,9 @@ module ControlFields
 					end
 				end	
 				field = screentblnamechop+"_"+viewtblnamechop+"_id"+delm
-				if screendata[field]
+				###if screendata[field]
 					fetch_data[field] =  rec["id"]
-				end
+				###end
 				findstatus = true
 			else
 				fetch_data[screentblnamechop+"_"+viewtblnamechop+"_id"+delm] =  ""  ##再入力時のNgに対応
@@ -216,6 +244,7 @@ module ControlFields
 		err = {}
 		strsql = %Q% select blkuky_grp,pobject_code_fld from r_blkukys where pobject_code_tbl = '#{tbl}' 
 						and blkuky_expiredate > current_date order by blkuky_grp,blkuky_seqno%
+						
 		ActiveRecord::Base.connection.select_all(strsql).each do |rec|
 			if save_blkuky_grp != rec["blkuky_grp"] 
 				if  !save_blkuky_grp.nil? and keys.exclude?("id")
@@ -238,17 +267,19 @@ module ControlFields
 		keys.each do |key|
 			symkey = tblchop + "_" + key.gsub("s_id","_id")
 			if linedata[symkey].nil?
-				strwhere = "        #{symkey} must be select "
-				recs = []
+				strwhere = "       #{symkey} must be select      "
 				break
+			else
+				strwhere << "  #{key} = '#{linedata[symkey]}'     and "
 			end
-			strwhere << "  #{key} = '#{linedata[symkey]}'     and "
 		end
 		if strwhere =~ /where/ 
 			strsql = "select id from #{tbl} " + strwhere[0..-5]
 			recs = ActiveRecord::Base.connection.select_all(strsql)
+			err[strwhere[6..-5]] = recs
+		else
+			err[strwhere[6..-5]] = []
 		end
-		err[strwhere[6..-5]] = recs
 		return err
 	end
 
@@ -341,100 +372,100 @@ module ControlFields
 		return sort_info
 	end	
 
-	def check_qty params
-		linedata = params[:parse_linedata]
-		tblname =  params[:screenCode].split("_")[1]
-		if linedata[tblname.chop + "_qty"]
-			symqty = tblname.chop + "_qty"
-		else
-			symqty = tblname.chop + "_qty_stk"
-		end
+	# def check_qty params
+	# 	linedata = params[:parse_linedata]
+	# 	tblname =  params[:screenCode].split("_")[1]
+	# 	if linedata[tblname.chop + "_qty"]
+	# 		symqty = tblname.chop + "_qty"
+	# 	else
+	# 		symqty = tblname.chop + "_qty_stk"
+	# 	end
 
-		if linedata[symqty] == ""
-			checkstatus = false
-			params[:err] =  "error   --->#{symqty} missing "
-		else
-			currtblnamechop = ""
-			tblnamechop = "" 
-			strsql = ""
-			linedata.each do |key,val|
-				case key.to_s
-					when  /_sno_/ ### ordからいきなり　actでの入力を認めている。
-						if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
-							currtblnamechop,tblnamechop = key.to_s.split("_sno_")
-							strsql = %Q%select id from #{tblnamechop}s  where sno = '#{val}' %
-							break
-						end
-					when  /_cno_/  
-						if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
-							currtblnamechop,tblnamechop = key.to_s.split("_cno_")
-							strsql = %Q%select id from #{tblnamechop}s  where cno = '#{val}' %
-							break
-						end
-					when  /_gno_/  
-						if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
-							currtblnamechop,tblnamechop = key.to_s.split("_gno_")
-							strsql = %Q%select id from #{tblnamechop}s  where gno = '#{val}' %
-							break
-						end
-				end
-			end
-			if 	strsql.size > 0
-					tblids = ActiveRecord::Base.connection.select_values(strsql)	
-					strsql = %Q%select sum(qty_pare) qty from trngantts where paretblname = '#{tblnamechop}s'
-								and paretblid in(#{tblids.join(",")})
-								and orgtblid = paretblid and paretblid = tblid
-					%
-					prev_qty = ActiveRecord::Base.connection.select_value(strsql)	
-					if linedata[symqty].to_f  <= prev_qty.to_f   ### オーダ以上を許可するルール未設定
-						checkstatus = true
-					else
-						checkstatus = false
-						params[:err] =  "error ---> #{prev_qty} <　input qty:#{linedata[symqty]} "
-					end
-			end
-			if linedata["id"] != "" and checkstatus == true ###更新の時のみ　ords-->insts  insts -->actsに既にどれだけ変化しているか？
-				strsql = %Q%select sum(qty) qty from trngantts where tblname = '#{currtblnamechop}s'
-								and tblid = #{linedata["id"]} group by  tblname,tblid
-				%
-				chng_qty = ActiveRecord::Base.connection.select_value(strsql)	
-				chng_qty ||= 0.0  ###すでに次の状態に変化した数値
-				if chng_qty.to_f <= linedata[symqty].to_f
-					checkstatus = true
-				else
-					checkstatus = false
-					params[:err] =  "error   ---> qty must be >= #{chng_qty} "
-				end	
-			end
-		end
-		return params
-	end	
+	# 	if linedata[symqty] == ""
+	# 		checkstatus = false
+	# 		params[:err] =  "error   --->#{symqty} missing "
+	# 	else
+	# 		currtblnamechop = ""
+	# 		tblnamechop = "" 
+	# 		strsql = ""
+	# 		linedata.each do |key,val|
+	# 			case key.to_s
+	# 				when  /_sno_/ ### ordからいきなり　actでの入力を認めている。
+	# 					if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
+	# 						currtblnamechop,tblnamechop = key.to_s.split("_sno_")
+	# 						strsql = %Q%select id from #{tblnamechop}s  where sno = '#{val}' %
+	# 						break
+	# 					end
+	# 				when  /_cno_/  
+	# 					if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
+	# 						currtblnamechop,tblnamechop = key.to_s.split("_cno_")
+	# 						strsql = %Q%select id from #{tblnamechop}s  where cno = '#{val}' %
+	# 						break
+	# 					end
+	# 				when  /_gno_/  
+	# 					if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
+	# 						currtblnamechop,tblnamechop = key.to_s.split("_gno_")
+	# 						strsql = %Q%select id from #{tblnamechop}s  where gno = '#{val}' %
+	# 						break
+	# 					end
+	# 			end
+	# 		end
+	# 		if 	strsql.size > 0
+	# 				tblids = ActiveRecord::Base.connection.select_values(strsql)	
+	# 				strsql = %Q%select sum(qty_pare) qty from trngantts where paretblname = '#{tblnamechop}s'
+	# 							and paretblid in(#{tblids.join(",")})
+	# 							and orgtblid = paretblid and paretblid = tblid
+	# 				%
+	# 				prev_qty = ActiveRecord::Base.connection.select_value(strsql)	
+	# 				if linedata[symqty].to_f  <= prev_qty.to_f   ### オーダ以上を許可するルール未設定
+	# 					checkstatus = true
+	# 				else
+	# 					checkstatus = false
+	# 					params[:err] =  "error ---> #{prev_qty} <　input qty:#{linedata[symqty]} "
+	# 				end
+	# 		end
+	# 		if linedata["id"] != "" and checkstatus == true ###更新の時のみ　ords-->insts  insts -->actsに既にどれだけ変化しているか？
+	# 			strsql = %Q%select sum(qty) qty from trngantts where tblname = '#{currtblnamechop}s'
+	# 							and tblid = #{linedata["id"]} group by  tblname,tblid
+	# 			%
+	# 			chng_qty = ActiveRecord::Base.connection.select_value(strsql)	
+	# 			chng_qty ||= 0.0  ###すでに次の状態に変化した数値
+	# 			if chng_qty.to_f <= linedata[symqty].to_f
+	# 				checkstatus = true
+	# 			else
+	# 				checkstatus = false
+	# 				params[:err] =  "error   ---> qty must be >= #{chng_qty} "
+	# 			end	
+	# 		end
+	# 	end
+	# 	return params
+	# end	
 
-	def check_loca_code_to params
-		linedata = params[:parse_linedata]
-		tblname =  params[:screenCode].split("_")[1]
-		id = linedata["#{tblname.chop}_id"]
-		if id != ""  ###更新の時のみ　ords-->insts  insts -->actsに既にどれだけ変化しているか？
-			sym = "loca_code_to"
-			if linedata[sym] == ""
-				checkstatus = false
-				params[:err] =  "error   --->#{sym} missing "
-			else
-				strsql = %Q%select sum(qty) from trngantts where orgtblname ='#{tblname}' and orgtblid = #{id} 
-						 and  tblid = #{id} and tblname = '#{tblname}' group by orgtblname,orgtblid,tblname,tblid %
-				trn_qty = ActiveRecord::Base.connection.select_value(strsql)
-				chng_qty ||= 0.0  ###すでに次の状態に変化した数値
-				strsql = %Q%select loca_code_to,#{tblname.chop}_qty from r_#{tblname} where id = #{id} %
-				rec = ActiveRecord::Base.connection.select_one(strsql)
-				if (chng_qty != rec["#{tblname.chop}_qty"] or rec["#{tblname.chop}_qty"]  != trn_qty) and 
-						linedata[sym] != rec["loca_code_to"]
-					checkstatus = false
-					params[:err] =  "error   ---> loca_code_to must be >= #{rec["loca_code_to"]} "
-				end 
-			end
-		end
-		return params
-	end	
+	# def check_loca_code_to params
+	# 	linedata = params[:parse_linedata]
+	# 	tblname =  params[:screenCode].split("_")[1]
+	# 	id = linedata["#{tblname.chop}_id"]
+	# 	if id != ""  ###更新の時のみ　ords-->insts  insts -->actsに既にどれだけ変化しているか？
+	# 		sym = "loca_code_to"
+	# 		if linedata[sym] == ""
+	# 			checkstatus = false
+	# 			params[:err] =  "error   --->#{sym} missing "
+	# 		else
+	# 			strsql = %Q%select sum(qty) from trngantts where orgtblname ='#{tblname}' and orgtblid = #{id} 
+	# 					 and  tblid = #{id} and tblname = '#{tblname}' group by orgtblname,orgtblid,tblname,tblid %
+	# 			trn_qty = ActiveRecord::Base.connection.select_value(strsql)
+	# 			chng_qty ||= 0.0  ###すでに次の状態に変化した数値
+	# 			strsql = %Q%select loca_code_to,#{tblname.chop}_qty from r_#{tblname} where id = #{id} %
+	# 			rec = ActiveRecord::Base.connection.select_one(strsql)
+	# 			if (chng_qty != rec["#{tblname.chop}_qty"] or rec["#{tblname.chop}_qty"]  != trn_qty) and 
+	# 					linedata[sym] != rec["loca_code_to"]
+	# 				checkstatus = false
+	# 				params[:err] =  "error   ---> loca_code_to must be >= #{rec["loca_code_to"]} "
+	# 			end 
+	# 		end
+	# 	end
+	# 	return params
+	# end	
 
 	###使用していない
 	def check_itm_loca_nditm params  ###使用してない
@@ -500,16 +531,12 @@ module ControlFields
 			"shpschs"=>"SS","shpords"=>"SE","shpinsts"=>"SH","shpacts"=>"SA","shprets"=>"SR"}
 	end
 
-	def mkTblListByTbl   ###例:指示テーブル等を使用せずordsから直接snoを入力してpuractsを作成
-		{"purmk1s"=>["purords","purinsts","purdlvs"],
-			"purords"=>["inspords"],	
-			"puracts"=>["inspinsps"]
-		}
-	end 
-
-	def mkTblListByOpeitms   ##
-		{"opeitm_acceptance_proc"=>{"purords"=>["payschs"],"puracts"=>["payords"],"custords"=>["billschs"],"custacts"=>["billords"]}}
-	end 
+	# def mkTblListByTbl   ###例:指示テーブル等を使用せずordsから直接snoを入力してpuractsを作成
+	# 	{"purmk1s"=>["purords","purinsts","purdlvs"],
+	# 		"purords"=>["inspords"],	
+	# 		"puracts"=>["inspinsps"]
+	# 	}
+	# end 
  
 	### prd,pur,shp ・・・schs,ords,insts,acts,retsのレコード作成　	
 	def proc_fields_update parent,paretblname
@@ -526,6 +553,10 @@ module ControlFields
 					@para["chrgs_id"] = val
 				when /#{paretblname.chop}_qty$/
 					@para["parent_qty"] = val.to_f
+				when /#{paretblname.chop}_qty_sch$/
+					@para["parent_qty_sch"] = val.to_f
+				when /#{paretblname.chop}_qty_stk$/
+					@para["parent_qty_stk"] = val.to_f
 				when /#{paretblname.chop}_qty_bal$/
 					@para["parent_qty_bal"] = val.to_f
 				when  /#{paretblname.chop}_prjno_id/
@@ -606,6 +637,8 @@ module ControlFields
 						field_processseq_pare
 				when "prjnos_id"
 						field_prjnos_id
+				when "qty_sch"
+						field_qty_sch 
 				when "qty"
 						field_qty 
 				when "qty_case"
@@ -703,6 +736,11 @@ module ControlFields
 			@command_c["#{@tblnamechop}_chrg_id"] = @para["chrgs_id"]
 		end
 	end	
+
+	def field_qty_sch 
+		@qty_sch = @para["parent_qty_sch"] * @para["chilnum"] / @para["parenum"]
+		#consumunitqty等については親に合わせて計算する。
+	end
 
 	def field_qty 
 		@qty = @para["parent_qty"] * @para["chilnum"] / @para["parenum"]

@@ -12,7 +12,17 @@ module Api
                 params[:message] = " yup schema created " 
                 render json:{:params=>params} 
               when 'createTblViewScreen'  ### blktbs tblfields 
-                messages,modifysql = TblField.blktbs params,current_api_user
+                messages,modifysql = TblField.proc_blktbs params,current_api_user
+		            $tblfield_materiallized.each do |view|
+				            strsql = %Q%select 1 from pg_catalog.pg_matviews pm 
+				                  where matviewname = '#{view}' %
+				            if ActiveRecord::Base.connection.select_one(strsql)			
+					                strsql = %Q%REFRESH MATERIALIZED VIEW #{view} %
+					                ActiveRecord::Base.connection.execute(strsql)
+				            else
+					                3.times{p "materiallized error :#{view}"}
+				            end
+		            end
                 foo = File.open("#{Rails.root}/vendor/postgresql/tblviewupdate#{(Time.now).strftime("%Y%m%d%H%M%S")}.sql", "w:UTF-8") # 書き込みモード
                 foo.puts modifysql
                 foo.close

@@ -115,25 +115,32 @@ const AutoCell = ({
         return updateRow
   }
 
-  const onLineValite = (row,index,data,params) => {
+  const onLineValite = (tgrow,index,data,params) => {
     let screenSchema = Yup.object().shape(yupschema[params.screenCode])
     let updateRow = {}
     Object.keys(screenSchema.fields).map((field) => {
-       updateRow[field] = row[field] 
+       updateRow[field] = tgrow[field] 
       return updateRow  //更新可能項目のみをセレクト
     })  
     yupErrCheck(screenSchema,"confirm",updateRow)
     if (updateRow["confirm_gridmessage"] === "doing") {
-      let row = {}
+      let newrow = {}
       Object.keys(data[index]).map((key,idx)=>{  //複数key対応
        if(/_gridmessage/.test(key)){}
-         else{row[key]=data[index][key]}
+         else{newrow[key]=data[index][key]}
          return null
        }
       )
-      updateParams([{ linedata: JSON.stringify(row)}, { index: index },
+      updateParams([{ linedata: JSON.stringify(newrow)}, { index: index },
                         { req: "confirm7" }])
       handleScreenRequest(params,data)
+    }else{
+      let msg_id = "confirm_gridmessage"
+      updateMyData(index, msg_id, " error " + updateRow[msg_id])
+      msg_id = `${updateRow["errPath"]}_gridmessage`
+      updateMyData(index, msg_id, " error " + updateRow[msg_id])
+      setClassFunc(updateRow["errPath"],row,className,req)
+      updateMyData(index, "confirm", false)
     }
   }
   //id,row,className,req  autocellで指定が必要

@@ -29,6 +29,7 @@ export  function yupErrCheck (schema,field,linedata) {
               mfield = err.path+"_gridmessage"
               linedata[mfield] = err.errors.join(",")
               linedata.confirm_gridmessage = `error ${err.path}　${linedata[mfield]}　`
+              linedata["errPath"] = err.path
               return linedata
     default:  
               mfield = field+"_gridmessage"
@@ -109,11 +110,16 @@ export function dataCheck7(schema,updateRow){
         default:
           switch(field){
             case "screen_rowlist":  //一画面に表示できる行数をセットする項目の指定が正しくできているか？
-                if(updateRow[`${field}_gridmessage`]===""){updateRow[`${field}_gridmessage`] = "ok"}
-                    updateRow[field].split(',').map((rowcnt)=>{
+                updateRow[field].split(',').map((rowcnt)=>{
                     if(isNaN(rowcnt)){ 
                         updateRow[`${field}_gridmessage`] = "error  must be xxx,yyy,zzz :xxx-->numeric"
                         confirm_gridmessage =  updateRow[`${field}_gridmessage`] + confirm_gridmessage
+                      }else{
+                        if(updateRow[`${field}_gridmessage`]){
+                            if(/error/.test(updateRow[`${field}_gridmessage`])){}
+                            else{updateRow[`${field}_gridmessage`] = "ok"}
+                             }
+                        else{updateRow[`${field}_gridmessage`] = "ok"}
                       } //エラーセット
                     return updateRow
                 })
