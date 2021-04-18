@@ -336,6 +336,7 @@ and person.USRGRPS_ID = usrgrp.ID
    (	CONTENTS VARCHAR(4000),
   REMARK VARCHAR(4000),
 	EXPIREDATE DATE,
+	priority numeric(38,0),
 	PERSONS_ID_UPD numeric(38,0),
 	UPDATE_IP VARCHAR(40),
 	CREATED_AT TIMESTAMP (6),
@@ -352,8 +353,15 @@ and person.USRGRPS_ID = usrgrp.ID
    ;
 CREATE  SEQUENCE PRJNOS_seq INCREMENT BY 1 START WITH 10000   PRJNOS_seq
 ;
-CREATE OR REPLACE  VIEW R_PRJNOS (ID, PRJNO_ID, PRJNO_REMARK, PRJNO_EXPIREDATE, PRJNO_UPDATE_IP, PRJNO_CREATED_AT, PRJNO_UPDATED_AT, PRJNO_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, PRJNO_CODE, PRJNO_NAME, PRJNO_CODE_CHIL,PRJNO_NAME_CHIL,PRJNO_ID_CHIL) AS 
-  select prjno.id id,prjno.id prjno_id ,prjno.remark prjno_remark ,prjno.expiredate prjno_expiredate ,prjno.update_ip prjno_update_ip ,prjno.created_at prjno_created_at ,prjno.updated_at prjno_updated_at ,prjno.persons_id_upd prjno_person_id_upd , person_upd.person_id_upd person_id_upd, person_upd.person_code_upd person_code_upd, person_upd.person_name_upd person_name_upd,prjno.code prjno_code ,prjno.name prjno_name ,prjno_chil.code prjno_chil_code,prjno_chil.name prjno_chil_name,prjno_chil.id prjno_id_chil
+CREATE OR REPLACE  VIEW R_PRJNOS (ID, PRJNO_ID, PRJNO_REMARK, PRJNO_EXPIREDATE,
+									PRJNO_UPDATE_IP, PRJNO_CREATED_AT, PRJNO_UPDATED_AT, 
+									PRJNO_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, 
+									PRJNO_CODE, PRJNO_NAME, PRJNO_CODE_CHIL,PRJNO_NAME_CHIL,PRJNO_ID_CHIL,prjno_priority) AS 
+  select prjno.id id,prjno.id prjno_id ,prjno.remark prjno_remark ,prjno.expiredate prjno_expiredate ,prjno.update_ip prjno_update_ip ,
+  prjno.created_at prjno_created_at ,prjno.updated_at prjno_updated_at ,prjno.persons_id_upd prjno_person_id_upd , 
+  person_upd.person_id_upd person_id_upd, person_upd.person_code_upd person_code_upd, 
+  person_upd.person_name_upd person_name_upd,prjno.code prjno_code ,prjno.name prjno_name ,
+  prjno_chil.code prjno_chil_code,prjno_chil.name prjno_chil_name,prjno_chil.id prjno_id_chil,prjno.priority prjno_priority
  from prjnos prjno ,upd_persons  person_upd,prjnos prjno_chil
  where  person_upd.id = prjno.persons_id_upd and prjno.prjnos_id_chil = prjno_chil.id
 ; 

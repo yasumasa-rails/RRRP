@@ -86,7 +86,7 @@ module GanttChart
 
 	def get_ordtbl_ordid tblname,tblid
 		until tblname =~ /ords$/
-			strsql %Q&select srctblname,srctblid from srctbls 
+			strsql %Q&select srctblname,srctblid from linktbls 
 										where tblname = '#{tblname} and tblid = #{tblid}		
 			&
 			ord = ActiveRecord::Base.connection.select_one(strsql)

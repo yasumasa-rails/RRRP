@@ -70,6 +70,7 @@ const Menus7 = ({ isAuthenticated ,menuListData,uid,getScreen, params,grid_colum
             </Tabs>
               {(grid_columns_info&&menuChanging===false)&&<div> <ScreenGrid7 second={false} /></div>}
               {/*(grid_columns_info&&menuChanging===false)&&<div> <ButtonList second={false} /></div>*/}
+              <p> {hostError?hostError:""} </p>
            </div>    
       )
     }else{

@@ -34,15 +34,15 @@ class CreateOtherTableRecordJob < ApplicationJob
                         when "trngantts" ###prd,purのとき
                             reqparams = Operation.proc_trngantts processreq["tblname"],processreq["tblid"],
                                                     processreq["paretblname"],processreq["paretblid"],reqparams
-                            if reqparams["mkords_id"] 
-					            reqparams["segment"] = "mkords"
-					            strsql = "select * from mkords where id = #{reqparams["mkords_id"]} "
-					            mkord = ActiveRecord::Base.connection.select_one(strsql) 
-					            reqparams["tbldata"] = mkord.stringify_keys  
-					            reqparams["orgtblname"] = "mkords"  
-					            reqparams["orgtblid"] = reqparams["mkords_id"] 
-					            processreqs_id ,reqparams= Operation.proc_processreqs_add "mkords",reqparams["mkords_id"] ,nil,nil,reqparams	
-				            end
+                            # if reqparams["mkords_id"] ##
+					        #     reqparams["segment"] = "mkords"
+					        #     strsql = "select * from mkords where id = #{reqparams["mkords_id"]} "
+					        #     mkord = ActiveRecord::Base.connection.select_one(strsql) 
+					        #     reqparams["tbldata"] = mkord.stringify_keys  
+					        #     reqparams["orgtblname"] = "mkords"  
+					        #     reqparams["orgtblid"] = reqparams["mkords_id"] 
+					        #     processreqs_id ,reqparams= Operation.proc_processreqs_add "mkords",reqparams["mkords_id"] ,nil,nil,reqparams	
+				            # end
                         when "opeitm_acceptance_proc"  ### opeitmsのフラグ処理
                             if parent 
                                 case processreq["tblname"]
@@ -65,8 +65,8 @@ class CreateOtherTableRecordJob < ApplicationJob
                             parent = ActiveRecord::Base.connection.select_one(strsql) ###依頼元
 
                             tbl_opeitm_id = processreq["tblname"].chop + "_opeitm_id"
-                            strsql = %Q%select * from nditms where expiredate > current_date and opeitms_id = #{tbldata["opeitms_id"]}%
-                            
+
+                            strsql = %Q%select * from nditms where expiredate > current_date and opeitms_id = #{tbldata["opeitms_id"]}%  
                             trnganttkey ||= 0  ###keyのカウンター
                             key = reqparams["trnganttkey"]
                             if key
@@ -81,12 +81,21 @@ class CreateOtherTableRecordJob < ApplicationJob
                                 reqparams["trnganttkey"] = key + format('%05d', trnganttkey)
                                 reqparams["child"] = child
                                 reqparams["opeitm"] = opeitm  ###子部品のopeitms
-				                RorBlkctl.proc_private_aud_rec(command_r,1,processreq["tblname"],processreq["tblid"],reqparams) 
-                                command_r[:sio_result_f] =  "1"   ## 1 normal end
-                                command_r[:sio_message_contents] = nil
-                                tblname = command_r[:sio_viewname].split("_")[1]
-                                tblid = command_r[(tblname.chop + "_id")] =  command_r["id"]
-                                RorBlkctl.proc_insert_sio_r(command_r) #### if @pare_class != "batch"    ## 結果のsio書き込み
+                                begin
+                                    ActiveRecord::Base.connection.begin_db_transaction()
+                                    RorBlkctl.proc_private_aud_rec(command_r,1,processreq["tblname"],processreq["tblid"],reqparams) 
+                                rescue
+                                    Rails.logger.debug"error class #{self} : #{Time.now}: #{$@} "
+                                    Rails.logger.debug"error class #{self} : $!: #{$!} "
+                                else
+                                    command_r[:sio_result_f] =  "1"   ## 1 normal end
+                                    command_r[:sio_message_contents] = nil
+                                    tblname = command_r[:sio_viewname].split("_")[1]
+                                    tblid = command_r[(tblname.chop + "_id")] =  command_r["id"]
+                                    RorBlkctl.proc_insert_sio_r(command_r) #### if @pare_class != "batch"    ## 結果のsio書き込み
+                                    ActiveRecord::Base.connection.commit_db_transaction()
+                                ensure
+                                end
                             end 
                         when "sumrequest" 
                         when "splitrequest"  
@@ -117,20 +126,31 @@ class CreateOtherTableRecordJob < ApplicationJob
                             mkordparams[:outcnt] = mkord["outcnt"].to_f
                             mkordparams[:outqty] = mkord["outqty"].to_f
                             mkordparams[:outamt] = mkord["outamt"].to_f
-                            mkordparams = Operation.proc_mkords email,reqparams,mkordparams
-                            strsql = %Q%update mkords set incnt = #{mkordparams[:incnt]},inqty = #{mkordparams[:inqty]},
+                            begin
+                                ActiveRecord::Base.connection.begin_db_transaction()
+                                mkordparams = Operation.proc_mkords email,reqparams,mkordparams
+                            rescue
+                                mkordparams[:message_code] = "error #{$!}"[0..100]
+                                mkordparams[:remark] = "error #{$@}"[0..100]
+                            else
+                                mkordparams[:message_code] = ""
+                                mkordparams[:remark] = ""
+                            ensure        
+                                strsql = %Q%update mkords set incnt = #{mkordparams[:incnt]},inqty = #{mkordparams[:inqty]},
                                                 inamt = #{mkordparams[:inamt]},outcnt = #{mkordparams[:outcnt]},
-                                                outqty = #{mkordparams[:outqty]},outamt = #{mkordparams[:outamt]} 
+                                                outqty = #{mkordparams[:outqty]},outamt = #{mkordparams[:outamt]} ,
+                                                message_code = '#{mkordparams[:message_code]}',remark = '#{mkordparams[:remark]}'
                                                 where id = #{reqparams["mkords_id"]}
-                            %
-                            ActiveRecord::Base.connection.update(strsql)
-
+                                %
+                                ActiveRecord::Base.connection.update(strsql)
+                                ActiveRecord::Base.connection.commit_db_transaction()
+                            end
                         when "consume_child_parts"  ###qty_act子部品の消費 ###金型返却　###装置の解放
                             act_qty = tbldata["qty_stk"].to_f
                             strsql =%Q& select gantt.* ,c_alloc.id alloc_id, '#{processreq["tblname"]}' act_tblname,#{processreq["tblid"]} acttblid,
                                                 ope.packqty packqty
                                             from trngantts gantt 
-                                            inner join((alloctbls p_alloc inner join srctbls src 
+                                            inner join((alloctbls p_alloc inner join linktbls src 
                                                 on p_alloc.srctblname = src.srctblname and p_alloc.srctblid = src.srctblid
                                                     and  src.tblname = '#{processreq["tblname"]}' and src.tblid =  #{processreq["tblid"]})
                                                     --- xxxactsからxxxords(insts)を求める p_alloc親のalloctbls
@@ -153,9 +173,9 @@ class CreateOtherTableRecordJob < ApplicationJob
                                 consumtype = consumtype.gsub(" ","")
                                 case consumtype
                                     when "con" ###子部品の消費
-                                        Operation.proc_consume_child_parts rec,act_qty,processreq["tblname"],processreq["tblid"]
+                                        Shipment.proc_consume_child_parts rec,act_qty,processreq["tblname"],processreq["tblid"]
                                     when "" ###子部品の消費
-                                        Operation.proc_consume_child_parts rec,act_qty,processreq["tblname"],processreq["tblid"]
+                                        Shipment.proc_consume_child_parts rec,act_qty,processreq["tblname"],processreq["tblid"]
                                 end
                             end
 
@@ -174,7 +194,7 @@ class CreateOtherTableRecordJob < ApplicationJob
                                 case consumtype  ###
                                 when "con" ###子部品消費
                                     ###消費
-                                    Operation.proc_consume_self_sch_parts rec,processreq["paretblname"],parent
+                                    Shipment.proc_consume_self_sch_parts rec,processreq["paretblname"],parent
                                 end
                             end
                     
@@ -202,7 +222,7 @@ class CreateOtherTableRecordJob < ApplicationJob
                                 case consumtype  ###
                                 when "con" ###子部品消費
                                     ###消費
-                                    Operation.proc_consume_self_ord_parts stkinout
+                                    Shipment.proc_consume_self_ord_parts stkinout
                                 end
                             end
                         when "consume_exception"
@@ -215,7 +235,7 @@ class CreateOtherTableRecordJob < ApplicationJob
                                                     inner join alloctbls alloc on gantt.id = alloc.trngantts_id 
                                                     where alloc.srctblname = '#{processreq["tblname"]}' and alloc.srctblid = #{processreq["tblid"]}
                                                     and (gantt.tblname != gantt.paretblname or gantt.tblid != gantt.paretblid)
-                                                    ----and (alloc.qty - alloc.qty_linkto_alloctbl - alloc.qty_alloc) > 0
+                                                    ---and (alloc.qty - alloc.qty_linkto_alloctbl) > 0
                                                     ---child_trngantts でxxxordsを作成済　 alloc.qty_linkto_alloctbl > 0
                                                     for update
                                %
@@ -239,11 +259,11 @@ class CreateOtherTableRecordJob < ApplicationJob
                                         if locas_id_shelfno != pare_loca_id 
                                             case  processreq["paretblname"]
                                                 when /schs$/
-                                                    Operation.proc_create_shp processreq,email,pare_loca_id,parent,tbldata["shelfnos_id_to"] do
+                                                    Shipment.proc_create_shp processreq,email,pare_loca_id,parent,tbldata["shelfnos_id_to"] do
                                                         "sch"
                                                     end
                                                 when  /ords$/   
-                                                    Operation.proc_create_shp processreq,email,pare_loca_id,parent,tbldata["shelfnos_id_to"] do
+                                                    Shipment.proc_create_shp processreq,email,pare_loca_id,parent,tbldata["shelfnos_id_to"] do
                                                         "ord"
                                                     end
                                                 ##

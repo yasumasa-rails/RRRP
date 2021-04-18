@@ -67,8 +67,11 @@ module Api
 
             when "check_request"  
                 xparams = params.dup ## ControlFields.proc_judge_check_code でparamsがnilになってしまうため。
-                xparams[:parse_linedata] =  JSON.parse(params[:linedata])
-                xparams = ControlFields.proc_judge_check_code xparams
+                ScreenLib.proc_create_grid_editable_columns_info current_api_user[:email],xparams,grid_columns_info
+                xparams[:parse_linedata] = JSON.parse(params[:linedata])
+                JSON.parse(params[:checkcode]).each do |sfd,yupcheckcode|
+                  xparams = ControlFields.proc_judge_check_code xparams,sfd,yupcheckcode
+                end
                 xparams[:parse_linedata] = {}
                 render json: {:params=>xparams}   
 
@@ -77,7 +80,7 @@ module Api
                 ScreenLib.proc_create_grid_editable_columns_info current_api_user[:email],params,grid_columns_info
                 tblnamechop = params[:screenCode].split("_")[1].chop
                 yup_fetch_code = grid_columns_info["yup"]["yupfetchcode"]
-                yup_check_code = grid_columns_info["yup"]["yupcheckcode"]
+                yupcheckcode = grid_columns_info["yup"]["yupcheckcode"]
                 rparams[:parse_linedata] = JSON.parse(params[:linedata])
                 parse_linedata = rparams[:parse_linedata].dup
                 addfield = {}
@@ -98,8 +101,8 @@ module Api
                     end
                   end
                   if rparams[:err] == ""
-                    if yup_check_code[field] 
-                      rparams = ControlFields.proc_judge_check_code rparams  
+                    if yupcheckcode[field] 
+                      rparams = ControlFields.proc_judge_check_code rparams,field,yupcheckcode[field]  
                       if rparams[:err] != ""
                         rparams[:parse_linedata][:confirm_gridmessage] = rparams[:err] 
                         rparams[:parse_linedata][:confirm] = false 

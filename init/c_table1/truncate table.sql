@@ -95,6 +95,8 @@ truncate table sio.sio_r_shpacts;
 
 REFRESH MATERIALIZED view  r_pobjects;
 REFRESH MATERIALIZED view  r_fieldcodes;
+REFRESH MATERIALIZED view r_blktbs ;
 REFRESH MATERIALIZED view r_tblfields; 
 REFRESH MATERIALIZED view r_screenfields; 
 commit;
+

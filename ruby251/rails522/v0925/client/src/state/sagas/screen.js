@@ -169,7 +169,8 @@ export function* ScreenSaga({ payload: {params,data,}  }) {
     }
     catch(e){
       message = ` Something went wrong ${e} `;
-      data[params.index]["confirm_gridmessage"] = message
+      if(params.index){data[params.index]["confirm_gridmessage"] = message}
+        else{}      
       if(params.second===true){
             return  yield put({type:SECONDSCREEN_FAILURE, payload:{message:message,data}})   
       }else{  

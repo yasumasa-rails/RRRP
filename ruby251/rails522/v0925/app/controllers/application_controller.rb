@@ -8,6 +8,7 @@ class ApplicationController < ActionController::API
 		$ftype[rec["pobject_code_fld"]] = rec["fieldcode_ftype"]
 	end
 
+	###マテリアライズドビュー
 	$materiallized = {"scrlvs"=>["r_screens","r_screenfields"],
 		"pobjects"=>["r_pobjects","r_fieldcodes","r_blktbs","r_tblfields","r_screens","r_screenfields"],
 		"fieldcodes"=>["r_fieldcodes","r_tblfields","r_screenfields"],

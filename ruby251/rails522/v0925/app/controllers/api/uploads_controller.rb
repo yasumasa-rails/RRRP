@@ -127,6 +127,9 @@ module Api
         end
         if status == true  and defCode == "add_update"
             results = RorBlkctl.proc_update_table_json(command_all,command_all.size,results)
+
+            ### errorの処理　未処理
+
             if $materiallized[tblname]
               $materiallized[tblname].each do |view|
                 strsql = %Q%select 1 from pg_catalog.pg_matviews pm 

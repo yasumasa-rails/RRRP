@@ -339,7 +339,7 @@ module Shipmeny
 			command_c["shpinst_tax"] = 0
 			command_c["shpinst_amt"] = 0
 		end
-		reqparams = RorBlkctl.proc_private_aud_rec  command_c,1,nil,nil,nil
+		reqparams = RorBlkctl.proc_update_table  command_c,1
 	end
 
 	def reset_shpords outstk,shp,pare,screenCode,packqty
@@ -362,7 +362,7 @@ module Shipmeny
 			command_c["shpord_qty"] = qty
 			command_c["shpord_amt"] = qty * command_c["shpsch_price"].to_f
 			###tax 未設定
-			RorBlkctl.proc_private_aud_rec  command_c,1,nil,nil,nil
+			RorBlkctl.proc_update_table  command_c,1
 			stkinout["processseq"] = command_c["shpord_processseq"]
 			stkinout["itms_id"] = command_c["shpord_itm_id"]
 			stkinout["prjnos_id"] = command_c["shpord_prjno_id"]
@@ -385,7 +385,7 @@ module Shipmeny
 				command_c["shpord_qty"] = qty
 				command_c["shpord_amt"] = qty * command_c["shpsch_price"].to_f
 				###tax 未設定
-				RorBlkctl.proc_private_aud_rec  command_c,1,nil,nil,nil
+				RorBlkctl.proc_update_table  command_c,1
 				stkinout["processseq"] = command_c[tblname.chop+"_processseq"]
 				stkinout["itms_id"] = command_c["shpord_itm_id"]
 				stkinout["prjnos_id"] = command_c["shpord_prjno_id"]
@@ -426,7 +426,7 @@ module Shipmeny
 						command_c["shpord_qty"] = qty
 						command_c["shpord_amt"] = qty * command_c["shpord_price"].to_f
 						###tax 未設定
-						RorBlkctl.proc_private_aud_rec  command_c,1,nil,nil,nil
+						RorBlkctl.proc_update_table  command_c,1
 						stkinout["processseq"] = command_c["shpord_processseq"]
 						stkinout["itms_id"] = command_c["shpord_itm_id"]
 						stkinout["prjnos_id"] = command_c["shpord_prjno_id"]
@@ -442,4 +442,195 @@ module Shipmeny
 		end		
 	end	
 	
+	###shpschs,shpords用
+	def proc_create_shp req,email,pare_loca_id,parent,shelfnos_id_to 
+			###shpschs shpordsの時   shpinstsはmkshpinstsで対応
+			command_c = {}
+			tblnamechop = "shp#{yield}"
+			command_c[:sio_code] =  command_c[:sio_viewname] =  "r_#{tblnamechop}s"
+			command_c[:sio_message_contents] = nil
+			command_c[:sio_recordcount] = 1
+			command_c[:sio_result_f] =   "0"  
+			command_c[:sio_classname] = "#{tblnamechop}_add_"
+			strsql = %Q% select pobject_code_sfd from  func_get_screenfield_grpname('#{email}','r_#{tblnamechop}s')
+					%
+			fields = ActiveRecord::Base.connection.select_values(strsql) 
+			opeitm_id = {}
+			strsql = %Q& select ord.* from r_#{req["tblname"]} ord	where ord.id = #{req["tblid"]}
+				&
+			ActiveRecord::Base.connection.select_one(strsql).each do |key,val|
+					if key == "id" 
+						command_c[key] = ""
+						command_c["#{tblnamechop}_id"] = "" 
+					else
+						if fields.index(key)
+							command_c[key] = val
+						else
+							if fields.index(key.sub("#{req["tblname"].chop}","#{tblnamechop}"))
+								command_c[key.sub("#{req["tblname"].chop}","#{tblnamechop}")] = val
+							else
+								case key.to_s
+								when "opeitm_itm_id"
+									command_c["#{tblnamechop}_itm_id"] = val
+								when "opeitm_processseq"
+									command_c["#{tblnamechop}_processseq"] = val
+								end
+							end
+						end
+					end
+			end
+			command_c["#{tblnamechop}_isudate"] = Time.now 
+			command_c["#{tblnamechop}_packno"] = ""  ###shpschs,shpordsの時は何もセットしない。
+			command_c["#{tblnamechop}_lotno"] = "" 
+			command_c["#{tblnamechop}_shelfno_id_fm"] = shelfnos_id_to
+			command_c["#{tblnamechop}_loca_id_to"] = pare_loca_id
+			command_c["#{tblnamechop}_depdate"] = parent["#{req["paretblname"].chop}_starttime"]
+			command_c["#{tblnamechop}_gno"] = parent["#{req["paretblname"].chop}_sno"] 
+			command_c["#{tblnamechop}_transport_id"] = 0 
+			command_c["#{tblnamechop}_paretblname"] = req["paretblname"] 
+			command_c["#{tblnamechop}_paretblid"] = req["paretblid"]
+			if req["paretblname"] =~ /^pur/   ###tblname= 'feepayment'--->有償支給
+				strsql =%Q&select * from pricemsts where tblname= 'feepayment' and expiredate >= current_date
+									and itms_id = #{command_c["#{tblnamechop}_itm_id"]} 
+									and processseq = #{command_c["#{tblnamechop}_processseq"]}
+									and (locas_id = #{pare_loca_id} or locas_id = (select id from locas where code = 'dummy' ))
+									order by expiredate limit 1
+				& 
+				rec = ActiveRecord::Base.connection.select_one(strsql)
+				if rec
+					###日付、数量による再設定
+				else
+					command_c["#{tblnamechop}_price"] = 0 	
+					command_c["#{tblnamechop}_amt"] = 0 	
+					command_c["#{tblnamechop}_tax"] = 0 	
+					command_c["#{tblnamechop}_crr_id"] = 0 	
+				end
+			else
+				command_c["#{tblnamechop}_price"] = 0 	
+				command_c["#{tblnamechop}_amt"] = 0 	
+				command_c["#{tblnamechop}_tax"] = 0 	
+				command_c["#{tblnamechop}_crr_id"] = 0 	
+			end	
+			stkinout = {}
+			opeitm = proc_get_opeitms_rec(command_c[tblnamechop+"_itm_id"],nil,command_c[tblnamechop+"_processseq"],nil)
+			packqty = command_c["opeitm_packqty"] = opeitm["packqty"].to_f
+	
+			stkinout["expiredate"] = command_c[tblnamechop+"_expiredate"]
+			stkinout["lotno"] =  ""   ###shpschs,shpordsの時は何もセットしない。
+			stkinout["packno"] =  if packqty == 0 then "" else "packno" end
+			stkinout["alloctbls_id"] = req["alloc_id"]
+			stkinout["processseq"] = command_c[tblnamechop+"_processseq"]
+			stkinout["itms_id"] = command_c[tblnamechop+"_itm_id"]
+			stkinout["stktaking_proc"] = opeitm["stktaking_proc"]
+			stkinout["prjnos_id"] = command_c[tblnamechop+"_prjno_id"]
+			stkinout["inoutflg"] = tblnamechop
+			stkinout["shelfnos_id_out"] = command_c[tblnamechop+"_shelfno_id_fm"] 
+			stkinout["starttime"]  = command_c[tblnamechop+"_depdate"]
+			###stkinout["qty_stk"] = 0
+	
+			case tblnamechop 
+			when /shpsch/
+				 ###stkinout["qty_sch"] = command_c["#{tblnamechop}_qty"]  
+				 ###stkinout["qty"] = 0 
+			when /shpord/
+				 ###stkinout["qty"] = command_c["#{tblnamechop}_qty"]  
+				 ###stkinout["qty_sch"] = 0 
+			end	
+			proc_mk_outstks_rec stkinout,"add"
+	
+			strsql = %Q&select id from shelfnos where locas_id_shelfno = #{command_c["#{tblnamechop}_loca_id_to"]}
+												and code = 'consume'
+				&
+			shelfnos_id_to = ActiveRecord::Base.connection.select_value(strsql)
+			stkinout["shelfnos_id_in"] = (shelfnos_id_to||=0)
+			proc_mk_instks_rec stkinout,"add"
+			reqparams = RorBlkctl.proc_update_table  command_c,1
+	end	
+	
+	def proc_consume_self_sch_parts rec,paretblname,parent   ###tblname like %schs
+		strsql = %Q%select instk.packno,instk.alloctbls_id alloc_id,
+					---instk.qty,instk.qty_stk,instk.qty_sch,
+					alloc.qty,alloc.qty_stk,
+					gantt.itms_id,gantt.processseq,gantt.prjnos_id,gantt.expiredate,gantt.qty_bal trn_qty_bal,
+					instk.shelfnos_id_in,alloc.srctblname,
+					shelf.locas_id_shelfno shelf_loca_id
+					from instks instk 
+					inner join (alloctbls alloc inner join trngantts gantt on gantt.id =  alloc.trngantts_id)
+						on alloc.id = instk.alloctbls_id 
+					inner join shelfnos shelf on shelf.id =   shelfnos_id_in
+					where  alloc.trngantts_id = #{rec["id"]} 
+					---and instk.qty_sch > 0
+					and alloc.srctblname = '#{rec["tblname"]}' and alloc.srctblid = #{rec["tblid"]}
+		%
+		ActiveRecord::Base.connection.select_all(strsql).each do |stkinout|
+			stkinout["inoutflg"] = "con"
+			stkinout["alloctbls_id"] = stkinout["alloc_id"]
+			case paretblname ###消費場所
+			when /^prd/
+				if parent["workplace_loca_id_workplace"] == stkinout["shelf_loca_id"]
+					stkinout["shelfnos_id_out"] = stkinout["shelfnos_id_in"]  ### 子部品を直接親のlocasに納入した時
+				else	
+					strsql = %Q%select id from shelfnos where code = 'consume' 
+														and locas_id_shelfno = #{parent["workplace_loca_id_workplace"]}
+					%
+					stkinout["shelfnos_id_out"] = ActiveRecord::Base.connection.select_value(strsql)
+					stkinout["shelfnos_id_out"] ||= 0 
+				end
+			when /^pur/
+				if parent["supplier_loca_id_supplier"] == stkinout["shelf_loca_id"]
+					stkinout["shelfnos_id_out"] = stkinout["shelfnos_id_in"]  ### 子部品を直接親のlocasに納入した時
+				else	
+					strsql = %Q%select id from shelfnos where code = 'consume' 
+														and locas_id_shelfno = #{parent["supplier_loca_id_supplier"]}
+					%
+					stkinout["shelfnos_id_out"] = ActiveRecord::Base.connection.select_value(strsql)
+					stkinout["shelfnos_id_out"] ||= 0 
+				end
+			else
+				stkinout["shelfnos_id_out"] = 0
+			end
+			
+			stkinout["starttime"] = parent[paretblname.chop+"_duedate"]
+			
+			stkinout["qty_sch"] = stkinout["qty"]
+			stkinout["qty"] = 0
+			stkinout["qty_stk"] = 0
+			proc_mk_outstks_rec stkinout,"add"
+		end
+	end
+
+	def proc_consume_self_ord_parts stkinout ###親がacts,schs以外の時
+		###親を求める。
+		strsql = %Q%select s.id shelfno_id,ord.duedate from #{stkinout["paretblname"]} ord
+					#{case stkinout["paretblname"] 
+						when /^prd/
+							"inner join (r_workplaces w 
+										inner join shelfnos s on w.workplace_loca_id_workplace = s.locas_id_shelfno 
+													 and s.code = 'consume'
+												)
+									on workplaces_id = w.id	
+										"
+						when /^pur/
+							"inner join (r_suppliers w 
+										inner join shelfnos s on w.supplier_loca_id_supplier = s.locas_id_shelfno 
+													and s.code = 'consume'
+												)
+									on suppliers_id = w.id	
+										"
+						else
+						end}
+					where ord.id = #{stkinout["paretblid"]}
+			%	
+		parent = ActiveRecord::Base.connection.select_one(strsql)
+		stkinout["shelfnos_id_out"] = (parent["shelfno_id"]||=0)
+		stkinout["inoutflg"] = "con"
+		###消費時期
+		stkinout["starttime"] = parent["duedate"]
+		stkinout["qty"] = stkinout["qty"].to_f 
+		stkinout["qty_sch"] = 0
+		stkinout["qty_stk"] = 0
+		proc_mk_outstks_rec stkinout,"add"
+	end
+
+
 end    

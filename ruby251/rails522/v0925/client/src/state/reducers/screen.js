@@ -11,44 +11,44 @@ export let getScreenState = state => state.screen
 const initialValues = {
 }
 
-const screenreducer =  ( state= initialValues , action) =>{
-switch (action.type) {
+const screenreducer =  ( state= initialValues , actions) =>{
+switch (actions.type) {
 // Set the requesting flag and append a message to be shown
 
 case SCREENINIT_REQUEST:
   return {...state,
-          params:action.payload.params,
+          params:actions.payload.params,
           loading:true,
           message: [{ body: 'screen loading ...', time: new Date() }],
-          // editableflg:action.payload.editableflg
+          // editableflg:actions.payload.editableflg
 }
 
 
 case SCREEN_PARAMS_SET:
 return {...state,
-  params:action.payload.params,
+  params:actions.payload.params,
 }
 
 
 //case SCREEN_ONKEYUP:
 //return {...state,
-//  data:action.payload.data,
+//  data:actions.payload.data,
 //}
 
 
 case YUP_ERR_SET:
   return {...state,
-    data:action.payload.data,
+    data:actions.payload.data,
     loading : false,
-    error : action.payload.error,
+    error : actions.payload.error,
 }
   
 case SCREEN_REQUEST:
 return {...state,
-        params:action.payload.params,
+        params:actions.payload.params,
         loading:true,
         message: [{ body: 'screen loading ...', time: new Date() }],
-        // editableflg:action.payload.editableflg
+        // editableflg:actions.payload.editableflg
 }
 
 case SCREEN_SUCCESS7: // payloadに統一
@@ -56,22 +56,22 @@ return {...state,
   loading:false,
   hostError: null,
   disabled:false,
-  data: action.payload.data.data,
-  params: action.payload.data.params,
-  status: action.payload.data.status,
-  grid_columns_info:action.payload.data.grid_columns_info,
+  data: actions.payload.data.data,
+  params: actions.payload.data.params,
+  status: actions.payload.data.status,
+  grid_columns_info:actions.payload.data.grid_columns_info,
 }
 
 case SCREEN_LINEEDIT:
 return {...state,
-  data:action.payload.data,
-  params:action.payload.params,
+  data:actions.payload.data,
+  params:actions.payload.params,
   loading:false,
-  hostError:action.payload.data[action.payload.params.index].confirm_message
+  hostError:actions.payload.data[actions.payload.params.index].confirm_message
 }  
 
 case  DROPDOWNVALUE_SET:
-    let {index,field,val} = {...action.payload.dropDownValue}
+    let {index,field,val} = {...actions.payload.dropDownValue}
     state.data[index][field] = val
     return {...state,
       data:state.data
@@ -81,30 +81,30 @@ case  DROPDOWNVALUE_SET:
 // set the success and requesting flags to false
 case SCREEN_FAILURE:
   return {...state,
-  hostError: action.payload.message,
-  data: action.payload.data,
+  hostError: actions.payload.message,
+  data: actions.payload.data,
   loading:false,
 }
 
 case FETCH_REQUEST:
 return {...state,
-  params:action.payload.params, 
+  params:actions.payload.params, 
   loading:true,
   //editableflg:false
 }
 
 case FETCH_FAILURE:
     return {...state,
-      data:action.payload.data,  
-      params:action.payload.params,  
+      data:actions.payload.data,  
+      params:actions.payload.params,  
       loading:false,
-      hostError: action.payload.params.err,  
+      hostError: actions.payload.params.err,  
     }
 
 case FETCH_RESULT:
           return {...state,
-            data:action.payload.data, 
-            params:action.payload.params,  
+            data:actions.payload.data, 
+            params:actions.payload.params,  
             loading:false,
             hostError: null,
     }
@@ -118,7 +118,7 @@ case INPUTPROTECT_RESULT:
 
 case YUP_RESULT:
     return {...state,
-      message: action.payload.message,
+      message: actions.payload.message,
     }
 
 case MKSHPINSTS_SUCCESS:
@@ -137,7 +137,7 @@ return {...state,
 case CONFIRMALL_SUCCESS:
   return {...state,
    loading:false,
-   hostError: action.payload.messages,
+   hostError: actions.payload.messages,
    disabled:false,
 }
 

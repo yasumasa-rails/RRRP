@@ -1,0 +1,6 @@
+ --- create view script   r_classlists 
+ --- create view script   r_units 
+ --- create view script   r_boxes 
+ --- create view script   r_itms 
+ --- create view script   r_opeitms 
+ --- create view script   r_nditms 

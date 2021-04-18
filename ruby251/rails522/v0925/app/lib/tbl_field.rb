@@ -27,6 +27,10 @@ extend self
 				next
 			else
 			    @checktbls[linedata["pobject_code_tbl"]]="done"
+				if linedata["pobject_code_tbl"] =~ /persons|prjnos/  ###自己参照のため使用できない。
+					@messages << " #{linedata["pobject_code_tbl"]} can not use create view program "
+					return 	@messages,@modifysql
+				end
 				strsql = %Q&
 							select 	fld.ftype fieldcode_ftype,fld.dataprecision fieldcode_dataprecision,fld.datascale fieldcode_datascale,
 									fld.fieldlength fieldcode_fieldlength,
@@ -75,8 +79,14 @@ extend self
 					end
 				end
 
-				if @tblsfields[linedata["pobject_code_tbl"]]["id"].nil?
-					@messages << "table #{linedata["pobject_code_tbl"]} has not id "
+				if @tblsfields[linedata["pobject_code_tbl"]].nil?
+					@messages << "table #{linedata["pobject_code_tbl"]} not exists "
+					return @messages,@messages
+				else
+					if @tblsfields[linedata["pobject_code_tbl"]]["id"].nil?
+						@messages << "table #{linedata["pobject_code_tbl"]} has not id "
+						return @messages,@messages
+					end
 				end
 			end	
 		end	
@@ -112,23 +122,6 @@ extend self
 		end
 		return 	@messages,@modifysql
 	end
-
-	# def set_fields
-	# 			# strsql = "select 	pobject_code_sfd column_name from 	r_screenfields
-	# 	# 			where 	pobject_code_sfd like 'screenfield%'
-	# 	# 			and pobject_code_sfd not  in('screenfield_updated_at','screenfield_created_at','screenfield_update_ip',
-	# 	# 			'screenfield_id','screenfield_person_id_upd','screenfield_editable')"
-	# 	strsql = %Q&select sfd.code column_name 
-	# 						from screenfields screenfield
-	# 						inner join pobjects sfd on screenfield.pobjects_id_sfd = sfd.id 
-	# 	 					where  screenfield.selection = '1' and
-	# 								screenfield.expiredate > current_date and
-	# 								sfd.code like 'screenfield%' and
-	# 								sfd.code not  in('screenfield_updated_at','screenfield_created_at','screenfield_update_ip',
-	# 																'screenfield_id','screenfield_person_id_upd','screenfield_editable')
-	# 		&		
-	# 	@fields = ActiveRecord::Base.connection.select_values(strsql)	###screenfieldsの項目を調べる。項目が増えた時の対応	
-	# end	
 
 	def delete_tblfields fields,columns  ###{ fields={field =>tblrecOfField}}  tblrecOfField ={fieldcode_ftype=>xx,fieldcode_dataprecision..}
 		del_columns = columns.dup
@@ -280,7 +273,7 @@ extend self
 		when "numeric"
 			@modifysql << "\n alter table  #{rec["pobject_code_tbl"]}  ADD COLUMN #{rec["pobject_code_fld"]} #{rec["fieldcode_ftype"]}(#{rec["fieldcode_dataprecision"]},#{rec["fieldcode_datascale"]})"
 			if rec["pobject_code_fld"] =~ /_id$|_id_/
-				@modifysql << " not null;\n"
+				@modifysql << "  DEFAULT 0  not null;\n"
 			else
 				@modifysql << " ;\n"
 			end	
@@ -304,44 +297,47 @@ extend self
 						person_tbl = "persons" 
 						delm = "_upd"
 						person_screenfield = {}
-						ActiveRecord::Base.connection.select_all(screenfield_sql(person_tbl,nil)).each do |field|
-							case field["pobject_code_sfd"]
+						viewfield = "person_id_upd"
+						ActiveRecord::Base.connection.select_all(screenfield_sql(person_tbl,nil)).each do |upd_field|
+							case upd_field["pobject_code_sfd"]
 							when "id"
-								field["pobject_code_sfd"] = "#{tbl.chop}_person_id_upd"
-								person_screenfield[field["pobject_code_sfd"]] = field
+								upd_field["pobject_code_sfd"] = "#{tbl.chop}_person_id_upd"
+								person_screenfield[upd_field["pobject_code_sfd"]] = upd_field
 							when "person_code"
-								field["pobject_code_sfd"] = "person_code_upd"
-								person_screenfield[field["pobject_code_sfd"]] = field
-								field["screenfield_crtfield"] = "person_upd"
+								upd_field["screenfield_crtfield"] = "person_upd"
+								upd_field["pobject_code_sfd"] = "person_code_upd"
+								person_screenfield["person_code_upd"] = upd_field
 							when "person_name"
-								field["pobject_code_sfd"] = "person_name_upd"
-								person_screenfield[field["pobject_code_sfd"]] = field
-								field["screenfield_crtfield"] = "person_upd"
+								upd_field["screenfield_crtfield"] = "person_upd"
+								upd_field["pobject_code_sfd"] = "person_name_upd"
+								person_screenfield["person_name_upd"] = upd_field
 							end
 						end
-						person_screenfield.each do |sfd,field|
+						person_screenfield.each do |sfd,upd_field|
 							if last_screenfields[sfd]
 								last_screenfields.delete(sfd)   ###残った項目が削除対象
 							else
 								pobjects_id_sfd = chk_pobject_sfd_and_add(sfd)
-								add_screenfield_record screens_id,pobjects_id_sfd,field,"add",false 
+								add_screenfield_record screens_id,pobjects_id_sfd,upd_field,"add",false
 							end
 						end
 					when /s_id/
 						viewfield =  tbl.chop +  "_" +  pobject_code_fld.sub("s_id","_id")
 						if last_screenfields[viewfield].nil?
 							pobjects_id_sfd = chk_pobject_sfd_and_add viewfield
-							add_screenfield_record screens_id,pobjects_id_sfd,field,"add",true
+							add_screenfield_record screens_id,pobjects_id_sfd,field,"add",false
 						end
 						othertbl,delm = pobject_code_fld.split("_id",2) 
 						delm ||= ""
 						other_screenfield = {}
 						ActiveRecord::Base.connection.select_all(screenfield_sql(othertbl,false)).each do |other|
-								other["pobject_code_sfd"] = other["pobject_code_sfd"] + delm
-								other_screenfield[other["pobject_code_sfd"]] = other
+							other["pobject_code_sfd"] = other["pobject_code_sfd"] + delm
+							other_screenfield[other["pobject_code_sfd"]] = other
 						end
 						other_screenfield.each do |other_sfd,other_field|
-							if last_screenfields[other_sfd]
+							last_other_sfd = last_screenfields[other_sfd] 
+							if last_other_sfd
+								add_screenfield_record screens_id,last_other_sfd["screenfield_pobject_id_sfd"],last_other_sfd,"update",false
 								last_screenfields.delete(other_sfd)   ###残った項目が削除対象
 							else	
 								other_field["pobject_code_sfd"] = other_sfd
@@ -371,9 +367,8 @@ extend self
 									add_screenfield_record screens_id,pobjects_id_sfd,last_screenfields[viewfield],"update",true
 								end
 							else
-								add_screenfield_record screens_id,pobjects_id_sfd,last_screenfields[viewfield],"update",true
+								add_screenfield_record screens_id,pobjects_id_sfd,last_screenfields[viewfield],"delete",true
 							end
-							last_screenfields.delete(viewfield)
 						else
 							add_screenfield_record screens_id,pobjects_id_sfd,field,"add",true
 						end
@@ -397,20 +392,20 @@ extend self
 			create_viewfield "r_#{tbl}"
 		else 
 			### テーブルscreendsに登録されてない
-			@messages << " <p>please add screen  to　screens   --> '#{screen}' </p>"
-			strsql = "select * from pobjects where code ='#{screen}' and objecttype = 'screen'"
+			@messages << " <p>please add screen  to　screens   --> 'r_#{tbl}' </p>"
+			strsql = "select * from pobjects where code ='r_#{tbl}' and objecttype = 'screen'"
 			pobject_id_scr = ActiveRecord::Base.connection.select_one(strsql)
 			if pobject_id_scr
 				###ok
 			else
-				@messages << " <p>please  add screen code to pobjects --> '#{screen}' </p>"
+				@messages << " <p>please  add screen code to pobjects --> 'r_#{tbl}' </p>"
 			end	
 			screens_id = nil
 		end	
 	end
 	
 	def create_tbl_and_add_view_screenfields_id fields ### pobject_code_tbl
-		pobject_code_tbl = fields["pobject_code_tbl"]
+		pobject_code_tbl = fields["id"]["pobject_code_tbl"]
 		tmpstrsql = "\n create table #{pobject_code_tbl} ("
 		
 		fields.each do |pobject_code_fld,field|
@@ -483,15 +478,14 @@ extend self
 		command_r["pobject_code"] = screenfield
 		command_r["pobject_objecttype"] = "view_field"
 		command_r["pobject_expiredate"] = '2099/12/31'
-		###screenfield_screen_id = 1201 and  screenfield_pobject_id_sfd = 13952
-		###p command_r if command_r["screenfield_pobject_id_sfd"].to_s == "13952"
-		reqparams = RorBlkctl.proc_private_aud_rec(command_r,1,nil,nil,nil) 
-		if @sio_result_f ==   "9"
-		 	@messages <<  "error  add_pobject_record #{screenfield}"
+		reqparams = RorBlkctl.proc_update_table(command_r,1) 
+		if command_r[:sio_result_f] ==   "9"
+		 	@messages <<  "error  add_pobject_record #{screenfield}\n"
+			 @messages  << command_r[:sio_message_contents][0..200] + "\n"
+			@messages  << command_r[:sio_errline][0..200] 
 		end  
 		return command_r["id"]
 	end	
-
 	
 	def  update_pobject_record screenfield,id
 		command_r =  RorBlkctl.proc_init_from_screen @current_api_user,@params[:screenCode]
@@ -506,11 +500,14 @@ extend self
 		command_r["pobject_code"] = screenfield
 		command_r["pobject_objecttype"] = "view_field"
 		command_r["pobject_expiredate"] = '2099/12/31'
-		reqparams = RorBlkctl.proc_private_aud_rec(command_r,1,nil,nil,nil) 
-		if @sio_result_f ==   "9"
-		 	@messages <<  "error  add_pobject_record #{screenfield}"
+		reqparams = RorBlkctl.proc_update_table(command_r,1) 
+		if command_r[:sio_result_f] ==   "9"
+		 	@messages <<  "error  add_pobject_record #{screenfield}\n"
+			 @messages  << command_r[:sio_message_contents][0..200] + "\n"
+			@messages  << command_r[:sio_errline][0..200] 
 		end  
-	end	
+	end
+
 	def add_screenfield_record screens_id,pobjects_id_sfd,field,aud,owner  ###aud:add,update,delete   owner:自分自身の	テーブル?
 			command_r =  RorBlkctl.proc_init_from_screen @current_api_user,"r_screenfields"
 			command_r[:sio_viewname] =  "r_screenfields"
@@ -536,44 +533,48 @@ extend self
 			command_r["screenfield_remark"] =	field["screenfield_remark"]
 			command_r["screenfield_expiredate"] = (field["screenfield_expiredate"]||=field["tblfield_expiredate"])
 			command_r["screenfield_screen_id"] = screens_id
-			command_r["screenfield_selection"] = 	if owner == true
-														"1"
-													else 
-														if field["pobject_code_sfd"] =~ /_code|_name|_sno_|_cno_|_go_|_id/
+			command_r["screenfield_selection"] = 	if aud == "add"
+														if owner == true
 															"1"
-														else
-															"0"
+														else 
+															if field["pobject_code_sfd"] =~ /_code|_name|_sno|_cno|_go|_id/
+																"1"
+															else
+																"0"
+															end
 														end
+													else
+														field["screenfield_selection"]			
 													end		
-			command_r["screenfield_hideflg"] = if field["pobject_code_fld"] =~ /_id/  or field["pobject_code_fld"] == "id" then "1" else "0" end
-			command_r["screenfield_seqno"] =	if field["screenfield_seqno"]
+			command_r["screenfield_hideflg"] = if field["pobject_code_sfd"] =~ /_id/  or field["pobject_code_sfd"] == "id" then "1" else "0" end
+			command_r["screenfield_seqno"] =	if aud == "update"
 													field["screenfield_seqno"]
 												else
-													case field["pobject_code_fld"]
+													case field["pobject_code_sfd"]
 													when  /created_at|updated_at|update_ip|_id/  
 	  													9990
 													when "id"
 														99999
-													when "expiredate"
+													when /expiredate/
 														8880
-													when "remark"
+													when /remark/
 														8885
-													when "contents"
+													when /contents/
 														8887
-													when /_code|_sno_/
-														10
-													when /_gno_|_cno_/ 
-														300
+													when /_upd/
+														8885
+													when /_gno|_cno|_sno/ 
+														500
 													when /_name_/	
-														210
+														400
 													when /_code_/	
-														200
+														300
 													when /_name/	
-														110
+														200
 													when /_code/	
 														100
 													else
-														500
+														600
 													end
 												end		
 			command_r["screenfield_rowpos"]=(field["screenfield_rowpos"]||=0)
@@ -592,7 +593,27 @@ extend self
 			command_r["screenfield_edoptmaxlength"] = (field["screenfield_edoptmaxlength"]||=0)
 			command_r["screenfield_indisp"] =	(field["screenfield_indisp"]||="0")
 			command_r["screenfield_subindisp"] =""
-			command_r["screenfield_editable"] =	(field["screenfield_editable"]||="0")
+			command_r["screenfield_editable"] =	if field["pobject_code_sfd"]  =~ /_upd/
+													"0"
+												else
+													if owner == true
+														(field["screenfield_editable"]||="1")
+													else	 	
+														if field["pobject_code_sfd"] =~ /_code/
+															if field["screenfield_created_at"] == field["screenfield_updated_at"]
+																"1"
+															else
+																field["screenfield_editable"]
+															end
+														else	
+															if field["screenfield_created_at"] == field["screenfield_updated_at"]
+																"0"
+															else
+																field["screenfield_editable"]
+															end
+														end
+													end
+												end
 			command_r["screenfield_maxvalue"] = (field["screenfield_maxvalue"]||=0)
 			command_r["screenfield_minvalue"] = (field["screenfield_minvalue"]||=0)
 			command_r["screenfield_edoptsize"] = (field["screenfield_edoptsize"]||="0")
@@ -608,8 +629,10 @@ extend self
 												else
 													field["screenfield_crtfield"]	
 												end
-			reqparams = RorBlkctl.proc_private_aud_rec(command_r,1,nil,nil,nil) 
-			if @sio_result_f ==   "9"
+			reqparams = RorBlkctl.proc_update_table(command_r,1) 
+			if command_r[:sio_result_f] ==   "9"
+				@messages  << command_r[:sio_message_contents][0..200] + "\n"
+			 	@messages  << command_r[:sio_errline][0..200] 
 		 		@messages <<  "error  add screenfield record #{field["pobject_code_tbl"].chop}_#{field["pobject_code_fld"]}"
 			else  
 		  		@params[:addId] = command_r["id"]
@@ -703,15 +726,7 @@ extend self
 	end
 	
 	def create_sio_table  viewname
-		begin
-		  @modifysql  << "\n DROP TABLE IF EXISTS " + "sio.sio_" + viewname + ";"
-		rescue
-			  ###例外が発生したときの処理
-		else
-		# 例外が発生しなかったときに実行される処理
-		ensure
-		# 例外の発生有無に関わらず最後に必ず実行する処理
-		end
+		 @modifysql  << "\n DROP TABLE IF EXISTS " + "sio.sio_" + viewname + ";"
 			@modifysql << "\n CREATE TABLE " + "sio.sio_" + viewname   + " (\n"
 		  	@modifysql <<  "          sio_id numeric(22,0)  CONSTRAINT " +  "SIO_" + viewname   + "_id_pk PRIMARY KEY "
 		 	@modifysql <<  "          ,sio_user_code numeric(22,0)\n"
@@ -748,15 +763,15 @@ extend self
 			@modifysql <<  "\n drop sequence  if exists sio.sio_#{viewname}_seq ;"##logger.debug @modifysql
 			@modifysql <<  "\n create sequence sio.sio_#{viewname}_seq ;"##logger.debug @modifysql
 	end #
-	def sio_fields view
+	def sio_fields screen
 			sio_field_strsql = ""
 			strsql ="select screenfield.type screenfield_type,screenfield.dataprecision screenfield_dataprecision,
 							screenfield.datascale screenfield_datascale,sfd.code pobject_code_sfd,
 			 				screenfield.edoptmaxlength screenfield_edoptmaxlength,field.fieldlength fieldcode_fieldlength
 					from screenfields screenfield
 					inner join pobjects sfd on screenfield.pobjects_id_sfd = sfd.id 
-					inner join (select s.id,px.code pobject_code_view from screens s inner join pobjects px on s.pobjects_id_view = px.id
-								where px.code =  '#{view}' and px.objecttype = 'view') screen
+					inner join (select s.id,px.code pobject_code_scr from screens s inner join pobjects px on s.pobjects_id_scr = px.id
+								where px.code =  '#{screen}' and px.objecttype = 'screen') screen
 						on screen.id = screenfield.screens_id 
 					inner join(select t.id,fx.fieldlength from tblfields t  inner join (select f.fieldlength,f.id from fieldcodes f
 																inner join pobjects p
@@ -826,8 +841,8 @@ extend self
 		strsql = %Q&select sfd.code pobject_code_sfd
 						from screenfields s
 						inner join pobjects sfd on s.pobjects_id_sfd = sfd.id 
-						inner join (select s.id,px.code pobject_code_view from screens s inner join pobjects px on s.pobjects_id_view = px.id
-										where px.code =  'r_#{tbl}' and px.objecttype = 'view') screen
+						inner join (select s.id,px.code pobject_code_view from screens s inner join pobjects px on s.pobjects_id_scr = px.id
+										where px.code =  'r_#{tbl}' and px.objecttype = 'screen') screen
 							on screen.id = s.screens_id 
 						inner join(select t.id,fx.fieldlength from tblfields t  inner join (select f.fieldlength,f.id from fieldcodes f
 															inner join pobjects p
@@ -893,7 +908,6 @@ extend self
 		return @messages,@sql
 	end
 
-
 	def chk_constraint tblname,grpname
 		strsql = %Q%SELECT table_name,constraint_name
 					FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
@@ -912,6 +926,7 @@ extend self
 		end
 		return 	constraint_exists
 	end	
+
 	def	create_uniq_constraint tblname,grpname,codes
 		 @sql << %Q%ALTER TABLE public.#{tblname}
 				ADD CONSTRAINT #{tblname}_uky#{grpname} UNIQUE(#{codes.join(",")});\n%
@@ -974,8 +989,8 @@ extend self
 		s.edoptsize screenfield_edoptsize,s.edoptmaxlength screenfield_edoptmaxlength,s.edoptrow screenfield_edoptrow,
 		s.edoptcols screenfield_edoptcols,s.edoptvalue screenfield_sdoptvalue,
 		s.crtfield screenfield_crtfield,
-		s.expiredate	screenfield_expiredate,
-		s.id screenfield_id,
+		s.expiredate	screenfield_expiredate,s.paragraph screenfield_paragraph,
+		s.id screenfield_id,s.tblfields_id screenfield_tblfield_id,s.pobjects_id_sfd screenfield_pobject_id_sfd,
 		s.created_at screenfield_created_at,s.updated_at screenfield_updated_at ,s.remark screenfield_remark
 		from screenfields s inner join (select s0.id screens_id from screens s0
 											inner join pobjects p3 on s0.pobjects_id_scr = p3.id and p3.code = 'r_#{tbl}') s1

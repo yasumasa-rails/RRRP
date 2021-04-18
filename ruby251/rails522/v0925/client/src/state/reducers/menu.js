@@ -1,5 +1,5 @@
 import {  MENU_REQUEST, MENU_SUCCESS,LOGOUT_REQUEST,MENU_FAILURE,
-          SCREENINIT_REQUEST,SCREEN_SUCCESS7  } from 'actions'
+          SCREENINIT_REQUEST,SCREEN_SUCCESS7,SCREEN_FAILURE,  } from 'actions'
 const initialValues = {
   isSubmitting:false,
   isSignUp:false,
@@ -34,6 +34,13 @@ const menureducer =  (state= initialValues , actions) =>{
           return {...state,
             menuChanging:false,
     }
+
+    case SCREEN_FAILURE:
+      return {...state,
+        hostError: actions.payload.message,
+        loading:false,
+      } 
+
 
     case  LOGOUT_REQUEST:
     return {}  

@@ -130,7 +130,7 @@ module ControlFields
 						if  field =~ /_sno_|_cno_/ and field =~ /^#{screentblnamechop}/ and val != ""  and field !~ /_gridmessage/ and 
 							srctblnamechop =~ /^pur|^prd|^shp|^cust/
 								strsql = %Q% select sum(qty_src) qty_src 
-												from srctbls  where #{key.split("_")[1]} = '#{val}' ---key.split("_")[1] :xno
+												from linktbls  where #{key.split("_")[1]} = '#{val}' ---key.split("_")[1] :xno
 												and srctblname = '#{srctblnamechop}s'
 								%  ###次のステータスに移行していないqtyを求める。　
 								org =  ActiveRecord::Base.connection.select_one(strsql)
@@ -283,18 +283,17 @@ module ControlFields
 		return err
 	end
 
-	def proc_judge_check_code params
-		if params[:yupcheckcode]
-			judge_code = JSON.parse(params[:yupcheckcode])
+	def proc_judge_check_code params,sfd,yupcheckcode  ###item未使用
 			checkstatus = true
-			judge_code.each do |key,val|
-				params = __send__("check_#{val.split(",")[0]}",params)  ###[1]: nil all,add,updateは画面側で判断
+			check_proc = yupcheckcode.split(",")[0]
+			params = __send__("check_#{check_proc}",params,sfd,yupcheckcode)  ###[1]: nil all,add,updateは画面側で判断
+			if params[:err] =~ /error/
+				return params
 			end
-		end
 		return params 
 	end	
 
-	def check_paragraph params
+	def check_paragraph params,item,yupcheckcode ### item,yupcheckcode 未使用
 		linedata = params[:parse_linedata]
 		if linedata["screenfield_paragraph"] == ""
 			if linedata["pobject_code_sfd"] =~ /_code/ and params[:screenCode].split("_")[1].chop == linedata["pobject_code_sfd"].split("_"[0])
@@ -336,7 +335,7 @@ module ControlFields
 		return params
 	end	
 
-	def check_strorder params
+	def check_strorder params,item,yupcheckcode
 		linedata = params[:parse_linedata]
 		if linedata["screen_strorder"] and linedata["screen_strorder"] != ""
 			ary_select_fields = linedata.keys
@@ -372,103 +371,125 @@ module ControlFields
 		return sort_info
 	end	
 
-	# def check_qty params
-	# 	linedata = params[:parse_linedata]
-	# 	tblname =  params[:screenCode].split("_")[1]
-	# 	if linedata[tblname.chop + "_qty"]
-	# 		symqty = tblname.chop + "_qty"
-	# 	else
-	# 		symqty = tblname.chop + "_qty_stk"
-	# 	end
+	def check_qty params,item,yupcheckcode
+	 	linedata = params[:parse_linedata]
+		tblname =  params[:screenCode].split("_")[1]
+	 	if linedata[tblname.chop + "_qty"]
+	 		symqty = tblname.chop + "_qty"
+	 	else
+	 		symqty = tblname.chop + "_qty_stk"
+	 	end
 
-	# 	if linedata[symqty] == ""
-	# 		checkstatus = false
-	# 		params[:err] =  "error   --->#{symqty} missing "
-	# 	else
-	# 		currtblnamechop = ""
-	# 		tblnamechop = "" 
-	# 		strsql = ""
-	# 		linedata.each do |key,val|
-	# 			case key.to_s
-	# 				when  /_sno_/ ### ordからいきなり　actでの入力を認めている。
-	# 					if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
-	# 						currtblnamechop,tblnamechop = key.to_s.split("_sno_")
-	# 						strsql = %Q%select id from #{tblnamechop}s  where sno = '#{val}' %
-	# 						break
-	# 					end
-	# 				when  /_cno_/  
-	# 					if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
-	# 						currtblnamechop,tblnamechop = key.to_s.split("_cno_")
-	# 						strsql = %Q%select id from #{tblnamechop}s  where cno = '#{val}' %
-	# 						break
-	# 					end
-	# 				when  /_gno_/  
-	# 					if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
-	# 						currtblnamechop,tblnamechop = key.to_s.split("_gno_")
-	# 						strsql = %Q%select id from #{tblnamechop}s  where gno = '#{val}' %
-	# 						break
-	# 					end
-	# 			end
-	# 		end
-	# 		if 	strsql.size > 0
-	# 				tblids = ActiveRecord::Base.connection.select_values(strsql)	
-	# 				strsql = %Q%select sum(qty_pare) qty from trngantts where paretblname = '#{tblnamechop}s'
-	# 							and paretblid in(#{tblids.join(",")})
-	# 							and orgtblid = paretblid and paretblid = tblid
-	# 				%
-	# 				prev_qty = ActiveRecord::Base.connection.select_value(strsql)	
-	# 				if linedata[symqty].to_f  <= prev_qty.to_f   ### オーダ以上を許可するルール未設定
-	# 					checkstatus = true
-	# 				else
-	# 					checkstatus = false
-	# 					params[:err] =  "error ---> #{prev_qty} <　input qty:#{linedata[symqty]} "
-	# 				end
-	# 		end
-	# 		if linedata["id"] != "" and checkstatus == true ###更新の時のみ　ords-->insts  insts -->actsに既にどれだけ変化しているか？
-	# 			strsql = %Q%select sum(qty) qty from trngantts where tblname = '#{currtblnamechop}s'
-	# 							and tblid = #{linedata["id"]} group by  tblname,tblid
-	# 			%
-	# 			chng_qty = ActiveRecord::Base.connection.select_value(strsql)	
-	# 			chng_qty ||= 0.0  ###すでに次の状態に変化した数値
-	# 			if chng_qty.to_f <= linedata[symqty].to_f
-	# 				checkstatus = true
-	# 			else
-	# 				checkstatus = false
-	# 				params[:err] =  "error   ---> qty must be >= #{chng_qty} "
-	# 			end	
-	# 		end
-	# 	end
-	# 	return params
-	# end	
+	 	if linedata[symqty] == ""
+	 		checkstatus = false
+	 		params[:err] =  "error   --->#{symqty} missing "
+	 	else
+	 		currtblnamechop = ""
+	 		tblnamechop = "" 
+	 		strsql = ""
+	 		linedata.each do |key,val|
+	 			case key.to_s
+	 				when  /_sno_/ ### ordからいきなり　actでの入力を認めている。
+	 					if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
+	 						currtblnamechop,tblnamechop = key.to_s.split("_sno_")
+	 						strsql = %Q%select id from #{tblnamechop}s  where sno = '#{val}' %
+	 						break
+	 					end
+	 				when  /_cno_/  
+	 					if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
+	 						currtblnamechop,tblnamechop = key.to_s.split("_cno_")
+	 						strsql = %Q%select id from #{tblnamechop}s  where cno = '#{val}' %
+	 						break
+	 					end
+	 				when  /_gno_/  
+	 					if (tblnamechop == "" or  tblnamechop =~ /ord$/ or key.to_s =~ /dlv$/) and val != ""
+	 						currtblnamechop,tblnamechop = key.to_s.split("_gno_")
+	 						strsql = %Q%select id from #{tblnamechop}s  where gno = '#{val}' %
+	 						break
+	 					end
+	 			end
+	 		end
+	 		if 	strsql.size > 0
+	 				tblids = ActiveRecord::Base.connection.select_values(strsql)	
+					strsql = %Q%select sum(qty_pare) qty from trngantts where paretblname = '#{tblnamechop}s'
+	 							and paretblid in(#{tblids.join(",")})
+	 							and orgtblid = paretblid and paretblid = tblid
+	 				%
+	 				prev_qty = ActiveRecord::Base.connection.select_value(strsql)	
+	 				if linedata[symqty].to_f  <= prev_qty.to_f   ### オーダ以上を許可するルール未設定
+	 					checkstatus = true
+	 				else
+	 					checkstatus = false
+	 					params[:err] =  "error ---> #{prev_qty} <　input qty:#{linedata[symqty]} "
+	 				end
+	 		end
+	 		if linedata["id"] != "" and checkstatus == true ###更新の時のみ　ords-->insts  insts -->actsに既にどれだけ変化しているか？
+	 			strsql = %Q%select sum(qty) qty from trngantts where tblname = '#{currtblnamechop}s'
+	 							and tblid = #{linedata["id"]} group by  tblname,tblid
+	 			%
+	 			chng_qty = ActiveRecord::Base.connection.select_value(strsql)	
+	 			chng_qty ||= 0.0  ###すでに次の状態に変化した数値
+	 			if chng_qty.to_f <= linedata[symqty].to_f
+	 				checkstatus = true
+	 			else
+	 				checkstatus = false
+	 				params[:err] =  "error   ---> qty must be >= #{chng_qty} "
+	 			end	
+	 		end
+	 	end
+	 	return params
+	end	
 
-	# def check_loca_code_to params
-	# 	linedata = params[:parse_linedata]
-	# 	tblname =  params[:screenCode].split("_")[1]
-	# 	id = linedata["#{tblname.chop}_id"]
-	# 	if id != ""  ###更新の時のみ　ords-->insts  insts -->actsに既にどれだけ変化しているか？
-	# 		sym = "loca_code_to"
-	# 		if linedata[sym] == ""
-	# 			checkstatus = false
-	# 			params[:err] =  "error   --->#{sym} missing "
-	# 		else
-	# 			strsql = %Q%select sum(qty) from trngantts where orgtblname ='#{tblname}' and orgtblid = #{id} 
-	# 					 and  tblid = #{id} and tblname = '#{tblname}' group by orgtblname,orgtblid,tblname,tblid %
-	# 			trn_qty = ActiveRecord::Base.connection.select_value(strsql)
-	# 			chng_qty ||= 0.0  ###すでに次の状態に変化した数値
-	# 			strsql = %Q%select loca_code_to,#{tblname.chop}_qty from r_#{tblname} where id = #{id} %
-	# 			rec = ActiveRecord::Base.connection.select_one(strsql)
-	# 			if (chng_qty != rec["#{tblname.chop}_qty"] or rec["#{tblname.chop}_qty"]  != trn_qty) and 
-	# 					linedata[sym] != rec["loca_code_to"]
-	# 				checkstatus = false
-	# 				params[:err] =  "error   ---> loca_code_to must be >= #{rec["loca_code_to"]} "
-	# 			end 
-	# 		end
-	# 	end
-	# 	return params
-	# end	
+	 def check_loca_code_to params,item,yupcheckcode
+	 	linedata = params[:parse_linedata]
+	 	tblname =  params[:screenCode].split("_")[1]
+	 	id = linedata["#{tblname.chop}_id"]
+	 	if id != ""  ###更新の時のみ　ords-->insts  insts -->actsに既にどれだけ変化しているか？
+	 		sym = "loca_code_to"
+	 		if linedata[sym] == ""
+	 			checkstatus = false
+	 			params[:err] =  "error   --->#{sym} missing "
+	 		else
+	 			strsql = %Q%select sum(qty) from trngantts where orgtblname ='#{tblname}' and orgtblid = #{id} 
+	 					 and  tblid = #{id} and tblname = '#{tblname}' group by orgtblname,orgtblid,tblname,tblid %
+	 			trn_qty = ActiveRecord::Base.connection.select_value(strsql)
+	 			chng_qty ||= 0.0  ###すでに次の状態に変化した数値
+	 			strsql = %Q%select loca_code_to,#{tblname.chop}_qty from r_#{tblname} where id = #{id} %
+	 			rec = ActiveRecord::Base.connection.select_one(strsql)
+	 			if (chng_qty != rec["#{tblname.chop}_qty"] or rec["#{tblname.chop}_qty"]  != trn_qty) and 
+	 					linedata[sym] != rec["loca_code_to"]
+	 				checkstatus = false
+	 				params[:err] =  "error   ---> loca_code_to must be >= #{rec["loca_code_to"]} "
+	 			end 
+	 		end
+	 	end
+	 	return params
+	 end	
+
+	def check_already_used params,item,yupcheckcode   ###あるidで登録されたcodeが別のテーブルに既に登録されているとき、codeの変更は不可
+		###外部keyでチェックすべき???
+			check_code,view,field = yupcheckcode.split(",")
+				strsql = %Q&select #{field} from #{view} where #{field} = '#{params[:parse_linedata][item.to_sym]}'
+				&
+				old_value = ActiveRecord::Base.connection.select_value(strsql)
+				old_value ||= ""
+				if params[:parse_linedata][item.to_sym].nil? or params[:parse_linedata][item.to_sym] == ""
+					new_value = ""
+				else
+					strsql = %Q&select #{field} from #{view} where #{field.sub("_code","_id")} = #{params[:parse_linedata]["id"]}
+					&
+					new_value = ActiveRecord::Base.connection.select_value(strsql)
+				end
+				if old_value == new_value
+					params[:err] = "" 
+				else	
+					params[:err] =  "error   ---> #{field} can not change because #{view} already used "
+				end
+		return params	
+	end
 
 	###使用していない
-	def check_itm_loca_nditm params  ###使用してない
+	def check_itm_loca_nditm params,yupcheckcode ###使用してない
 		linedata = params[:parse_linedata]
 		if linedata["itm_code_nditm"].size > 0 and  linedata["loca_code_nditm"].size > 0
 			strsql = "select id from itms where code = '#{linedata["itm_code_nditm"]}' and expiredate > current_date"
@@ -496,38 +517,13 @@ module ControlFields
 		return params
 	end	
 
-	def prevTbl
-		{"purords"=>"purschs","purinsts"=>"purords","purdlvs"=>"purinsts","puracts"=>"purdlvs",
-			"inspords"=>"inspschs","inspinsts"=>"inspords","inspacts"=>"inspinsts",
-			"prdords"=>"prdschs","prdinsts"=>"prdords","prdacts"=>"prdinsts",
-			"payords"=>"payschs","payinsts"=>"payords","payacts"=>"payinsts",
-			"billords"=>"billschs","billinsts"=>"billords","billacts"=>"billinsts",
-			"shpords"=>"shpschs","shpinsts"=>"shpords","shpacts"=>"shpinsts"}
-	end
-	def prevStatus
-		{"purords"=>"pursch","purinsts"=>"purord","purdlvs"=>"purinsts","puracts"=>"purdlvs",
-			"prdords"=>"prdsch","prdinsts"=>"prdord","prdacts"=>"prdinst",
-			"payords"=>"paysch","payinsts"=>"payord","payacts"=>"payinst",
-			"billords"=>"billsch","billinsts"=>"billord","billacts"=>"billinst",
-			"shpords"=>"shpsch","shpinsts"=>"shpord","shpacts"=>"shpinst"}
-	end
-
-	def nextTbl
-		{"purschs"=>"purords","purords"=>"purinsts","purinsts"=>"purdlvs","purdlvs"=>"puracts",
-			"inspschs"=>"inspords","inspords"=>"inspinsts","inspinsts"=>"inspacts",
-			"prdschs"=>"prdords","prdords"=>"prdinsts","prdinsts"=>"prdacts",
-			"payschs"=>"payords","payords"=>"payinsts","payinsts"=>"payacts",
-			"billschs"=>"billords","billords"=>"billinsts","billinsts"=>"billacts",
-			"shpschs"=>"shpords","shpords"=>"shpinsts","shpinsts"=>"shpacts"}
-	end
-
 	def proc_snolist   ###reqparams["segment"] = ["trn_org"]の対象でもある。
 		{"purschs"=>"PS","purords"=>"PE","purinsts"=>"PH","purdlvs"=>"PV","puracts"=>"PA","purrets"=>"PR",
 			"inspschs"=>"IS","inspords"=>"IE","inspinsts"=>"IH","inspacts"=>"IA","insprets"=>"IR",
 			"prdschs"=>"MS","prdords"=>"ME","prdinsts"=>"MH","prdacts"=>"MA","prdrets"=>"MR",
 			"billschs"=>"BS","billords"=>"BE","billinsts"=>"BH","billacts"=>"BA","billrets"=>"BR",
 			"payschs"=>"YS","payords"=>"YE","payinsts"=>"YH","payacts"=>"YA","payrets"=>"YR",
-			"custschs"=>"CS","custords"=>"CE","custinsts"=>"YH","custacts"=>"YA","custrets"=>"YR",
+			"custschs"=>"CS","custords"=>"CQ","custinsts"=>"CJ","custacts"=>"CA","custrets"=>"CR",
 			"shpschs"=>"SS","shpords"=>"SE","shpinsts"=>"SH","shpacts"=>"SA","shprets"=>"SR"}
 	end
 

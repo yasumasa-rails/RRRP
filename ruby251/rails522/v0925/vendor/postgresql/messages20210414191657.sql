@@ -1,0 +1,2 @@
+ --- create view script   r_custrcvplcs 
+ --- create view script   r_custwhs 

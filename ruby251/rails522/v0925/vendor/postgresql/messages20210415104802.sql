@@ -1,0 +1,6 @@
+ --- create view script   r_prdinsts 
+ --- create view script   r_custinsts 
+ --- create view script   r_purinsts 
+ --- create view script   r_billinsts 
+ --- create view script   r_payinsts 
+ --- create view script   r_shpinsts 

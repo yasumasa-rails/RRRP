@@ -1,0 +1,4 @@
+ --- create view script   r_prdrsltinputs 
+ --- create view script   r_prdreplyinputs 
+ --- create view script   r_purreplyinputs 
+ --- create view script   r_purrsltinputs 
