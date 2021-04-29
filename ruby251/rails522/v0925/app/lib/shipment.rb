@@ -172,7 +172,7 @@ module Shipmeny
 												and code = 'consume'
 				&
 			shelfnos_id = ActiveRecord::Base.connection.select_value(strsql)
-			stkinout = Operation.proc_rinout_to_inout "outstk",r_outstks 
+			stkinout = rinout_to_inout "outstk",r_outstks 
 			stkinout["shelfnos_id_in"] = shelfnos_id
 			stkinout["alloctbls_id"] = r_outstks["outstk_alloctbl_id"]
 			stkinout["inoutflg"] = "shp"
@@ -191,6 +191,28 @@ module Shipmeny
 		RorBlkctl.proc_update_table_json(command_all,command_all.size,nil)
 		return outcnt,err
 	end	
+
+	
+	def rinout_to_inout stk,r_inout  ###
+		stkinout = {}
+		stkinout["shelfnos_id_out"] = r_inout["outstk_shelfno_id_out"]
+		stkinout["shelfnos_id_in"] = r_inout["instk_shelfno_id_in"]
+		stkinout["qty_stk"] = r_inout["alloctbl_qty_stk"]
+		if r_inout["srctblname"] =~ /schs$/
+			stkinout["qty_sch"] = r_inout["alloctbl_qty"]
+		else
+			stkinout["qty"] = r_inout["alloctbl_qty"]
+		end
+		stkinout["itms_id"] = r_inout["trngantt_itm_id"]
+		stkinout["lotno"] = r_inout["#{stk}_lotno"]
+		stkinout["processseq"] = r_inout["trngantt_processseq"]
+		stkinout["packno"] =  r_inout["#{stk}_packno"]
+		stkinout["prjnos_id"] = r_inout["trngantt_prjno_id"]
+		stkinout["starttime"] = r_inout["#{stk}_starttime"]
+		stkinout["expiredate"] = r_inout["#{stk}_expiredate"]
+		return stkinout
+end
+
 
 
 	def proc_mkshpacts params,grid_columns_info
@@ -543,7 +565,7 @@ module Shipmeny
 				&
 			shelfnos_id_to = ActiveRecord::Base.connection.select_value(strsql)
 			stkinout["shelfnos_id_in"] = (shelfnos_id_to||=0)
-			proc_mk_instks_rec stkinout,"add"
+			Operation.proc_mk_instks_rec stkinout,"add"
 			reqparams = RorBlkctl.proc_update_table  command_c,1
 	end	
 	

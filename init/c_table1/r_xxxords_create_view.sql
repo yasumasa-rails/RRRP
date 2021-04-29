@@ -38,13 +38,8 @@ billord.tblid  billord_tblid,
 billord.tax  billord_tax,
   bill.bill_chrg_id_bill  bill_chrg_id_bill ,
   bill.person_code_chrg_bill  person_code_chrg_bill ,
-  bill.usrgrp_name_chrg_bill  usrgrp_name_chrg_bill ,
-  bill.usrgrp_code_chrg_bill  usrgrp_code_chrg_bill ,
   bill.person_name_chrg_bill  person_name_chrg_bill ,
   itm.itm_classlist_id  itm_classlist_id ,
-  bill.scrlv_code_chrg_bill  scrlv_code_chrg_bill ,
-  bill.loca_code_sect_chrg_bill  loca_code_sect_chrg_bill ,
-  bill.loca_name_sect_chrg_bill  loca_name_sect_chrg_bill ,
   bill.person_sect_id_chrg_bill  person_sect_id_chrg_bill ,
   bill.chrg_person_id_chrg_bill  chrg_person_id_chrg_bill ,
   bill.bill_crr_id_bill  bill_crr_id_bill ,
@@ -72,56 +67,51 @@ billord.locas_id_to   billord_loca_id_to
           ,sio_sord varchar(256)
           ,sio_search varchar(10)
           ,sio_sidx varchar(256)
-,loca_code_bill  varchar (50) 
 ,itm_code  varchar (50) 
-,loca_name_bill  varchar (100) 
-,loca_code_to  varchar (50) 
-,person_code_upd  varchar (50) 
-,itm_name  varchar (100) 
-,person_name_upd  varchar (100) 
-,person_code_chrg_bill  varchar (50) 
-,person_name_chrg_bill  varchar (100) 
-,loca_name_to  varchar (100) 
-,scrlv_code_chrg_bill  varchar (50) 
-,usrgrp_code_chrg_bill  varchar (50) 
-,usrgrp_name_chrg_bill  varchar (100) 
-,loca_code_sect_chrg_bill  varchar (50) 
-,loca_name_sect_chrg_bill  varchar (100) 
-,crr_code_bill  varchar (50) 
-,crr_name_bill  varchar (100) 
+,unit_code  varchar (50) 
 ,classlist_code  varchar (50) 
 ,classlist_name  varchar (100) 
-,unit_code  varchar (50) 
+,itm_name  varchar (100) 
 ,unit_name  varchar (100) 
-,billord_orgtblid  numeric (38,0)
-,billord_saledate   timestamp(6) 
-,billord_qty  numeric (22,6)
-,billord_price  numeric (38,4)
-,billord_amt  numeric (18,4)
+,loca_code_to  varchar (50) 
+,crr_code_bill  varchar (50) 
+,person_code_chrg_bill  varchar (50) 
+,loca_code_bill  varchar (50) 
+,loca_name_bill  varchar (100) 
+,crr_name_bill  varchar (100) 
+,person_name_chrg_bill  varchar (100) 
+,loca_name_to  varchar (100) 
 ,billord_sno  varchar (40) 
 ,billord_duedate   timestamp(6) 
 ,billord_isudate   timestamp(6) 
+,billord_contents  varchar (4000) 
 ,billord_tblname  varchar (30) 
 ,billord_tblid  numeric (38,0)
 ,billord_tax  numeric (38,4)
-,billord_expiredate   date 
-,billord_remark  varchar (4000) 
-,billord_contents  varchar (4000) 
-,billord_bill_id  numeric (38,0)
-,bill_loca_id_bill  numeric (38,0)
-,billord_updated_at   timestamp(6) 
-,billord_created_at   timestamp(6) 
-,billord_itm_id  numeric (38,0)
-,billord_update_ip  varchar (40) 
-,billord_loca_id_to  numeric (38,0)
-,bill_crr_id_bill  numeric (22,0)
-,bill_chrg_id_bill  numeric (22,0)
-,itm_classlist_id  numeric (38,0)
-,person_sect_id_chrg_bill  numeric (22,0)
-,chrg_person_id_chrg_bill  numeric (38,0)
-,billord_person_id_upd  numeric (22,0)
-,itm_unit_id  numeric (22,0)
 ,id  numeric (38,0)
+,billord_orgtblid  numeric (38,0)
+,billord_bill_id  numeric (38,0)
+,billord_saledate   timestamp(6) 
+,billord_remark  varchar (4000) 
+,billord_expiredate   date 
+,billord_update_ip  varchar (40) 
+,billord_created_at   timestamp(6) 
+,billord_updated_at   timestamp(6) 
+,billord_itm_id  numeric (38,0)
+,billord_qty  numeric (22,6)
+,billord_price  numeric (38,4)
+,billord_amt  numeric (18,4)
+,billord_loca_id_to  numeric (38,0)
+,person_name_upd  varchar (100) 
+,person_code_upd  varchar (50) 
+,itm_classlist_id  numeric (38,0)
+,bill_chrg_id_bill  numeric (22,0)
+,bill_loca_id_bill  numeric (38,0)
+,itm_unit_id  numeric (22,0)
+,billord_person_id_upd  numeric (22,0)
+,bill_crr_id_bill  numeric (22,0)
+,chrg_person_id_chrg_bill  numeric (38,0)
+,person_sect_id_chrg_bill  numeric (22,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(22,0)
@@ -147,15 +137,10 @@ billord.locas_id_to   billord_loca_id_to
   itm.unit_code  unit_code ,
   itm.itm_unit_id  itm_unit_id ,
 payord.id id,
-  chrg.loca_code_sect_chrg  loca_code_sect_chrg ,
-  chrg.loca_name_sect_chrg  loca_name_sect_chrg ,
   chrg.person_sect_id_chrg  person_sect_id_chrg ,
   person_upd.person_code  person_code_upd ,
   person_upd.person_name  person_name_upd ,
-  chrg.scrlv_code_chrg  scrlv_code_chrg ,
   chrg.chrg_person_id_chrg  chrg_person_id_chrg ,
-  chrg.usrgrp_code_chrg  usrgrp_code_chrg ,
-  chrg.usrgrp_name_chrg  usrgrp_name_chrg ,
   supplier.loca_code_payment  loca_code_payment ,
   supplier.loca_name_payment  loca_name_payment ,
   itm.classlist_code  classlist_code ,
@@ -163,8 +148,6 @@ payord.id id,
   supplier.payment_loca_id_payment  payment_loca_id_payment ,
   supplier.payment_chrg_id_payment  payment_chrg_id_payment ,
   supplier.person_code_chrg_payment  person_code_chrg_payment ,
-  supplier.usrgrp_name_chrg_payment  usrgrp_name_chrg_payment ,
-  supplier.usrgrp_code_chrg_payment  usrgrp_code_chrg_payment ,
   supplier.person_name_chrg_payment  person_name_chrg_payment ,
   supplier.supplier_payment_id  supplier_payment_id ,
   supplier.supplier_loca_id_supplier  supplier_loca_id_supplier ,
@@ -173,35 +156,22 @@ payord.id id,
   supplier.loca_code_supplier  loca_code_supplier ,
   supplier.loca_name_supplier  loca_name_supplier ,
   supplier.person_code_chrg_supplier  person_code_chrg_supplier ,
-  supplier.usrgrp_name_chrg_supplier  usrgrp_name_chrg_supplier ,
-  supplier.usrgrp_code_chrg_supplier  usrgrp_code_chrg_supplier ,
   supplier.person_name_chrg_supplier  person_name_chrg_supplier ,
   supplier.crr_name_supplier  crr_name_supplier ,
   supplier.crr_code_supplier  crr_code_supplier ,
   crr_pur.crr_name  crr_name_pur ,
   crr_pur.crr_code  crr_code_pur ,
   itm.itm_classlist_id  itm_classlist_id ,
-  supplier.scrlv_code_chrg_supplier  scrlv_code_chrg_supplier ,
-  supplier.loca_name_sect_chrg_supplier  loca_name_sect_chrg_supplier ,
-  supplier.loca_code_sect_chrg_supplier  loca_code_sect_chrg_supplier ,
-  supplier.scrlv_code_chrg_payment  scrlv_code_chrg_payment ,
-  supplier.loca_name_sect_chrg_payment  loca_name_sect_chrg_payment ,
-  supplier.loca_code_sect_chrg_payment  loca_code_sect_chrg_payment ,
   supplier.chrg_person_id_chrg_supplier  chrg_person_id_chrg_supplier ,
   supplier.chrg_person_id_chrg_payment  chrg_person_id_chrg_payment ,
   supplier.person_sect_id_chrg_supplier  person_sect_id_chrg_supplier ,
   supplier.person_sect_id_chrg_payment  person_sect_id_chrg_payment ,
-  payment_pay.scrlv_code_chrg_payment  scrlv_code_chrg_payment_pay ,
   payment_pay.payment_chrg_id_payment  payment_chrg_id_payment_pay ,
-  payment_pay.loca_code_sect_chrg_payment  loca_code_sect_chrg_payment_pay ,
   payment_pay.loca_code_payment  loca_code_payment_pay ,
-  payment_pay.loca_name_sect_chrg_payment  loca_name_sect_chrg_payment_pay ,
   payment_pay.loca_name_payment  loca_name_payment_pay ,
   payment_pay.person_code_chrg_payment  person_code_chrg_payment_pay ,
   payment_pay.person_name_chrg_payment  person_name_chrg_payment_pay ,
-  payment_pay.usrgrp_name_chrg_payment  usrgrp_name_chrg_payment_pay ,
   payment_pay.person_sect_id_chrg_payment  person_sect_id_chrg_payment_pay ,
-  payment_pay.usrgrp_code_chrg_payment  usrgrp_code_chrg_payment_pay ,
   payment_pay.payment_loca_id_payment  payment_loca_id_payment_pay ,
   payment_pay.chrg_person_id_chrg_payment  chrg_person_id_chrg_payment_pay ,
 payord.price  payord_price,
@@ -254,100 +224,80 @@ payord.payments_id_pay   payord_payment_id_pay,
           ,sio_sord varchar(256)
           ,sio_search varchar(10)
           ,sio_sidx varchar(256)
-,crr_code_payment_pay  varchar (50) 
-,crr_code_payment  varchar (50) 
-,person_code_upd  varchar (50) 
-,person_name_upd  varchar (100) 
-,crr_name_payment_pay  varchar (100) 
-,crr_name_payment  varchar (100) 
 ,payord_sno  varchar (40) 
-,loca_name_sect_chrg  varchar (100) 
-,scrlv_code_chrg  varchar (50) 
-,usrgrp_code_chrg  varchar (50) 
-,usrgrp_name_chrg  varchar (100) 
-,loca_code_payment  varchar (50) 
-,loca_name_payment  varchar (100) 
-,classlist_code  varchar (50) 
-,classlist_name  varchar (100) 
-,person_name_chrg  varchar (100) 
 ,person_code_chrg  varchar (50) 
 ,itm_name  varchar (100) 
 ,itm_code  varchar (50) 
 ,unit_name  varchar (100) 
 ,unit_code  varchar (50) 
-,loca_code_sect_chrg  varchar (50) 
-,person_code_chrg_payment  varchar (50) 
-,usrgrp_name_chrg_payment  varchar (100) 
-,usrgrp_code_chrg_payment  varchar (50) 
-,person_name_chrg_payment  varchar (100) 
-,loca_code_supplier  varchar (50) 
-,loca_name_supplier  varchar (100) 
-,person_code_chrg_supplier  varchar (50) 
-,usrgrp_name_chrg_supplier  varchar (100) 
-,usrgrp_code_chrg_supplier  varchar (50) 
-,person_name_chrg_supplier  varchar (100) 
-,crr_name_supplier  varchar (100) 
-,crr_code_supplier  varchar (50) 
-,crr_name_pur  varchar (100) 
-,crr_code_pur  varchar (50) 
-,scrlv_code_chrg_supplier  varchar (50) 
-,loca_name_sect_chrg_supplier  varchar (100) 
-,loca_code_sect_chrg_supplier  varchar (50) 
-,scrlv_code_chrg_payment  varchar (50) 
-,loca_name_sect_chrg_payment  varchar (100) 
-,loca_code_sect_chrg_payment  varchar (50) 
-,scrlv_code_chrg_payment_pay  varchar (50) 
-,loca_code_sect_chrg_payment_pay  varchar (50) 
-,loca_code_payment_pay  varchar (50) 
-,loca_name_sect_chrg_payment_pay  varchar (100) 
-,loca_name_payment_pay  varchar (100) 
-,person_code_chrg_payment_pay  varchar (50) 
+,person_name_chrg  varchar (100) 
 ,person_name_chrg_payment_pay  varchar (100) 
-,usrgrp_name_chrg_payment_pay  varchar (100) 
-,usrgrp_code_chrg_payment_pay  varchar (50) 
+,person_code_chrg_payment_pay  varchar (50) 
+,loca_name_payment_pay  varchar (100) 
+,loca_code_payment_pay  varchar (50) 
+,loca_code_payment  varchar (50) 
+,loca_name_payment  varchar (100) 
+,classlist_code  varchar (50) 
+,classlist_name  varchar (100) 
+,crr_code_pur  varchar (50) 
+,crr_name_pur  varchar (100) 
+,person_code_chrg_payment  varchar (50) 
+,person_name_chrg_payment  varchar (100) 
+,crr_code_supplier  varchar (50) 
+,crr_name_supplier  varchar (100) 
+,person_name_chrg_supplier  varchar (100) 
+,person_code_chrg_supplier  varchar (50) 
+,loca_name_supplier  varchar (100) 
+,loca_code_supplier  varchar (50) 
 ,payord_qty  numeric (18,4)
-,payord_expiredate   date 
-,payord_isudate   timestamp(6) 
 ,payord_price  numeric (38,4)
+,payord_duedate   timestamp(6) 
+,payord_amt  numeric (18,4)
+,payord_isudate   timestamp(6) 
+,payord_expiredate   date 
+,payord_tax  numeric (38,4)
 ,payord_sno_purord  varchar (50) 
 ,payord_contract_price  varchar (1) 
-,payord_tax  numeric (38,4)
 ,payord_itm_code_client  varchar (50) 
-,payord_amt  numeric (18,4)
-,payord_duedate   timestamp(6) 
-,payord_remark  varchar (4000) 
+,crr_code_payment  varchar (50) 
+,crr_code_payment_pay  varchar (50) 
+,crr_name_payment  varchar (100) 
+,crr_name_payment_pay  varchar (100) 
 ,payord_contents  varchar (4000) 
-,payord_person_id_upd  numeric (38,0)
-,payord_supplier_id  numeric (22,0)
+,payord_remark  varchar (4000) 
+,person_code_upd  varchar (50) 
+,person_name_upd  varchar (100) 
+,payord_update_ip  varchar (40) 
 ,payord_crr_id_pur  numeric (22,0)
 ,payord_payment_id_pay  numeric (22,0)
 ,payment_crr_id_payment  numeric (22,0)
-,payment_crr_id_payment_pay  numeric (22,0)
+,payord_updated_at   timestamp(6) 
 ,id  numeric (38,0)
+,payord_id  numeric (38,0)
+,payord_person_id_upd  numeric (38,0)
+,payment_crr_id_payment_pay  numeric (22,0)
+,payord_chrg_id  numeric (38,0)
+,payord_supplier_id  numeric (22,0)
 ,payord_itm_id  numeric (38,0)
 ,payord_created_at   timestamp(6) 
-,payord_update_ip  varchar (40) 
-,payord_updated_at   timestamp(6) 
-,payord_id  numeric (38,0)
-,payord_chrg_id  numeric (38,0)
-,supplier_payment_id  numeric (38,0)
-,payment_chrg_id_payment  numeric (22,0)
-,chrg_person_id_chrg_payment_pay  numeric (38,0)
-,chrg_person_id_chrg_supplier  numeric (38,0)
-,payment_loca_id_payment_pay  numeric (38,0)
-,payment_loca_id_payment  numeric (38,0)
 ,chrg_person_id_chrg_payment  numeric (38,0)
 ,person_sect_id_chrg_payment  numeric (22,0)
-,itm_classlist_id  numeric (38,0)
-,itm_unit_id  numeric (22,0)
-,person_sect_id_chrg_payment_pay  numeric (22,0)
-,person_sect_id_chrg  numeric (22,0)
-,chrg_person_id_chrg  numeric (38,0)
-,person_sect_id_chrg_supplier  numeric (22,0)
-,supplier_chrg_id_supplier  numeric (22,0)
-,supplier_crr_id_supplier  numeric (22,0)
 ,payment_chrg_id_payment_pay  numeric (22,0)
+,chrg_person_id_chrg  numeric (38,0)
+,person_sect_id_chrg  numeric (22,0)
+,person_sect_id_chrg_payment_pay  numeric (22,0)
+,payment_loca_id_payment_pay  numeric (38,0)
+,chrg_person_id_chrg_payment_pay  numeric (38,0)
+,itm_unit_id  numeric (22,0)
+,supplier_crr_id_supplier  numeric (22,0)
+,supplier_chrg_id_supplier  numeric (22,0)
 ,supplier_loca_id_supplier  numeric (22,0)
+,supplier_payment_id  numeric (38,0)
+,payment_chrg_id_payment  numeric (22,0)
+,payment_loca_id_payment  numeric (38,0)
+,itm_classlist_id  numeric (38,0)
+,chrg_person_id_chrg_supplier  numeric (38,0)
+,person_sect_id_chrg_supplier  numeric (22,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(22,0)
@@ -415,8 +365,6 @@ mkord.chrgs_id_trn   mkord_chrg_id_trn,
   chrg_trn.person_code_chrg  person_code_chrg_trn ,
   chrg_trn.person_name_chrg  person_name_chrg_trn ,
   chrg_trn.person_sect_id_chrg  person_sect_id_chrg_trn ,
-  chrg_trn.loca_code_sect_chrg  loca_code_sect_chrg_trn ,
-  chrg_trn.loca_name_sect_chrg  loca_name_sect_chrg_trn ,
 mkord.duedate_pare  mkord_duedate_pare,
 mkord.sno_pare  mkord_sno_pare,
 mkord.confirm  mkord_confirm,
@@ -463,8 +411,6 @@ mkord.duedate_org  mkord_duedate_org
 ,mkord_tblname  varchar (20) 
 ,mkord_runtime  numeric (2,0)
 ,mkord_cmpldate   timestamp(6) 
-,person_code_upd  varchar (50) 
-,person_name_upd  varchar (100) 
 ,itm_code_trn  varchar (50) 
 ,mkord_opeitm_processseq_trn  varchar (3) 
 ,itm_name_trn  varchar (100) 
@@ -473,59 +419,59 @@ mkord.duedate_org  mkord_duedate_org
 ,loca_name_trn  varchar (100) 
 ,person_code_chrg_trn  varchar (50) 
 ,person_name_chrg_trn  varchar (100) 
-,loca_code_sect_chrg_trn  varchar (50) 
-,loca_name_sect_chrg_trn  varchar (100) 
 ,loca_code_to  varchar (50) 
 ,loca_name_to  varchar (100) 
 ,mkord_sno_trn  varchar (50) 
 ,mkord_paretblname  varchar (20) 
-,mkord_sno_pare  varchar (50) 
 ,itm_code_pare  varchar (50) 
 ,itm_name_pare  varchar (100) 
-,mkord_itm_code_pare  varchar (50) 
 ,loca_code_pare  varchar (50) 
 ,loca_name_pare  varchar (100) 
-,mkord_duedate_pare   timestamp(6) 
-,mkord_starttime_trn   timestamp(6) 
 ,mkord_sno_org  varchar (50) 
-,itm_code_org  varchar (50) 
 ,mkord_orgtblname  varchar (20) 
+,itm_code_org  varchar (50) 
 ,mkord_opeitm_processseq_org  varchar (3) 
 ,itm_name_org  varchar (100) 
 ,itm_std_org  varchar (50) 
 ,loca_code_org  varchar (50) 
 ,loca_name_org  varchar (100) 
-,classlist_code_org  varchar (50) 
-,classlist_name_pare  varchar (100) 
 ,classlist_name_org  varchar (100) 
+,classlist_name_pare  varchar (100) 
+,classlist_code_org  varchar (50) 
 ,mkord_duedate_org   timestamp(6) 
 ,mkord_message_code  varchar (256) 
 ,mkord_expiredate   date 
+,mkord_opeitm_processseq_pare  varchar (3) 
+,mkord_manual  varchar (1) 
+,mkord_itm_code_pare  varchar (50) 
+,mkord_skipcnt  numeric (38,0)
 ,mkord_incnt  numeric (38,0)
 ,mkord_outcnt  numeric (38,0)
 ,mkord_inqty  numeric (22,6)
 ,mkord_outqty  numeric (22,6)
 ,mkord_inamt  numeric (38,4)
 ,mkord_outamt  numeric (38,4)
-,mkord_skipcnt  numeric (38,0)
 ,mkord_skipqty  numeric (22,6)
 ,mkord_skipamt  numeric (38,4)
-,mkord_manual  varchar (1) 
-,mkord_opeitm_processseq_pare  varchar (3) 
+,mkord_duedate_pare   timestamp(6) 
+,mkord_sno_pare  varchar (50) 
+,mkord_starttime_trn   timestamp(6) 
 ,mkord_remark  varchar (4000) 
+,person_code_upd  varchar (50) 
+,person_name_upd  varchar (100) 
 ,mkord_itm_id_org  numeric (38,0)
 ,mkord_loca_id_pare  numeric (38,0)
 ,mkord_itm_id_pare  numeric (38,0)
 ,mkord_loca_id_trn  numeric (38,0)
 ,mkord_loca_id_org  numeric (38,0)
 ,mkord_person_id_upd  numeric (38,0)
-,mkord_updated_at   timestamp(6) 
 ,mkord_id  numeric (38,0)
 ,mkord_update_ip  varchar (40) 
 ,mkord_loca_id_to  numeric (38,0)
 ,mkord_created_at   timestamp(6) 
-,id  numeric (38,0)
 ,mkord_chrg_id_trn  numeric (38,0)
+,mkord_updated_at   timestamp(6) 
+,id  numeric (38,0)
 ,mkord_itm_id_trn  numeric (38,0)
 ,person_sect_id_chrg_trn  numeric (22,0)
           ,sio_errline varchar(4000)
@@ -554,30 +500,14 @@ mkord.duedate_org  mkord_duedate_org
   opeitm.itm_code  itm_code ,
   opeitm.unit_name  unit_name ,
   opeitm.unit_code  unit_code ,
-  opeitm.loca_code  loca_code ,
-  opeitm.loca_name  loca_name ,
   opeitm.itm_unit_id  itm_unit_id ,
-  opeitm.opeitm_processseq  opeitm_processseq ,
-  opeitm.opeitm_minqty  opeitm_minqty ,
-  opeitm.opeitm_packqty  opeitm_packqty ,
   opeitm.opeitm_priority  opeitm_priority ,
   opeitm.opeitm_itm_id  opeitm_itm_id ,
-  opeitm.opeitm_loca_id  opeitm_loca_id ,
-  opeitm.opeitm_duration  opeitm_duration ,
 prdord.id id,
-  chrg.loca_code_sect_chrg  loca_code_sect_chrg ,
-  chrg.loca_name_sect_chrg  loca_name_sect_chrg ,
   prjno.prjno_name  prjno_name ,
   chrg.person_sect_id_chrg  person_sect_id_chrg ,
-  opeitm.opeitm_operation  opeitm_operation ,
   person_upd.person_code  person_code_upd ,
   person_upd.person_name  person_name_upd ,
-  opeitm.opeitm_maxqty  opeitm_maxqty ,
-  opeitm.opeitm_opt_fixoterm  opeitm_opt_fixoterm ,
-  opeitm.opeitm_autocreate_ord  opeitm_autocreate_ord ,
-  opeitm.opeitm_autocreate_inst  opeitm_autocreate_inst ,
-  opeitm.opeitm_prdpurshp  opeitm_prdpurshp ,
-  opeitm.opeitm_safestkqty  opeitm_safestkqty ,
   opeitm.unit_code_case  unit_code_case ,
   opeitm.unit_name_case  unit_name_case ,
   opeitm.opeitm_unit_id_case  opeitm_unit_id_case ,
@@ -598,20 +528,10 @@ prdord.isudate  prdord_isudate,
   opeitm.shelfno_loca_id_shelfno  shelfno_loca_id_shelfno ,
   opeitm.loca_code_shelfno  loca_code_shelfno ,
   opeitm.loca_name_shelfno  loca_name_shelfno ,
-  opeitm.opeitm_contents  opeitm_contents ,
-  opeitm.opeitm_autocreate_act  opeitm_autocreate_act ,
-  opeitm.opeitm_shuffle_flg  opeitm_shuffle_flg ,
-  opeitm.opeitm_shuffle_loca  opeitm_shuffle_loca ,
-  opeitm.opeitm_chkord_proc  opeitm_chkord_proc ,
   prjno.prjno_code  prjno_code ,
-  opeitm.opeitm_esttosch  opeitm_esttosch ,
   chrg.chrg_person_id_chrg  chrg_person_id_chrg ,
-  chrg.usrgrp_code_chrg  usrgrp_code_chrg ,
-  chrg.usrgrp_name_chrg  usrgrp_name_chrg ,
   opeitm.classlist_code  classlist_code ,
   opeitm.classlist_name  classlist_name ,
-  opeitm.opeitm_rule_price  opeitm_rule_price ,
-  opeitm.opeitm_mold  opeitm_mold ,
 prdord.prjnos_id   prdord_prjno_id,
 prdord.gno  prdord_gno,
   opeitm.boxe_unit_id_box  boxe_unit_id_box ,
@@ -625,14 +545,8 @@ prdord.gno  prdord_gno,
   opeitm.opeitm_boxe_id  opeitm_boxe_id ,
 prdord.opeitms_id   prdord_opeitm_id,
 prdord.chrgs_id   prdord_chrg_id,
-  opeitm.opeitm_opt_fix_flg  opeitm_opt_fix_flg ,
-  opeitm.opeitm_prjalloc_flg  opeitm_prjalloc_flg ,
 prdord.starttime  prdord_starttime,
   prjno.prjno_code_chil  prjno_code_chil ,
-  opeitm.opeitm_units_lttime  opeitm_units_lttime ,
-  opeitm.opeitm_autoord_p  opeitm_autoord_p ,
-  opeitm.opeitm_autoinst_p  opeitm_autoinst_p ,
-  opeitm.opeitm_autoact_p  opeitm_autoact_p ,
   opeitm.opeitm_shelfno_id  opeitm_shelfno_id ,
 prdord.confirm  prdord_confirm,
 prdord.opt_fixoterm  prdord_opt_fixoterm,
@@ -652,10 +566,15 @@ prdord.qty_case  prdord_qty_case,
   workplace.loca_name_workplace  loca_name_workplace ,
 prdord.shelfnos_id_to   prdord_shelfno_id_to,
   workplace.workplace_chrg_id_workplace  workplace_chrg_id_workplace ,
+  workplace.person_code_chrg_workplace  person_code_chrg_workplace ,
+  workplace.person_name_chrg_workplace  person_name_chrg_workplace ,
   workplace.person_sect_id_chrg_workplace  person_sect_id_chrg_workplace ,
   workplace.chrg_person_id_chrg_workplace  chrg_person_id_chrg_workplace ,
 prdord.workplaces_id   prdord_workplace_id,
-prdord.sno_prdsch  prdord_sno_prdsch
+prdord.sno_prdsch  prdord_sno_prdsch,
+  prjno.prjno_name_chil  prjno_name_chil ,
+  opeitm.loca_code_opeitm  loca_code_opeitm ,
+  opeitm.loca_name_opeitm  loca_name_opeitm 
  from prdords   prdord,
   r_persons  person_upd ,  r_prjnos  prjno ,  r_opeitms  opeitm ,  r_chrgs  chrg ,  r_shelfnos  shelfno_to ,  r_workplaces  workplace 
   where       prdord.persons_id_upd = person_upd.id      and prdord.prjnos_id = prjno.id      and prdord.opeitms_id = opeitm.id      and prdord.chrgs_id = chrg.id      and prdord.shelfnos_id_to = shelfno_to.id      and prdord.workplaces_id = workplace.id     ;
@@ -684,17 +603,12 @@ prdord.sno_prdsch  prdord_sno_prdsch
 ,prdord_sno  varchar (40) 
 ,itm_code  varchar (50) 
 ,itm_name  varchar (100) 
-,opeitm_processseq  numeric (3,0)
 ,prdord_duedate   timestamp(6) 
 ,prdord_qty  numeric (18,4)
-,loca_code  varchar (50) 
-,loca_name  varchar (100) 
 ,loca_code_workplace  varchar (50) 
 ,loca_name_workplace  varchar (100) 
 ,opeitm_priority  numeric (3,0)
-,prdord_starttime   timestamp(6) 
 ,prdord_toduedate   timestamp(6) 
-,opeitm_packqty  numeric (38,0)
 ,prdord_qty_case  numeric (38,0)
 ,prjno_code  varchar (50) 
 ,prjno_name  varchar (100) 
@@ -715,15 +629,17 @@ prdord.sno_prdsch  prdord_sno_prdsch
 ,prdord_autocreate_inst  varchar (1) 
 ,prdord_autocreate_act  varchar (1) 
 ,prdord_autoinst_p  numeric (3,0)
-,prdord_gno  varchar (40) 
 ,prdord_expiredate   date 
-,loca_name_sect_chrg  varchar (100) 
-,loca_code_sect_chrg  varchar (50) 
-,prjno_code_chil  varchar (50) 
-,usrgrp_code_chrg  varchar (50) 
-,usrgrp_name_chrg  varchar (100) 
+,person_name_chrg_workplace  varchar (100) 
+,person_code_chrg_workplace  varchar (50) 
 ,prdord_sno_prdsch  varchar (50) 
+,prjno_code_chil  varchar (50) 
+,loca_code_opeitm  varchar (50) 
+,loca_name_opeitm  varchar (100) 
+,prjno_name_chil  varchar (100) 
 ,unit_code  varchar (50) 
+,prdord_gno  varchar (40) 
+,prdord_starttime   timestamp(6) 
 ,unit_name  varchar (100) 
 ,unit_code_case  varchar (50) 
 ,unit_name_case  varchar (100) 
@@ -735,59 +651,35 @@ prdord.sno_prdsch  prdord_sno_prdsch
 ,unit_name_prdpurshp  varchar (100) 
 ,boxe_code  varchar (50) 
 ,boxe_name  varchar (100) 
-,opeitm_mold  varchar (1) 
-,opeitm_opt_fix_flg  varchar (1) 
-,opeitm_units_lttime  varchar (4) 
-,opeitm_minqty  numeric (38,6)
-,opeitm_maxqty  numeric (22,0)
-,opeitm_esttosch  numeric (22,0)
-,opeitm_chkord_proc  numeric (3,0)
-,opeitm_operation  varchar (20) 
-,opeitm_autoinst_p  numeric (3,0)
-,opeitm_autocreate_ord  varchar (1) 
-,opeitm_autocreate_inst  varchar (1) 
-,opeitm_shuffle_flg  varchar (1) 
-,opeitm_shuffle_loca  varchar (1) 
-,opeitm_autocreate_act  varchar (1) 
-,opeitm_rule_price  varchar (1) 
-,opeitm_contents  varchar (4000) 
-,opeitm_prdpurshp  varchar (20) 
-,opeitm_autoord_p  numeric (3,0)
-,opeitm_opt_fixoterm  numeric (5,2)
-,opeitm_prjalloc_flg  numeric (22,0)
-,opeitm_duration  numeric (38,2)
-,opeitm_safestkqty  numeric (38,0)
-,opeitm_autoact_p  numeric (3,0)
 ,prdord_remark  varchar (4000) 
-,prdord_person_id_upd  numeric (38,0)
-,prdord_prjno_id  numeric (38,0)
-,prdord_id  numeric (38,0)
-,prdord_update_ip  varchar (40) 
-,prdord_opeitm_id  numeric (38,0)
-,prdord_chrg_id  numeric (38,0)
-,prdord_created_at   timestamp(6) 
-,prdord_updated_at   timestamp(6) 
-,id  numeric (38,0)
-,prdord_shelfno_id_to  numeric (38,0)
-,prdord_workplace_id  numeric (22,0)
-,chrg_person_id_chrg  numeric (38,0)
-,shelfno_loca_id_shelfno  numeric (38,0)
-,boxe_unit_id_outbox  numeric (38,0)
-,itm_classlist_id  numeric (38,0)
 ,person_sect_id_chrg  numeric (22,0)
-,chrg_person_id_chrg_workplace  numeric (38,0)
-,boxe_unit_id_box  numeric (38,0)
-,opeitm_loca_id  numeric (38,0)
+,id  numeric (38,0)
 ,shelfno_loca_id_shelfno_to  numeric (38,0)
 ,workplace_loca_id_workplace  numeric (22,0)
 ,opeitm_itm_id  numeric (38,0)
-,opeitm_unit_id_prdpurshp  numeric (38,0)
 ,itm_unit_id  numeric (22,0)
+,prdord_shelfno_id_to  numeric (38,0)
 ,workplace_chrg_id_workplace  numeric (22,0)
 ,person_sect_id_chrg_workplace  numeric (22,0)
-,opeitm_shelfno_id  numeric (22,0)
-,opeitm_unit_id_case  numeric (38,0)
+,chrg_person_id_chrg_workplace  numeric (38,0)
+,prdord_workplace_id  numeric (22,0)
+,opeitm_unit_id_prdpurshp  numeric (38,0)
+,prdord_prjno_id  numeric (38,0)
+,chrg_person_id_chrg  numeric (38,0)
+,boxe_unit_id_box  numeric (38,0)
+,boxe_unit_id_outbox  numeric (38,0)
 ,opeitm_boxe_id  numeric (22,0)
+,prdord_opeitm_id  numeric (38,0)
+,prdord_chrg_id  numeric (38,0)
+,shelfno_loca_id_shelfno  numeric (38,0)
+,opeitm_shelfno_id  numeric (22,0)
+,prdord_person_id_upd  numeric (38,0)
+,prdord_id  numeric (38,0)
+,prdord_update_ip  varchar (40) 
+,prdord_created_at   timestamp(6) 
+,prdord_updated_at   timestamp(6) 
+,opeitm_unit_id_case  numeric (38,0)
+,itm_classlist_id  numeric (38,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(22,0)
@@ -806,24 +698,20 @@ prdord.sno_prdsch  prdord_sno_prdsch
   drop view if  exists r_purords cascade ; 
  create or replace view r_purords as select  
   opeitm.opeitm_unit_id_prdpurshp  opeitm_unit_id_prdpurshp ,
+  opeitm.unit_name_prdpurshp  unit_name_prdpurshp ,
+  opeitm.unit_code_prdpurshp  unit_code_prdpurshp ,
 purord.autoinst_p  purord_autoinst_p,
 purord.autocreate_act  purord_autocreate_act,
 purord.autoact_p  purord_autoact_p,
   chrg.person_name_chrg  person_name_chrg ,
   chrg.person_code_chrg  person_code_chrg ,
   opeitm.itm_name  itm_name ,
-  opeitm.itm_std  itm_std ,
   opeitm.itm_code  itm_code ,
   opeitm.unit_name  unit_name ,
   opeitm.unit_code  unit_code ,
-  opeitm.loca_code  loca_code ,
-  opeitm.loca_name  loca_name ,
   opeitm.itm_unit_id  itm_unit_id ,
-  opeitm.opeitm_processseq  opeitm_processseq ,
-  opeitm.opeitm_packqty  opeitm_packqty ,
   opeitm.opeitm_priority  opeitm_priority ,
   opeitm.opeitm_itm_id  opeitm_itm_id ,
-  opeitm.opeitm_loca_id  opeitm_loca_id ,
 purord.qty  purord_qty,
 purord.duedate  purord_duedate,
 purord.isudate  purord_isudate,
@@ -833,15 +721,11 @@ purord.created_at  purord_created_at,
 purord.updated_at  purord_updated_at,
 purord.id  purord_id,
 purord.sno  purord_sno,
-  opeitm.opeitm_duration  opeitm_duration ,
 purord.id id,
-  chrg.loca_code_sect_chrg  loca_code_sect_chrg ,
-  chrg.loca_name_sect_chrg  loca_name_sect_chrg ,
   prjno.prjno_name  prjno_name ,
   chrg.person_sect_id_chrg  person_sect_id_chrg ,
   person_upd.person_code  person_code_upd ,
   person_upd.person_name  person_name_upd ,
-  opeitm.opeitm_autocreate_inst  opeitm_autocreate_inst ,
 purord.amt  purord_amt,
 purord.toduedate  purord_toduedate,
 purord.persons_id_upd   purord_person_id_upd,
@@ -858,6 +742,8 @@ purord.opeitms_id   purord_opeitm_id,
   opeitm.shelfno_code  shelfno_code ,
   opeitm.shelfno_name  shelfno_name ,
   opeitm.shelfno_loca_id_shelfno  shelfno_loca_id_shelfno ,
+  opeitm.loca_code_shelfno  loca_code_shelfno ,
+  opeitm.loca_name_shelfno  loca_name_shelfno ,
 purord.autocreate_inst  purord_autocreate_inst,
   prjno.prjno_code  prjno_code ,
 purord.prjnos_id   purord_prjno_id,
@@ -874,16 +760,21 @@ purord.gno  purord_gno,
   crr.crr_code  crr_code ,
   crr.crr_name  crr_name ,
   opeitm.boxe_unit_id_box  boxe_unit_id_box ,
+  opeitm.unit_code_box  unit_code_box ,
+  opeitm.unit_name_box  unit_name_box ,
   opeitm.boxe_unit_id_outbox  boxe_unit_id_outbox ,
+  opeitm.unit_code_outbox  unit_code_outbox ,
+  opeitm.unit_name_outbox  unit_name_outbox ,
+  opeitm.boxe_code  boxe_code ,
+  opeitm.boxe_name  boxe_name ,
   opeitm.opeitm_boxe_id  opeitm_boxe_id ,
 purord.itm_code_client  purord_itm_code_client,
 purord.starttime  purord_starttime,
   prjno.prjno_code_chil  prjno_code_chil ,
-  opeitm.opeitm_autoinst_p  opeitm_autoinst_p ,
-  opeitm.opeitm_autoact_p  opeitm_autoact_p ,
   opeitm.opeitm_shelfno_id  opeitm_shelfno_id ,
   supplier.payment_chrg_id_payment  payment_chrg_id_payment ,
-  supplier.usrgrp_name_chrg_payment  usrgrp_name_chrg_payment ,
+  supplier.person_code_chrg_payment  person_code_chrg_payment ,
+  supplier.person_name_chrg_payment  person_name_chrg_payment ,
 purord.suppliers_id   purord_supplier_id,
   supplier.supplier_payment_id  supplier_payment_id ,
   supplier.supplier_loca_id_supplier  supplier_loca_id_supplier ,
@@ -901,8 +792,6 @@ purord.crrs_id_pur   purord_crr_id_pur,
   opeitm.itm_classlist_id  itm_classlist_id ,
   supplier.chrg_person_id_chrg_supplier  chrg_person_id_chrg_supplier ,
   supplier.chrg_person_id_chrg_payment  chrg_person_id_chrg_payment ,
-  opeitm.opeitm_stktaking_proc  opeitm_stktaking_proc ,
-  opeitm.opeitm_acceptance_proc  opeitm_acceptance_proc ,
   supplier.person_sect_id_chrg_supplier  person_sect_id_chrg_supplier ,
   supplier.person_sect_id_chrg_payment  person_sect_id_chrg_payment ,
 purord.shelfnos_id_to   purord_shelfno_id_to,
@@ -914,7 +803,10 @@ purord.shelfnos_id_to   purord_shelfno_id_to,
 purord.crrs_id   purord_crr_id,
   supplier.payment_crr_id_payment  payment_crr_id_payment ,
   supplier.crr_code_payment  crr_code_payment ,
-  supplier.crr_name_payment  crr_name_payment 
+  supplier.crr_name_payment  crr_name_payment ,
+  prjno.prjno_name_chil  prjno_name_chil ,
+  opeitm.loca_code_opeitm  loca_code_opeitm ,
+  opeitm.loca_name_opeitm  loca_name_opeitm 
  from purords   purord,
   r_persons  person_upd ,  r_opeitms  opeitm ,  r_prjnos  prjno ,  r_chrgs  chrg ,  r_suppliers  supplier ,  r_crrs  crr_pur ,  r_shelfnos  shelfno_to ,  r_crrs  crr 
   where       purord.persons_id_upd = person_upd.id      and purord.opeitms_id = opeitm.id      and purord.prjnos_id = prjno.id      and purord.chrgs_id = chrg.id      and purord.suppliers_id = supplier.id      and purord.crrs_id_pur = crr_pur.id      and purord.shelfnos_id_to = shelfno_to.id      and purord.crrs_id = crr.id     ;
@@ -940,28 +832,18 @@ purord.crrs_id   purord_crr_id,
 ,purord_sno  varchar (40) 
 ,purord_isudate   timestamp(6) 
 ,itm_code  varchar (50) 
-,crr_code  varchar (50) 
-,crr_code_payment  varchar (50) 
-,person_code_upd  varchar (50) 
 ,itm_name  varchar (100) 
+,person_code_upd  varchar (50) 
 ,person_name_upd  varchar (100) 
-,itm_std  varchar (50) 
-,opeitm_processseq  numeric (3,0)
 ,purord_starttime   timestamp(6) 
 ,purord_duedate   timestamp(6) 
-,crr_name_payment  varchar (100) 
 ,purord_qty  numeric (18,4)
-,crr_name  varchar (100) 
-,opeitm_packqty  numeric (38,0)
 ,loca_code_supplier  varchar (50) 
 ,loca_name_supplier  varchar (100) 
-,loca_code  varchar (50) 
-,loca_name  varchar (100) 
 ,purord_qty_case  numeric (38,0)
 ,purord_price  numeric (38,4)
 ,purord_amt  numeric (18,4)
 ,purord_tax  numeric (38,4)
-,purord_contract_price  varchar (1) 
 ,crr_code_supplier  varchar (50) 
 ,crr_name_supplier  varchar (100) 
 ,crr_code_pur  varchar (50) 
@@ -974,78 +856,88 @@ purord.crrs_id   purord_crr_id,
 ,loca_name_shelfno_to  varchar (100) 
 ,prjno_code  varchar (50) 
 ,prjno_name  varchar (100) 
+,loca_code_shelfno  varchar (50) 
+,loca_name_shelfno  varchar (100) 
 ,person_code_chrg_supplier  varchar (50) 
+,crr_code  varchar (50) 
 ,person_name_chrg_supplier  varchar (100) 
 ,person_code_chrg  varchar (50) 
 ,person_name_chrg  varchar (100) 
-,loca_code_sect_chrg  varchar (50) 
-,loca_name_sect_chrg  varchar (100) 
 ,purord_itm_code_client  varchar (50) 
 ,purord_opt_fixoterm  numeric (5,2)
 ,purord_autocreate_inst  varchar (1) 
 ,purord_autoinst_p  numeric (3,0)
 ,purord_autocreate_act  varchar (1) 
 ,purord_autoact_p  numeric (3,0)
-,purord_gno  varchar (40) 
 ,unit_code  varchar (50) 
 ,unit_name  varchar (100) 
 ,unit_code_case  varchar (50) 
 ,unit_name_case  varchar (100) 
+,unit_name_outbox  varchar (100) 
+,unit_code_outbox  varchar (50) 
 ,prjno_code_chil  varchar (50) 
 ,loca_code_payment  varchar (50) 
 ,loca_name_payment  varchar (100) 
 ,classlist_code  varchar (50) 
 ,classlist_name  varchar (100) 
-,usrgrp_name_chrg_payment  varchar (100) 
+,unit_code_prdpurshp  varchar (50) 
+,unit_name_prdpurshp  varchar (100) 
+,boxe_code  varchar (50) 
+,boxe_name  varchar (100) 
+,unit_code_box  varchar (50) 
+,unit_name_box  varchar (100) 
+,person_name_chrg_payment  varchar (100) 
+,person_code_chrg_payment  varchar (50) 
 ,purord_toduedate   timestamp(6) 
 ,purord_expiredate   date 
+,crr_name  varchar (100) 
 ,purord_sno_pursch  varchar (50) 
-,opeitm_autocreate_inst  varchar (1) 
+,loca_code_opeitm  varchar (50) 
 ,opeitm_priority  numeric (3,0)
-,opeitm_autoact_p  numeric (3,0)
-,opeitm_autoinst_p  numeric (3,0)
-,opeitm_duration  numeric (38,2)
-,opeitm_stktaking_proc  varchar (1) 
-,opeitm_acceptance_proc  varchar (1) 
+,crr_code_payment  varchar (50) 
+,loca_name_opeitm  varchar (100) 
+,crr_name_payment  varchar (100) 
+,prjno_name_chil  varchar (100) 
+,purord_contract_price  varchar (1) 
+,purord_gno  varchar (40) 
+,purord_crr_id  numeric (22,0)
 ,purord_remark  varchar (4000) 
-,purord_prjno_id  numeric (38,0)
-,purord_update_ip  varchar (40) 
-,purord_created_at   timestamp(6) 
-,purord_updated_at   timestamp(6) 
-,purord_id  numeric (38,0)
-,id  numeric (38,0)
-,purord_person_id_upd  numeric (38,0)
-,purord_opeitm_id  numeric (38,0)
+,boxe_unit_id_box  numeric (38,0)
 ,purord_chrg_id  numeric (38,0)
 ,purord_supplier_id  numeric (22,0)
+,purord_prjno_id  numeric (38,0)
+,purord_opeitm_id  numeric (38,0)
+,purord_person_id_upd  numeric (38,0)
 ,purord_crr_id_pur  numeric (22,0)
+,id  numeric (38,0)
+,purord_id  numeric (38,0)
 ,purord_shelfno_id_to  numeric (38,0)
-,purord_crr_id  numeric (22,0)
+,purord_updated_at   timestamp(6) 
+,purord_created_at   timestamp(6) 
+,purord_update_ip  varchar (40) 
+,shelfno_loca_id_shelfno_to  numeric (38,0)
 ,payment_crr_id_payment  numeric (22,0)
-,payment_chrg_id_payment  numeric (22,0)
-,opeitm_shelfno_id  numeric (22,0)
-,opeitm_boxe_id  numeric (22,0)
 ,boxe_unit_id_outbox  numeric (38,0)
-,opeitm_itm_id  numeric (38,0)
-,boxe_unit_id_box  numeric (38,0)
-,payment_loca_id_payment  numeric (38,0)
+,opeitm_shelfno_id  numeric (22,0)
+,opeitm_unit_id_prdpurshp  numeric (38,0)
 ,itm_classlist_id  numeric (38,0)
 ,chrg_person_id_chrg_supplier  numeric (38,0)
 ,chrg_person_id_chrg_payment  numeric (38,0)
-,chrg_person_id_chrg  numeric (38,0)
-,opeitm_unit_id_prdpurshp  numeric (38,0)
 ,person_sect_id_chrg_supplier  numeric (22,0)
+,chrg_person_id_chrg  numeric (38,0)
+,payment_chrg_id_payment  numeric (22,0)
 ,person_sect_id_chrg_payment  numeric (22,0)
-,itm_unit_id  numeric (22,0)
-,shelfno_loca_id_shelfno  numeric (38,0)
-,opeitm_unit_id_case  numeric (38,0)
-,person_sect_id_chrg  numeric (22,0)
-,opeitm_loca_id  numeric (38,0)
-,shelfno_loca_id_shelfno_to  numeric (38,0)
+,supplier_payment_id  numeric (38,0)
+,supplier_loca_id_supplier  numeric (22,0)
 ,supplier_chrg_id_supplier  numeric (22,0)
 ,supplier_crr_id_supplier  numeric (22,0)
-,supplier_loca_id_supplier  numeric (22,0)
-,supplier_payment_id  numeric (38,0)
+,payment_loca_id_payment  numeric (38,0)
+,shelfno_loca_id_shelfno  numeric (38,0)
+,opeitm_unit_id_case  numeric (38,0)
+,opeitm_boxe_id  numeric (22,0)
+,opeitm_itm_id  numeric (38,0)
+,person_sect_id_chrg  numeric (22,0)
+,itm_unit_id  numeric (22,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(22,0)
@@ -1091,17 +983,12 @@ shpord.itms_id   shpord_itm_id,
 shpord.remark  shpord_remark,
 shpord.amt  shpord_amt,
 shpord.tax  shpord_tax,
-  chrg.loca_code_sect_chrg  loca_code_sect_chrg ,
-  chrg.loca_name_sect_chrg  loca_name_sect_chrg ,
   prjno.prjno_name  prjno_name ,
   chrg.person_sect_id_chrg  person_sect_id_chrg ,
   person_upd.person_code  person_code_upd ,
   person_upd.person_name  person_name_upd ,
-  chrg.scrlv_code_chrg  scrlv_code_chrg ,
   prjno.prjno_code  prjno_code ,
   chrg.chrg_person_id_chrg  chrg_person_id_chrg ,
-  chrg.usrgrp_code_chrg  usrgrp_code_chrg ,
-  chrg.usrgrp_name_chrg  usrgrp_name_chrg ,
   itm.classlist_code  classlist_code ,
   itm.classlist_name  classlist_name ,
   crr.crr_code  crr_code ,
@@ -1129,7 +1016,8 @@ shpord.paretblname  shpord_paretblname,
 shpord.paretblid  shpord_paretblid,
 shpord.shelfnos_id_fm   shpord_shelfno_id_fm,
 shpord.sno_shpsch  shpord_sno_shpsch,
-shpord.gno_shpsch  shpord_gno_shpsch
+shpord.gno_shpsch  shpord_gno_shpsch,
+  prjno.prjno_name_chil  prjno_name_chil 
  from shpords   shpord,
   r_persons  person_upd ,  r_locas  loca_to ,  r_itms  itm ,  r_chrgs  chrg ,  r_prjnos  prjno ,  r_transports  transport ,  r_crrs  crr ,  r_shelfnos  shelfno_fm 
   where       shpord.persons_id_upd = person_upd.id      and shpord.locas_id_to = loca_to.id      and shpord.itms_id = itm.id      and shpord.chrgs_id = chrg.id      and shpord.prjnos_id = prjno.id      and shpord.transports_id = transport.id      and shpord.crrs_id = crr.id      and shpord.shelfnos_id_fm = shelfno_fm.id     ;
@@ -1153,71 +1041,67 @@ shpord.gno_shpsch  shpord_gno_shpsch
           ,sio_sidx varchar(256)
 ,person_code_upd  varchar (50) 
 ,person_name_upd  varchar (100) 
-,shpord_gno  varchar (40) 
-,shpord_sno  varchar (40) 
-,unit_name  varchar (100) 
-,unit_code  varchar (50) 
 ,transport_code  varchar (50) 
-,transport_name  varchar (100) 
-,person_name_chrg  varchar (100) 
-,person_code_chrg  varchar (50) 
-,itm_name  varchar (100) 
-,itm_code  varchar (50) 
-,loca_code_to  varchar (50) 
-,loca_name_to  varchar (100) 
-,loca_code_sect_chrg  varchar (50) 
-,loca_name_sect_chrg  varchar (100) 
-,prjno_name  varchar (100) 
-,scrlv_code_chrg  varchar (50) 
-,prjno_code  varchar (50) 
-,usrgrp_code_chrg  varchar (50) 
-,usrgrp_name_chrg  varchar (100) 
+,shpord_gno  varchar (40) 
+,unit_code  varchar (50) 
+,shpord_sno  varchar (40) 
 ,classlist_code  varchar (50) 
-,classlist_name  varchar (100) 
+,prjno_code  varchar (50) 
 ,crr_code  varchar (50) 
-,crr_name  varchar (100) 
-,prjno_code_chil  varchar (50) 
-,shelfno_code_fm  varchar (50) 
-,shelfno_name_fm  varchar (100) 
-,loca_code_shelfno_fm  varchar (50) 
-,loca_name_shelfno_fm  varchar (100) 
-,shpord_paretblname  varchar (30) 
-,shpord_qty  numeric (22,6)
-,shpord_paretblid  numeric (38,0)
-,shpord_sno_shpsch  varchar (50) 
-,shpord_qty_stk  numeric (22,6)
-,shpord_processseq  numeric (38,0)
-,shpord_manual  varchar (1) 
-,shpord_contract_price  varchar (1) 
-,shpord_isudate   timestamp(6) 
-,shpord_qty_case  numeric (22,0)
-,shpord_lotno  varchar (50) 
+,itm_code  varchar (50) 
 ,shpord_expiredate   date 
 ,shpord_depdate   timestamp(6) 
+,shpord_packno  varchar (10) 
 ,shpord_price  numeric (38,4)
+,shpord_lotno  varchar (50) 
+,shpord_qty_case  numeric (22,0)
 ,shpord_amt  numeric (18,4)
 ,shpord_tax  numeric (38,4)
-,shpord_packno  varchar (10) 
+,prjno_name  varchar (100) 
+,shpord_contract_price  varchar (1) 
+,shpord_processseq  numeric (38,0)
+,itm_name  varchar (100) 
+,unit_name  varchar (100) 
+,shpord_sno_shpsch  varchar (50) 
+,transport_name  varchar (100) 
+,shpord_qty  numeric (22,6)
+,shpord_paretblid  numeric (38,0)
+,shpord_paretblname  varchar (30) 
+,shpord_isudate   timestamp(6) 
+,shpord_qty_stk  numeric (22,6)
+,shpord_manual  varchar (1) 
+,classlist_name  varchar (100) 
+,crr_name  varchar (100) 
+,loca_code_shelfno_fm  varchar (50) 
+,shelfno_code_fm  varchar (50) 
+,person_code_chrg  varchar (50) 
+,loca_code_to  varchar (50) 
+,prjno_code_chil  varchar (50) 
+,person_name_chrg  varchar (100) 
+,loca_name_to  varchar (100) 
+,shelfno_name_fm  varchar (100) 
+,loca_name_shelfno_fm  varchar (100) 
+,prjno_name_chil  varchar (100) 
 ,shpord_gno_shpsch  varchar (50) 
 ,shpord_remark  varchar (4000) 
+,shpord_loca_id_to  numeric (38,0)
+,id  numeric (38,0)
+,shpord_transport_id  numeric (38,0)
+,itm_classlist_id  numeric (38,0)
+,shpord_created_at   timestamp(6) 
+,itm_unit_id  numeric (22,0)
+,shpord_id  numeric (38,0)
+,shelfno_loca_id_shelfno_fm  numeric (38,0)
+,shpord_person_id_upd  numeric (38,0)
+,shpord_crr_id  numeric (22,0)
 ,shpord_updated_at   timestamp(6) 
 ,shpord_update_ip  varchar (40) 
-,shpord_person_id_upd  numeric (38,0)
-,shpord_transport_id  numeric (38,0)
-,shpord_itm_id  numeric (38,0)
-,id  numeric (38,0)
-,shpord_crr_id  numeric (22,0)
-,shpord_chrg_id  numeric (38,0)
-,shpord_loca_id_to  numeric (38,0)
-,shpord_prjno_id  numeric (38,0)
-,shpord_id  numeric (38,0)
 ,shpord_shelfno_id_fm  numeric (22,0)
-,shpord_created_at   timestamp(6) 
-,itm_classlist_id  numeric (38,0)
-,person_sect_id_chrg  numeric (22,0)
+,shpord_chrg_id  numeric (38,0)
 ,chrg_person_id_chrg  numeric (38,0)
-,shelfno_loca_id_shelfno_fm  numeric (38,0)
-,itm_unit_id  numeric (22,0)
+,person_sect_id_chrg  numeric (22,0)
+,shpord_prjno_id  numeric (38,0)
+,shpord_itm_id  numeric (38,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(22,0)
@@ -1236,15 +1120,16 @@ shpord.gno_shpsch  shpord_gno_shpsch
   drop view if  exists r_custords cascade ; 
  create or replace view r_custords as select  
   opeitm.opeitm_unit_id_prdpurshp  opeitm_unit_id_prdpurshp ,
+  opeitm.unit_name_prdpurshp  unit_name_prdpurshp ,
+  opeitm.unit_code_prdpurshp  unit_code_prdpurshp ,
   opeitm.itm_name  itm_name ,
   opeitm.itm_code  itm_code ,
   opeitm.unit_name  unit_name ,
   opeitm.unit_code  unit_code ,
   opeitm.itm_unit_id  itm_unit_id ,
   opeitm.opeitm_processseq  opeitm_processseq ,
-  opeitm.opeitm_packqty  opeitm_packqty ,
+  opeitm.opeitm_priority  opeitm_priority ,
   opeitm.opeitm_itm_id  opeitm_itm_id ,
-  opeitm.opeitm_loca_id  opeitm_loca_id ,
 custord.remark  custord_remark,
 custord.update_ip  custord_update_ip,
 custord.duedate  custord_duedate,
@@ -1265,7 +1150,6 @@ custord.isudate  custord_isudate,
   custrcvplc.loca_name_custrcvplc  loca_name_custrcvplc ,
 custord.id id,
 custord.custs_id   custord_cust_id,
-  cust.cust_loca_id_cust  cust_loca_id_cust ,
   prjno.prjno_name  prjno_name ,
   person_upd.person_code  person_code_upd ,
   person_upd.person_name  person_name_upd ,
@@ -1273,33 +1157,26 @@ custord.custs_id   custord_cust_id,
   opeitm.unit_name_case  unit_name_case ,
   opeitm.opeitm_unit_id_case  opeitm_unit_id_case ,
 custord.cno  custord_cno,
+  opeitm.shelfno_code  shelfno_code ,
+  opeitm.shelfno_name  shelfno_name ,
   opeitm.shelfno_loca_id_shelfno  shelfno_loca_id_shelfno ,
+  opeitm.loca_code_shelfno  loca_code_shelfno ,
+  opeitm.loca_name_shelfno  loca_name_shelfno ,
   prjno.prjno_code  prjno_code ,
 custord.prjnos_id   custord_prjno_id,
 custord.gno  custord_gno,
   custrcvplc.custrcvplc_loca_id_custrcvplc  custrcvplc_loca_id_custrcvplc ,
-  cust.cust_contract_price  cust_contract_price ,
 custord.contract_price  custord_contract_price,
-  cust.cust_chrg_id_cust  cust_chrg_id_cust ,
-  cust.chrg_person_id_chrg_cust  chrg_person_id_chrg_cust ,
-  cust.person_code_chrg_cust  person_code_chrg_cust ,
-  cust.person_name_chrg_cust  person_name_chrg_cust ,
-  cust.person_sect_id_chrg_cust  person_sect_id_chrg_cust ,
-custord.chrgs_id_cpo   custord_chrg_id_cpo,
-  chrg_cpo.person_code_chrg  person_code_chrg_cpo ,
-  chrg_cpo.person_name_chrg  person_name_chrg_cpo ,
-  chrg_cpo.loca_code_sect_chrg  loca_code_sect_chrg_cpo ,
-  chrg_cpo.loca_name_sect_chrg  loca_name_sect_chrg_cpo ,
+custord.chrgs_id_custord   custord_chrg_id_custord,
+  chrg_custord.person_code_chrg  person_code_chrg_custord ,
+  chrg_custord.person_name_chrg  person_name_chrg_custord ,
   opeitm.classlist_code  classlist_code ,
   opeitm.classlist_name  classlist_name ,
-  chrg_cpo.person_sect_id_chrg  person_sect_id_chrg_cpo ,
   cust.bill_loca_id_bill  bill_loca_id_bill ,
   cust.loca_code_bill  loca_code_bill ,
   cust.loca_name_bill  loca_name_bill ,
   cust.cust_bill_id  cust_bill_id ,
-  chrg_cpo.chrg_person_id_chrg  chrg_person_id_chrg_cpo ,
   cust.crr_name_cust  crr_name_cust ,
-  cust.cust_crr_id_cust  cust_crr_id_cust ,
   cust.crr_code_cust  crr_code_cust ,
   opeitm.boxe_unit_id_box  boxe_unit_id_box ,
   opeitm.unit_code_box  unit_code_box ,
@@ -1307,15 +1184,13 @@ custord.chrgs_id_cpo   custord_chrg_id_cpo,
   opeitm.boxe_unit_id_outbox  boxe_unit_id_outbox ,
   opeitm.unit_code_outbox  unit_code_outbox ,
   opeitm.unit_name_outbox  unit_name_outbox ,
-  opeitm.boxe_code  boxe_code ,
-  opeitm.boxe_name  boxe_name ,
-  opeitm.opeitm_boxe_id  opeitm_boxe_id ,
 custord.custrcvplcs_id   custord_custrcvplc_id,
 custord.itm_code_client  custord_itm_code_client,
 custord.contents  custord_contents,
-  prjno.prjno_code_chil  prjno_code_chil ,
   opeitm.opeitm_shelfno_id  opeitm_shelfno_id ,
   cust.bill_chrg_id_bill  bill_chrg_id_bill ,
+  cust.person_code_chrg_bill  person_code_chrg_bill ,
+  cust.person_name_chrg_bill  person_name_chrg_bill ,
   opeitm.itm_classlist_id  itm_classlist_id ,
   shelfno_fm.shelfno_code  shelfno_code_fm ,
   shelfno_fm.shelfno_name  shelfno_name_fm ,
@@ -1326,15 +1201,19 @@ custord.contents  custord_contents,
   cust.chrg_person_id_chrg_bill  chrg_person_id_chrg_bill ,
 custord.opeitms_id   custord_opeitm_id,
 custord.cno_custsch  custord_cno_custsch,
-  cust.bill_crr_id_bill  bill_crr_id_bill ,
   cust.crr_code_bill  crr_code_bill ,
   cust.crr_name_bill  crr_name_bill ,
 custord.starttime  custord_starttime,
-  custrcvplc.custrcvplc_stktaking_proc  custrcvplc_stktaking_proc ,
-custord.shelfnos_id_fm   custord_shelfno_id_fm
+custord.shelfnos_id_fm   custord_shelfno_id_fm,
+  prjno.prjno_priority  prjno_priority ,
+custord.crrs_id_custord   custord_crr_id_custord,
+  crr_custord.crr_code  crr_code_custord ,
+  crr_custord.crr_name  crr_name_custord ,
+  opeitm.loca_code_opeitm  loca_code_opeitm ,
+  opeitm.loca_name_opeitm  loca_name_opeitm 
  from custords   custord,
-  r_persons  person_upd ,  r_custs  cust ,  r_prjnos  prjno ,  r_chrgs  chrg_cpo ,  r_custrcvplcs  custrcvplc ,  r_opeitms  opeitm ,  r_shelfnos  shelfno_fm 
-  where       custord.persons_id_upd = person_upd.id      and custord.custs_id = cust.id      and custord.prjnos_id = prjno.id      and custord.chrgs_id_cpo = chrg_cpo.id      and custord.custrcvplcs_id = custrcvplc.id      and custord.opeitms_id = opeitm.id      and custord.shelfnos_id_fm = shelfno_fm.id     ;
+  r_persons  person_upd ,  r_custs  cust ,  r_prjnos  prjno ,  r_chrgs  chrg_custord ,  r_custrcvplcs  custrcvplc ,  r_opeitms  opeitm ,  r_shelfnos  shelfno_fm ,  r_crrs  crr_custord 
+  where       custord.persons_id_upd = person_upd.id      and custord.custs_id = cust.id      and custord.prjnos_id = prjno.id      and custord.chrgs_id_custord = chrg_custord.id      and custord.custrcvplcs_id = custrcvplc.id      and custord.opeitms_id = opeitm.id      and custord.shelfnos_id_fm = shelfno_fm.id      and custord.crrs_id_custord = crr_custord.id     ;
  DROP TABLE IF EXISTS sio.sio_r_custords;
  CREATE TABLE sio.sio_r_custords (
           sio_id numeric(22,0)  CONSTRAINT SIO_r_custords_id_pk PRIMARY KEY           ,sio_user_code numeric(22,0)
@@ -1357,99 +1236,94 @@ custord.shelfnos_id_fm   custord_shelfno_id_fm
 ,custord_cno  varchar (40) 
 ,loca_code_cust  varchar (50) 
 ,loca_name_cust  varchar (100) 
-,crr_code_cust  varchar (50) 
-,loca_code_custrcvplc  varchar (50) 
-,person_code_upd  varchar (50) 
-,person_name_upd  varchar (100) 
-,crr_name_cust  varchar (100) 
 ,itm_code  varchar (50) 
-,loca_name_custrcvplc  varchar (100) 
 ,itm_name  varchar (100) 
 ,opeitm_processseq  numeric (3,0)
+,opeitm_priority  numeric (3,0)
+,custord_itm_code_client  varchar (50) 
+,loca_code_opeitm  varchar (50) 
+,loca_name_opeitm  varchar (100) 
 ,custord_duedate   timestamp(6) 
 ,custord_qty  numeric (18,4)
 ,custord_price  numeric (22,0)
-,cust_contract_price  varchar (1) 
 ,custord_contract_price  varchar (1) 
-,custord_itm_code_client  varchar (50) 
 ,custord_amt  numeric (18,4)
-,person_code_chrg_cust  varchar (50) 
-,person_name_chrg_cust  varchar (100) 
-,person_code_chrg_cpo  varchar (50) 
-,person_name_chrg_cpo  varchar (100) 
-,loca_code_sect_chrg_cpo  varchar (50) 
-,loca_name_sect_chrg_cpo  varchar (100) 
+,person_code_chrg_bill  varchar (50) 
 ,loca_code_bill  varchar (50) 
 ,loca_name_bill  varchar (100) 
 ,unit_code  varchar (50) 
 ,unit_name  varchar (100) 
 ,unit_name_case  varchar (100) 
 ,unit_code_case  varchar (50) 
+,crr_code_cust  varchar (50) 
+,prjno_code  varchar (50) 
+,shelfno_code  varchar (50) 
+,prjno_name  varchar (100) 
+,crr_name_cust  varchar (100) 
+,shelfno_name  varchar (100) 
+,crr_code_custord  varchar (50) 
+,prjno_priority  numeric (38,0)
+,crr_name_custord  varchar (100) 
+,loca_name_shelfno  varchar (100) 
+,person_name_chrg_bill  varchar (100) 
+,unit_code_prdpurshp  varchar (50) 
+,unit_name_prdpurshp  varchar (100) 
+,loca_code_shelfno  varchar (50) 
 ,unit_code_box  varchar (50) 
 ,unit_name_box  varchar (100) 
-,unit_code_outbox  varchar (50) 
-,unit_name_outbox  varchar (100) 
-,shelfno_code_fm  varchar (50) 
-,shelfno_name_fm  varchar (100) 
-,loca_code_shelfno_fm  varchar (50) 
-,boxe_code  varchar (50) 
-,boxe_name  varchar (100) 
-,loca_name_shelfno_fm  varchar (100) 
 ,crr_code_bill  varchar (50) 
 ,crr_name_bill  varchar (100) 
-,prjno_code  varchar (50) 
-,prjno_name  varchar (100) 
-,prjno_code_chil  varchar (50) 
+,unit_code_outbox  varchar (50) 
+,unit_name_outbox  varchar (100) 
+,custord_starttime   timestamp(6) 
 ,classlist_code  varchar (50) 
 ,custord_cno_custsch  varchar (50) 
-,custord_starttime   timestamp(6) 
 ,classlist_name  varchar (100) 
 ,custord_sno  varchar (40) 
+,loca_code_custrcvplc  varchar (50) 
+,loca_code_shelfno_fm  varchar (50) 
+,person_code_chrg_custord  varchar (50) 
+,shelfno_code_fm  varchar (50) 
+,shelfno_name_fm  varchar (100) 
+,loca_name_shelfno_fm  varchar (100) 
+,loca_name_custrcvplc  varchar (100) 
+,person_name_chrg_custord  varchar (100) 
 ,custord_gno  varchar (40) 
-,opeitm_packqty  numeric (38,0)
-,custrcvplc_stktaking_proc  varchar (1) 
+,custord_shelfno_id_fm  numeric (22,0)
+,custord_crr_id_custord  numeric (22,0)
+,custord_chrg_id_custord  numeric (38,0)
+,person_code_upd  varchar (50) 
+,person_name_upd  varchar (100) 
 ,custord_toduedate   timestamp(6) 
 ,custord_expiredate   date 
 ,custord_contents  varchar (4000) 
 ,custord_remark  varchar (4000) 
-,custrcvplc_loca_id_custrcvplc  numeric (38,0)
-,custord_custrcvplc_id  numeric (38,0)
-,shelfno_loca_id_shelfno_fm  numeric (38,0)
-,custord_chrg_id_cpo  numeric (38,0)
-,custord_shelfno_id_fm  numeric (22,0)
-,custord_opeitm_id  numeric (38,0)
-,custord_prjno_id  numeric (38,0)
-,cust_crr_id_cust  numeric (38,0)
-,chrg_person_id_chrg_bill  numeric (38,0)
-,cust_loca_id_cust  numeric (38,0)
-,opeitm_unit_id_case  numeric (38,0)
-,shelfno_loca_id_shelfno  numeric (38,0)
-,cust_chrg_id_cust  numeric (38,0)
-,chrg_person_id_chrg_cust  numeric (38,0)
-,person_sect_id_chrg_cust  numeric (22,0)
-,opeitm_loca_id  numeric (38,0)
-,opeitm_itm_id  numeric (38,0)
-,person_sect_id_chrg_cpo  numeric (22,0)
-,bill_loca_id_bill  numeric (38,0)
-,opeitm_unit_id_prdpurshp  numeric (38,0)
-,chrg_person_id_chrg_cpo  numeric (38,0)
 ,itm_unit_id  numeric (22,0)
-,boxe_unit_id_box  numeric (38,0)
 ,boxe_unit_id_outbox  numeric (38,0)
-,opeitm_boxe_id  numeric (22,0)
 ,opeitm_shelfno_id  numeric (22,0)
 ,bill_chrg_id_bill  numeric (22,0)
-,itm_classlist_id  numeric (38,0)
+,boxe_unit_id_box  numeric (38,0)
+,shelfno_loca_id_shelfno  numeric (38,0)
+,shelfno_loca_id_shelfno_fm  numeric (38,0)
 ,person_sect_id_chrg_bill  numeric (22,0)
-,bill_crr_id_bill  numeric (22,0)
-,cust_bill_id  numeric (22,0)
+,chrg_person_id_chrg_bill  numeric (38,0)
+,custord_opeitm_id  numeric (38,0)
+,opeitm_unit_id_case  numeric (38,0)
+,opeitm_unit_id_prdpurshp  numeric (38,0)
+,opeitm_itm_id  numeric (38,0)
+,custord_custrcvplc_id  numeric (38,0)
+,bill_loca_id_bill  numeric (38,0)
+,custrcvplc_loca_id_custrcvplc  numeric (38,0)
+,custord_prjno_id  numeric (38,0)
+,itm_classlist_id  numeric (38,0)
+,custord_updated_at   timestamp(6) 
 ,custord_update_ip  varchar (40) 
 ,custord_cust_id  numeric (22,0)
-,custord_updated_at   timestamp(6) 
-,custord_id  numeric (22,0)
-,custord_person_id_upd  numeric (22,0)
-,custord_created_at   timestamp(6) 
 ,id  numeric (22,0)
+,custord_created_at   timestamp(6) 
+,custord_person_id_upd  numeric (22,0)
+,cust_bill_id  numeric (22,0)
+,custord_id  numeric (22,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(22,0)

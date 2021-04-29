@@ -1,6 +1,5 @@
 
 
-
   drop view if  exists r_asstwhs cascade ; 
  create or replace view r_asstwhs as select  
 asstwh.id id,
@@ -8,6 +7,7 @@ asstwh.id id,
   loca_asstwh.loca_name  loca_name_asstwh ,
   person_upd.person_code  person_code_upd ,
   person_upd.person_name  person_name_upd ,
+asstwh.id  asstwh_id,
 asstwh.remark  asstwh_remark,
 asstwh.expiredate  asstwh_expiredate,
 asstwh.update_ip  asstwh_update_ip,
@@ -15,14 +15,9 @@ asstwh.created_at  asstwh_created_at,
 asstwh.updated_at  asstwh_updated_at,
 asstwh.persons_id_upd   asstwh_person_id_upd,
 asstwh.locas_id_asstwh   asstwh_loca_id_asstwh,
-  chrg_asstwh.usrgrp_code_chrg  usrgrp_code_chrg_asstwh ,
-  chrg_asstwh.usrgrp_name_chrg  usrgrp_name_chrg_asstwh ,
   chrg_asstwh.person_code_chrg  person_code_chrg_asstwh ,
   chrg_asstwh.person_name_chrg  person_name_chrg_asstwh ,
   chrg_asstwh.person_sect_id_chrg  person_sect_id_chrg_asstwh ,
-  chrg_asstwh.loca_code_sect_chrg  loca_code_sect_chrg_asstwh ,
-  chrg_asstwh.loca_name_sect_chrg  loca_name_sect_chrg_asstwh ,
-  chrg_asstwh.scrlv_code_chrg  scrlv_code_chrg_asstwh ,
 asstwh.chrgs_id_asstwh   asstwh_chrg_id_asstwh,
 asstwh.contents  asstwh_contents,
 asstwh.autocreate_inst  asstwh_autocreate_inst,
@@ -50,32 +45,28 @@ asstwh.acceptance_proc  asstwh_acceptance_proc,
           ,sio_sord varchar(256)
           ,sio_search varchar(10)
           ,sio_sidx varchar(256)
-,person_code_upd  varchar (50) 
-,loca_code_asstwh  varchar (50) 
-,person_name_upd  varchar (100) 
-,loca_name_asstwh  varchar (100) 
-,loca_code_sect_chrg_asstwh  varchar (50) 
-,loca_name_sect_chrg_asstwh  varchar (100) 
-,scrlv_code_chrg_asstwh  varchar (50) 
-,usrgrp_code_chrg_asstwh  varchar (50) 
-,usrgrp_name_chrg_asstwh  varchar (100) 
 ,person_code_chrg_asstwh  varchar (50) 
-,person_name_chrg_asstwh  varchar (100) 
-,asstwh_stktaking_proc  varchar (1) 
+,loca_code_asstwh  varchar (50) 
 ,asstwh_autocreate_inst  varchar (1) 
+,person_name_chrg_asstwh  varchar (100) 
+,loca_name_asstwh  varchar (100) 
+,asstwh_stktaking_proc  varchar (1) 
 ,asstwh_acceptance_proc  varchar (1) 
-,asstwh_expiredate   date 
-,asstwh_remark  varchar (4000) 
 ,asstwh_contents  varchar (4000) 
+,asstwh_remark  varchar (4000) 
+,asstwh_expiredate   date 
+,person_code_upd  varchar (50) 
+,person_name_upd  varchar (100) 
 ,chrg_person_id_chrg_asstwh  numeric (38,0)
+,person_sect_id_chrg_asstwh  numeric (22,0)
+,asstwh_person_id_upd  numeric (22,0)
+,asstwh_id  numeric (22,0)
 ,asstwh_update_ip  varchar (40) 
 ,asstwh_created_at   timestamp(6) 
 ,asstwh_updated_at   timestamp(6) 
-,asstwh_loca_id_asstwh  numeric (38,0)
-,asstwh_chrg_id_asstwh  numeric (38,0)
-,person_sect_id_chrg_asstwh  numeric (22,0)
-,asstwh_person_id_upd  numeric (22,0)
-,id  numeric (38,0)
+,id  numeric (22,0)
+,asstwh_loca_id_asstwh  numeric (22,0)
+,asstwh_chrg_id_asstwh  numeric (22,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(22,0)
@@ -180,12 +171,7 @@ bill.updated_at  bill_updated_at,
 bill.persons_id_upd   bill_person_id_upd,
 bill.chrgs_id_bill   bill_chrg_id_bill,
   chrg_bill.person_code_chrg  person_code_chrg_bill ,
-  chrg_bill.usrgrp_name_chrg  usrgrp_name_chrg_bill ,
-  chrg_bill.usrgrp_code_chrg  usrgrp_code_chrg_bill ,
   chrg_bill.person_name_chrg  person_name_chrg_bill ,
-  chrg_bill.scrlv_code_chrg  scrlv_code_chrg_bill ,
-  chrg_bill.loca_code_sect_chrg  loca_code_sect_chrg_bill ,
-  chrg_bill.loca_name_sect_chrg  loca_name_sect_chrg_bill ,
   chrg_bill.person_sect_id_chrg  person_sect_id_chrg_bill ,
   chrg_bill.chrg_person_id_chrg  chrg_person_id_chrg_bill ,
 bill.crrs_id_bill   bill_crr_id_bill,
@@ -214,16 +200,9 @@ bill.crrs_id_bill   bill_crr_id_bill,
           ,sio_sidx varchar(256)
 ,loca_code_bill  varchar (50) 
 ,loca_name_bill  varchar (100) 
-,person_code_upd  varchar (50) 
-,person_name_upd  varchar (100) 
 ,loca_abbr_bill  varchar (50) 
 ,person_code_chrg_bill  varchar (50) 
 ,person_name_chrg_bill  varchar (100) 
-,scrlv_code_chrg_bill  varchar (50) 
-,usrgrp_code_chrg_bill  varchar (50) 
-,usrgrp_name_chrg_bill  varchar (100) 
-,loca_code_sect_chrg_bill  varchar (50) 
-,loca_name_sect_chrg_bill  varchar (100) 
 ,bill_personname  varchar (30) 
 ,crr_code_bill  varchar (50) 
 ,crr_name_bill  varchar (100) 
@@ -231,17 +210,19 @@ bill.crrs_id_bill   bill_crr_id_bill,
 ,bill_expiredate   date 
 ,bill_remark  varchar (4000) 
 ,loca_tel_bill  varchar (20) 
-,bill_updated_at   timestamp(6) 
-,bill_loca_id_bill  numeric (38,0)
-,bill_id  numeric (38,0)
+,person_code_upd  varchar (50) 
+,person_name_upd  varchar (100) 
 ,bill_update_ip  varchar (40) 
-,bill_created_at   timestamp(6) 
-,id  numeric (38,0)
+,bill_updated_at   timestamp(6) 
 ,bill_person_id_upd  numeric (38,0)
 ,bill_chrg_id_bill  numeric (22,0)
+,id  numeric (38,0)
+,bill_loca_id_bill  numeric (38,0)
+,bill_id  numeric (38,0)
+,bill_created_at   timestamp(6) 
 ,bill_crr_id_bill  numeric (22,0)
-,chrg_person_id_chrg_bill  numeric (38,0)
 ,person_sect_id_chrg_bill  numeric (22,0)
+,chrg_person_id_chrg_bill  numeric (38,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(22,0)
@@ -276,12 +257,7 @@ payment.personname  payment_personname,
 payment.locas_id_payment   payment_loca_id_payment,
 payment.chrgs_id_payment   payment_chrg_id_payment,
   chrg_payment.person_code_chrg  person_code_chrg_payment ,
-  chrg_payment.usrgrp_name_chrg  usrgrp_name_chrg_payment ,
-  chrg_payment.usrgrp_code_chrg  usrgrp_code_chrg_payment ,
   chrg_payment.person_name_chrg  person_name_chrg_payment ,
-  chrg_payment.scrlv_code_chrg  scrlv_code_chrg_payment ,
-  chrg_payment.loca_name_sect_chrg  loca_name_sect_chrg_payment ,
-  chrg_payment.loca_code_sect_chrg  loca_code_sect_chrg_payment ,
   chrg_payment.chrg_person_id_chrg  chrg_person_id_chrg_payment ,
   chrg_payment.person_sect_id_chrg  person_sect_id_chrg_payment ,
 payment.crrs_id_payment   payment_crr_id_payment,
@@ -308,34 +284,29 @@ payment.crrs_id_payment   payment_crr_id_payment,
           ,sio_sord varchar(256)
           ,sio_search varchar(10)
           ,sio_sidx varchar(256)
-,crr_code_payment  varchar (50) 
 ,loca_code_payment  varchar (50) 
 ,loca_name_payment  varchar (100) 
-,person_code_upd  varchar (50) 
-,person_name_upd  varchar (100) 
 ,person_code_chrg_payment  varchar (50) 
-,crr_name_payment  varchar (100) 
 ,person_name_chrg_payment  varchar (100) 
-,loca_code_sect_chrg_payment  varchar (50) 
-,loca_name_sect_chrg_payment  varchar (100) 
-,usrgrp_code_chrg_payment  varchar (50) 
-,usrgrp_name_chrg_payment  varchar (100) 
-,scrlv_code_chrg_payment  varchar (50) 
 ,payment_personname  varchar (30) 
 ,payment_expiredate   date 
-,payment_contents  varchar (4000) 
-,payment_remark  varchar (4000) 
-,payment_loca_id_payment  numeric (38,0)
-,payment_id  numeric (38,0)
-,payment_update_ip  varchar (40) 
-,payment_created_at   timestamp(6) 
-,payment_updated_at   timestamp(6) 
-,payment_person_id_upd  numeric (38,0)
-,id  numeric (38,0)
-,payment_chrg_id_payment  numeric (22,0)
+,crr_code_payment  varchar (50) 
+,crr_name_payment  varchar (100) 
 ,payment_crr_id_payment  numeric (22,0)
-,person_sect_id_chrg_payment  numeric (22,0)
+,payment_remark  varchar (4000) 
+,payment_contents  varchar (4000) 
+,person_name_upd  varchar (100) 
+,person_code_upd  varchar (50) 
+,payment_chrg_id_payment  numeric (22,0)
+,payment_id  numeric (38,0)
+,id  numeric (38,0)
+,payment_person_id_upd  numeric (38,0)
+,payment_created_at   timestamp(6) 
+,payment_update_ip  varchar (40) 
+,payment_loca_id_payment  numeric (38,0)
+,payment_updated_at   timestamp(6) 
 ,chrg_person_id_chrg_payment  numeric (38,0)
+,person_sect_id_chrg_payment  numeric (22,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(22,0)
@@ -359,6 +330,7 @@ cust.remark  cust_remark,
 cust.persons_id_upd   cust_person_id_upd,
 cust.expiredate  cust_expiredate,
 cust.update_ip  cust_update_ip,
+cust.id  cust_id,
 cust.created_at  cust_created_at,
   loca_cust.loca_name  loca_name_cust ,
   loca_cust.loca_code  loca_code_cust ,
@@ -369,16 +341,11 @@ cust.locas_id_cust   cust_loca_id_cust,
 cust.contract_price  cust_contract_price,
 cust.rule_price  cust_rule_price,
 cust.contents  cust_contents,
-  chrg_cust.scrlv_code_chrg  scrlv_code_chrg_cust ,
 cust.chrgs_id_cust   cust_chrg_id_cust,
   chrg_cust.chrg_person_id_chrg  chrg_person_id_chrg_cust ,
   chrg_cust.person_code_chrg  person_code_chrg_cust ,
   chrg_cust.person_name_chrg  person_name_chrg_cust ,
   chrg_cust.person_sect_id_chrg  person_sect_id_chrg_cust ,
-  chrg_cust.loca_code_sect_chrg  loca_code_sect_chrg_cust ,
-  chrg_cust.loca_name_sect_chrg  loca_name_sect_chrg_cust ,
-  chrg_cust.usrgrp_code_chrg  usrgrp_code_chrg_cust ,
-  chrg_cust.usrgrp_name_chrg  usrgrp_name_chrg_cust ,
 cust.amtdecimal  cust_amtdecimal,
 cust.amtround  cust_amtround,
   bill.bill_loca_id_bill  bill_loca_id_bill ,
@@ -392,12 +359,7 @@ cust.crrs_id_cust   cust_crr_id_cust,
 cust.autocreate_custact  cust_autocreate_custact,
   bill.bill_chrg_id_bill  bill_chrg_id_bill ,
   bill.person_code_chrg_bill  person_code_chrg_bill ,
-  bill.usrgrp_name_chrg_bill  usrgrp_name_chrg_bill ,
-  bill.usrgrp_code_chrg_bill  usrgrp_code_chrg_bill ,
   bill.person_name_chrg_bill  person_name_chrg_bill ,
-  bill.scrlv_code_chrg_bill  scrlv_code_chrg_bill ,
-  bill.loca_code_sect_chrg_bill  loca_code_sect_chrg_bill ,
-  bill.loca_name_sect_chrg_bill  loca_name_sect_chrg_bill ,
   bill.person_sect_id_chrg_bill  person_sect_id_chrg_bill ,
   bill.chrg_person_id_chrg_bill  chrg_person_id_chrg_bill ,
   bill.bill_crr_id_bill  bill_crr_id_bill ,
@@ -424,56 +386,47 @@ cust.autocreate_custact  cust_autocreate_custact,
           ,sio_sord varchar(256)
           ,sio_search varchar(10)
           ,sio_sidx varchar(256)
-,crr_code_cust  varchar (50) 
-,loca_code_bill  varchar (50) 
-,loca_name_bill  varchar (100) 
 ,loca_code_cust  varchar (50) 
+,loca_name_cust  varchar (100) 
 ,person_code_upd  varchar (50) 
 ,person_name_upd  varchar (100) 
-,person_code_chrg_bill  varchar (50) 
-,crr_name_cust  varchar (100) 
-,person_name_chrg_bill  varchar (100) 
-,loca_name_cust  varchar (100) 
-,scrlv_code_chrg_bill  varchar (50) 
-,usrgrp_code_chrg_bill  varchar (50) 
-,usrgrp_name_chrg_bill  varchar (100) 
-,loca_code_sect_chrg_bill  varchar (50) 
-,loca_name_sect_chrg_bill  varchar (100) 
-,crr_code_bill  varchar (50) 
-,crr_name_bill  varchar (100) 
 ,person_code_chrg_cust  varchar (50) 
-,scrlv_code_chrg_cust  varchar (50) 
 ,person_name_chrg_cust  varchar (100) 
-,loca_code_sect_chrg_cust  varchar (50) 
-,loca_name_sect_chrg_cust  varchar (100) 
-,usrgrp_code_chrg_cust  varchar (50) 
-,usrgrp_name_chrg_cust  varchar (100) 
-,cust_amtdecimal  numeric (38,0)
-,cust_rule_price  varchar (1) 
-,cust_autocreate_custact  varchar (1) 
-,cust_amtround  varchar (2) 
+,loca_code_bill  varchar (50) 
+,loca_name_bill  varchar (100) 
+,person_code_chrg_bill  varchar (50) 
+,person_name_chrg_bill  varchar (100) 
+,crr_code_bill  varchar (50) 
+,crr_code_cust  varchar (50) 
+,crr_name_bill  varchar (100) 
+,crr_name_cust  varchar (100) 
 ,cust_contract_price  varchar (1) 
+,cust_rule_price  varchar (1) 
+,cust_amtdecimal  numeric (38,0)
+,cust_amtround  varchar (2) 
 ,cust_personname  varchar (30) 
+,cust_crr_id_cust  numeric (38,0)
+,cust_autocreate_custact  varchar (1) 
 ,cust_custtype  varchar (1) 
 ,cust_expiredate   date 
 ,cust_remark  varchar (4000) 
 ,cust_contents  varchar (4000) 
-,bill_crr_id_bill  numeric (22,0)
-,bill_loca_id_bill  numeric (38,0)
-,chrg_person_id_chrg_cust  numeric (38,0)
-,cust_chrg_id_cust  numeric (38,0)
-,cust_bill_id  numeric (38,0)
-,cust_crr_id_cust  numeric (38,0)
-,bill_chrg_id_bill  numeric (22,0)
-,cust_loca_id_cust  numeric (38,0)
-,cust_created_at   timestamp(6) 
+,cust_id  numeric (38,0)
 ,cust_update_ip  varchar (40) 
-,cust_updated_at   timestamp(6) 
-,person_sect_id_chrg_bill  numeric (22,0)
-,person_sect_id_chrg_cust  numeric (22,0)
 ,chrg_person_id_chrg_bill  numeric (38,0)
-,cust_person_id_upd  numeric (22,0)
+,cust_bill_id  numeric (38,0)
+,cust_updated_at   timestamp(6) 
+,bill_crr_id_bill  numeric (22,0)
+,person_sect_id_chrg_bill  numeric (22,0)
+,cust_loca_id_cust  numeric (38,0)
+,bill_chrg_id_bill  numeric (22,0)
+,cust_person_id_upd  numeric (38,0)
+,cust_chrg_id_cust  numeric (38,0)
+,chrg_person_id_chrg_cust  numeric (38,0)
 ,id  numeric (38,0)
+,cust_created_at   timestamp(6) 
+,bill_loca_id_bill  numeric (38,0)
+,person_sect_id_chrg_cust  numeric (22,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)
           ,sio_org_tblid numeric(22,0)
@@ -499,8 +452,6 @@ supplier.id id,
   payment.payment_loca_id_payment  payment_loca_id_payment ,
   payment.payment_chrg_id_payment  payment_chrg_id_payment ,
   payment.person_code_chrg_payment  person_code_chrg_payment ,
-  payment.usrgrp_name_chrg_payment  usrgrp_name_chrg_payment ,
-  payment.usrgrp_code_chrg_payment  usrgrp_code_chrg_payment ,
   payment.person_name_chrg_payment  person_name_chrg_payment ,
 supplier.amtdecimal  supplier_amtdecimal,
 supplier.remark  supplier_remark,
@@ -523,17 +474,9 @@ supplier.crrs_id_supplier   supplier_crr_id_supplier,
   loca_supplier.loca_code  loca_code_supplier ,
   loca_supplier.loca_name  loca_name_supplier ,
   chrg_supplier.person_code_chrg  person_code_chrg_supplier ,
-  chrg_supplier.usrgrp_name_chrg  usrgrp_name_chrg_supplier ,
-  chrg_supplier.usrgrp_code_chrg  usrgrp_code_chrg_supplier ,
   chrg_supplier.person_name_chrg  person_name_chrg_supplier ,
   crr_supplier.crr_name  crr_name_supplier ,
   crr_supplier.crr_code  crr_code_supplier ,
-  chrg_supplier.scrlv_code_chrg  scrlv_code_chrg_supplier ,
-  chrg_supplier.loca_name_sect_chrg  loca_name_sect_chrg_supplier ,
-  chrg_supplier.loca_code_sect_chrg  loca_code_sect_chrg_supplier ,
-  payment.scrlv_code_chrg_payment  scrlv_code_chrg_payment ,
-  payment.loca_name_sect_chrg_payment  loca_name_sect_chrg_payment ,
-  payment.loca_code_sect_chrg_payment  loca_code_sect_chrg_payment ,
   chrg_supplier.chrg_person_id_chrg  chrg_person_id_chrg_supplier ,
   payment.chrg_person_id_chrg_payment  chrg_person_id_chrg_payment ,
   chrg_supplier.person_sect_id_chrg  person_sect_id_chrg_supplier ,
@@ -563,54 +506,44 @@ supplier.crrs_id_supplier   supplier_crr_id_supplier,
           ,sio_search varchar(10)
           ,sio_sidx varchar(256)
 ,loca_code_supplier  varchar (50) 
-,crr_code_payment  varchar (50) 
-,person_code_upd  varchar (50) 
 ,loca_name_supplier  varchar (100) 
-,person_name_upd  varchar (100) 
-,crr_name_payment  varchar (100) 
 ,person_code_chrg_supplier  varchar (50) 
 ,person_name_chrg_supplier  varchar (100) 
-,usrgrp_code_chrg_supplier  varchar (50) 
-,usrgrp_name_chrg_payment  varchar (100) 
-,loca_code_sect_chrg_supplier  varchar (50) 
-,loca_name_sect_chrg_supplier  varchar (100) 
-,scrlv_code_chrg_supplier  varchar (50) 
 ,crr_code_supplier  varchar (50) 
 ,crr_name_supplier  varchar (100) 
 ,loca_code_payment  varchar (50) 
 ,loca_name_payment  varchar (100) 
 ,person_code_chrg_payment  varchar (50) 
 ,person_name_chrg_payment  varchar (100) 
-,scrlv_code_chrg_payment  varchar (50) 
-,usrgrp_code_chrg_payment  varchar (50) 
-,usrgrp_name_chrg_supplier  varchar (100) 
-,loca_code_sect_chrg_payment  varchar (50) 
-,loca_name_sect_chrg_payment  varchar (100) 
-,supplier_personname  varchar (30) 
+,supplier_rule_price  varchar (1) 
 ,supplier_amtdecimal  numeric (38,0)
+,supplier_contract_price  varchar (1) 
 ,supplier_custtype  varchar (1) 
 ,supplier_expiredate   date 
-,supplier_contract_price  varchar (1) 
-,supplier_rule_price  varchar (1) 
+,supplier_personname  varchar (30) 
 ,supplier_amtround  varchar (2) 
+,crr_code_payment  varchar (50) 
+,crr_name_payment  varchar (100) 
 ,supplier_contents  varchar (4000) 
 ,supplier_remark  varchar (4000) 
-,supplier_loca_id_supplier  numeric (22,0)
-,id  numeric (38,0)
-,supplier_payment_id  numeric (38,0)
-,supplier_person_id_upd  numeric (38,0)
-,supplier_id  numeric (38,0)
+,person_code_upd  varchar (50) 
+,person_name_upd  varchar (100) 
 ,supplier_updated_at   timestamp(6) 
+,supplier_loca_id_supplier  numeric (22,0)
+,supplier_chrg_id_supplier  numeric (22,0)
+,supplier_crr_id_supplier  numeric (22,0)
 ,supplier_update_ip  varchar (40) 
 ,supplier_created_at   timestamp(6) 
-,supplier_crr_id_supplier  numeric (22,0)
-,supplier_chrg_id_supplier  numeric (22,0)
+,id  numeric (38,0)
+,supplier_id  numeric (38,0)
+,supplier_payment_id  numeric (38,0)
 ,payment_crr_id_payment  numeric (22,0)
+,supplier_person_id_upd  numeric (38,0)
 ,chrg_person_id_chrg_payment  numeric (38,0)
 ,person_sect_id_chrg_supplier  numeric (22,0)
 ,person_sect_id_chrg_payment  numeric (22,0)
-,payment_loca_id_payment  numeric (38,0)
 ,payment_chrg_id_payment  numeric (22,0)
+,payment_loca_id_payment  numeric (38,0)
 ,chrg_person_id_chrg_supplier  numeric (38,0)
           ,sio_errline varchar(4000)
           ,sio_org_tblname varchar(30)

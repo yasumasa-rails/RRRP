@@ -40,7 +40,7 @@ module ControlFields
 				end	  
 			end  
 	  	end 
-	  	##params["linedata"] = JSON.generate(fetch_data)
+	  	params["linedata"] = JSON.generate(fetch_data)
 	  	return params 
 	end  
 
@@ -115,9 +115,9 @@ module ControlFields
 								# 	end
 								# end
 							when /custords$/
-								if fetchview =~ /opeitms$/
-									fetch_data["loca_code_fm"] = rec["loca_code"]
-								end
+								# if fetchview =~ /opeitms$/
+								# 	fetch_data["loca_code_fm"] = rec["loca_code"]
+								# end
 						end	
 					else 
 						if srctblnamechop =~ /^pur|^prd|^shp|^cust/ and rec[field] and key !~ /person.*upd/  and field !=  "id"
@@ -266,7 +266,7 @@ module ControlFields
 		tblchop = tbl.chop
 		keys.each do |key|
 			symkey = tblchop + "_" + key.gsub("s_id","_id")
-			if linedata[symkey].nil?
+			if linedata[symkey].nil? or linedata[symkey]  == ""
 				strwhere = "       #{symkey} must be select      "
 				break
 			else
@@ -468,23 +468,23 @@ module ControlFields
 
 	def check_already_used params,item,yupcheckcode   ###あるidで登録されたcodeが別のテーブルに既に登録されているとき、codeの変更は不可
 		###外部keyでチェックすべき???
-			check_code,view,field = yupcheckcode.split(",")
-				strsql = %Q&select #{field} from #{view} where #{field} = '#{params[:parse_linedata][item.to_sym]}'
+		check_code,view,field = yupcheckcode.split(",")
+		strsql = %Q&select #{field} from #{view} where #{field} = '#{params[:parse_linedata][item.to_sym]}'
 				&
-				old_value = ActiveRecord::Base.connection.select_value(strsql)
-				old_value ||= ""
-				if params[:parse_linedata][item.to_sym].nil? or params[:parse_linedata][item.to_sym] == ""
+		old_value = ActiveRecord::Base.connection.select_value(strsql)
+		old_value ||= ""
+		if params[:parse_linedata][item.to_sym].nil? or old_value == ""
 					new_value = ""
-				else
+		else
 					strsql = %Q&select #{field} from #{view} where #{field.sub("_code","_id")} = #{params[:parse_linedata]["id"]}
 					&
 					new_value = ActiveRecord::Base.connection.select_value(strsql)
-				end
-				if old_value == new_value
+			end
+		if old_value == new_value
 					params[:err] = "" 
-				else	
+			else	
 					params[:err] =  "error   ---> #{field} can not change because #{view} already used "
-				end
+		end
 		return params	
 	end
 
@@ -535,7 +535,7 @@ module ControlFields
 	# end 
  
 	### prd,pur,shp ・・・schs,ords,insts,acts,retsのレコード作成　	
-	def proc_fields_update parent,paretblname
+	def proc_fields_update parent,paretblname   ###xxxschsの作成のみ
 		@command_c = {}
 		@para = {}
 		yield @command_c,@para   ###@para 子供自身の員数等
@@ -635,14 +635,14 @@ module ControlFields
 						field_prjnos_id
 				when "qty_sch"
 						field_qty_sch 
-				when "qty"
-						field_qty 
+				###when "qty"   ###xxxschsではqtyは存在しない
+				###		field_qty 
 				when "qty_case"
 						field_qty_case 
 				when "qty_bal"
 						field_qty_bal 
-				when "qty_stk"
-						field_qty_stk 
+				# when "qty_stk"
+				# 		field_qty_stk 
 				when "starttime"  ###稼働日計算
 						field_starttime
 				when "shelfnos_id_to"
@@ -653,8 +653,8 @@ module ControlFields
 						field_suppliers_id
 				when "workplaces_id"
 						field_workplaces_id
-				when "crrs_id_pur"
-						field_crrs_id_pur
+				when "crrs_id"
+						field_crrs_id
 			end	
 		end		
 		return @command_c
@@ -701,8 +701,8 @@ module ControlFields
 		@command_c["#{@tblnamechop}_workplace_id"] = id ##
 	end 
 
-	def field_crrs_id_pur 
-		@command_c["#{@tblnamechop}_crr_id_pur"] = @para["crrs_id_pur"]
+	def field_crrs_id 
+		@command_c["#{@tblnamechop}_crr_id"] = @para["crrs_id"]
 	end 
 
 	def field_shelfnos_id_to 
@@ -733,13 +733,13 @@ module ControlFields
 		end
 	end	
 
-	def field_qty_sch 
-		@qty_sch = @para["parent_qty_sch"] * @para["chilnum"] / @para["parenum"]
-		#consumunitqty等については親に合わせて計算する。
-	end
+	# def field_qty_sch 
+	# 	@qty_sch = @para["parent_qty_sch"] * @para["chilnum"] / @para["parenum"]
+	# 	#consumunitqty等については親に合わせて計算する。
+	# end
 
-	def field_qty 
-		@qty = @para["parent_qty"] * @para["chilnum"] / @para["parenum"]
+	def field_qty_sch 
+		@qty = @para["parent_qty_sch"] * @para["chilnum"] / @para["parenum"]
 		#consumunitqty等については親に合わせて計算する。
 		 if @para["consumunitqty"] > 0
 		 	@qty = (@qty /  @para["consumunitqty"]).ceil *  @para["consumunitqty"]
@@ -749,14 +749,14 @@ module ControlFields
 		end	
 		if @para["packqty"] > 0			
 			qty_case = (@qty /  @para["packqty"]).ceil 
-			@command_c["#{@tblnamechop}_qty"]  =  qty_case  *  @para["packqty"]
-			@qty_bal = @command_c["#{@tblnamechop}_qty"]  - @qty
+			@command_c["#{@tblnamechop}_qty_sch"]  =  qty_case  *  @para["packqty"]
+			@qty_bal = @command_c["#{@tblnamechop}_qty_sch"]  - @qty
 		else
-			@command_c["#{@tblnamechop}_qty"] = @qty
+			@command_c["#{@tblnamechop}_qty_sch"] = @qty
 			@qty_bal = 0
 		end	
-		if @para["consumminqty"] > @command_c["#{@tblnamechop}_qty"]
-			@command_c["#{tblnamechop}_qty"] = @para["consumminqty"]  ###最小消費数
+		if @para["consumminqty"] > @command_c["#{@tblnamechop}_qty_sch"]
+			@command_c["#{tblnamechop}_qty_sch"] = @para["consumminqty"]  ###最小消費数
 			@qty_bal = 0
 		end	
 	end	
@@ -769,12 +769,12 @@ module ControlFields
 		end	
 	end	
 
-	def field_qty_stk 
-		@command_c["#{@tblnamechop}_qty_stk"] = @para["parent_qty"] * @para["chilnum"] / @para["parenum"]
-		if @consumminqty > @command_c["#{@tblnamechop}_qty_stk"]
-			@command_c["#{tblnamechop}_qty_stk"] = @para["consumunitqty"]
-		end	
-	end	
+	# def field_qty_stk 
+	# 	@command_c["#{@tblnamechop}_qty_stk"] = @para["parent_qty"] * @para["chilnum"] / @para["parenum"]
+	# 	if @consumminqty > @command_c["#{@tblnamechop}_qty_stk"]
+	# 		@command_c["#{tblnamechop}_qty_stk"] = @para["consumunitqty"]
+	# 	end	
+	# end	
 
 	def field_qty_bal ### custords・・・の時@para["parent_qty_bal"]= nil
 		@command_c["#{@tblnamechop}_qty_bal"] = @qty_bal  ###field_qty で計算
@@ -782,7 +782,7 @@ module ControlFields
 
 	def field_price_amt_tax_contract_price 
 		@command_c["#{@tblnamechop}_price"] = 0 if @command_c["#{@tblnamechop}_price"].nil?
-		@command_c["#{@tblnamechop}_amt"] = 0 if @command_c["#{@tblnamechop}_amt"].nil?
+		@command_c["#{@tblnamechop}_amt_sch"] = 0 if @command_c["#{@tblnamechop}_amt_sch"].nil?
 		@command_c["#{@tblnamechop}_tax"] = 0 if @command_c["#{@tblnamechop}_tax"].nil?
 	end
 

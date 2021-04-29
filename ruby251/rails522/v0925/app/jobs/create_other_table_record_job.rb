@@ -350,21 +350,27 @@ class CreateOtherTableRecordJob < ApplicationJob
 	###schsの追加	paretblname =~ /schs$|ords$/の時呼ばれる 
 	def add_update_table_from_nditm  child,parent,paretblname ### id processreqsのid child-->nditms  parent ===> r_prd,pur XXXs
 		opeitm  = Operation.proc_get_opeitms_rec(child["itms_id_nditm"],nil,child["processseq_nditm"],999)
+        if paretblname =~ /ords/   ###ordsから schsを作成
+            parent["#{paretblname.chop}_qty_sch"] = parent["#{paretblname.chop}_qty"] 
+            parent["#{paretblname.chop}_amt_sch"] = parent["#{paretblname.chop}_amt"] 
+            parent.delete("#{paretblname.chop}_qty") 
+            parent.delete("#{paretblname.chop}_amt") 
+        end
 		command_r = ControlFields.proc_fields_update parent,paretblname do |command_c,para|
 			command_c[:sio_viewname] =  "r_"+ opeitm["prdpurshp"]+"schs" 
 			command_c["id"]=""
-			command_c["opeitm_loca_id"] = opeitm["locas_id"]
+			command_c["opeitm_loca_id_opeitm"] = opeitm["locas_id_opeitm"]
 			para["opeitms_id"] = opeitm["id"]
 			para["duration"] =  opeitm["duration"].to_f
 			para["packqty"] =  opeitm["packqty"].to_f
 			para["shelfnos_id_to"] = opeitm["shelfnos_id"]
-			para["locas_id"] = opeitm["locas_id"]  ###発注の時の作業場所
+			para["locas_id"] = opeitm["locas_id_opeitm"]  ###発注の時の作業場所
 			para["parenum"] = child["parenum"].to_f
 			para["chilnum"] = child["chilnum"].to_f
 			para["locas_id_fm"] = child["locas_id_fm"]
 			para["consumunitqty"] = child["consumunitqty"].to_f
 			para["consumminqty"] = child["consumminqty"].to_f
-			para["crrs_id_pur"] = child["crrs_id"]  ###発注の時の作業場所
+			para["crrs_id"] = child["crrs_id"]  
 		end
 		return command_r,opeitm
     end

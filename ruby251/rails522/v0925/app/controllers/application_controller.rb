@@ -15,7 +15,16 @@ class ApplicationController < ActionController::API
 		"blktbs"=>["r_blktbs","r_tblfields","r_screenfields"],
 		"tblfields"=>["r_tblfields","r_screenfields"],
 		"screens"=>["r_screens","r_screenfields"],
-		"screenfields"=>["r_screenfields"]}
+		"screenfields"=>["r_screenfields"],
+		"units"=>["r_itms","r_opeitms","r_nditms"],
+		"boxes"=>["r_opeitms","r_nditms"],
+		"shelfnos"=>["r_opeitms","r_nditms"],
+		"classlists"=>["r_itms","r_opeitms","r_nditms"],
+		"itms"=>["r_itms","r_opeitms","r_nditms"],
+		"opeitms"=>["r_opeitms","r_nditms"],
+		"crrs"=>["r_nditms"],
+		"locas"=>["r_nditms"],
+		"nditms"=>["r_nditms"]}
 
 	$tblfield_materiallized = ["r_pobjects","r_screenfields"]
 end

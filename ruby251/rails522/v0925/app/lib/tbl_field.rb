@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-module TblField
+module TblField   ###developmentのみで起動
 extend self
 	def proc_blktbs params,current_api_user   ### r_blktbs又はr_tblfieldsから呼ばれることを想定
 		@checktbls = {}   ### 対象となるテーブル群
@@ -325,7 +325,7 @@ extend self
 						viewfield =  tbl.chop +  "_" +  pobject_code_fld.sub("s_id","_id")
 						if last_screenfields[viewfield].nil?
 							pobjects_id_sfd = chk_pobject_sfd_and_add viewfield
-							add_screenfield_record screens_id,pobjects_id_sfd,field,"add",false
+							add_screenfield_record screens_id,pobjects_id_sfd,field,"add",true
 						end
 						othertbl,delm = pobject_code_fld.split("_id",2) 
 						delm ||= ""
@@ -337,6 +337,7 @@ extend self
 						other_screenfield.each do |other_sfd,other_field|
 							last_other_sfd = last_screenfields[other_sfd] 
 							if last_other_sfd
+								last_other_sfd["screenfield_crtfield"] = othertbl.chop + delm
 								add_screenfield_record screens_id,last_other_sfd["screenfield_pobject_id_sfd"],last_other_sfd,"update",false
 								last_screenfields.delete(other_sfd)   ###残った項目が削除対象
 							else	
@@ -533,14 +534,19 @@ extend self
 			command_r["screenfield_remark"] =	field["screenfield_remark"]
 			command_r["screenfield_expiredate"] = (field["screenfield_expiredate"]||=field["tblfield_expiredate"])
 			command_r["screenfield_screen_id"] = screens_id
+			command_r["screenfield_indisp"] =	(field["screenfield_indisp"]||="0")
 			command_r["screenfield_selection"] = 	if aud == "add"
 														if owner == true
 															"1"
 														else 
-															if field["pobject_code_sfd"] =~ /_code|_name|_sno|_cno|_go|_id/
+															if field["pobject_code_sfd"] =~ /_code|_name|_sno|_cno|_go/
 																"1"
 															else
-																"0"
+																if command_r["screenfield_indisp"] != "0"   ###必須項目
+																	"1"
+																else	
+																	"0"
+																end
 															end
 														end
 													else
@@ -591,7 +597,6 @@ extend self
 			command_r["screenfield_dataprecision"] = (field["screenfield_dataprecision"]||=field["fieldcode_dataprecision"])
 			command_r["screenfield_datascale"] = (field["screenfield_datascale"]||=field["fieldcode_datascale"])
 			command_r["screenfield_edoptmaxlength"] = (field["screenfield_edoptmaxlength"]||=0)
-			command_r["screenfield_indisp"] =	(field["screenfield_indisp"]||="0")
 			command_r["screenfield_subindisp"] =""
 			command_r["screenfield_editable"] =	if field["pobject_code_sfd"]  =~ /_upd/
 													"0"
@@ -819,10 +824,21 @@ extend self
 				chktbl = chktbl_delm[0]
 				delm = (chktbl_delm[1]||="")
 				if chkfields.empty? or chkfields["r_#{chktbl}"].nil?
-					strsql = "select	table_name,column_name from 	information_schema.columns 
-											where 	table_catalog='#{ActiveRecord::Base.configurations["development"]["database"]}' 
-											and table_name='r_#{chktbl}'  and column_name  not like '%_upd'
-											and column_name  != 'id' "
+					strsql = "
+								SELECT     
+											cls.relname      AS table_name
+											,att.attname      AS column_name
+								 FROM        pg_catalog.pg_class       cls
+								 LEFT  JOIN  pg_catalog.pg_namespace   nms
+										 ON  cls.relnamespace = nms.oid
+								 LEFT  JOIN  pg_catalog.pg_attribute   att
+										 ON  cls.oid = att.attrelid
+										AND  att.attnum > 0
+								 WHERE       cls.relkind IN ('r','v','m')
+								   AND       nms.nspname = 'public'
+								   and att.attname  not like '%_upd'	and att.attname  != 'id' 
+									and cls.relname = 'r_#{chktbl}'
+								"
 					chks = ActiveRecord::Base.connection.select_all(strsql)
 					chks.each do |chkrec|
 						if chkfields[chkrec["column_name"]+delm].nil? 

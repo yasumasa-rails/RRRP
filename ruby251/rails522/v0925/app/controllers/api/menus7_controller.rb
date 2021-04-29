@@ -179,18 +179,7 @@ module Api
                     rparams[:parse_linedata][(tblnamechop+"_id").to_sym] = command_c[tblnamechop+"_id"]
                     rparams[:parse_linedata][:confirm] = true  
                     rparams[:parse_linedata][("confirm_gridmessage").to_sym] = "done"
-                    if $materiallized[tblnamechop+"s"]
-                      $materiallized[tblnamechop+"s"].each do |view|
-                        strsql = %Q%select 1 from pg_catalog.pg_matviews pm 
-                              where matviewname = '#{view}' %
-                        if ActiveRecord::Base.connection.select_one(strsql)			
-                              strsql = %Q%REFRESH MATERIALIZED VIEW #{view} %
-                              ActiveRecord::Base.connection.execute(strsql)
-                        else
-                              3.times{p "materiallized error :#{view}"}
-                        end
-                      end
-                    end
+                    RorBlkctl.proc_materiallized tblnamechop+"s"
                   end
                 end 
                 render json: {:linedata=> rparams[:parse_linedata]}

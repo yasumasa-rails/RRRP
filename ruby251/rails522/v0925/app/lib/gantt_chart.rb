@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# RorBlk
 # 2099/12/31を修正する時は　2100/01/01の修正も
 module GanttChart
     extend self
@@ -13,7 +12,7 @@ module GanttChart
 																order by opeitm_priority desc, opeitm_processseq desc,opeitm_Expiredate ")
 		end
         if rec then
-            ngantts << {:seq=>"001",:mlevel=>1,:itms_id=>rec["opeitm_itm_id"],:locas_id=>rec["opeitm_loca_id"],:opeitms_id=>rec["id"],
+            ngantts << {:seq=>"001",:mlevel=>1,:itms_id=>rec["opeitm_itm_id"],:locas_id=>rec["opeitm_loca_id_opeitm"],:opeitms_id=>rec["id"],
 								:itm_code=>rec["itm_code"],:itm_name=>rec["itm_name"],
 								:loca_code=>rec["loca_code"],:loca_name=>rec["loca_name"],
 								:parenum=>1,:chilnum=>1,:duration=>rec["opeitm_duration"],:prdpurshp=>rec["opeitm_prdpurshp"],
@@ -207,7 +206,7 @@ module GanttChart
 			end
 		end
 		command_r[:opeitm_itm_id] = value[:itm_id]
-		command_r[:opeitm_loca_id] = value[:loca_id]
+		command_r[:opeitm_loca_id_opeitm] = value[:loca_id]
 		command_r[:sio_viewname]  = command_r[:sio_code] = @screen_code = "r_opeitms"
 		command_r[:opeitm_priority] = value[:priority]
 		command_r[:opeitm_processseq] = value[:processseq]
@@ -221,7 +220,8 @@ module GanttChart
 		proc_simple_sio_insert command_r  ###重複チェックは　params[:tasks][@tree[key]][:processseq] > value[:processseq]　が確定済なので不要
 	end
 	def update_nditm_from_gantt(key,value ,command_r)
-		strsql = "select id from opeitms where itms_id = #{params[:tasks][@tree[key]][:itm_id]} and locas_id = #{params[:tasks][@tree[key]][:loca_id]} and
+		strsql = "select id from opeitms where itms_id = #{params[:tasks][@tree[key]][:itm_id]} and 
+					locas_id_opeitm = #{params[:tasks][@tree[key]][:loca_id]} and
 					processseq = #{params[:tasks][@tree[key]][:processseq]} and priority = #{params[:tasks][@tree[key]][:priority]}"
 		pare_opeitm_id = ActiveRecord::Base.connection.select_value(strsql)
 		if pare_opeitm_id
@@ -280,7 +280,8 @@ module GanttChart
 						command_r[:opeitm_id] = command_r[:id] = opeitm["id"]
 					end
 				else
-					strsql = "select * from r_opeitms where itm_code = '#{value["copy_itemcode"]}' and loca_code = '#{value["loca_code"]}' and opeitm_processseq = #{value[:processseq]} "
+					strsql = "select * from r_opeitms where itm_code = '#{value["copy_itemcode"]}' and
+										 loca_code_opeitm = '#{value["loca_code"]}' and opeitm_processseq = #{value[:processseq]} "
 					if ActiveRecord::Base.connection.select_one(strsql)
 						@ganttdata[key][:priority] = "???"  ###priority違いで同じものがいる。
 					else
@@ -345,11 +346,13 @@ module GanttChart
 					value[:processseq] = "999"
 					if (params[:tasks][@tree[key]][:priority] > value[:priority] and params[:tasks][@tree[key]][:priority] == 999) or params[:tasks][@tree[key]][:priority] == value[:priority]
 						if value[:itm_id] != "" and value[:loca_id] != ""
-							strsql = "select id from opeitms where itms_id = #{value[:itm_id]} and locas_id = #{value[:loca_id]} and processseq = #{value[:processseq]} and priority = #{value[:priority]} "
+							strsql = "select id from opeitms where itms_id = #{value[:itm_id]} and 
+																locas_id_opeitm = #{value[:loca_id]} and processseq = #{value[:processseq]} and priority = #{value[:priority]} "
 							ope = ActiveRecord::Base.connection.select_one(strsql)
 							if value[:prdpurshp] =~ /prd|pur|shp|con/  ### prd,pur,shp以外に増えたときの対応
 								if  ope.nil?
-									strsql = "select * from r_opeitms where itm_code = '#{value["copy_itemcode"]}' and opeitm_processseq = 999 and opeitm_priority = 999 "
+									strsql = "select * from r_opeitms where itm_code = '#{value["copy_itemcode"]}' and opeitm_processseq = 999 and
+																			 opeitm_priority = 999 "
 									copy_opeitm = ActiveRecord::Base.connection.select_one(strsql)
 									if copy_opeitm
 										update_opeitm_from_gantt(copy_opeitm,value ,command_r)do
@@ -521,7 +524,7 @@ module GanttChart
 				@itm_id = @opeitm_itm_id
 			end
 			if @loca_id.nil?
-				@loca_id = @opeitm_loca_id
+				@loca_id = @opeitm_loca_id_opeitm
 			end
 		else
 			if @itm_id

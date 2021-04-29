@@ -6,9 +6,9 @@ truncate table purdlvs;
 truncate table puracts;
 truncate table inamts;
 truncate table outamts;
-truncate table lotstkhists;
 
 truncate table alloctbls cascade;
+truncate table lotstkhists cascade;
 
 truncate table prdschs;
 truncate table prdords;
@@ -45,8 +45,33 @@ truncate table srctbls;
 truncate table instks cascade;
 truncate table outstks cascade;
 
-commit;
+insert into lotstkhists(id,
+									itms_id,shelfnos_id,
+									prjnos_id,
+									starttime,processseq,
+									lotno,packno,
+									qty_sch,
+									qty_stk,
+									qty,
+									stktaking_proc,
+									created_at,
+									updated_at,
+									update_ip,persons_id_upd,expiredate,remark)
+							values(0,
+									0,0,
+									0,
+									'2000/01/01',999,
+									'','',
+									0,
+									0,
+									0,
+									'',
+									to_timestamp('2000/01/01 0:0:0','yyyy/mm/dd hh24:mi:ss'),
+									to_timestamp('2000/01/01 0:0:0','yyyy/mm/dd hh24:mi:ss'),
+									' ',0,'2099/12/31','')
+;
 
+commit;
 
 truncate table sio.sio_r_purschs;
 truncate table sio.sio_r_purords;
@@ -98,5 +123,8 @@ REFRESH MATERIALIZED view  r_fieldcodes;
 REFRESH MATERIALIZED view r_blktbs ;
 REFRESH MATERIALIZED view r_tblfields; 
 REFRESH MATERIALIZED view r_screenfields; 
+REFRESH MATERIALIZED view r_itms ;
+REFRESH MATERIALIZED view r_opeitms; 
+REFRESH MATERIALIZED view r_nditms; 
 commit;
 

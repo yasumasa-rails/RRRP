@@ -1,5 +1,0 @@
- --- create view script   r_custdlvs 
- --- create view script   r_custwhs 
- --- create view script   r_custinsts 
- --- create view script   r_custords 
- --- create view script   r_custacts 

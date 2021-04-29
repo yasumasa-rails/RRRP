@@ -344,7 +344,6 @@ and person.USRGRPS_ID = usrgrp.ID
 	ID numeric(38,0),
 	NAME VARCHAR(100),
 	CODE VARCHAR(50),
-	PRIORITY numeric,
 	PRJNOS_ID_CHIL numeric(38,0),
 	 CONSTRAINT PRJNOS_ID_PK PRIMARY KEY (ID),
 	 CONSTRAINT PRJNO_PERSONS_ID_UPD FOREIGN KEY (PERSONS_ID_UPD)
@@ -353,18 +352,31 @@ and person.USRGRPS_ID = usrgrp.ID
    ;
 CREATE  SEQUENCE PRJNOS_seq INCREMENT BY 1 START WITH 10000   PRJNOS_seq
 ;
-CREATE OR REPLACE  VIEW R_PRJNOS (ID, PRJNO_ID, PRJNO_REMARK, PRJNO_EXPIREDATE,
-									PRJNO_UPDATE_IP, PRJNO_CREATED_AT, PRJNO_UPDATED_AT, 
-									PRJNO_PERSON_ID_UPD, PERSON_ID_UPD, PERSON_CODE_UPD, PERSON_NAME_UPD, 
-									PRJNO_CODE, PRJNO_NAME, PRJNO_CODE_CHIL,PRJNO_NAME_CHIL,PRJNO_ID_CHIL,prjno_priority) AS 
-  select prjno.id id,prjno.id prjno_id ,prjno.remark prjno_remark ,prjno.expiredate prjno_expiredate ,prjno.update_ip prjno_update_ip ,
-  prjno.created_at prjno_created_at ,prjno.updated_at prjno_updated_at ,prjno.persons_id_upd prjno_person_id_upd , 
-  person_upd.person_id_upd person_id_upd, person_upd.person_code_upd person_code_upd, 
-  person_upd.person_name_upd person_name_upd,prjno.code prjno_code ,prjno.name prjno_name ,
-  prjno_chil.code prjno_chil_code,prjno_chil.name prjno_chil_name,prjno_chil.id prjno_id_chil,prjno.priority prjno_priority
- from prjnos prjno ,upd_persons  person_upd,prjnos prjno_chil
- where  person_upd.id = prjno.persons_id_upd and prjno.prjnos_id_chil = prjno_chil.id
-; 
+CREATE OR REPLACE VIEW public.r_prjnos
+AS SELECT prjno.id,
+    prjno.persons_id_upd AS prjno_person_id_upd,
+    prjno.updated_at AS prjno_updated_at,
+    prjno.created_at AS prjno_created_at,
+    prjno.update_ip AS prjno_update_ip,
+    prjno.expiredate AS prjno_expiredate,
+    prjno.remark AS prjno_remark,
+    person_upd.person_code AS person_code_upd,
+    person_upd.person_name AS person_name_upd,
+    prjno.code AS prjno_code,
+    prjno.name AS prjno_name,
+    prjno_chil.code AS prjno_code_chil,
+    prjno_chil.name AS prjno_name_chil,
+    prjno.contents AS prjno_contents,
+    prjno.priority AS prjno_priority,
+    prjno_chil.priority AS prjno_priority_chil,
+    prjno.id AS prjno_id,
+    prjno_chil.id AS prjno_id_chil
+   FROM prjnos prjno,
+    r_persons person_upd,
+    prjnos prjno_chil
+  WHERE prjno.persons_id_upd = person_upd.id AND prjno.prjnos_id_chil = prjno_chil.id
+  			and prjno.id = prjno.prjnos_id_chil  ;
+  		
  CREATE OR REPLACE  VIEW R_CHRGS (
   ID
   , CHRG_ID

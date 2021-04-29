@@ -17,7 +17,7 @@ module Api
         tmp1,defCode,screenCode,tmp2 = blob_path.split("@")
         tblname = screenCode.split("_")[1]
         column_info,page_info,where_info,select_fields,yup,dropdownlist,sort_info,nameToCode = 
-                  RorBlkctl.proc_create_upload_editable_columns_info screenCode,current_api_user[:email],"inlineaddreq" 
+                  ScreenLib.proc_create_upload_editable_columns_info screenCode,current_api_user[:email],"inlineaddreq" 
         
         strsql = "select	column_name from 	information_schema.columns 
                   where 	table_catalog='#{ActiveRecord::Base.configurations["development"]["database"]}' 
@@ -129,19 +129,7 @@ module Api
             results = RorBlkctl.proc_update_table_json(command_all,command_all.size,results)
 
             ### errorの処理　未処理
-
-            if $materiallized[tblname]
-              $materiallized[tblname].each do |view|
-                strsql = %Q%select 1 from pg_catalog.pg_matviews pm 
-                      where matviewname = '#{view}' %
-                if ActiveRecord::Base.connection.select_one(strsql)			
-                      strsql = %Q%REFRESH MATERIALIZED VIEW #{view} %
-                      ActiveRecord::Base.connection.execute(strsql)
-                else
-                      3.times{p "materiallized error :#{view}"}
-                end
-              end
-            end
+            RorBlkctl.proc_materiallized tblname
         end
         render json: {:results=>results}
 

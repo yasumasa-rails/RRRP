@@ -84,7 +84,8 @@ extend self
                     screenfield_minvalue,screenfield_formatter,	pobject_code_scr ,screenfield_edoptmaxlength,
                     max(screenfield_updated_at) screenfield_updated_at,screenfield_paragraph
                     from r_screenfields
-                    where screenfield_editable !=0 
+                    where screenfield_editable !=0 and screenfield_selection != '0' and
+                    screenfield_expiredate > current_date
                     #{if screencode then " and pobject_code_scr = '#{screencode}' " else "" end }
                     group by pobject_code_sfd,screenfield_type,screenfield_indisp,screenfield_maxvalue,screenfield_edoptmaxlength,
                     screenfield_minvalue,screenfield_formatter,screenfield_paragraph,pobject_code_scr
@@ -93,13 +94,15 @@ extend self
     def fetchcodesql screencode
          %Q%select pobject_code_sfd,screenfield_paragraph
                     from r_screenfields
-                    where trim(screenfield_paragraph) != ''
+                    where trim(screenfield_paragraph) != '' and
+                    screenfield_expiredate > current_date
                     #{if screencode then " and pobject_code_scr = '#{screencode}' " else "" end }%
     end     
     def checkcodesql screencode
          %Q%select pobject_code_sfd,screenfield_subindisp
                     from r_screenfields
-                    where trim(screenfield_subindisp) != '' and screenfield_subindisp is not null
+                    where trim(screenfield_subindisp) != '' and screenfield_subindisp is not null and
+                    screenfield_expiredate > current_date
                     #{if screencode then " and pobject_code_scr = '#{screencode}' " else "" end }%
     end  
 end

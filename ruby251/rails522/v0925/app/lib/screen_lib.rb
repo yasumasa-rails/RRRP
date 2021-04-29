@@ -282,7 +282,7 @@ module ScreenLib
 	def proc_create_grid_editable_columns_info email,params,grid_columns_info
 		req = params[:req]
 		screenCode = params[:screenCode]
-		grid_columns_info = Rails.cache.fetch('screenfield'+RorBlkctl.grp_code(email)+screenCode) do
+		grid_columns_info = Rails.cache.fetch('screenfield'+RorBlkctl.proc_grp_code(email)+screenCode) do
 				###  ダブルコーティション　「"」は使用できない。 
 			sqlstr = "select * from  func_get_screenfield_grpname('#{email}','#{screenCode}')"
 			screenwidth = 0
@@ -308,8 +308,7 @@ module ScreenLib
 									}
 				hiddenColumns << "confirm_gridmessage"
 			end		
-			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|		
-				##if i["screenfield_selection"] == "0" or i["pobject_code_sfd"] == "id" or i["pobject_code_sfd"] =~ /_id/ 		
+			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|			
 					select_fields = 	select_fields + 	i["pobject_code_sfd"] + ','
 					if 	nameToCode[i["screenfield_name"]].nil?   ###nameToCode excelから取り込むときの表示文字からテーブル項目名への変換テーブル
 						nameToCode[i["screenfield_name"]] = i["pobject_code_sfd"]
@@ -439,7 +438,7 @@ module ScreenLib
 		columns_info = "["
 		columns_color = {}
 		select_fields = ""	
-		download_columns_info = Rails.cache.fetch('download'+RorBlkctl.grp_code(email)+screenCode) do
+		download_columns_info = Rails.cache.fetch('download'+RorBlkctl.proc_grp_code(email)+screenCode) do
 				###  ダブルコーティション　「"」は使用できない。 
 				sqlstr = "select * from  func_get_screenfield_grpname('#{email}','#{screenCode}')"
 				ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|
@@ -496,4 +495,144 @@ module ScreenLib
 		end	
 		return  pagedata
 	end	
-end   ##module Ror_blk
+
+	def proc_create_upload_editable_columns_info screen_code,email,req
+		grid_columns_info = Rails.cache.fetch('screenfield'+RorBlkctl.proc_grp_code(email)+screen_code) do
+				###  ダブルコーティション　「"」は使用できない。 
+			sqlstr = "select * from  func_get_screenfield_grpname('#{email}','#{screen_code}')"
+			columns_info = []
+			page_info = {}
+			where_info = {}
+			select_fields = ""
+			gridmessages_fields = ""  ### error messages
+			dropdownlist = {}
+			sort_info = {}
+			screenwidth = 0
+			nameToCode = {}
+			columns_info << {:Header=>"confirm",
+									:accessor=>"confirm",
+									:show=>true,
+									:filtered=>false,
+									:id=>"",
+									:className=>"checkbox",
+									:width=>50
+									}
+			columns_info << {:Header=>"confirm_gridmessage",
+									:accessor=>"confirm_gridmessage",
+									:show=>false,
+									:filtered=>false,
+									:id=>"",
+									:className=>"gridmessage",
+									}
+			ActiveRecord::Base.connection.select_all(sqlstr).each_with_index do |i,cnt|				
+					select_fields = 	select_fields + 	i["pobject_code_sfd"] + ','
+					if 	nameToCode[i["screenfield_name"]].nil?   ###nameToCode excelから取り込むときの表示文字からテーブル項目名への変換テーブル
+						nameToCode[i["screenfield_name"]] = i["pobject_code_sfd"]
+					else
+						if i["pobject_code_sfd"].split("_")[0] == screen_code.split("_")[1].chop
+							nameToCode[i["screenfield_name"]] = i["pobject_code_sfd"]  ###nameがテーブル項目しか登録されてない。
+						end
+					end
+					columns_info << {:Header=>"#{i["screenfield_name"]}",
+									:accessor=>"#{i["pobject_code_sfd"]}",
+									:show=>if  i["screenfield_hideflg"] == "0" then true else false end,
+									:filtered=>true,
+									:width => i["screenfield_width"].to_i,
+									:id=>"#{i["screenfield_id"]}",
+									##:style=>%Q%{"textAlign":#{if i["screenfield_type"] == "numeric" then "right" else "left" end}%, 
+									:style=>{:textAlign=>if i["screenfield_type"] == "numeric" then "right" else "left" end}, 
+									:className=>if ((req==="editabletablereq" or req==="inlineaddreq") and i["screenfield_editable"] === "1") or
+													(req==="editabletablereq"  and i["screenfield_editable"] === "2") or
+													( req==="inlineaddreq" and i["screenfield_editable"] === "3") 
+													if  i["screenfield_type"] == "select" 
+															"renderSelectEditable"
+													else
+														if i["screenfield_type"] == "check" 
+																		"checkbox"
+														else		
+															if	(i["screenfield_indisp"] === "1" or i["screenfield_indisp"] === "2")
+																			"renderEditableRequired"
+															else
+																			"renderEditable"
+															end
+														end
+													end				  
+												else	
+													if  i["screenfield_type"] == "select" 
+																	"renderSelectNonEditable"
+													else	
+														if i["screenfield_type"] == "check" 
+																		""
+												   		else
+																		"renderNonEditable"
+														end
+													end
+												end	
+									}
+					if ((req==="editabletablereq" or req==="inlineaddreq") and i["screenfield_editable"] === "1") or
+						(req==="editabletablereq"  and i["screenfield_editable"] === "2") or
+						( req==="inlineaddreq" and i["screenfield_editable"] === "3") 
+						columns_info << {:Header=>"#{i["screenfield_name"]}_gridmessage",
+										:accessor=>"#{i["pobject_code_sfd"]}_gridmessage",
+										:show=>false,
+										:filtered=>false,
+										:width => 10,
+										:id=>"#{i["screenfield_id"]}_gridmessage",
+										:className=>"gridmessages"
+									}
+						gridmessages_fields << %Q% '' #{i["pobject_code_sfd"]}_gridmessage,%	
+					end																
+					where_info[i["pobject_code_sfd"].to_sym] = 	i["screenfield_type"]	
+					if cnt == 0
+								where_info[:filtered] = i["screen_strwhere"]
+								###page_info[:sizePerPage] = i["screen_rows_per_page"].to_i
+								page_info[:pageNo] = 1
+								page_info[:sizePerPageList] = []
+								i["screen_rowlist"].split(",").each do |list|
+									page_info[:sizePerPageList]  <<  list.to_i
+								end
+								if i["screen_strorder"] 
+									sort_info[:default] = i["screen_strorder"]
+								end	
+				 	end
+					if  i["screenfield_edoptvalue"]
+						dropdownlist[i["pobject_code_sfd"]] = i["screenfield_edoptvalue"]
+					end	
+					if   i["screenfield_hideflg"] == "0" 
+						screenwidth = screenwidth +  i["screenfield_width"].to_i
+					end
+				##end
+			end	
+			if (req==="inlineaddreq")
+				columns_info << {:Header=>"confirm",
+									:accessor=>"confirm",
+									:show=>true,
+									:filtered=>false,
+									:id=>"",
+									:className=>"checkbox",
+									:width=>50
+									}
+			end	
+			yup={}
+			yup[:yupfetchcode] = YupSchema.create_yupfetchcode screen_code   
+			yup[:yupcheckcode]  = YupSchema.create_yupcheckcode screen_code   
+			dropdownlist.each do |key,val|
+				tmpval="["
+				val.split(",").each do  |drop|
+					tmpval << %Q%{"value":"#{drop.split(":")[0]}","label":"#{drop.split(":")[1]}"},%
+				end
+				dropdownlist[key] = tmpval.chop + "]"
+			end	
+			if sort_info[:default]
+				ary_select_fields = select_fields.split(',')
+				sort_info = ControlFields.proc_detail_check_strorder sort_info,ary_select_fields
+			end	 
+			page_info[:screenwidth] = screenwidth	
+			if gridmessages_fields.size > 1
+				select_fields << gridmessages_fields
+			end
+			grid_columns_info = [columns_info,page_info,where_info,select_fields.chop,yup,dropdownlist,sort_info,nameToCode]
+		end
+	end
+
+end   ##module ScreenLib
