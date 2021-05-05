@@ -1,4 +1,8 @@
 
+ alter table billschs  ADD COLUMN gno varchar(40);
+
+ alter table payschs  ADD COLUMN gno varchar(40);
+
   drop view if  exists r_billschs cascade ; 
  create or replace view r_billschs as select  
   itm.itm_name  itm_name ,

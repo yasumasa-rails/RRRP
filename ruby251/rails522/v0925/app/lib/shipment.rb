@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #shipment
 # 2099/12/31を修正する時は　2100/01/01の修正も
-module Shipmeny
+module Shipment
 	extend self
 	def proc_mkshpinsts screenCode,clickIndex  ###screenCode:r_purords,r_prdords
 		pagedata = []
@@ -38,7 +38,7 @@ module Shipmeny
 			&
 			ActiveRecord::Base.connection.select_all(strsql).each do |inout|
 				allshpqty = inout["qty"].to_f
-				opeitm = Operation.proc_get_opeitms_rec(inout["itms_id"],nil,inout["processseq"],nil)
+				opeitm = RorBlkctl.proc_get_opeitms_rec(inout["itms_id"],nil,inout["processseq"],nil)
 				strsql = %Q&select max(lot.lotstkhist_starttime) starttime,
 							max(lot.lotstkhist_itm_id) itms_id,max(lot.lotstkhist_processseq) processseq,
 							lot.lotstkhist_shelfno_id shelfnos_id,
@@ -177,7 +177,7 @@ module Shipmeny
 			stkinout["alloctbls_id"] = r_outstks["outstk_alloctbl_id"]
 			stkinout["inoutflg"] = "shp"
 			packnos =[{:packno=>r_outstks["outstk_packno"]}]
-			instk_ids = Operation.proc_mk_instks_rec stkinout,packnos,"add"
+			instk_ids = Operation.proc_mk_instks_rec stkinout,"add"
 			command_c["shpact_instk_id"] = instk_ids[0]
 			command_c[:sio_code] =  command_c[:sio_viewname] =  "r_shpacts"
 			command_c[:sio_message_contents] = nil
@@ -361,7 +361,8 @@ end
 			command_c["shpinst_tax"] = 0
 			command_c["shpinst_amt"] = 0
 		end
-		reqparams = RorBlkctl.proc_update_table  command_c,1
+		###reqparams = RorBlkctl.proc_update_table  command_c,1
+		RorBlkctl.proc_private_aud_rec   command_c,1,nil,nil,nil
 	end
 
 	def reset_shpords outstk,shp,pare,screenCode,packqty
@@ -384,7 +385,8 @@ end
 			command_c["shpord_qty"] = qty
 			command_c["shpord_amt"] = qty * command_c["shpsch_price"].to_f
 			###tax 未設定
-			RorBlkctl.proc_update_table  command_c,1
+			###RorBlkctl.proc_update_table  command_c,1
+			RorBlkctl.proc_private_aud_rec   command_c,1,nil,nil,nil
 			stkinout["processseq"] = command_c["shpord_processseq"]
 			stkinout["itms_id"] = command_c["shpord_itm_id"]
 			stkinout["prjnos_id"] = command_c["shpord_prjno_id"]
@@ -407,7 +409,8 @@ end
 				command_c["shpord_qty"] = qty
 				command_c["shpord_amt"] = qty * command_c["shpsch_price"].to_f
 				###tax 未設定
-				RorBlkctl.proc_update_table  command_c,1
+				###RorBlkctl.proc_update_table  command_c,1
+				RorBlkctl.proc_private_aud_rec   command_c,1,nil,nil,reqparams
 				stkinout["processseq"] = command_c[tblname.chop+"_processseq"]
 				stkinout["itms_id"] = command_c["shpord_itm_id"]
 				stkinout["prjnos_id"] = command_c["shpord_prjno_id"]
@@ -448,7 +451,8 @@ end
 						command_c["shpord_qty"] = qty
 						command_c["shpord_amt"] = qty * command_c["shpord_price"].to_f
 						###tax 未設定
-						RorBlkctl.proc_update_table  command_c,1
+						###RorBlkctl.proc_update_table  command_c,1
+						RorBlkctl.proc_private_aud_rec   command_c,1,nil,nil,nil
 						stkinout["processseq"] = command_c["shpord_processseq"]
 						stkinout["itms_id"] = command_c["shpord_itm_id"]
 						stkinout["prjnos_id"] = command_c["shpord_prjno_id"]
@@ -466,8 +470,9 @@ end
 	
 	###shpschs,shpords用
 	def proc_create_shp req,email,pare_loca_id,parent,shelfnos_id_to 
-			###shpschs shpordsの時   shpinstsはmkshpinstsで対応
+			###自分自身のshpschs shpordsを作成   shpinstsはmkshpinstsで対応親から子のshpinsts作成
 			command_c = {}
+			opeitm = {}
 			tblnamechop = "shp#{yield}"
 			command_c[:sio_code] =  command_c[:sio_viewname] =  "r_#{tblnamechop}s"
 			command_c[:sio_message_contents] = nil
@@ -477,26 +482,24 @@ end
 			strsql = %Q% select pobject_code_sfd from  func_get_screenfield_grpname('#{email}','r_#{tblnamechop}s')
 					%
 			fields = ActiveRecord::Base.connection.select_values(strsql) 
-			opeitm_id = {}
-			strsql = %Q& select ord.* from r_#{req["tblname"]} ord	where ord.id = #{req["tblid"]}
+			strsql = %Q& select ord.* from #{req["tblname"]} ord	where ord.id = #{req["tblid"]}
 				&
 			ActiveRecord::Base.connection.select_one(strsql).each do |key,val|
 					if key == "id" 
 						command_c[key] = ""
 						command_c["#{tblnamechop}_id"] = "" 
 					else
-						if fields.index(key)
-							command_c[key] = val
+						new_key = tblnamechop + "_" +key.sub("s_id","_id")
+						if fields.index(new_key)
+								command_c[new_key] = val
 						else
-							if fields.index(key.sub("#{req["tblname"].chop}","#{tblnamechop}"))
-								command_c[key.sub("#{req["tblname"].chop}","#{tblnamechop}")] = val
-							else
-								case key.to_s
-								when "opeitm_itm_id"
-									command_c["#{tblnamechop}_itm_id"] = val
-								when "opeitm_processseq"
-									command_c["#{tblnamechop}_processseq"] = val
-								end
+							if  key.to_s == "opeitms_id"   ###shpxxxsではopeitmは使用しない。
+									strsql = %Q&
+										select * from opeitms where id = #{val}
+									&
+									opeitm = ActiveRecord::Base.connection.select_one(strsql) 
+									command_c["#{tblnamechop}_itm_id"] = opeitm["itms_id"]
+									command_c["#{tblnamechop}_processseq"] = opeitm["processseq"]
 							end
 						end
 					end
@@ -523,18 +526,26 @@ end
 					###日付、数量による再設定
 				else
 					command_c["#{tblnamechop}_price"] = 0 	
-					command_c["#{tblnamechop}_amt"] = 0 	
+					if tblnamechop =~ /sch/
+						command_c["#{tblnamechop}_amt_sch"] = 0
+					else
+						command_c["#{tblnamechop}_amt"] = 0
+						command_c["#{tblnamechop}_crr_id_#{tblnamechop}"] = 0 	
+					end
 					command_c["#{tblnamechop}_tax"] = 0 	
-					command_c["#{tblnamechop}_crr_id"] = 0 	
 				end
 			else
-				command_c["#{tblnamechop}_price"] = 0 	
-				command_c["#{tblnamechop}_amt"] = 0 	
-				command_c["#{tblnamechop}_tax"] = 0 	
-				command_c["#{tblnamechop}_crr_id"] = 0 	
+				command_c["#{tblnamechop}_price"] = 0 	 	
+				if tblnamechop =~ /sch/
+					command_c["#{tblnamechop}_amt_sch"] = 0
+				else
+					command_c["#{tblnamechop}_amt"] = 0
+					command_c["#{tblnamechop}_crr_id_#{tblnamechop}"] = 0 
+				end
+				command_c["#{tblnamechop}_tax"] = 0 		
 			end	
 			stkinout = {}
-			opeitm = proc_get_opeitms_rec(command_c[tblnamechop+"_itm_id"],nil,command_c[tblnamechop+"_processseq"],nil)
+			###opeitm = RorBlkctl.proc_get_opeitms_rec(command_c[tblnamechop+"_itm_id"],nil,command_c[tblnamechop+"_processseq"],nil)
 			packqty = command_c["opeitm_packqty"] = opeitm["packqty"].to_f
 	
 			stkinout["expiredate"] = command_c[tblnamechop+"_expiredate"]
@@ -558,7 +569,7 @@ end
 				 ###stkinout["qty"] = command_c["#{tblnamechop}_qty"]  
 				 ###stkinout["qty_sch"] = 0 
 			end	
-			proc_mk_outstks_rec stkinout,"add"
+			Operation.proc_mk_outstks_rec stkinout,"add"
 	
 			strsql = %Q&select id from shelfnos where locas_id_shelfno = #{command_c["#{tblnamechop}_loca_id_to"]}
 												and code = 'consume'
@@ -566,7 +577,8 @@ end
 			shelfnos_id_to = ActiveRecord::Base.connection.select_value(strsql)
 			stkinout["shelfnos_id_in"] = (shelfnos_id_to||=0)
 			Operation.proc_mk_instks_rec stkinout,"add"
-			reqparams = RorBlkctl.proc_update_table  command_c,1
+			###reqparams = RorBlkctl.proc_update_table  command_c,1
+			reqparams = RorBlkctl.proc_private_aud_rec   command_c,1,nil,nil,nil
 	end	
 	
 	def proc_consume_self_sch_parts rec,paretblname,parent   ###tblname like %schs
@@ -617,7 +629,7 @@ end
 			stkinout["qty_sch"] = stkinout["qty"]
 			stkinout["qty"] = 0
 			stkinout["qty_stk"] = 0
-			proc_mk_outstks_rec stkinout,"add"
+			Operation.proc_mk_outstks_rec stkinout,"add"
 		end
 	end
 
@@ -651,7 +663,7 @@ end
 		stkinout["qty"] = stkinout["qty"].to_f 
 		stkinout["qty_sch"] = 0
 		stkinout["qty_stk"] = 0
-		proc_mk_outstks_rec stkinout,"add"
+		Operation.proc_mk_outstks_rec stkinout,"add"
 	end
 
 

@@ -539,7 +539,7 @@ extend self
 														if owner == true
 															"1"
 														else 
-															if field["pobject_code_sfd"] =~ /_code|_name|_sno|_cno|_go/
+															if field["pobject_code_sfd"] =~ /_code|_name|_sno|_cno|_go|person_id_upd/
 																"1"
 															else
 																if command_r["screenfield_indisp"] != "0"   ###必須項目

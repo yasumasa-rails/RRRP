@@ -32,6 +32,20 @@ module RorBlkctl
 			end
 		end
 	end
+	
+	def proc_get_opeitms_rec itms_id,locas_id,processseq = nil,priority = nil  ###
+		strsql = %Q& select * from opeitms where itms_id = #{itms_id} 
+					#{if locas_id then " and locas_id = " + locas_id.to_s else "" end}
+				   #{if processseq then " and processseq = " + processseq.to_s else "" end}
+				   #{if priority then " and priority = " + priority.to_s else "" end}
+				   and expiredate > current_date  order by  priority desc &
+		newrec = ActiveRecord::Base.connection.select_one(strsql)
+		if newrec
+			return newrec
+		else
+			return nil
+        end
+	end
 
 	def prc_get_viewrec_by_tblname_tblid tblname,tblid
 		strsql = %Q&select * from r_#{tblname} where id = #{tblid}
@@ -155,9 +169,9 @@ module RorBlkctl
 				###
 				###➁
 				###
-				Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
-				###reqparams["segment"]  = "trngantts"   ###Operation.：prdordsのtrngantts作成
-				###processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams				
+				###Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
+				reqparams["segment"]  = "trngantts"   ###Operation.：prdordsのtrngantts作成
+				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams				
 				###
 				###➂
 				###
@@ -178,10 +192,15 @@ module RorBlkctl
 				# ###ordではsnoが入らないときがある。###sno,cnoでの前の状態との関係
 				###
 			when /prdinsts|prdreplyinputs/ 
-				Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
-
+				###Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
+				reqparams["segment"]  = "trngantts"   ###Operation.：prdordsのtrngantts作成
+				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams				
+				
 			when /prdacts/ 
-				Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
+				###Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
+				reqparams["segment"]  = "trngantts"   ###Operation.：prdordsのtrngantts作成
+				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams				
+				
 				reqparams["segment"]  = "consume_child_parts"  ###子部品の消費　金型の返却(未設定)　装置の解放(未設定)
 				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
@@ -217,9 +236,9 @@ module RorBlkctl
 				###
 				###➁
 				###
-				Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
-				###reqparams["segment"]  = "trngantts"   ##
-				###processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
+				###Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
+				reqparams["segment"]  = "trngantts"   ##
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 				###
 				###➂
 				###
@@ -238,10 +257,15 @@ module RorBlkctl
 
 				###
 			when /purinsts|purreplyinputs|purdlvs/  
-				Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
+				reqparams["segment"]  = "trngantts"   ##
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
+				###Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
 
 			when /puracts/   
-				Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
+				###Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
+				reqparams["segment"]  = "trngantts"   ##
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
+				
 				reqparams["segment"]  = "consume_child_parts"
 				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
@@ -256,14 +280,14 @@ module RorBlkctl
 				processreqs_id ,reqparams = Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
 			when /custinsts|custdlvs/  
-				Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
-				###reqparams["segment"]  = "trngantts"   ###Operation.：
-				###processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
+				###Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
+				reqparams["segment"]  = "trngantts"   ###Operation.：
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
 			when /custacts/   
-				Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
-				###reqparams["segment"]  = "trngantts"   ###Operation.
-				###processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
+				###Operation.proc_trngantts tblname,tblid,tblname,tblid,reqparams
+				reqparams["segment"]  = "trngantts"   ###Operation.
+				processreqs_id ,reqparams= Operation.proc_processreqs_add tblname,@src_tbl[:id],tblname,@src_tbl[:id],reqparams	
 
 			when /^custs$|suppliers|workplaces/
 				reqparams["segment"] = "createtable"
@@ -471,14 +495,6 @@ module RorBlkctl
 							rec[tblnamechop+"_gno"] = @src_tbl[:gno] = ControlFields.proc_field_gno(rec["id"])
 						end
 					else
-						# case j_to_sfld   ###j_to_sfld.split("_")[0]   sno又はcno
-						# when /^sno_|^cno_/
-						# 	sno_strsql = %Q%select id from #{j_to_sfld.split("_")[1]}s where  #{j_to_sfld.split("_")[0]} = '#{k}'
-						# 				for update
-						# 	%
-						# 	srctblname = j_to_sfld.split("_")[1] + "s"
-						# 	srctblid =  ActiveRecord::Base.connection.select_value(sno_strsql)  ###ロックをかけておく
-						# end		
 					end
 				end
             end   ## if j_to_s.

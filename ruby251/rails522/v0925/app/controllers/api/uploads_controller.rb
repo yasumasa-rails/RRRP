@@ -60,7 +60,7 @@ module Api
                         end  
                         if yupcheckcode[field] and val != ""
                             jparams["yupcheckcode"] = %Q%{"#{field}":"#{val}"}%
-                            jparams = ControlFields.proc_judge_check_code jparams
+                            jparams = ControlFields.proc_judge_check_code jparams,field,yupcheckcode[field]
                             if jparams[:err] != ""
                                 jparams[:parse_linedata]["confirm_gridmessage"] = jparams[:err]
                                 status = false 

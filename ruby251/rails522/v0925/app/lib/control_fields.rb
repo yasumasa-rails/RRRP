@@ -498,7 +498,7 @@ module ControlFields
 				strsql = "select id from locas where code = '#{linedata["loca_code_nditm"]}' and expiredate > current_date"
 				locas_id = ActiveRecord::Base.connection.select_value(strsql)
 				if locas_id
-					opeitms = Operation.proc_get_opeitms_rec itms_id,locas_id,processseq = nil,priority = nil
+					opeitms = RorBlkctl.proc_get_opeitms_rec itms_id,locas_id,processseq = nil,priority = nil
 					if opeitms
 						checkstatus = true
 					else
@@ -543,19 +543,19 @@ module ControlFields
 			case key
 				when /opeitm_processseq$/
 					@para["parent_processseq"] = val
-				when /#{paretblname.chop}_starttime/
+				when /starttime/
 					@para["parent_starttime"] = val.to_date
-				when  /#{paretblname.chop}_chrg_id/
+				when  /chrgs_id/
 					@para["chrgs_id"] = val
-				when /#{paretblname.chop}_qty$/
+				when /qty$/
 					@para["parent_qty"] = val.to_f
-				when /#{paretblname.chop}_qty_sch$/
+				when /qty_sch$/
 					@para["parent_qty_sch"] = val.to_f
-				when /#{paretblname.chop}_qty_stk$/
+				when /qty_stk$/
 					@para["parent_qty_stk"] = val.to_f
-				when /#{paretblname.chop}_qty_bal$/
+				when /qty_bal$/
 					@para["parent_qty_bal"] = val.to_f
-				when  /#{paretblname.chop}_prjno_id/
+				when  /prjnos_id/
 					@para["parent_prjno_id"] = val
 				when  /opeitm_packqty/
 					@para["parent_packqty"] = val.to_f
